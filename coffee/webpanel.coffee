@@ -12,6 +12,7 @@
 			return
 	}
 
+
 	ko.bindingHandlers.inputClear = {
 	init: (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) ->
 
@@ -520,7 +521,7 @@
 
 	actionButtonHtml = '<ul class="b_button_action" data-bind="css: $data.firstActionClass">' +
 		'<li class="g_first" data-bind="click: $data.doFirstAction">' +
-			'<img data-bind="attr: { src: firstActionIcon }">' +
+			'<i></i>' +
 		'</li>' +
 		'<li class="g_last drop_down" data-bind="click: $data.generateActionList">' +
 			'<img src="/img/icons/action/drop_down.png">' +
