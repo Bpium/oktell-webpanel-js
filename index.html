@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>Тестовая страничка для вебпанели</title>
+
+	<link rel="stylesheet" href="/css/webpanel.css"/>
+
+	<script type="text/javascript" src="/jslib/vendor/jquery-1.9.1.js"></script>
+	<script type="text/javascript" src="/jslib/vendor/knockout-2.2.1.js"></script>
+	<script type="text/javascript" src="/jslib/vendor/lodash.js"></script>
+	<script type="text/javascript" src="/jslib/vendor/oktell.js"></script>
+
+
+	<script type="text/javascript">
+		window.oktell = new Oktell
+	</script>
+
+	<script type="text/javascript" src="/coffee/webpanel.js"></script>
+
+	<script type="text/javascript">
+		$(function(){
+			var stateEl = $('#connectionState');
+			stateEl.text('Соединение');
+			var oktell = window.oktell
+
+			oktell.on('disconnect', function(reason){
+				stateEl.text('Ошибка')
+			});
+
+			oktell.connect({
+				url: '192.168.0.61',
+				login: 'a6',
+				password: 'a6',
+				debugMode: true,
+				openTimeout: 5000,
+				expires: 84600,
+				queryTimeout: 5000,
+				defaultAvatar: '/img/noavatar.png',
+				defaultAvatar32x32: '/img/noavatar.png',
+				defaultAvatar64x64: '/img/noavatar.png',
+				callback: function(data) {
+					if ( data.result ) {
+						stateEl.text('Онлайн')
+						oktell.trigger('oktellConnected')
+					} else {
+						stateEl.text('Ошибка')
+					}
+				}
+			});
+
+			$.oktellPanel({
+				oktell: oktell,
+				dynamic: true,
+				position: 'right',
+				debug: true
+			});
+			$('.userPhone').oktellButton()
+		});
+	</script>
+
+</head>
+<body>
+	<div style="width: 500px; height: 500px;">
+		<span>Статус:</span> <span id="connectionState">Соединение</span>
+		<span class="userPhone" data-phone="103"></span>
+	</div>
+
+</body>
+</html>
