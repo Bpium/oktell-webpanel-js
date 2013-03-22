@@ -1,0 +1,65 @@
+<div class="l_panel j_panel">
+	<div class="i_panel_bookmark">
+		<div class="i_panel_bookmark_bg"></div>
+	</div>
+	<div class="h_panel_bg">
+		<div class="h_padding" style="height: 100%">
+			<div class="b_marks i_conference" data-bind="visible: usersService.abonentsCount">
+				<div class="b_marks_noise">
+					<p class="b_marks_header">
+						<span class="b_marks_label" data-bind="text: langs.inTalk"></span>
+						<span class="b_marks_time" style="display: none;">2:35</span>
+					</p>
+					<table>
+						<tbody data-bind="template: { name: 'oktellWebPanelUserTemplate', foreach: usersService.abonents }"></tbody>
+					</table>
+				</div>
+			</div>
+			<div class="b_marks i_flash" data-bind="visible: usersService.holdedAbonentsCount">
+				<div class="b_marks_noise">
+					<p class="b_marks_header">
+						<span class="b_marks_label" data-bind="text: langs.onHold"></span>
+						<span class="b_marks_time">15:45</span>
+					</p>
+					<table class="j_table_favorite">
+						<tbody data-bind="template: { name: 'oktellWebPanelUserTemplate', foreach: usersService.holdedAbonents }"></tbody>
+					</table>
+				</div>
+			</div>
+			<div class="b_marks i_flash" data-bind="visible: usersService.queueAbonents().length">
+				<div class="b_marks_noise">
+					<p class="b_marks_header">
+						<span class="b_marks_label" data-bind="text: langs.queue"></span>
+					</p>
+					<table class="j_table_queue">
+						<tbody data-bind="template: { name: 'oktellWebPanelUserTemplate', foreach: usersService.queueAbonents }"></tbody>
+					</table>
+				</div>
+			</div>
+			<div class="b_inconversation j_phone_block">
+				<table class="j_table_phone" style="width: 100%">
+					<tbody></tbody>
+				</table>
+			</div>
+			<div class="b_marks i_phone">
+				<div class="h_shadow_bottom">
+					<div class="h_phone_number_input">
+						<div class="i_phone_state_bg"></div>
+						<div class="h_input_padding">
+							<div class="i_phone_popup_button">
+								<i></i>
+							</div>
+							<input class="b_phone_number_input" type="text"
+								   data-bind="attr: { placeholder: langs.inputPlaceholder }, hasfocus: panelNumberHasFocus, value: actionList.panelNumber, inputClear: actionList.panelNumber, valueUpdate: 'afterkeydown'">
+						</div>
+					</div>
+				</div>
+			</div>
+			<div style="height: 100%; overflow: hidden;" data-bind="jScroll: true">
+				<table class="b_main_list">
+					<tbody data-bind="template: { name: 'oktellWebPanelUserTemplate', foreach: usersService.usersForPanel }, "></tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>

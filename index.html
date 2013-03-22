@@ -10,6 +10,17 @@
 	<script type="text/javascript" src="/jslib/vendor/knockout-2.2.1.js"></script>
 	<script type="text/javascript" src="/jslib/vendor/lodash.js"></script>
 	<script type="text/javascript" src="/jslib/vendor/oktell.js"></script>
+	<script type="text/javascript" src="/jslib/jqueryPlugins/iScroll.js"></script>
+
+
+	<script type="text/javascript" src="/coffee/utils.js"></script>
+	<script type="text/javascript" src="/coffee/koBindings/hoverSelect.js"></script>
+	<script type="text/javascript" src="/coffee/koBindings/inputClear.js"></script>
+	<script type="text/javascript" src="/coffee/koBindings/jScroll.js"></script>
+	<script type="text/javascript" src="/coffee/class/ActionList.js"></script>
+	<script type="text/javascript" src="/coffee/class/Panel.js"></script>
+	<script type="text/javascript" src="/coffee/class/User.js"></script>
+	<script type="text/javascript" src="/coffee/class/UsersService.js"></script>
 
 
 	<script type="text/javascript">
@@ -32,7 +43,7 @@
 				url: '192.168.0.61',
 				login: 'a6',
 				password: 'a6',
-				debugMode: true,
+				//debugMode: true,
 				openTimeout: 5000,
 				expires: 84600,
 				queryTimeout: 5000,
@@ -48,6 +59,8 @@
 					}
 				}
 			});
+
+			[]
 
 			$.oktellPanel({
 				oktell: oktell,
@@ -67,4 +80,7 @@
 	</div>
 
 </body>
+<script type="text/html" id="">
+
+</script>
 </html>
