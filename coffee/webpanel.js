@@ -66,12 +66,18 @@
   popupHtml = loadTemplate('/templates/numpad.html');
   panelWasInitialized = false;
   initPanel = function(opts) {
-    var closeClass, critWidth, cssPos, curOpt, element, elementWidth, hidePanel, killPanelHideTimer, mouseOnPanel, newCssPos, openClass, panelBookmarkEl, panelHideTimer, panelPos, panelStatus, walkAway, xPos, xStartPos,
+    var $user, $userActionButton, closeClass, critWidth, cssPos, curOpt, element, elementWidth, hidePanel, killPanelHideTimer, mouseOnPanel, newCssPos, oldBinding, openClass, panelBookmarkEl, panelHideTimer, panelPos, panelStatus, walkAway, xPos, xStartPos,
       _this = this;
 
     panelWasInitialized = true;
     options = $.extend(defaultOptions, opts || {});
-    $('body').append('<script type="text/html" id="oktellWebPanelUserTemplate" >' + userTemplateHtml + '</script>');
+    $user = $(userTemplateHtml);
+    $userActionButton = $(actionButtonHtml);
+    oldBinding = $userActionButton.attr('data-bind');
+    $userActionButton.attr('data-bind', oldBinding + ', visible: $data.actionBarIsVisible');
+    $user.find('td.b_contact_title').append($userActionButton);
+    window.u = $user;
+    $('body').append('<script type="text/html" id="oktellWebPanelUserTemplate" >' + $user[0].outerHTML + '</script>');
     actionListEl = $(actionListHtml);
     $('body').append(actionListEl);
     oktell = getOptions().oktell;
@@ -255,6 +261,7 @@
   afterOktellConnect = function() {
     var el, _i, _len;
 
+    oktellConnected = true;
     for (_i = 0, _len = elsForInitButtonAfterConnect.length; _i < _len; _i++) {
       el = elsForInitButtonAfterConnect[_i];
       addActionButtonToEl(el);

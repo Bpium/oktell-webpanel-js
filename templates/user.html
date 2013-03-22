@@ -1,5 +1,4 @@
-<tr class="b_contact"
-	data-bind="hoverSelect: true, actionBar: $data, css: { 'm_offline': $data.isOffline, 'm_busy': $data.isBusy }">
+<tr class="b_contact" data-bind="hoverSelect: true, actionBar: $data, css: { 'm_offline': $data.isOffline, 'm_busy': $data.isBusy }">
 	<td class="b_contact_avatar">
 		<img data-bind="attr: { src: $data.avatarLink32x32 }">
 
@@ -7,16 +6,7 @@
 	</td>
 	<td class="b_contact_title">
 		<div class="wrapword">
-			<a><b data-bind="text: $data.name"></b><span class="o_number"
-														 data-bind="text: $data.showedNumber"></span></a>
+			<a><b data-bind="text: $data.name"></b><span class="o_number" data-bind="text: $data.showedNumber"></span></a>
 		</div>
-		<ul class="b_button_action" data-bind="visible: $data.actionBarIsVisible, css: $data.firstActionClass">
-			<li class="g_first" data-bind="click: $data.doFirstAction">
-				<img data-bind="attr: { src: firstActionIcon }">
-			</li>
-			<li class="g_last drop_down" data-bind="click: $data.generateActionList">
-				<img src="/img/icons/action/drop_down.png">
-			</li>
-		</ul>
 	</td>
 </tr>

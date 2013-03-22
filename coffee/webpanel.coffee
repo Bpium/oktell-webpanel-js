@@ -79,6 +79,7 @@
 	###############################################################
 	userTemplateHtml = loadTemplate '/templates/user.html'
 
+
 	################################################################
 	# panel html
 	################################################################
@@ -101,7 +102,15 @@
 
 		options = $.extend defaultOptions, opts or {}
 
-		$('body').append '<script type="text/html" id="oktellWebPanelUserTemplate" >' + userTemplateHtml + '</script>'
+		$user = $(userTemplateHtml)
+		$userActionButton = $(actionButtonHtml)
+		oldBinding = $userActionButton.attr 'data-bind'
+		$userActionButton.attr 'data-bind', oldBinding + ', visible: $data.actionBarIsVisible'
+		$user.find('td.b_contact_title').append $userActionButton
+
+		window.u = $user
+
+		$('body').append '<script type="text/html" id="oktellWebPanelUserTemplate" >' + $user[0].outerHTML + '</script>'
 
 		actionListEl = $(actionListHtml)
 		$('body').append actionListEl
@@ -286,6 +295,7 @@
 	elsWithButton = []
 
 	afterOktellConnect = ->
+		oktellConnected = true
 		for el in elsForInitButtonAfterConnect
 			addActionButtonToEl el
 		elsForInitButtonAfterConnect = []

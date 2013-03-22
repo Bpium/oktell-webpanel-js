@@ -93,6 +93,7 @@ User = (function() {
         return _this.loadActions();
       }
     });
+    this.loadActions();
     return;
   }
 

@@ -84,4 +84,6 @@ class User
 			if @hovered()
 				@loadActions()
 
+		@loadActions()
+
 		return
