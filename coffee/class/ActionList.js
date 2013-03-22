@@ -83,7 +83,19 @@ ActionList = (function() {
     _.each(this.allItems, function(v, k) {
       v.id = k;
       v.firstClass = ko.observable(false);
-      return v.lastClass = ko.observable(false);
+      v.lastClass = ko.observable(false);
+      return v.css = ko.computed(function() {
+        var css;
+
+        css = 'i_' + k;
+        if (v.firstClass()) {
+          css += ' g_first';
+        }
+        if (v.lastClass()) {
+          css += ' g_last';
+        }
+        return css;
+      });
     });
     this.actions = ko.observableArray([]);
     this.target = ko.observable();

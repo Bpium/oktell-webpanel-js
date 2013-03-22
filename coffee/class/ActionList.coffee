@@ -26,6 +26,14 @@ class ActionList
 			v.id = k
 			v.firstClass = ko.observable false
 			v.lastClass = ko.observable false
+			v.css = ko.computed =>
+				css = 'i_'+k
+				if v.firstClass()
+					css += ' g_first'
+				if v.lastClass()
+					css += ' g_last'
+				css
+
 
 
 		@actions = ko.observableArray []
