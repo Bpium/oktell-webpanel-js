@@ -10,43 +10,6 @@ ActionList = (function() {
       call: {
         icon: '/img/icons/action/call.png',
         iconWhite: '/img/icons/action/white/call.png',
-        text: 'Позвонить'
-      },
-      conference: {
-        icon: '/img/icons/action/confinvite.png',
-        iconWhite: '/img/icons/action/white/confinvite.png',
-        text: 'Конференция'
-      },
-      transfer: {
-        icon: '/img/icons/action/transfer.png',
-        text: 'Перевести'
-      },
-      toggle: {
-        icon: '/img/icons/action/toggle.png',
-        text: 'Переключиться'
-      },
-      intercom: {
-        icon: '/img/icons/action/intercom.png',
-        text: 'Интерком'
-      },
-      endCall: {
-        icon: '/img/icons/action/endcall.png',
-        iconWhite: '/img/icons/action/white/endcall.png',
-        text: 'Завершить'
-      },
-      ghostListen: {
-        icon: '/img/icons/action/ghost_monitor.png',
-        text: 'Прослушка'
-      },
-      ghostHelp: {
-        icon: '/img/icons/action/ghost_help.png',
-        text: 'Помощь'
-      }
-    };
-    this.allItems = {
-      call: {
-        icon: '/img/icons/action/call.png',
-        iconWhite: '/img/icons/action/white/call.png',
         text: this.langs.call
       },
       conference: {
@@ -118,6 +81,7 @@ ActionList = (function() {
       return _this.showList(ul);
     };
     this.doActionByClick = function(item) {
+      _this.menu.hide();
       return _this.doAction(item);
     };
     this.doAction = function(item, target) {
@@ -179,7 +143,7 @@ ActionList = (function() {
           return items.push(i);
         }
       });
-      if (items.length > 1) {
+      if (items.length > 0) {
         _.last(items).lastClass(true);
       }
       return items;

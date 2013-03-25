@@ -62,7 +62,9 @@ User = (function() {
       if (state === 0 || state === 7 || !_this.number) {
         _this.actions([]);
       } else {
-        _this.loadActions();
+        setTimeout(function() {
+          return _this.loadActions();
+        }, 1);
       }
     });
     this.isOffline = ko.computed(function() {

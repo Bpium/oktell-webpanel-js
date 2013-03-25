@@ -1,4 +1,8 @@
 class UsersService
+
+	log: ->
+		console.log.apply console, arguments
+
 	# find user or create fantom
 	getUser: (data, dontRemember) ->
 		if typeof data is 'string' or typeof data is 'number'
@@ -155,8 +159,9 @@ class UsersService
 				#log 'pbxnumberstatechanged', data
 				nums = []
 				_.each data.numbers, (n) =>
-					if @userByNumber[n.num.toString()]
-						@userByNumber[n.num.toString()].state( parseInt( n.numstateid ) )
+					if @allUsersByNumber[n.num.toString()]
+						#@log 'change number state' , n.num.toString(), parseInt( n.numstateid ), @allUsersByNumber[n.num.toString()]
+						@allUsersByNumber[n.num.toString()].state( parseInt( n.numstateid ) )
 
 			oktell.on 'abonentsChange', ( abonents ) =>
 				#log 'Oktell abonentsChange', abonents
@@ -179,11 +184,12 @@ class UsersService
 			_.each oktell.getUsers(), (u) =>
 				user = new User( @oktell, @actionList, u )
 
-				strNumber = u.number?.toString()
+				if u.number
+					strNumber = u.number.toString()
 
 				if not user.avatarLink32x32
 					user.avatarLink32x32 = @defaultAvatar32
-				if u.number
+				if strNumber
 					@userByNumber[strNumber] = user
 
 				if u.id.toLowerCase() isnt myId.toLowerCase()
@@ -191,7 +197,8 @@ class UsersService
 				else
 					@me = user
 
-				@allUsersByNumber[strNumber] = user
+				if strNumber
+					@allUsersByNumber[strNumber] = user
 
 			setAbonents oktell.getAbonents()
 			setHold oktell.getHoldInfo()

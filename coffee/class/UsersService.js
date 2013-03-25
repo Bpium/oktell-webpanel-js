@@ -2,6 +2,10 @@
 var UsersService;
 
 UsersService = (function() {
+  UsersService.prototype.log = function() {
+    return console.log.apply(console, arguments);
+  };
+
   UsersService.prototype.getUser = function(data, dontRemember) {
     var fantom, strNumber;
 
@@ -179,8 +183,8 @@ UsersService = (function() {
 
         nums = [];
         return _.each(data.numbers, function(n) {
-          if (_this.userByNumber[n.num.toString()]) {
-            return _this.userByNumber[n.num.toString()].state(parseInt(n.numstateid));
+          if (_this.allUsersByNumber[n.num.toString()]) {
+            return _this.allUsersByNumber[n.num.toString()].state(parseInt(n.numstateid));
           }
         });
       });
@@ -197,14 +201,16 @@ UsersService = (function() {
       myId = oktellInfo.userid;
       _this.myNumber = (_ref = oktellInfo.number) != null ? _ref.toString() : void 0;
       _.each(oktell.getUsers(), function(u) {
-        var strNumber, user, _ref1;
+        var strNumber, user;
 
         user = new User(_this.oktell, _this.actionList, u);
-        strNumber = (_ref1 = u.number) != null ? _ref1.toString() : void 0;
+        if (u.number) {
+          strNumber = u.number.toString();
+        }
         if (!user.avatarLink32x32) {
           user.avatarLink32x32 = _this.defaultAvatar32;
         }
-        if (u.number) {
+        if (strNumber) {
           _this.userByNumber[strNumber] = user;
         }
         if (u.id.toLowerCase() !== myId.toLowerCase()) {
@@ -212,7 +218,9 @@ UsersService = (function() {
         } else {
           _this.me = user;
         }
-        return _this.allUsersByNumber[strNumber] = user;
+        if (strNumber) {
+          return _this.allUsersByNumber[strNumber] = user;
+        }
       });
       setAbonents(oktell.getAbonents());
       setHold(oktell.getHoldInfo());

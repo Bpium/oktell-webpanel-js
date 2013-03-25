@@ -51,7 +51,9 @@ class User
 			if state is 0 or state is 7 or not @number
 				@actions []
 			else
-				@loadActions()
+				setTimeout =>
+					@loadActions()
+				,1
 			#log 'state change for ' + @name + ': ' + @state.peek(), @actions.peek()
 			return
 

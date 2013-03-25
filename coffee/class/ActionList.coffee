@@ -2,16 +2,6 @@ class ActionList
 	constructor: ( oktell, $menu ) ->
 
 		@allItems =
-			call: { icon: '/img/icons/action/call.png', iconWhite: '/img/icons/action/white/call.png', text: 'Позвонить' }
-			conference : { icon: '/img/icons/action/confinvite.png', iconWhite: '/img/icons/action/white/confinvite.png', text: 'Конференция' }
-			transfer : { icon: '/img/icons/action/transfer.png', text: 'Перевести' }
-			toggle : { icon: '/img/icons/action/toggle.png', text: 'Переключиться' }
-			intercom : { icon: '/img/icons/action/intercom.png', text: 'Интерком' }
-			endCall : { icon: '/img/icons/action/endcall.png', iconWhite: '/img/icons/action/white/endcall.png', text: 'Завершить' }
-			ghostListen : { icon: '/img/icons/action/ghost_monitor.png', text: 'Прослушка' }
-			ghostHelp : { icon: '/img/icons/action/ghost_help.png', text: 'Помощь' }
-
-		@allItems =
 			call: { icon: '/img/icons/action/call.png', iconWhite: '/img/icons/action/white/call.png', text: @langs.call }
 			conference : { icon: '/img/icons/action/confinvite.png', iconWhite: '/img/icons/action/white/confinvite.png', text: @langs.conference }
 			transfer : { icon: '/img/icons/action/transfer.png', text: @langs.transfer }
@@ -62,6 +52,7 @@ class ActionList
 			@showList ul
 
 		@doActionByClick = (item) =>
+			@menu.hide()
 			@doAction item
 		@doAction = (item, target) =>
 
@@ -111,7 +102,7 @@ class ActionList
 						i.firstClass true
 					i.lastClass false
 					items.push i
-			if items.length > 1
+			if items.length > 0
 				_.last(items).lastClass true
 			return items
 
