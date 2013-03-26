@@ -163,7 +163,47 @@
 				</li>
 			</ul><br>
 			<br>
+            <ul style="z-index: 999; padding: 0px; font-size: 13px; font-family: Tahoma; top: 50px; left: 350px; visibility: visible; display: inline-block" class="b_actions_group_list">
+                <li class="i_call g_first" data-bind="click: $parent.doActionByClick, css: $data.css, hoverSelect: true" data-action="call">
+                    <i></i>
+                    <span data-bind="text: a.text">Позвонить</span>
+                </li>
 
+                <li class="i_conference" data-bind="click: $parent.doActionByClick, css: $data.css, hoverSelect: true" data-action="conference">
+                    <i></i>
+                    <span data-bind="text: a.text">Конференция</span>
+                </li>
+
+                <li class="i_intercom" data-bind="click: $parent.doActionByClick, css: $data.css, hoverSelect: true" data-action="intercom">
+                    <i></i>
+                    <span data-bind="text: a.text">Интерком</span>
+                </li>
+
+                <li class="i_toggle" data-bind="click: $parent.doActionByClick, css: $data.css, hoverSelect: true" data-action="intercom">
+                    <i></i>
+                    <span data-bind="text: a.text">toggle</span>
+                </li>
+
+                <li class="i_transfer" data-bind="click: $parent.doActionByClick, css: $data.css, hoverSelect: true" data-action="intercom">
+                    <i></i>
+                    <span data-bind="text: a.text">transfer</span>
+                </li>
+
+                <li class="i_endcall" data-bind="click: $parent.doActionByClick, css: $data.css, hoverSelect: true" data-action="intercom">
+                    <i></i>
+                    <span data-bind="text: a.text">endcall</span>
+                </li>
+
+                <li class="i_ghostlisten" data-bind="click: $parent.doActionByClick, css: $data.css, hoverSelect: true" data-action="intercom">
+                    <i></i>
+                    <span data-bind="text: a.text">ghostlisten</span>
+                </li>
+
+                <li class="i_ghosthelp g_last" data-bind="click: $parent.doActionByClick, css: $data.css, hoverSelect: true" data-action="intercom">
+                    <i></i>
+                    <span data-bind="text: a.text">ghosthelp</span>
+                </li>
+            </ul>
 
 		</div>
 	</div>
