@@ -34,9 +34,9 @@ do ($, ko)->
 
 	options = null
 	actionListEl = null
-	actionList = null
-	panel = null
-	usersService = null
+#	actionList = null
+#	panel = null
+#	usersService = null
 	oktell = null
 	oktellConnected = false
 	afterOktellConnect = null
@@ -49,14 +49,15 @@ do ($, ko)->
 
 	actionListHtml = loadTemplate '/templates/actionList.html'
 
-	ActionList.prototype.langs = langs.actions
+#	ActionList.prototype.langs = langs.actions
 	List.prototype.langs = langs.actions
 
-	Panel.prototype.langs = langs.panel
+#	Panel.prototype.langs = langs.panel
 
 	userTemplateHtml = loadTemplate '/templates/user.html'
 
 	CUser.prototype.template = userTemplateHtml.replace '<!--button-->', actionButtonHtml
+	CUser.prototype.buttonTemplate = actionButtonHtml
 
 
 	panelHtml = loadTemplate '/templates/panel.html'
@@ -92,24 +93,25 @@ do ($, ko)->
 		panelPos = getOptions().position
 		curOpt = {}
 
-		actionList = new ActionList(oktell, actionListEl)
+#		actionList = new ActionList(oktell, actionListEl)
 		#ko.applyBindings actionList, actionListEl[0]
 
-		usersService = new UsersService(oktell, actionList, afterOktellConnect, getOptions().debug)
-		window.usersService = usersService
+#		usersService = new UsersService(oktell, actionList, afterOktellConnect, getOptions().debug)
+#		window.usersService = usersService
 
-		panel = new Panel(actionList, usersService)
+#		panel = new Panel(actionList, usersService)
 
-		list = new List oktell, panelEl, actionListEl
-		window.list = list
 
 		$("body").append(panelEl)
 
 		panelEl.find(".h_input_padding").after popupHtml
 
-		ko.applyBindings panel, panelEl[0]
+		list = new List oktell, panelEl, actionListEl, afterOktellConnect, getOptions().debug
+		window.list = list
 
-		panel.afterRender(panelEl);
+		#ko.applyBindings panel, panelEl[0]
+
+		#panel.afterRender(panelEl);
 
 		if panelPos is "right"
 			panelEl.addClass("right");
@@ -246,28 +248,22 @@ do ($, ko)->
 					element.removeClass(openClass).addClass(closeClass)
 
 
-		$('.h_phone_number_input', panelEl).on 'click', ".i_phone_popup_button", (e) ->
-			inputBox = $(this).parent().parent()
-			popupKeypad = panelEl.find(".b_phone_keypad")
-			if popupKeypad.is(":visible")
-				popupKeypad.slideUp(200)
-			else
-				popupKeypad.slideDown(200)
+#		$('.h_phone_number_input', panelEl).on 'click', ".i_phone_popup_button", (e) ->
+#			inputBox = $(this).parent().parent()
+#			popupKeypad = panelEl.find(".b_phone_keypad")
+#			if popupKeypad.is(":visible")
+#				popupKeypad.slideUp(200)
+#			else
+#				popupKeypad.slideDown(200)
 
-		$(document).on "click", (e) =>
-			element = $(e.target);
-			if element.parents(".j_phone_keypad", panelEl).size() is 0 and element.parents(".h_phone_number_input", panelEl).size() is 0
-				$(".i_phone_number_bg_active", panelEl).removeClass("i_phone_number_bg_active", panelEl);
+#		$(document).on "click", (e) =>
+#			element = $(e.target);
+#			if element.parents(".j_phone_keypad", panelEl).size() is 0 and element.parents(".h_phone_number_input", panelEl).size() is 0
+#				$(".i_phone_number_bg_active", panelEl).removeClass("i_phone_number_bg_active", panelEl);
 
-		$('.b_phone_keypad li a', panelEl).bind 'click', (e) ->
-			e.preventDefault()
-			input = panelEl.find "input.b_phone_number_input"
-			input.focus()
-			input.val( input.val() + $(this).attr("href") )
-			input.change()
+
 
 	elsForInitButtonAfterConnect = []
-	elsWithButton = []
 
 	afterOktellConnect = ->
 		oktellConnected = true
@@ -279,10 +275,8 @@ do ($, ko)->
 		el.addClass(getOptions().buttonCss)
 		phone = el.attr('data-phone')
 		if phone
-			el.html(actionButtonHtml)
-			user = usersService.getUser phone
-			ko.applyBindings user, el.children()[0]
-		elsWithButton.push el
+			button = list.getUserButtonForPlagin phone
+			el.html button
 
 	addActionButtonToEl = (el) ->
 		if not oktellConnected

@@ -20,6 +20,7 @@ CUser = (function() {
     this.firstLiCssPrefix = 'm_button_action_';
     this.els = $();
     this.buttonEls = $();
+    this.loadActions();
     this.regexps = {
       name: /\{\{name\}\}/,
       number: /\{\{number\}\}/,
@@ -67,22 +68,34 @@ CUser = (function() {
   };
 
   CUser.prototype.getEl = function() {
-    var buttonEl, el,
-      _this = this;
+    var $el;
 
-    el = $(this.template.replace(this.regexps.name, this.nameHtml).replace(this.regexps.number, this.numberHtml).replace(this.regexps.avatarLink32x32, this.avatarLink32x32).replace(this.regexps.css, this.defaultAvatarCss));
-    this.els = this.els.add(el);
-    el.data('user', this);
-    buttonEl = el.find('.b_button_action');
-    this.buttonEls = this.buttonEls.add(buttonEl);
-    buttonEl.data('user', this);
-    buttonEl.children(':first').bind('click', function() {
+    $el = $(this.template.replace(this.regexps.name, this.nameHtml).replace(this.regexps.number, this.numberHtml).replace(this.regexps.avatarLink32x32, this.avatarLink32x32).replace(this.regexps.css, this.defaultAvatarCss));
+    this.els = this.els.add($el);
+    $el.data('user', this);
+    this.initButtonEl($el.find('.b_button_action'));
+    return $el;
+  };
+
+  CUser.prototype.initButtonEl = function($el) {
+    var _this = this;
+
+    this.buttonEls = this.buttonEls.add($el);
+    $el.data('user', this);
+    $el.children(':first').bind('click', function() {
       return _this.doAction(_this.buttonLastAction);
     });
     if (this.buttonLastAction) {
-      buttonEl.addClass(this.firstLiCssPrefix + this.buttonLastAction.toLowerCase());
+      return $el.addClass(this.firstLiCssPrefix + this.buttonLastAction.toLowerCase());
     }
-    return el;
+  };
+
+  CUser.prototype.getButtonEl = function() {
+    var $el;
+
+    $el = $(this.buttonTemplate);
+    this.initButtonEl($el);
+    return $el;
   };
 
   CUser.prototype.isHovered = function(isHovered) {

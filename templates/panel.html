@@ -4,7 +4,7 @@
 	</div>
 	<div class="h_panel_bg">
 		<div class="h_padding" style="height: 100%">
-			<div class="b_marks i_conference j_abonents" data-bind="visible: usersService.abonentsCount">
+			<div class="b_marks i_conference j_abonents" style="display: none" data-bind="visible: usersService.abonentsCount">
 				<div class="b_marks_noise">
 					<p class="b_marks_header">
 						<span class="b_marks_label" data-bind="text: langs.inTalk"></span>
@@ -15,7 +15,7 @@
 					</table>
 				</div>
 			</div>
-			<div class="b_marks i_flash j_hold" data-bind="visible: usersService.holdedAbonentsCount">
+			<div class="b_marks i_flash j_hold" style="display: none" data-bind="visible: usersService.holdedAbonentsCount">
 				<div class="b_marks_noise">
 					<p class="b_marks_header">
 						<span class="b_marks_label" data-bind="text: langs.onHold"></span>
@@ -26,7 +26,7 @@
 					</table>
 				</div>
 			</div>
-			<div class="b_marks i_flash j_queue" data-bind="visible: usersService.queueAbonents().length">
+			<div class="b_marks i_flash j_queue" style="display: none" data-bind="visible: usersService.queueAbonents().length">
 				<div class="b_marks_noise">
 					<p class="b_marks_header">
 						<span class="b_marks_label" data-bind="text: langs.queue"></span>
@@ -46,16 +46,18 @@
 					<div class="h_phone_number_input">
 						<div class="i_phone_state_bg"></div>
 						<div class="h_input_padding">
-							<div class="i_phone_popup_button">
+							<div class="i_phone_popup_button j_keypad_expand">
 								<i></i>
 							</div>
-							<input class="b_phone_number_input" type="text"
-								   data-bind1="attr: { placeholder: langs.inputPlaceholder }, hasfocus: panelNumberHasFocus, value: actionList.panelNumber, inputClear: actionList.panelNumber, valueUpdate: 'afterkeydown'">
+							<div class="jInputClear_hover">
+								<input class="b_phone_number_input" type="text" data-bind1="attr: { placeholder: langs.inputPlaceholder }, hasfocus: panelNumberHasFocus, value: actionList.panelNumber, inputClear: actionList.panelNumber, valueUpdate: 'afterkeydown'">
+								<span class="jInputClear_close">&times;</span>
+							</div>
 						</div>
 					</div>
 				</div>
 			</div>
-			<div style="height: 100%; overflow: hidden;" data-bind="jScroll: true">
+			<div class="j_main_list" style="height: 100%; overflow: hidden;" data-bind="jScroll: true">
 				<table class="b_main_list">
 					<tbody data-bind1="template: { name: 'oktellWebPanelUserTemplate', foreach: usersService.usersForPanel }, "></tbody>
 				</table>

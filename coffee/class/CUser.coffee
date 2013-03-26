@@ -17,6 +17,7 @@ class CUser
 		@els = $()
 		@buttonEls = $()
 
+		@loadActions()
 
 		@regexps =
 			name: /\{\{name\}\}/
@@ -57,18 +58,23 @@ class CUser
 
 	getEl: ->
 
-		el = $(@template.replace( @regexps.name, @nameHtml).replace( @regexps.number, @numberHtml).replace( @regexps.avatarLink32x32, @avatarLink32x32).replace( @regexps.css, @defaultAvatarCss ) )
-		@els = @els.add el
-		el.data 'user', @
-		buttonEl = el.find '.b_button_action'
-		@buttonEls = @buttonEls.add buttonEl
-		buttonEl.data 'user', @
-		buttonEl.children(':first').bind 'click', =>
+		$el = $(@template.replace( @regexps.name, @nameHtml).replace( @regexps.number, @numberHtml).replace( @regexps.avatarLink32x32, @avatarLink32x32).replace( @regexps.css, @defaultAvatarCss ) )
+		@els = @els.add $el
+		$el.data 'user', @
+		@initButtonEl $el.find '.b_button_action'
+		return $el
+
+	initButtonEl: ($el) ->
+		@buttonEls = @buttonEls.add $el
+		$el.data 'user', @
+		$el.children(':first').bind 'click', =>
 			@doAction @buttonLastAction
-		if @buttonLastAction then buttonEl.addClass @firstLiCssPrefix + @buttonLastAction.toLowerCase()
-		el
+		if @buttonLastAction then $el.addClass @firstLiCssPrefix + @buttonLastAction.toLowerCase()
 
-
+	getButtonEl: () ->
+		$el = $(@buttonTemplate)
+		@initButtonEl $el
+		return $el
 
 	isHovered: (isHovered) ->
 		if @hasHover is isHovered then return

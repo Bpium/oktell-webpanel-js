@@ -416,36 +416,38 @@
             .l_panel .b_phone_keypad .b_phone_panel li.g_first {
                 border-left: none;
             }
-                .l_panel .b_phone_keypad .b_phone_panel li a{
+                .l_panel .b_phone_keypad .b_phone_panel li button{
                     border-radius: 0 !important;
                     border: none;
                     text-align: center;
                     line-height: 140%;
                     font-size: 17px;
                     display: block;
+                    width: 100%;
+                    height: 100%;
                 }
-                .l_panel .b_phone_keypad .b_phone_panel li.g_top_left a {
+                .l_panel .b_phone_keypad .b_phone_panel li.g_top_left button {
                     -webkit-border-top-left-radius: 3px;
                     -moz-border-radius-topleft: 3px;
                     border-top-left-radius: 3px;
                 }
-                .l_panel .b_phone_keypad .b_phone_panel li.g_top_right a {
+                .l_panel .b_phone_keypad .b_phone_panel li.g_top_right button {
                     -webkit-border-top-right-radius: 3px;
                     -moz-border-radius-topright: 3px;
                     border-top-right-radius: 3px;
                 }
-                .l_panel .b_phone_keypad .b_phone_panel li.g_bottom_left a {
+                .l_panel .b_phone_keypad .b_phone_panel li.g_bottom_left button {
                     -webkit-border-bottom-left-radius: 3px;
                     -moz-border-radius-bottomleft: 3px;
                     border-bottom-left-radius: 3px;
                 }
-                .l_panel .b_phone_keypad .b_phone_panel li.g_bottom_right a {
+                .l_panel .b_phone_keypad .b_phone_panel li.g_bottom_right button {
                     -webkit-border-bottom-right-radius: 3px;
                     -moz-border-radius-bottomright: 3px;
                     border-bottom-right-radius: 3px;
                 }
-                .l_panel .b_phone_keypad .b_phone_panel li a.m_big:hover,
-                .l_panel .b_phone_keypad .b_phone_panel li a.m_big:active{
+                .l_panel .b_phone_keypad .b_phone_panel li button.m_big:hover,
+                .l_panel .b_phone_keypad .b_phone_panel li button.m_big:active{
                     border: none;
                 }
 
