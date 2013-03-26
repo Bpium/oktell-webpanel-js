@@ -13,7 +13,8 @@ CUser = (function() {
     this.name = data.name;
     this.nameHtml = data.name ? escapeHtml(data.name) : this.numberHtml;
     this.state = false;
-    this.avatarLink32x32 = data.avatarLink32x32 || this.defaultAvatar32;
+    this.avatarLink32x32 = data.avatarLink32x32 || this.defaultAvatar32 || '';
+    this.defaultAvatarCss = this.avatarLink32x32 ? '' : 'm_default';
     this.hasHover = false;
     this.buttonLastAction = '';
     this.firstLiCssPrefix = 'm_button_action_';
@@ -22,7 +23,8 @@ CUser = (function() {
     this.regexps = {
       name: /\{\{name\}\}/,
       number: /\{\{number\}\}/,
-      avatarLink32x32: /\{\{avatarLink32x32\}\}/
+      avatarLink32x32: /\{\{avatarLink32x32\}\}/,
+      css: /\{\{css\}\}/
     };
     if (((_ref2 = data.numberObj) != null ? _ref2.state : void 0) != null) {
       this.setState(data.numberObj.state);
@@ -68,7 +70,7 @@ CUser = (function() {
     var buttonEl, el,
       _this = this;
 
-    el = $(this.template.replace(this.regexps.name, this.nameHtml).replace(this.regexps.number, this.numberHtml).replace(this.regexps.avatarLink32x32, this.avatarLink32x32));
+    el = $(this.template.replace(this.regexps.name, this.nameHtml).replace(this.regexps.number, this.numberHtml).replace(this.regexps.avatarLink32x32, this.avatarLink32x32).replace(this.regexps.css, this.defaultAvatarCss));
     this.els = this.els.add(el);
     el.data('user', this);
     buttonEl = el.find('.b_button_action');
@@ -144,6 +146,15 @@ CUser = (function() {
         return this.oktell.ghostConference(target);
       case 'endCall':
         return this.oktell.endCall(target);
+    }
+  };
+
+  CUser.prototype.doLastFirstAction = function() {
+    if (this.buttonLastAction) {
+      this.doAction(this.buttonLastAction);
+      return true;
+    } else {
+      return false;
     }
   };
 

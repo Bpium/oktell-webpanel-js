@@ -45,12 +45,21 @@ class List
 		@filterInput = @panelEl.find 'input'
 		debouncedSetFilter = false
 
-		@filterInput.bind 'keydown', =>
+		@filterInput.bind 'keydown', (e)=>
 			if not debouncedSetFilter
 				debouncedSetFilter = debounce =>
 					@setFilter @filterInput.val()
-				, 200
-			debouncedSetFilter()
+				, 100
+			if e.keyCode is 13
+				@filterInput.blur()
+				setTimeout =>
+					user = @panelUsersFiltered[0]
+					user.doLastFirstAction()
+					@filterInput.val('')
+					@setFilter ''
+				, 50
+			else
+				debouncedSetFilter()
 			return true
 
 		@panelEl.on 'mouseenter', '.b_contact', ->

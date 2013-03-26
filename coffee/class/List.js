@@ -74,13 +74,25 @@ List = (function() {
     this.queueBlockEl = this.panelEl.find('.j_queue');
     this.filterInput = this.panelEl.find('input');
     debouncedSetFilter = false;
-    this.filterInput.bind('keydown', function() {
+    this.filterInput.bind('keydown', function(e) {
       if (!debouncedSetFilter) {
         debouncedSetFilter = debounce(function() {
           return _this.setFilter(_this.filterInput.val());
-        }, 200);
+        }, 100);
       }
-      debouncedSetFilter();
+      if (e.keyCode === 13) {
+        _this.filterInput.blur();
+        setTimeout(function() {
+          var user;
+
+          user = _this.panelUsersFiltered[0];
+          user.doLastFirstAction();
+          _this.filterInput.val('');
+          return _this.setFilter('');
+        }, 50);
+      } else {
+        debouncedSetFilter();
+      }
       return true;
     });
     this.panelEl.on('mouseenter', '.b_contact', function() {

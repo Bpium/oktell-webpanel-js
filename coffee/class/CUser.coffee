@@ -8,7 +8,8 @@ class CUser
 		@name = data.name
 		@nameHtml = if data.name then escapeHtml(data.name) else @numberHtml
 		@state = false
-		@avatarLink32x32 = data.avatarLink32x32 or @defaultAvatar32
+		@avatarLink32x32 = data.avatarLink32x32 or @defaultAvatar32 or ''
+		@defaultAvatarCss = if @avatarLink32x32 then '' else 'm_default'
 		@hasHover = false
 		@buttonLastAction = ''
 		@firstLiCssPrefix = 'm_button_action_'
@@ -21,6 +22,7 @@ class CUser
 			name: /\{\{name\}\}/
 			number: /\{\{number\}\}/
 			avatarLink32x32: /\{\{avatarLink32x32\}\}/
+			css: /\{\{css\}\}/
 
 		if data.numberObj?.state?
 			@setState data.numberObj.state
@@ -54,7 +56,8 @@ class CUser
 		return false
 
 	getEl: ->
-		el = $(@template.replace( @regexps.name, @nameHtml).replace( @regexps.number, @numberHtml).replace( @regexps.avatarLink32x32, @avatarLink32x32))
+
+		el = $(@template.replace( @regexps.name, @nameHtml).replace( @regexps.number, @numberHtml).replace( @regexps.avatarLink32x32, @avatarLink32x32).replace( @regexps.css, @defaultAvatarCss ) )
 		@els = @els.add el
 		el.data 'user', @
 		buttonEl = el.find '.b_button_action'
@@ -123,3 +126,8 @@ class CUser
 				@oktell.endCall target
 
 
+	doLastFirstAction: ->
+		if @buttonLastAction
+			@doAction @buttonLastAction
+			true
+		else false
