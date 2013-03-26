@@ -1,4 +1,4 @@
-(($, ko)->
+do ($, ko)->
 	if not $ or not ko
 		throw new Error('Error init oktell panel, jQuery or Knockout.js is not defined')
 
@@ -41,62 +41,34 @@
 	oktellConnected = false
 	afterOktellConnect = null
 
+	list = null
+
+
 	getOptions = ->
 		options or defaultOptions
 
-	################################################################
-	# utils
-	################################################################
-
-
-	################################################################
-	# actionList html
-	################################################################
 	actionListHtml = loadTemplate '/templates/actionList.html'
 
-
-	################################################################
-	# ActionList
-	################################################################
 	ActionList.prototype.langs = langs.actions
+	List.prototype.langs = langs.actions
 
-	################################################################
-	# User
-	################################################################
-
-	################################################################
-	# UsersService
-	################################################################
-
-
-	################################################################
-	# Panel
-	################################################################
 	Panel.prototype.langs = langs.panel
 
-	################################################################
-	# add user template
-	###############################################################
 	userTemplateHtml = loadTemplate '/templates/user.html'
 
+	CUser.prototype.template = userTemplateHtml.replace '<!--button-->', actionButtonHtml
 
-	################################################################
-	# panel html
-	################################################################
+
 	panelHtml = loadTemplate '/templates/panel.html'
 
 	panelEl = $(panelHtml)
 
 	window.p = panelEl
 
-
 	popupHtml = loadTemplate '/templates/numpad.html'
 
-
-	################################################################
-	# panel Dom init
-	################################################################
 	panelWasInitialized = false
+
 	initPanel = (opts)->
 		panelWasInitialized = true
 
@@ -121,12 +93,15 @@
 		curOpt = {}
 
 		actionList = new ActionList(oktell, actionListEl)
-		ko.applyBindings actionList, actionListEl[0]
+		#ko.applyBindings actionList, actionListEl[0]
 
 		usersService = new UsersService(oktell, actionList, afterOktellConnect, getOptions().debug)
 		window.usersService = usersService
 
 		panel = new Panel(actionList, usersService)
+
+		list = new List oktell, panelEl, actionListEl
+		window.list = list
 
 		$("body").append(panelEl)
 
@@ -336,4 +311,3 @@
 
 
 
-)($, ko)

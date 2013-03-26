@@ -23,3 +23,6 @@ debounce = (func, wait, immediate) ->
 		if callNow
 			result = func.apply(context, args)
 		result
+
+escapeHtml = (string) ->
+	(''+string).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#x27;').replace(/\//g,'&#x2F;')

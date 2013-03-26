@@ -4,18 +4,18 @@
 	</div>
 	<div class="h_panel_bg">
 		<div class="h_padding" style="height: 100%">
-			<div class="b_marks i_conference" data-bind="visible: usersService.abonentsCount">
+			<div class="b_marks i_conference j_abonents" data-bind="visible: usersService.abonentsCount">
 				<div class="b_marks_noise">
 					<p class="b_marks_header">
 						<span class="b_marks_label" data-bind="text: langs.inTalk"></span>
 						<span class="b_marks_time" style="display: none;">2:35</span>
 					</p>
-					<table>
-						<tbody data-bind="template: { name: 'oktellWebPanelUserTemplate', foreach: usersService.abonents }"></tbody>
+					<table >
+						<tbody data-bind1="template: { name: 'oktellWebPanelUserTemplate', foreach: usersService.abonents }"></tbody>
 					</table>
 				</div>
 			</div>
-			<div class="b_marks i_flash" data-bind="visible: usersService.holdedAbonentsCount">
+			<div class="b_marks i_flash j_hold" data-bind="visible: usersService.holdedAbonentsCount">
 				<div class="b_marks_noise">
 					<p class="b_marks_header">
 						<span class="b_marks_label" data-bind="text: langs.onHold"></span>
@@ -26,7 +26,7 @@
 					</table>
 				</div>
 			</div>
-			<div class="b_marks i_flash" data-bind="visible: usersService.queueAbonents().length">
+			<div class="b_marks i_flash j_queue" data-bind="visible: usersService.queueAbonents().length">
 				<div class="b_marks_noise">
 					<p class="b_marks_header">
 						<span class="b_marks_label" data-bind="text: langs.queue"></span>
@@ -50,14 +50,14 @@
 								<i></i>
 							</div>
 							<input class="b_phone_number_input" type="text"
-								   data-bind="attr: { placeholder: langs.inputPlaceholder }, hasfocus: panelNumberHasFocus, value: actionList.panelNumber, inputClear: actionList.panelNumber, valueUpdate: 'afterkeydown'">
+								   data-bind1="attr: { placeholder: langs.inputPlaceholder }, hasfocus: panelNumberHasFocus, value: actionList.panelNumber, inputClear: actionList.panelNumber, valueUpdate: 'afterkeydown'">
 						</div>
 					</div>
 				</div>
 			</div>
 			<div style="height: 100%; overflow: hidden;" data-bind="jScroll: true">
 				<table class="b_main_list">
-					<tbody data-bind="template: { name: 'oktellWebPanelUserTemplate', foreach: usersService.usersForPanel }, "></tbody>
+					<tbody data-bind1="template: { name: 'oktellWebPanelUserTemplate', foreach: usersService.usersForPanel }, "></tbody>
 				</table>
 			</div>
 		</div>

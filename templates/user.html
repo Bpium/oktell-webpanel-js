@@ -1,12 +1,13 @@
-<tr class="b_contact" data-bind="hoverSelect: true, actionBar: $data, css: { 'm_offline': $data.isOffline, 'm_busy': $data.isBusy }">
+<tr class="b_contact" data-bind1="hoverSelect: true, actionBar: $data, css: { 'm_offline': $data.isOffline, 'm_busy': $data.isBusy }">
 	<td class="b_contact_avatar">
-		<img data-bind="attr: { src: $data.avatarLink32x32 }">
+		<img data-bind="attr: { src: $data.avatarLink32x32 }" src="{{avatarLink32x32}}">
 
 		<div class="o_busy"></div>
 	</td>
 	<td class="b_contact_title">
 		<div class="wrapword">
-			<a><b data-bind="text: $data.name"></b><span class="o_number" data-bind="text: $data.showedNumber"></span></a>
+			<a><b data-bind="text: $data.name">{{name}}</b><span class="o_number" data-bind="text: $data.showedNumber">{{number}}</span></a>
 		</div>
+		<!--button-->
 	</td>
 </tr>
