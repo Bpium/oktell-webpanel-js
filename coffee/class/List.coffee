@@ -65,7 +65,7 @@ class List
 		@panelEl.on 'mouseenter', '.b_contact', ->
 			$(this).data('user')?.isHovered true
 		@panelEl.on 'mouseleave', '.b_contact', ->
-			$(this).data('user')?.isHovered false
+			#$(this).data('user')?.isHovered false
 
 		@panelEl.on 'click', '.b_contact .drop_down', (e)=>
 			dropdown = $(e.currentTarget)

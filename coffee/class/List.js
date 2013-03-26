@@ -100,11 +100,7 @@ List = (function() {
 
       return (_ref = $(this).data('user')) != null ? _ref.isHovered(true) : void 0;
     });
-    this.panelEl.on('mouseleave', '.b_contact', function() {
-      var _ref;
-
-      return (_ref = $(this).data('user')) != null ? _ref.isHovered(false) : void 0;
-    });
+    this.panelEl.on('mouseleave', '.b_contact', function() {});
     this.panelEl.on('click', '.b_contact .drop_down', function(e) {
       var dropdown, user;
 
