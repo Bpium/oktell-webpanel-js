@@ -3,7 +3,7 @@ var List;
 
 List = (function() {
   function List(oktell, panelEl, dropdownEl, debugMode) {
-    var debouncedSetFilter, oktellConnected,
+    var debouncedSetFilter, dropdownHideTimer, oktellConnected,
       _this = this;
 
     this.allActions = {
@@ -100,7 +100,11 @@ List = (function() {
 
       return (_ref = $(this).data('user')) != null ? _ref.isHovered(true) : void 0;
     });
-    this.panelEl.on('mouseleave', '.b_contact', function() {});
+    this.panelEl.on('mouseleave', '.b_contact', function() {
+      var _ref;
+
+      return (_ref = $(this).data('user')) != null ? _ref.isHovered(false) : void 0;
+    });
     this.panelEl.on('click', '.b_contact .drop_down', function(e) {
       var dropdown, user;
 
@@ -120,6 +124,16 @@ List = (function() {
         user.doAction(action);
       }
       return _this.dropdownEl.hide();
+    });
+    dropdownHideTimer = '';
+    this.dropdownEl.hover(function() {
+      return clearTimeout(dropdownHideTimer);
+    }, function() {
+      return dropdownHideTimer = setTimeout(function() {
+        var x;
+
+        return x = 1;
+      }, 500);
     });
     oktell.on('disconnect', function() {
       return oktellConnected = false;

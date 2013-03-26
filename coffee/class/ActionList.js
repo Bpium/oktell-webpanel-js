@@ -3,8 +3,7 @@ var ActionList;
 
 ActionList = (function() {
   function ActionList(oktell, $menu) {
-    var timeout_id,
-      _this = this;
+    var _this = this;
 
     this.allItems = {
       call: {
@@ -64,17 +63,6 @@ ActionList = (function() {
     this.target = ko.observable();
     this.panelNumber = ko.observable('');
     this.menu = $menu;
-    timeout_id = '';
-    this.menu.hover(function() {
-      return clearTimeout(timeout_id);
-    }, function() {
-      return timeout_id = setTimeout(function() {
-        var x;
-
-        x = 1;
-        return _this.menu.fadeOut(150);
-      }, 500);
-    });
     this.showActions = function(actions, number, ul) {
       _this.actions(actions || []);
       _this.target(number || '');

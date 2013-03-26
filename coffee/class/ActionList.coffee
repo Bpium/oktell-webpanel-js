@@ -35,15 +35,15 @@ class ActionList
 
 		@menu = $menu
 
-		timeout_id = ''
-
-		@menu.hover =>
-			clearTimeout(timeout_id);
-		, =>
-			timeout_id = setTimeout =>
-				x = 1
-				@menu.fadeOut(150)
-			, 500
+#		timeout_id = ''
+#
+#		@menu.hover =>
+#			clearTimeout(timeout_id);
+#		, =>
+#			timeout_id = setTimeout =>
+#				x = 1
+#				@menu.fadeOut(150)
+#			, 500
 
 		@showActions = ( actions, number, ul ) =>
 			#log 'actionList.showActions', actions, number, ul

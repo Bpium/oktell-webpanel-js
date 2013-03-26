@@ -65,7 +65,7 @@ class List
 		@panelEl.on 'mouseenter', '.b_contact', ->
 			$(this).data('user')?.isHovered true
 		@panelEl.on 'mouseleave', '.b_contact', ->
-			#$(this).data('user')?.isHovered false
+			$(this).data('user')?.isHovered false
 
 		@panelEl.on 'click', '.b_contact .drop_down', (e)=>
 			dropdown = $(e.currentTarget)
@@ -80,6 +80,17 @@ class List
 			if action and user
 				user.doAction action
 			@dropdownEl.hide()
+
+
+		dropdownHideTimer = ''
+		@dropdownEl.hover =>
+			clearTimeout dropdownHideTimer
+		, =>
+			dropdownHideTimer = setTimeout =>
+				x = 1
+				#@dropdownEl.fadeOut(150)
+			, 500
+
 
 
 		oktell.on 'disconnect', =>
