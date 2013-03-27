@@ -14,7 +14,12 @@ class List
 		@actionCssPrefix = 'i_'
 		@lastDropdownUser = false
 
+		@userWithGeneratedButtons = {}
+
 		@debugMode = debugMode
+
+		@dropdownPaddingBottomLeft = 3
+		@dropdownOpenedOnPanel = false
 
 		@regexps =
 			actionText: /\{\{actionText\}\}/
@@ -85,7 +90,7 @@ class List
 			dropdown = $(e.currentTarget)
 			user = dropdown.closest('.b_button_action').data('user')
 			if user
-				@showDropdown user, dropdown.closest('.b_button_action'), user.loadOktellActions()
+				@showDropdown user, dropdown.closest('.b_button_action'), user.loadOktellActions(), true
 
 		@dropdownEl.on 'click', '[data-action]', (e) =>
 			actionEl = $(e.currentTarget)
@@ -100,8 +105,9 @@ class List
 			clearTimeout dropdownHideTimer
 		, =>
 			dropdownHideTimer = setTimeout =>
-				x = 1
-				#@dropdownEl.fadeOut(150)
+				@dropdownEl.fadeOut 150, =>
+					@dropdownOpenedOnPanel = false
+
 			, 500
 
 		@panelEl.find('.j_keypad_expand').bind 'click', =>
@@ -168,6 +174,7 @@ class List
 
 	getUserButtonForPlagin: (phone) ->
 		user = @getUser phone
+		@userWithGeneratedButtons[phone] = user
 		button = user.getButtonEl()
 		button.find('.drop_down').bind 'click', =>
 			@showDropdown user, button, user.loadOktellActions()
@@ -196,7 +203,7 @@ class List
 			if user
 				@showDropdown user, $(this)
 
-	showDropdown: ( user, buttonEl, actions ) ->
+	showDropdown: ( user, buttonEl, actions, onPanel ) ->
 		t = @dropdownElLiTemplate
 		@dropdownEl.empty()
 
@@ -216,10 +223,11 @@ class List
 				@dropdownEl.data 'user', user
 
 				@dropdownEl.css
-					'top': buttonEl.offset().top,
-					'left': buttonEl.offset().left - @dropdownEl.width() + buttonEl.width()
+					'top': if @dropdownEl.height() + buttonEl.offset().top > $(window).height() then $(window).height() - @dropdownEl.height() - @dropdownPaddingBottomLeft else buttonEl.offset().top,
+					'left': Math.max @dropdownPaddingBottomLeft, buttonEl.offset().left - @dropdownEl.width() + buttonEl.width()
 					'visibility': 'visible'
 				@dropdownEl.fadeIn(100)
+				@dropdownOpenedOnPanel = true if onPanel
 			else
 				@dropdownEl.hide()
 		else
@@ -358,6 +366,10 @@ class List
 		fantom
 
 	reloadActions: ->
+		setTimeout =>
+			for phone, user in @userWithGeneratedButtons
+				user.loadActions()
+		, 100
 
 	addScroll: ->
 		$el = @usersListBlockEl

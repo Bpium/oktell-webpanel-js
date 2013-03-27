@@ -17,6 +17,8 @@ class CUser
 		@els = $()
 		@buttonEls = $()
 
+#		@separateButtonEls = $()
+
 		@loadActions()
 
 		@regexps =
@@ -74,6 +76,7 @@ class CUser
 	getButtonEl: () ->
 		$el = $(@buttonTemplate)
 		@initButtonEl $el
+#		@separateButtonEls = @separateButtonEls.add $el
 		return $el
 
 	isHovered: (isHovered) ->
@@ -97,10 +100,15 @@ class CUser
 			@buttonEls.removeClass @firstLiCssPrefix + @buttonLastAction.toLowerCase()
 
 		if action
+#			if not @buttonLastAction
+#				needShowSeparateButtons = true
 			@buttonLastAction = action
 			@buttonEls.addClass @firstLiCssPrefix + @buttonLastAction.toLowerCase()
+#			if needShowSeparateButtons
+#				@separateButtonEls.show()
 		else
 			@buttonLastAction = ''
+#			@separateButtonEls.hide()
 
 
 

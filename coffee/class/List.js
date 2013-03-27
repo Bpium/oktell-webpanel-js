@@ -46,7 +46,10 @@ List = (function() {
     };
     this.actionCssPrefix = 'i_';
     this.lastDropdownUser = false;
+    this.userWithGeneratedButtons = {};
     this.debugMode = debugMode;
+    this.dropdownPaddingBottomLeft = 3;
+    this.dropdownOpenedOnPanel = false;
     this.regexps = {
       actionText: /\{\{actionText\}\}/,
       action: /\{\{action\}\}/,
@@ -124,7 +127,7 @@ List = (function() {
       dropdown = $(e.currentTarget);
       user = dropdown.closest('.b_button_action').data('user');
       if (user) {
-        return _this.showDropdown(user, dropdown.closest('.b_button_action'), user.loadOktellActions());
+        return _this.showDropdown(user, dropdown.closest('.b_button_action'), user.loadOktellActions(), true);
       }
     });
     this.dropdownEl.on('click', '[data-action]', function(e) {
@@ -143,9 +146,9 @@ List = (function() {
       return clearTimeout(dropdownHideTimer);
     }, function() {
       return dropdownHideTimer = setTimeout(function() {
-        var x;
-
-        return x = 1;
+        return _this.dropdownEl.fadeOut(150, function() {
+          return _this.dropdownOpenedOnPanel = false;
+        });
       }, 500);
     });
     this.panelEl.find('.j_keypad_expand').bind('click', function() {
@@ -228,6 +231,7 @@ List = (function() {
       _this = this;
 
     user = this.getUser(phone);
+    this.userWithGeneratedButtons[phone] = user;
     button = user.getButtonEl();
     button.find('.drop_down').bind('click', function() {
       return _this.showDropdown(user, button, user.loadOktellActions());
@@ -267,7 +271,7 @@ List = (function() {
     });
   };
 
-  List.prototype.showDropdown = function(user, buttonEl, actions) {
+  List.prototype.showDropdown = function(user, buttonEl, actions, onPanel) {
     var a, aEls, t, _i, _len, _ref;
 
     t = this.dropdownElLiTemplate;
@@ -286,11 +290,14 @@ List = (function() {
         this.dropdownEl.children('li:last').addClass('g_last');
         this.dropdownEl.data('user', user);
         this.dropdownEl.css({
-          'top': buttonEl.offset().top,
-          'left': buttonEl.offset().left - this.dropdownEl.width() + buttonEl.width(),
+          'top': this.dropdownEl.height() + buttonEl.offset().top > $(window).height() ? $(window).height() - this.dropdownEl.height() - this.dropdownPaddingBottomLeft : buttonEl.offset().top,
+          'left': Math.max(this.dropdownPaddingBottomLeft, buttonEl.offset().left - this.dropdownEl.width() + buttonEl.width()),
           'visibility': 'visible'
         });
-        return this.dropdownEl.fadeIn(100);
+        this.dropdownEl.fadeIn(100);
+        if (onPanel) {
+          return this.dropdownOpenedOnPanel = true;
+        }
       } else {
         return this.dropdownEl.hide();
       }
@@ -499,7 +506,21 @@ List = (function() {
     return fantom;
   };
 
-  List.prototype.reloadActions = function() {};
+  List.prototype.reloadActions = function() {
+    var _this = this;
+
+    return setTimeout(function() {
+      var phone, user, _i, _len, _ref, _results;
+
+      _ref = _this.userWithGeneratedButtons;
+      _results = [];
+      for (user = _i = 0, _len = _ref.length; _i < _len; user = ++_i) {
+        phone = _ref[user];
+        _results.push(user.loadActions());
+      }
+      return _results;
+    }, 100);
+  };
 
   List.prototype.addScroll = function() {
     var $el, END_EVENT, MOVE_EVENT, START_EVENT, WHEEL_EV, get_koef, get_pageY, get_position, init, isTouch, jscroll_timer, move_by_bar, pageY_end, pageY_start, params, pos, pos_start, scrollClick, scrollTo, scrollWheelPos, scroll_hide, scroll_show, scrollbar_cont, scrollbar_inner, scroller, scroller_left_while_scrolling, scrolling, set_bar_bounds, set_position, vendor, wrapper,

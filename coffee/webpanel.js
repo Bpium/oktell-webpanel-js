@@ -65,7 +65,7 @@
   popupHtml = loadTemplate('/templates/numpad.html');
   panelWasInitialized = false;
   initPanel = function(opts) {
-    var $user, $userActionButton, closeClass, critWidth, cssPos, curOpt, element, elementWidth, hidePanel, killPanelHideTimer, mouseOnPanel, newCssPos, oldBinding, openClass, panelBookmarkEl, panelHideTimer, panelPos, panelStatus, walkAway, xPos, xStartPos;
+    var $user, $userActionButton, animOptHide, animOptShow, closeClass, critWidth, cssPos, element, elementWidth, hidePanel, killPanelHideTimer, mouseOnPanel, newCssPos, oldBinding, openClass, panelBookmarkEl, panelHideTimer, panelPos, panelStatus, walkAway, xPos, xStartPos;
 
     panelWasInitialized = true;
     options = $.extend(defaultOptions, opts || {});
@@ -74,13 +74,14 @@
     oldBinding = $userActionButton.attr('data-bind');
     $userActionButton.attr('data-bind', oldBinding + ', visible: $data.actionBarIsVisible');
     $user.find('td.b_contact_title').append($userActionButton);
-    window.u = $user;
-    $('body').append('<script type="text/html" id="oktellWebPanelUserTemplate" >' + $user[0].outerHTML + '</script>');
     actionListEl = $(actionListHtml);
     $('body').append(actionListEl);
     oktell = getOptions().oktell;
     panelPos = getOptions().position;
-    curOpt = {};
+    animOptShow = {};
+    animOptShow[panelPos] = '0px';
+    animOptHide = {};
+    animOptHide[panelPos] = '-281px';
     $("body").append(panelEl);
     panelEl.find(".h_input_padding").after(popupHtml);
     list = new List(oktell, panelEl, actionListEl, afterOktellConnect, getOptions().debug);
@@ -104,7 +105,6 @@
     panelEl.on("mouseenter", function() {
       mouseOnPanel = true;
       killPanelHideTimer();
-      curOpt[panelPos] = "0px";
       if (parseInt(panelEl.css(panelPos)) < 0 && (panelStatus === 'closed' || panelStatus === 'closing')) {
         panelStatus = 'opening';
         panelBookmarkEl.stop(true, true);
@@ -112,19 +112,18 @@
           left: '0px'
         }, 50, 'swing');
         panelEl.stop(true, true);
-        return panelEl.animate(curOpt, 100, "swing", function() {
+        panelEl.animate(animOptShow, 100, "swing", function() {
           panelEl.addClass("g_hover");
           return panelStatus = 'open';
         });
       }
+      return true;
     });
     hidePanel = function() {
       if (panelEl.hasClass("g_hover")) {
-        curOpt[panelPos] = "-281px";
         panelStatus = 'closing';
         panelEl.stop(true, true);
-        panelEl.animate(curOpt, 300, "swing", function() {
-          curOpt[panelPos] = "0px";
+        panelEl.animate(animOptHide, 300, "swing", function() {
           panelEl.css({
             panelPos: 0
           });
@@ -143,17 +142,18 @@
       return true;
     });
     $('html').on('mouseleave', function(e) {
-      return killPanelHideTimer();
+      killPanelHideTimer();
+      return true;
     });
     $('html').on('mousemove', function(e) {
-      if (!mouseOnPanel && panelHideTimer === false) {
+      if (!mouseOnPanel && panelHideTimer === false && !list.dropdownOpenedOnPanel) {
         panelHideTimer = setTimeout(function() {
           return hidePanel();
-        }, 300);
+        }, 100);
       }
       return true;
     });
-    if (navigator.userAgent.indexOf('iPad') !== -1) {
+    if (window.navigator.userAgent.indexOf('iPad') !== -1) {
       xStartPos = 0;
       xPos = 0;
       element = panelEl;
@@ -169,9 +169,7 @@
       }
       element.live("click", function() {
         if (element.hasClass(closeClass)) {
-          newCssPos = 0;
-          curOpt[panelPos] = newCssPos + "px";
-          return element.animate(curOpt, 200, "swing", function() {
+          return element.animate(animOptShow, 200, "swing", function() {
             element.removeClass(closeClass).addClass(openClass);
             return walkAway = 0;
           });
@@ -197,27 +195,19 @@
       });
       element.bind("touchend", function(e) {
         if (walkAway >= critWidth && walkAway < 0) {
-          newCssPos = "-281px";
-          curOpt[panelPos] = newCssPos;
-          return element.animate(curOpt, 200, "swing");
+          return element.animate(animOptHide, 200, "swing");
         }
       });
       if (walkAway * -1 >= critWidth && walkAway > 0) {
-        newCssPos = "0px";
-        curOpt[panelPos] = newCssPos;
-        element.animate(curOpt, 200, "swing");
+        element.animate(animOptShow, 200, "swing");
       }
       if (walkAway < critWidth && walkAway < 0) {
-        newCssPos = "0px";
-        curOpt[panelPos] = newCssPos;
-        element.animate(curOpt, 100, "swing", function() {
+        element.animate(animOptShow, 100, "swing", function() {
           return element.removeClass(closeClass).addClass(openClass);
         });
       }
       if (walkAway * -1 < critWidth && walkAway > 0) {
-        newCssPos = "-281px";
-        curOpt[panelPos] = newCssPos;
-        return element.animate(curOpt, 100, "swing", function() {
+        return element.animate(animOptHide, 100, "swing", function() {
           return element.removeClass(openClass).addClass(closeClass);
         });
       }
@@ -241,6 +231,7 @@
     phone = el.attr('data-phone');
     if (phone) {
       button = list.getUserButtonForPlagin(phone);
+      log('generated button for ' + phone, button);
       return el.html(button);
     }
   };

@@ -76,8 +76,20 @@
 </head>
 <body>
 	<div style="width: 500px; height: 500px;">
-		<span>Статус:</span> <span id="connectionState">Соединение</span>
-		<span class="userPhone" data-phone="103"></span>
+		<style type="text/css">
+			.userPhone {
+				width: 80px;
+				height: 30px;
+				background-color: #e3dfdf;
+			}
+		</style>
+		<span>Статус:</span> <span id="connectionState">Соединение</span><br>
+		103 <span class="userPhone" data-phone="103"></span><br>
+		101 <span class="userPhone" data-phone="101"></span><br>
+		102 <span class="userPhone" data-phone="102"></span><br>
+		104 <span class="userPhone" data-phone="104"></span><br>
+		105 <span class="userPhone" data-phone="105"></span><br>
+		106 <span class="userPhone" data-phone="106"></span><br>
 
 		<br>
 		<br>
@@ -163,7 +175,7 @@
 				</li>
 			</ul><br>
 			<br>
-            <ul style="z-index: 999; padding: 0px; font-size: 13px; font-family: Tahoma; top: 50px; left: 350px; visibility: visible; display: inline-block" class="b_actions_group_list">
+            <ul style="z-index: 999; padding: 0px; font-size: 13px; font-family: Tahoma; top: 80px; left: 350px; visibility: visible; display: inline-block" class="b_actions_group_list">
                 <li class="i_call g_first" data-bind="click: $parent.doActionByClick, css: $data.css, hoverSelect: true" data-action="call">
                     <i></i>
                     <span data-bind="text: a.text">Позвонить</span>
