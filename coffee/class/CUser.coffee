@@ -109,6 +109,7 @@ class CUser
 		else
 			@buttonLastAction = ''
 #			@separateButtonEls.hide()
+		actions
 
 
 

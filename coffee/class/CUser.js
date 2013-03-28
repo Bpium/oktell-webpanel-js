@@ -127,10 +127,11 @@ CUser = (function() {
     }
     if (action) {
       this.buttonLastAction = action;
-      return this.buttonEls.addClass(this.firstLiCssPrefix + this.buttonLastAction.toLowerCase());
+      this.buttonEls.addClass(this.firstLiCssPrefix + this.buttonLastAction.toLowerCase());
     } else {
-      return this.buttonLastAction = '';
+      this.buttonLastAction = '';
     }
+    return actions;
   };
 
   CUser.prototype.doAction = function(action) {

@@ -56,6 +56,7 @@
   };
   actionListHtml = loadTemplate('/templates/actionList.html');
   List.prototype.langs = langs.actions;
+  List.prototype.jScroll = jScroll;
   userTemplateHtml = loadTemplate('/templates/user.html');
   CUser.prototype.template = userTemplateHtml.replace('<!--button-->', actionButtonHtml);
   CUser.prototype.buttonTemplate = actionButtonHtml;

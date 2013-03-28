@@ -39,6 +39,7 @@ do ($, ko)->
 	actionListHtml = loadTemplate '/templates/actionList.html'
 
 	List.prototype.langs = langs.actions
+	List.prototype.jScroll = jScroll
 
 	userTemplateHtml = loadTemplate '/templates/user.html'
 
