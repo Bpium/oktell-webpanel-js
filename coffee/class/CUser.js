@@ -21,12 +21,6 @@ CUser = (function() {
     this.els = $();
     this.buttonEls = $();
     this.loadActions();
-    this.regexps = {
-      name: /\{\{name\}\}/,
-      number: /\{\{number\}\}/,
-      avatarLink32x32: /\{\{avatarLink32x32\}\}/,
-      css: /\{\{css\}\}/
-    };
     if (((_ref2 = data.numberObj) != null ? _ref2.state : void 0) != null) {
       this.setState(data.numberObj.state);
     } else if (data.state != null) {
@@ -35,6 +29,13 @@ CUser = (function() {
       this.setState(1);
     }
   }
+
+  CUser.prototype.regexps = {
+    name: /\{\{name\}\}/,
+    number: /\{\{number\}\}/,
+    avatarLink32x32: /\{\{avatarLink32x32\}\}/,
+    css: /\{\{css\}\}/
+  };
 
   CUser.prototype.setState = function(state) {
     var _this = this;
@@ -68,9 +69,10 @@ CUser = (function() {
   };
 
   CUser.prototype.getEl = function() {
-    var $el;
+    var $el, str;
 
-    $el = $(this.template.replace(this.regexps.name, this.nameHtml).replace(this.regexps.number, this.numberHtml).replace(this.regexps.avatarLink32x32, this.avatarLink32x32).replace(this.regexps.css, this.defaultAvatarCss));
+    str = this.template.replace(this.regexps.name, this.nameHtml).replace(this.regexps.number, this.numberHtml).replace(this.regexps.avatarLink32x32, this.avatarLink32x32).replace(this.regexps.css, this.defaultAvatarCss);
+    $el = $(str);
     this.els = this.els.add($el);
     $el.data('user', this);
     this.initButtonEl($el.find('.b_button_action'));

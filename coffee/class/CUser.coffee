@@ -21,11 +21,6 @@ class CUser
 
 		@loadActions()
 
-		@regexps =
-			name: /\{\{name\}\}/
-			number: /\{\{number\}\}/
-			avatarLink32x32: /\{\{avatarLink32x32\}\}/
-			css: /\{\{css\}\}/
 
 		if data.numberObj?.state?
 			@setState data.numberObj.state
@@ -33,6 +28,11 @@ class CUser
 			@setState data.state
 		else
 			@setState 1
+	regexps:
+		name: /\{\{name\}\}/
+		number: /\{\{number\}\}/
+		avatarLink32x32: /\{\{avatarLink32x32\}\}/
+		css: /\{\{css\}\}/
 
 	setState: (state) ->
 		state = parseInt state
@@ -59,8 +59,11 @@ class CUser
 		return false
 
 	getEl: ->
-
-		$el = $(@template.replace( @regexps.name, @nameHtml).replace( @regexps.number, @numberHtml).replace( @regexps.avatarLink32x32, @avatarLink32x32).replace( @regexps.css, @defaultAvatarCss ) )
+		str = @template.replace( @regexps.name, @nameHtml)
+			.replace( @regexps.number, @numberHtml)
+			.replace( @regexps.avatarLink32x32, @avatarLink32x32)
+			.replace( @regexps.css, @defaultAvatarCss )
+		$el = $(str)
 		@els = @els.add $el
 		$el.data 'user', @
 		@initButtonEl $el.find '.b_button_action'

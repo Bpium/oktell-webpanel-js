@@ -46,6 +46,7 @@ class List
 		@usersListEl = @usersListBlockEl.find 'tbody'
 		@abonentsListBlock = @panelEl.find '.j_abonents'
 		@abonentsListEl = @abonentsListBlock.find 'tbody'
+		@talkTimeEl = @abonentsListBlock.find '.b_marks_time'
 		@holdBlockEl = @panelEl.find '.j_hold'
 		@holdListEl = @holdBlockEl.find 'tbody'
 		@queueBlockEl = @panelEl.find '.j_queue'
@@ -158,6 +159,13 @@ class List
 				#log 'Oktell holdStateChange', holdInfo
 				@setHold holdInfo
 
+			oktell.on 'talkTimer', (seconds, formattedTime) =>
+				if seconds is false
+					@talkTimeEl.text ''
+				else
+					@talkTimeEl.text formattedTime
+
+
 			@setAbonents oktell.getAbonents()
 			@setHold oktell.getHoldInfo()
 
@@ -266,7 +274,7 @@ class List
 	setHold: (holdInfo) ->
 		abs = []
 		if holdInfo.hasHold
-			abs = [holdInfo]
+			abs = [holdInfo.abonent]
 		@syncAbonentsAndUserlist abs, @hold
 		@setHoldHtml()
 

@@ -74,6 +74,7 @@ List = (function() {
     this.usersListEl = this.usersListBlockEl.find('tbody');
     this.abonentsListBlock = this.panelEl.find('.j_abonents');
     this.abonentsListEl = this.abonentsListBlock.find('tbody');
+    this.talkTimeEl = this.abonentsListBlock.find('.b_marks_time');
     this.holdBlockEl = this.panelEl.find('.j_hold');
     this.holdListEl = this.holdBlockEl.find('tbody');
     this.queueBlockEl = this.panelEl.find('.j_queue');
@@ -206,6 +207,13 @@ List = (function() {
       });
       oktell.on('holdStateChange', function(holdInfo) {
         return _this.setHold(holdInfo);
+      });
+      oktell.on('talkTimer', function(seconds, formattedTime) {
+        if (seconds === false) {
+          return _this.talkTimeEl.text('');
+        } else {
+          return _this.talkTimeEl.text(formattedTime);
+        }
       });
       _this.setAbonents(oktell.getAbonents());
       _this.setHold(oktell.getHoldInfo());
@@ -367,7 +375,7 @@ List = (function() {
 
     abs = [];
     if (holdInfo.hasHold) {
-      abs = [holdInfo];
+      abs = [holdInfo.abonent];
     }
     this.syncAbonentsAndUserlist(abs, this.hold);
     return this.setHoldHtml();

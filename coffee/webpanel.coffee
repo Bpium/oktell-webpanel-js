@@ -48,11 +48,12 @@ do ($, ko)->
 
 	panelHtml = loadTemplate '/templates/panel.html'
 
+	panelHtml = panelHtml.replace('{{inTalk}}',langs.panel.inTalk)
+		.replace('{{onHold}}',langs.panel.onHold)
+		.replace('{{queue}}',langs.panel.queue)
+		.replace('{{inputPlaceholder}}',langs.panel.inputPlaceholder)
+
 	panelEl = $(panelHtml)
-
-	window.p = panelEl
-
-	popupHtml = loadTemplate '/templates/numpad.html'
 
 	panelWasInitialized = false
 
@@ -79,8 +80,6 @@ do ($, ko)->
 		animOptHide[panelPos] = '-281px'
 
 		$("body").append(panelEl)
-
-		panelEl.find(".h_input_padding").after popupHtml
 
 		list = new List oktell, panelEl, actionListEl, afterOktellConnect, getOptions().debug
 		window.list = list
