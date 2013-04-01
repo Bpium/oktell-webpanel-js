@@ -253,17 +253,18 @@ jScroll = ( $el )->
 			scroller_inner = $(".jscroll_scroller_inner", wrapper)
 			scroller_inner.appendTo '<div></div>'
 
-			myScroll = new iScroll wrapper.attr("id") ,
-				hScrollbar: false
-				scrollbarClass: 'jscroll_scroller_inner'
-				checkDOMChanges: true
-				bounceLock: true
-				onScrollMove: =>
-					params.onScroll()
-					true
-				onScrollEnd: =>
-					params.onScroll()
-					true
+			if window.iScroll?
+				myScroll = new window.iScroll wrapper.attr("id") ,
+					hScrollbar: false
+					scrollbarClass: 'jscroll_scroller_inner'
+					checkDOMChanges: true
+					bounceLock: true
+					onScrollMove: =>
+						params.onScroll()
+						true
+					onScrollEnd: =>
+						params.onScroll()
+						true
 
 			return true
 

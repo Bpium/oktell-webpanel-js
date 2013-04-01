@@ -240,20 +240,22 @@ jScroll = function($el) {
       scroller.after('<div class="jscroll_scroller_inner" />');
       scroller_inner = $(".jscroll_scroller_inner", wrapper);
       scroller_inner.appendTo('<div></div>');
-      myScroll = new iScroll(wrapper.attr("id"), {
-        hScrollbar: false,
-        scrollbarClass: 'jscroll_scroller_inner',
-        checkDOMChanges: true,
-        bounceLock: true,
-        onScrollMove: function() {
-          params.onScroll();
-          return true;
-        },
-        onScrollEnd: function() {
-          params.onScroll();
-          return true;
-        }
-      });
+      if (window.iScroll != null) {
+        myScroll = new window.iScroll(wrapper.attr("id"), {
+          hScrollbar: false,
+          scrollbarClass: 'jscroll_scroller_inner',
+          checkDOMChanges: true,
+          bounceLock: true,
+          onScrollMove: function() {
+            params.onScroll();
+            return true;
+          },
+          onScrollEnd: function() {
+            params.onScroll();
+            return true;
+          }
+        });
+      }
       return true;
     } else {
       return set_bar_bounds(wrapper, scroller, scrollbar_cont, scrollbar_inner);

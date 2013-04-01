@@ -6,15 +6,22 @@ fs = require('fs');
 module.exports = function(grunt) {
   grunt.initConfig({
     createbuildfolder: {
-      path: 'build'
+      path: 'builds'
     },
     insertfilesasvars: {
       htmlminTaskName: 'templates',
       target: 'coffee/webpanel.coffee',
-      dest: 'build/last/webpanel.coffee',
+      dest: 'buildlast/webpanel.coffee',
       regexFind: /loadTemplate(?:\s*\(\s*|\s+)[\"\'](.+?)[\"\']\s*\)*/,
       find: 'templates = {}',
       replace: 'templates = '
+    },
+    includecoffee: {
+      main: {
+        target: 'buildlast/webpanel.coffee',
+        dest: 'buildlast/webpanel.coffee',
+        regexp: /\#includecoffee\s+(.+?)[ \r\n]+/
+      }
     },
     htmlmin: {
       templates: {
@@ -31,14 +38,14 @@ module.exports = function(grunt) {
           bare: true
         },
         files: {
-          'build/last/webpanel.js': 'build/last/webpanel.coffee'
+          'buildlast/webpanel.js': 'buildlast/webpanel.coffee'
         }
       }
     },
     cssmin: {
       css: {
         files: {
-          'build/last/webpanel.min.css': 'css/webpanel.css'
+          'buildlast/webpanel.min.css': 'css/webpanel.css'
         }
       }
     },
@@ -47,7 +54,7 @@ module.exports = function(grunt) {
         files: [
           {
             src: 'css/webpanel.css',
-            dest: 'build/last/',
+            dest: 'buildlast/',
             flatten: true,
             expand: true
           }
@@ -59,21 +66,30 @@ module.exports = function(grunt) {
     },
     uglify: {
       main: {
-        'build/last/webpanel.min.js': 'build/last/webpanel.js'
+        files: {
+          'buildlast/webpanel.min.js': 'buildlast/webpanel.js'
+        }
       }
     },
-    clean: ['temp/*', 'build/last/*'],
+    clean: {
+      temp: ['temp/*'],
+      buildlast: ['buildlast/*']
+    },
     compress: {
       main: {
         options: {
-          archive: 'build/last/webpanel.zip',
+          archive: 'buildlast/webpanel.zip',
           mode: 'zip',
           pretty: true
         },
         files: [
           {
-            src: ['build/last/*'],
-            dest: 'build/last/webpanel.zip'
+            cwd: 'buildlast/',
+            src: '*',
+            dest: '',
+            expand: true,
+            filter: 'isFile',
+            flatten: true
           }
         ]
       }
@@ -86,7 +102,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-compress');
-  grunt.registerTask('build', ['createbuildfolder', 'insertfilesasvars', 'coffee', 'uglify', 'cssmin', 'compress', 'copy:css', 'copy:main', 'clean']);
+  grunt.registerTask('build', ['clean:buildlast', 'createbuildfolder', 'insertfilesasvars', 'includecoffee', 'coffee', 'uglify', 'cssmin', 'copy:css', 'compress', 'copy:main', 'clean:temp']);
   grunt.registerTask('createbuildfolder', 'Create new folder in builds path with date in name', function() {
     var config, copyConf, folder, moment;
 
@@ -98,21 +114,56 @@ module.exports = function(grunt) {
     copyConf = grunt.config('copy');
     copyConf.main.files.push({
       dest: folder + '/',
-      src: 'build/last/*',
+      src: 'buildlast/*',
       flatten: true,
       expand: true
     });
     grunt.config('copy', copyConf);
-    return grunt.option('buildFolder', folder);
+    grunt.option('buildFolder', folder);
+    return console.log('created folder ' + config.path + '/' + folder);
   });
-  return grunt.registerTask('insertfilesasvars', 'Replace matcged string by file', function() {
-    var cf, conf, config, f, fName, fNewName, file, files, i, rAll, replaceStr, _i, _j, _k, _l, _len, _len1, _len2, _len3, _ref, _ref1;
+  grunt.registerMultiTask('includecoffee', 'Replace matched string by file', function() {
+    var ch, config, f, file, files, i, m, pos, rAll, tabs, _i, _j, _k, _len, _len1, _len2, _ref;
+
+    config = this.data;
+    fs = require('fs');
+    file = fs.readFileSync(config.target).toString();
+    files = [];
+    rAll = new RegExp(config.regexp.source, 'gm');
+    _ref = file.match(rAll) || [];
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      f = _ref[_i];
+      m = f.match(config.regexp);
+      if (m) {
+        files.push(m);
+      }
+    }
+    for (i = _j = 0, _len1 = files.length; _j < _len1; i = ++_j) {
+      f = files[i];
+      files[i] = [f[0], (f[1][0] === '/' ? f[1].substr(1) : f[1])];
+    }
+    for (_k = 0, _len2 = files.length; _k < _len2; _k++) {
+      f = files[_k];
+      pos = file.indexOf(f[0]);
+      pos--;
+      tabs = '';
+      ch = file[pos];
+      while (ch === "\t") {
+        tabs += ch;
+        ch = file[--pos];
+      }
+      file = file.replace(f[0], f[0] + tabs + fs.readFileSync(f[1]).toString().replace(/(\r\n|\n)/g, "\n" + tabs) + "\r\n");
+    }
+    return fs.writeFileSync(config.dest, file);
+  });
+  return grunt.registerTask('insertfilesasvars', 'Replace matched string by file', function() {
+    var cf, conf, config, f, fName, fNewName, file, files, i, k, originalFileNames, rAll, replaceStr, _i, _j, _k, _len, _len1, _len2, _ref, _ref1;
 
     config = grunt.config.get(this.name);
     fs = require('fs');
     file = fs.readFileSync(config.target).toString();
     files = config.files;
-    console.log('FILES' + config.files);
+    originalFileNames = config.originalFileNames || {};
     if (!files) {
       files = [];
       rAll = new RegExp(config.regexFind.source, 'gm');
@@ -133,21 +184,22 @@ module.exports = function(grunt) {
           fName = f.split('/')[f.split('/').length - 1];
           fNewName = 'temp/' + fName.replace('.', '_' + Date.now() + '.');
           cf[fNewName] = f;
-          files[i] = fNewName;
+          originalFileNames[f] = fNewName;
         }
         conf[config.htmlminTaskName].files = cf;
         grunt.config('htmlmin', conf);
         grunt.task.run('htmlmin:' + config.htmlminTaskName);
         config.files = files;
+        config.originalFileNames = originalFileNames;
         grunt.config(this.name, config);
         grunt.task.run('insertfilesasvars');
         return;
       }
     }
     replaceStr = '{';
-    for (_l = 0, _len3 = files.length; _l < _len3; _l++) {
-      f = files[_l];
-      replaceStr += f ? "'" + f + "':'" + fs.readFileSync(f).toString().replace(/'/g, "\\'") + "', " : void 0;
+    for (k in originalFileNames) {
+      f = originalFileNames[k];
+      replaceStr += f ? "'" + k + "':'" + fs.readFileSync(f).toString().replace(/'/g, "\\'") + "', " : void 0;
     }
     replaceStr += '}';
     return fs.writeFileSync(config.dest, file.replace(config.find, config.replace + replaceStr));

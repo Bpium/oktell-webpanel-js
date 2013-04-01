@@ -2,10 +2,10 @@
 (function($) {
   var actionButtonHtml, actionListEl, actionListHtml, addActionButtonToEl, afterOktellConnect, defaultOptions, elsForInitButtonAfterConnect, getOptions, initActionButtons, initButtonOnElement, initPanel, langs, list, loadTemplate, oktell, oktellConnected, options, panelEl, panelHtml, panelWasInitialized, templates, userTemplateHtml;
 
-  templates = {};
-  if (!$ || !ko) {
-    throw new Error('Error init oktell panel, jQuery or Knockout.js is not defined');
+  if (!$) {
+    throw new Error('Error init oktell panel, jQuery ( $ ) is not defined');
   }
+  templates = {};
   loadTemplate = function(path) {
     var html;
 

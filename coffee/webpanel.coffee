@@ -1,11 +1,13 @@
 do ($)->
+	if not $
+		throw new Error('Error init oktell panel, jQuery ( $ ) is not defined')
 
 	templates = {}
 
-	if not $ or not ko
-		throw new Error('Error init oktell panel, jQuery or Knockout.js is not defined')
-
-	#include
+	#includecoffee coffee/utils.coffee
+	#includecoffee coffee/jScroll.coffee
+	#includecoffee coffee/class/CUser.coffee
+	#includecoffee coffee/class/List.coffee
 
 	loadTemplate = (path) ->
 		if templates[path]?
