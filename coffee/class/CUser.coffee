@@ -18,9 +18,18 @@ class CUser
 		@buttonEls = $()
 
 #		@separateButtonEls = $()
+		@init(data)
 
+
+	init: (data) ->
+		@id = data.id?.toString().toLowerCase()
+		@number = data.number?.toString() or ''
+		@numberHtml = escapeHtml data.number
+		@name = data.name
+		@nameHtml = if data.name then escapeHtml(data.name) else @numberHtml
+		@avatarLink32x32 = data.avatarLink32x32 or @defaultAvatar32 or ''
+		@defaultAvatarCss = if @avatarLink32x32 then '' else 'm_default'
 		@loadActions()
-
 
 		if data.numberObj?.state?
 			@setState data.numberObj.state
@@ -28,6 +37,8 @@ class CUser
 			@setState data.state
 		else
 			@setState 1
+
+
 	regexps:
 		name: /\{\{name\}\}/
 		number: /\{\{number\}\}/

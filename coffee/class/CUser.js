@@ -5,7 +5,7 @@ var CUser,
 CUser = (function() {
   function CUser(data) {
     this.doAction = __bind(this.doAction, this);
-    var _ref, _ref1, _ref2;
+    var _ref, _ref1;
 
     this.id = (_ref = data.id) != null ? _ref.toString().toLowerCase() : void 0;
     this.number = ((_ref1 = data.number) != null ? _ref1.toString() : void 0) || '';
@@ -20,15 +20,28 @@ CUser = (function() {
     this.firstLiCssPrefix = 'm_button_action_';
     this.els = $();
     this.buttonEls = $();
+    this.init(data);
+  }
+
+  CUser.prototype.init = function(data) {
+    var _ref, _ref1, _ref2;
+
+    this.id = (_ref = data.id) != null ? _ref.toString().toLowerCase() : void 0;
+    this.number = ((_ref1 = data.number) != null ? _ref1.toString() : void 0) || '';
+    this.numberHtml = escapeHtml(data.number);
+    this.name = data.name;
+    this.nameHtml = data.name ? escapeHtml(data.name) : this.numberHtml;
+    this.avatarLink32x32 = data.avatarLink32x32 || this.defaultAvatar32 || '';
+    this.defaultAvatarCss = this.avatarLink32x32 ? '' : 'm_default';
     this.loadActions();
     if (((_ref2 = data.numberObj) != null ? _ref2.state : void 0) != null) {
-      this.setState(data.numberObj.state);
+      return this.setState(data.numberObj.state);
     } else if (data.state != null) {
-      this.setState(data.state);
+      return this.setState(data.state);
     } else {
-      this.setState(1);
+      return this.setState(1);
     }
-  }
+  };
 
   CUser.prototype.regexps = {
     name: /\{\{name\}\}/,

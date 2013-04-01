@@ -160,11 +160,17 @@ List = (function() {
       _this.filterInput.val(_this.filterInput.val() + $(e.currentTarget).find('button').data('num'));
       return _this.filterInput.keydown();
     });
+    this.setUserListHeight = function() {
+      return _this.usersListBlockEl.css({
+        height: $(window).height() - _this.usersListBlockEl[0].offsetTop + 'px'
+      });
+    };
+    this.setUserListHeight();
     oktell.on('disconnect', function() {
       return oktellConnected = false;
     });
     oktell.on('connect', function() {
-      var oId, oInfo, oUser, oUsers, user, _ref;
+      var oId, oInfo, oUser, oUsers, strNumber, user, _ref, _ref1;
 
       oktellConnected = true;
       oInfo = oktell.getMyInfo();
@@ -176,9 +182,15 @@ List = (function() {
       oUsers = oktell.getUsers();
       for (oId in oUsers) {
         oUser = oUsers[oId];
-        user = new CUser(oUser);
-        if (user.number) {
-          _this.usersByNumber[user.number] = user;
+        strNumber = ((_ref1 = oUser.number) != null ? _ref1.toString() : void 0) || '';
+        if (_this.usersByNumber[strNumber]) {
+          user = _this.usersByNumber[strNumber];
+          user.init(oUser);
+        } else {
+          user = new CUser(oUser);
+          if (user.number) {
+            _this.usersByNumber[user.number] = user;
+          }
         }
         if (user.id !== oInfo.userid) {
           _this.panelUsers.push(user);
@@ -191,14 +203,14 @@ List = (function() {
         return _this.reloadActions();
       });
       oktell.onNativeEvent('pbxnumberstatechanged', function(data) {
-        var n, numStr, _i, _len, _ref1, _ref2, _results;
+        var n, numStr, _i, _len, _ref2, _ref3, _results;
 
-        _ref1 = data.numbers;
+        _ref2 = data.numbers;
         _results = [];
-        for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
-          n = _ref1[_i];
+        for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
+          n = _ref2[_i];
           numStr = n.num.toString();
-          _results.push((_ref2 = _this.usersByNumber[numStr]) != null ? _ref2.setState(n.numstateid) : void 0);
+          _results.push((_ref3 = _this.usersByNumber[numStr]) != null ? _ref3.setState(n.numstateid) : void 0);
         }
         return _results;
       });
@@ -261,9 +273,9 @@ List = (function() {
       this.keypadIsVisible = Boolean(visible);
       this.keypadEl.stop(true, true);
       if (this.keypadIsVisible) {
-        return this.keypadEl.slideDown(200);
+        return this.keypadEl.slideDown(200, this.setUserListHeight);
       } else {
-        return this.keypadEl.slideUp(200);
+        return this.keypadEl.slideUp(200, this.setUserListHeight);
       }
     }
   };
@@ -407,9 +419,9 @@ List = (function() {
     }
     this._setUsersHtml(usersArray, listEl);
     if (usersArray.length && blockEl.is(':not(:visible)')) {
-      return blockEl.slideDown(200);
+      return blockEl.slideDown(200, this.setUserListHeight);
     } else if (usersArray.length === 0 && blockEl.is(':visible')) {
-      return blockEl.slideUp(200);
+      return blockEl.slideUp(200, this.setUserListHeight);
     }
   };
 
@@ -499,6 +511,7 @@ List = (function() {
       strNumber = data.number.toString();
     }
     if (this.usersByNumber[strNumber]) {
+      this.usersByNumber[strNumber].init(data);
       return this.usersByNumber[strNumber];
     }
     fantom = new CUser({

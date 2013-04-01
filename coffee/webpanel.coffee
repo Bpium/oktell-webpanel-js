@@ -1,8 +1,16 @@
-do ($, ko)->
+do ($)->
+
+	templates = {}
+
 	if not $ or not ko
 		throw new Error('Error init oktell panel, jQuery or Knockout.js is not defined')
 
+	#include
+
 	loadTemplate = (path) ->
+		if templates[path]?
+			return templates[path]
+		# for dev mode
 		html = ''
 		$.ajax
 			url: path
@@ -209,7 +217,7 @@ do ($, ko)->
 			addActionButtonToEl el
 		elsForInitButtonAfterConnect = []
 
-	initBttonOnElement = (el) ->
+	initButtonOnElement = (el) ->
 		el.addClass(getOptions().buttonCss)
 		phone = el.attr('data-phone')
 		if phone
@@ -218,10 +226,10 @@ do ($, ko)->
 			el.html button
 
 	addActionButtonToEl = (el) ->
-		if not oktellConnected
-			elsForInitButtonAfterConnect.push el
-		else
-			initBttonOnElement el
+#		if not oktellConnected
+#			elsForInitButtonAfterConnect.push el
+#		else
+		initButtonOnElement el
 
 	initActionButtons = (selector) ->
 		$(selector+":not(."+ actionButtonContainerClass + ")").each ->

@@ -120,6 +120,12 @@ class List
 			@filterInput.val( @filterInput.val() + $(e.currentTarget).find('button').data('num') )
 			@filterInput.keydown()
 
+		@setUserListHeight = =>
+			@usersListBlockEl.css
+				height: $(window).height() - @usersListBlockEl[0].offsetTop + 'px'
+
+		@setUserListHeight()
+
 		oktell.on 'disconnect', =>
 			oktellConnected = false
 
@@ -134,9 +140,15 @@ class List
 
 			oUsers = oktell.getUsers()
 			for oId, oUser of oUsers
-				user = new CUser oUser
-				if user.number
-					@usersByNumber[user.number] = user
+				strNumber = oUser.number?.toString() or ''
+				if @usersByNumber[strNumber]
+					user = @usersByNumber[strNumber]
+					user.init oUser
+				else
+					user = new CUser oUser
+					if user.number
+						@usersByNumber[user.number] = user
+
 				if user.id isnt oInfo.userid
 					@panelUsers.push user
 				else
@@ -201,9 +213,9 @@ class List
 			@keypadIsVisible = Boolean(visible)
 			@keypadEl.stop true, true
 			if @keypadIsVisible
-				@keypadEl.slideDown 200
+				@keypadEl.slideDown 200, @setUserListHeight
 			else
-				@keypadEl.slideUp 200
+				@keypadEl.slideUp 200, @setUserListHeight
 
 	addEventListenersForButton: (user, button) ->
 		button.bind 'click', =>
@@ -295,9 +307,9 @@ class List
 		usersArray.push(u) for k,u of users
 		@_setUsersHtml usersArray, listEl
 		if usersArray.length and blockEl.is(':not(:visible)')
-			blockEl.slideDown 200
+			blockEl.slideDown 200, @setUserListHeight
 		else if usersArray.length is 0 and blockEl.is(':visible')
-			blockEl.slideUp 200
+			blockEl.slideUp 200, @setUserListHeight
 
 
 	_setUsersHtml: (usersArray, $el) ->
@@ -361,6 +373,7 @@ class List
 			strNumber = data.number.toString()
 
 		if @usersByNumber[strNumber]
+			@usersByNumber[strNumber].init(data)
 			return @usersByNumber[strNumber]
 
 		fantom = new CUser
