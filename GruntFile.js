@@ -43,14 +43,18 @@ module.exports = function(grunt) {
       }
     },
     copy: {
-      main: {
+      css: {
         files: [
           {
             src: 'css/webpanel.css',
             dest: 'build/last/',
-            filter: 'isFile'
+            flatten: true,
+            expand: true
           }
         ]
+      },
+      main: {
+        files: []
       }
     },
     uglify: {
@@ -82,7 +86,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-compress');
-  grunt.registerTask('build', ['createbuildfolder', 'insertfilesasvars', 'coffee', 'uglify', 'cssmin', 'compress', 'copy', 'clean']);
+  grunt.registerTask('build', ['createbuildfolder', 'insertfilesasvars', 'coffee', 'uglify', 'cssmin', 'compress', 'copy:css', 'copy:main', 'clean']);
   grunt.registerTask('createbuildfolder', 'Create new folder in builds path with date in name', function() {
     var config, copyConf, folder, moment;
 
@@ -95,7 +99,8 @@ module.exports = function(grunt) {
     copyConf.main.files.push({
       dest: folder + '/',
       src: 'build/last/*',
-      flatten: true
+      flatten: true,
+      expand: true
     });
     grunt.config('copy', copyConf);
     return grunt.option('buildFolder', folder);

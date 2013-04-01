@@ -29,12 +29,10 @@ module.exports = (grunt) ->
 				files:
 					'build/last/webpanel.min.css': 'css/webpanel.css'
 		copy:
+			css:
+				files: [{ src: 'css/webpanel.css', dest: 'build/last/', flatten: true, expand: true }]
 			main:
-				files: [
-					src: 'css/webpanel.css'
-					dest: 'build/last/'
-					filter: 'isFile'
-				]
+				files: []
 		uglify:
 			main:
 				'build/last/webpanel.min.js': 'build/last/webpanel.js'
@@ -56,7 +54,7 @@ module.exports = (grunt) ->
 	grunt.loadNpmTasks 'grunt-contrib-clean'
 	grunt.loadNpmTasks 'grunt-contrib-compress'
 
-	grunt.registerTask 'build', ['createbuildfolder', 'insertfilesasvars', 'coffee', 'uglify', 'cssmin', 'compress', 'copy', 'clean' ]
+	grunt.registerTask 'build', ['createbuildfolder', 'insertfilesasvars', 'coffee', 'uglify', 'cssmin', 'compress', 'copy:css', 'copy:main', 'clean']
 
 	grunt.registerTask 'createbuildfolder', 'Create new folder in builds path with date in name', ->
 		config = grunt.config.get this.name
@@ -69,6 +67,7 @@ module.exports = (grunt) ->
 			dest: folder + '/'
 			src: 'build/last/*'
 			flatten: true
+			expand: true
 		grunt.config 'copy', copyConf
 		grunt.option 'buildFolder', folder
 
