@@ -145,12 +145,12 @@ do ($)->
 			mouseOnPanel = false
 			true
 
-		$('html').on 'mouseleave', (e) ->
+		$('html').bind 'mouseleave', (e) ->
 			killPanelHideTimer()
 			return true
 
 
-		$('html').on 'mousemove', (e) ->
+		$('html').bind 'mousemove', (e) ->
 			if not mouseOnPanel and panelHideTimer is false and not list.dropdownOpenedOnPanel
 				panelHideTimer = setTimeout ->
 					hidePanel()
@@ -247,3 +247,11 @@ do ($)->
 	$.fn.oktellButton = ->
 		$(this).each ->
 			addActionButtonToEl $(this)
+
+
+#	$.fn.oktellActions = ->
+#		$(this).each ->
+#			$(this).bind 'click', (e)->
+#				e.preventDefault()
+#				el = $(this)
+#				phone = el.data 'phone'

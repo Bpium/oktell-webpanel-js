@@ -144,11 +144,11 @@
       mouseOnPanel = false;
       return true;
     });
-    $('html').on('mouseleave', function(e) {
+    $('html').bind('mouseleave', function(e) {
       killPanelHideTimer();
       return true;
     });
-    $('html').on('mousemove', function(e) {
+    $('html').bind('mousemove', function(e) {
       if (!mouseOnPanel && panelHideTimer === false && !list.dropdownOpenedOnPanel) {
         panelHideTimer = setTimeout(function() {
           return hidePanel();

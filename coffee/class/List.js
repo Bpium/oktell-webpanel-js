@@ -3,7 +3,7 @@ var List;
 
 List = (function() {
   function List(oktell, panelEl, dropdownEl, afterOktellConnect, debugMode) {
-    var debouncedSetFilter, dropdownHideTimer, oktellConnected,
+    var debouncedSetFilter, debouncedSetHeight, dropdownHideTimer, oktellConnected, usersScroller,
       _this = this;
 
     this.allActions = {
@@ -111,17 +111,17 @@ List = (function() {
       }
       return true;
     });
-    this.panelEl.on('mouseenter', '.b_contact', function() {
+    this.panelEl.bind('mouseenter', '.b_contact', function() {
       var _ref;
 
       return (_ref = $(this).data('user')) != null ? _ref.isHovered(true) : void 0;
     });
-    this.panelEl.on('mouseleave', '.b_contact', function() {
+    this.panelEl.bind('mouseleave', '.b_contact', function() {
       var _ref;
 
       return (_ref = $(this).data('user')) != null ? _ref.isHovered(false) : void 0;
     });
-    this.panelEl.on('click', '.b_contact .drop_down', function(e) {
+    this.panelEl.bind('click', '.b_contact .drop_down', function(e) {
       var dropdown, user;
 
       dropdown = $(e.currentTarget);
@@ -130,7 +130,7 @@ List = (function() {
         return _this.showDropdown(user, dropdown.closest('.b_button_action'), user.loadOktellActions(), true);
       }
     });
-    this.dropdownEl.on('click', '[data-action]', function(e) {
+    this.dropdownEl.bind('click', '[data-action]', function(e) {
       var action, actionEl, user;
 
       actionEl = $(e.currentTarget);
@@ -166,6 +166,16 @@ List = (function() {
       });
     };
     this.setUserListHeight();
+    usersScroller = this.usersListBlockEl.find('.jscroll_scroller');
+    debouncedSetHeight = debounce(function() {
+      usersScroller.css({
+        top: '0px'
+      });
+      return _this.setUserListHeight();
+    }, 50);
+    $(window).bind('resize', function() {
+      return debouncedSetHeight();
+    });
     oktell.on('disconnect', function() {
       return oktellConnected = false;
     });

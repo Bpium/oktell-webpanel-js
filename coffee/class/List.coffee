@@ -82,18 +82,18 @@ class List
 				debouncedSetFilter()
 			return true
 
-		@panelEl.on 'mouseenter', '.b_contact', ->
+		@panelEl.bind 'mouseenter', '.b_contact', ->
 			$(this).data('user')?.isHovered true
-		@panelEl.on 'mouseleave', '.b_contact', ->
+		@panelEl.bind 'mouseleave', '.b_contact', ->
 			$(this).data('user')?.isHovered false
 
-		@panelEl.on 'click', '.b_contact .drop_down', (e)=>
+		@panelEl.bind 'click', '.b_contact .drop_down', (e)=>
 			dropdown = $(e.currentTarget)
 			user = dropdown.closest('.b_button_action').data('user')
 			if user
 				@showDropdown user, dropdown.closest('.b_button_action'), user.loadOktellActions(), true
 
-		@dropdownEl.on 'click', '[data-action]', (e) =>
+		@dropdownEl.bind 'click', '[data-action]', (e) =>
 			actionEl = $(e.currentTarget)
 			action = actionEl.data 'action'
 			user = @dropdownEl.data('user')
@@ -125,6 +125,13 @@ class List
 				height: $(window).height() - @usersListBlockEl[0].offsetTop + 'px'
 
 		@setUserListHeight()
+		usersScroller = @usersListBlockEl.find('.jscroll_scroller')
+		debouncedSetHeight = debounce =>
+			usersScroller.css({top:'0px'})
+			@setUserListHeight()
+		, 50
+		$(window).bind 'resize', ->
+			debouncedSetHeight()
 
 		oktell.on 'disconnect', =>
 			oktellConnected = false
