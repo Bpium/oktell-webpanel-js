@@ -1,6 +1,6 @@
-<ul style="display: none; z-index: 999; padding: 0; font-size: 13px; font-family: Tahoma;" class="b_actions_group_list"	data-bind="foreach: { data: items, as: 'a' }">
-	<li class="{{css}}" data-bind="click: $parent.doActionByClick, css: $data.css, hoverSelect: true" data-action="{{action}}">
+<ul style="display: none; z-index: 999; padding: 0; font-size: 13px; font-family: Tahoma;" class="b_actions_group_list">
+	<li class="{{css}}" data-action="{{action}}">
 		<i></i>
-		<span data-bind="text: a.text">{{actionText}}</span>
+		<span>{{actionText}}</span>
 	</li>
 </ul>

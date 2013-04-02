@@ -195,6 +195,7 @@ List = (function() {
         strNumber = ((_ref1 = oUser.number) != null ? _ref1.toString() : void 0) || '';
         if (_this.usersByNumber[strNumber]) {
           user = _this.usersByNumber[strNumber];
+          oUser.isFantom = false;
           user.init(oUser);
         } else {
           user = new CUser(oUser);
@@ -521,7 +522,9 @@ List = (function() {
       strNumber = data.number.toString();
     }
     if (this.usersByNumber[strNumber]) {
-      this.usersByNumber[strNumber].init(data);
+      if (this.usersByNumber[strNumber].isFantom) {
+        this.usersByNumber[strNumber].init(data);
+      }
       return this.usersByNumber[strNumber];
     }
     fantom = new CUser({

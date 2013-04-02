@@ -7,9 +7,11 @@ CUser = (function() {
     this.doAction = __bind(this.doAction, this);
     var _ref, _ref1;
 
+    log('create user', data);
     this.id = (_ref = data.id) != null ? _ref.toString().toLowerCase() : void 0;
+    this.isFantom = data.isFantom || false;
     this.number = ((_ref1 = data.number) != null ? _ref1.toString() : void 0) || '';
-    this.numberHtml = escapeHtml(data.number);
+    this.numberHtml = escapeHtml(this.number);
     this.name = data.name;
     this.nameHtml = data.name ? escapeHtml(data.name) : this.numberHtml;
     this.state = false;
@@ -26,9 +28,11 @@ CUser = (function() {
   CUser.prototype.init = function(data) {
     var _ref, _ref1, _ref2;
 
+    log('init user', data);
     this.id = (_ref = data.id) != null ? _ref.toString().toLowerCase() : void 0;
+    this.isFantom = data.isFantom || false;
     this.number = ((_ref1 = data.number) != null ? _ref1.toString() : void 0) || '';
-    this.numberHtml = escapeHtml(data.number);
+    this.numberHtml = escapeHtml(this.number);
     this.name = data.name;
     this.nameHtml = data.name ? escapeHtml(data.name) : this.numberHtml;
     this.avatarLink32x32 = data.avatarLink32x32 || this.defaultAvatar32 || '';
@@ -58,6 +62,13 @@ CUser = (function() {
       return;
     }
     this.state = state;
+    if (this.els.length) {
+      if (this.state === 0) {
+        this.els.removeClass('m_busy').addClass('m_offline');
+      } else if (this.state === 5) {
+        this.els.removeClass('m_offline').addClass('m_busy');
+      }
+    }
     if (this.buttonEls.length) {
       log('LOAD actions after state change ');
       this.loadActions();

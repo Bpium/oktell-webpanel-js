@@ -150,6 +150,7 @@ class List
 				strNumber = oUser.number?.toString() or ''
 				if @usersByNumber[strNumber]
 					user = @usersByNumber[strNumber]
+					oUser.isFantom = false
 					user.init oUser
 				else
 					user = new CUser oUser
@@ -380,7 +381,7 @@ class List
 			strNumber = data.number.toString()
 
 		if @usersByNumber[strNumber]
-			@usersByNumber[strNumber].init(data)
+			@usersByNumber[strNumber].init(data) if @usersByNumber[strNumber].isFantom
 			return @usersByNumber[strNumber]
 
 		fantom = new CUser

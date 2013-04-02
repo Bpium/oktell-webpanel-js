@@ -1,10 +1,11 @@
 class CUser
 
 	constructor: (data) ->
-
+		log 'create user', data
 		@id = data.id?.toString().toLowerCase()
+		@isFantom = data.isFantom or false
 		@number = data.number?.toString() or ''
-		@numberHtml = escapeHtml data.number
+		@numberHtml = escapeHtml @number
 		@name = data.name
 		@nameHtml = if data.name then escapeHtml(data.name) else @numberHtml
 		@state = false
@@ -22,9 +23,11 @@ class CUser
 
 
 	init: (data) ->
+		log 'init user', data
 		@id = data.id?.toString().toLowerCase()
+		@isFantom = data.isFantom or false
 		@number = data.number?.toString() or ''
-		@numberHtml = escapeHtml data.number
+		@numberHtml = escapeHtml @number
 		@name = data.name
 		@nameHtml = if data.name then escapeHtml(data.name) else @numberHtml
 		@avatarLink32x32 = data.avatarLink32x32 or @defaultAvatar32 or ''
@@ -50,6 +53,11 @@ class CUser
 		if state is @state
 			return
 		@state = state
+		if @els.length
+			if @state is 0
+				@els.removeClass('m_busy').addClass('m_offline')
+			else if @state is 5
+				@els.removeClass('m_offline').addClass('m_busy')
 		if @buttonEls.length
 			log 'LOAD actions after state change '
 			@loadActions()
