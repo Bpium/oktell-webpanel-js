@@ -58,6 +58,8 @@ class CUser
 				@els.removeClass('m_busy').addClass('m_offline')
 			else if @state is 5
 				@els.removeClass('m_offline').addClass('m_busy')
+			else
+				@els.removeClass('m_offline').removeClass('m_busy')
 		if @buttonEls.length
 			log 'LOAD actions after state change '
 			@loadActions()

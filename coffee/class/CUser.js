@@ -67,6 +67,8 @@ CUser = (function() {
         this.els.removeClass('m_busy').addClass('m_offline');
       } else if (this.state === 5) {
         this.els.removeClass('m_offline').addClass('m_busy');
+      } else {
+        this.els.removeClass('m_offline').removeClass('m_busy');
       }
     }
     if (this.buttonEls.length) {
