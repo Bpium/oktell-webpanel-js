@@ -228,9 +228,6 @@ do ($)->
 			el.html button
 
 	addActionButtonToEl = (el) ->
-#		if not oktellConnected
-#			elsForInitButtonAfterConnect.push el
-#		else
 		initButtonOnElement el
 
 	initActionButtons = (selector) ->
