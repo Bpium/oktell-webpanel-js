@@ -986,8 +986,8 @@
         position: fixed;
         top: 50%;
         left: 50%;
-        margin-top: -94px; /* 50% высоты */
-        margin-left: -250px;  /* 50% ширины */
+        margin-top: -94px;
+        margin-left: -250px;
         height: 188px;
         width: 500px;
     }
