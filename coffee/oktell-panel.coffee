@@ -114,7 +114,6 @@ do ($)->
 			clearTimeout panelHideTimer
 			panelHideTimer = false
 
-
 		panelEl.on "mouseenter", ->
 			mouseOnPanel = true
 			killPanelHideTimer()
@@ -211,19 +210,15 @@ do ($)->
 				element.animate animOptHide, 100, "swing", ->
 					element.removeClass(openClass).addClass(closeClass)
 
-	elsForInitButtonAfterConnect = []
 
 	afterOktellConnect = ->
 		oktellConnected = true
-		for el in elsForInitButtonAfterConnect
-			addActionButtonToEl el
-		elsForInitButtonAfterConnect = []
 
 	initButtonOnElement = (el) ->
 		el.addClass(getOptions().buttonCss)
 		phone = el.attr('data-phone')
 		if phone
-			button = list.getUserButtonForPlagin phone
+			button = list.getUserButtonForPlugin phone
 			log 'generated button for ' + phone, button
 			el.html button
 

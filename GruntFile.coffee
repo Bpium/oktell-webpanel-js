@@ -7,16 +7,16 @@ module.exports = (grunt) ->
 			path: 'builds'
 		insertfilesasvars:
 			htmlminTaskName: 'templates'
-			target: 'coffee/webpanel.coffee'
-			dest: 'buildlast/webpanel.coffee'
+			target: 'coffee/oktell-panel.coffee'
+			dest: 'buildlast/oktell-panel.coffee'
 			regexFind: /loadTemplate(?:\s*\(\s*|\s+)[\"\'](.+?)[\"\']\s*\)*/
 			find: 'templates = {}'
 			replace: 'templates = '
 
 		includecoffee:
 			main:
-				target: 'buildlast/webpanel.coffee'
-				dest: 'buildlast/webpanel.coffee'
+				target: 'buildlast/oktell-panel.coffee'
+				dest: 'buildlast/oktell-panel.coffee'
 				regexp: /\#includecoffee\s+(.+?)[ \r\n]+/
 		htmlmin:
 			templates:
@@ -29,28 +29,28 @@ module.exports = (grunt) ->
 				options:
 					bare: true
 				files:
-					'buildlast/webpanel.js': 'buildlast/webpanel.coffee'
+					'buildlast/oktell-panel.js': 'buildlast/oktell-panel.coffee'
 		cssmin:
 			css:
 				files:
-					'buildlast/webpanel.min.css': 'css/webpanel.css'
+					'buildlast/oktell-panel.min.css': 'css/oktell-panel.css'
 		copy:
 			css:
 				files: [
-					{ src: 'css/webpanel.css', dest: 'buildlast/', flatten: true, expand: true }
+					{ src: 'css/oktell-panel.css', dest: 'buildlast/', flatten: true, expand: true }
 				]
 			main:
 				files: []
 		uglify:
 			main:
-				files: { 'buildlast/webpanel.min.js': 'buildlast/webpanel.js' }
+				files: { 'buildlast/oktell-panel.min.js': 'buildlast/oktell-panel.js' }
 		clean:
 			temp: ['temp/*']
 			buildlast: ['buildlast/*']
 		compress:
 			main:
 				options: {
-					archive: 'buildlast/webpanel.zip'
+					archive: 'buildlast/oktell-panel.zip'
 					mode: 'zip'
 					pretty: true
 				},

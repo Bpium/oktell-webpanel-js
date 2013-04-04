@@ -3,10 +3,6 @@ log = ->
 		console.log.apply(console, arguments);
 	catch e
 
-#	callFunc = (callback) ->
-#		if typeof callback is 'function'
-#			callback.apply(this, Array.prototype.slice.call( arguments, 1 ) )
-
 debounce = (func, wait, immediate) ->
 	timeout = ''
 	return ->

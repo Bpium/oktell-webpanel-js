@@ -10,16 +10,16 @@ module.exports = function(grunt) {
     },
     insertfilesasvars: {
       htmlminTaskName: 'templates',
-      target: 'coffee/webpanel.coffee',
-      dest: 'buildlast/webpanel.coffee',
+      target: 'coffee/oktell-panel.coffee',
+      dest: 'buildlast/oktell-panel.coffee',
       regexFind: /loadTemplate(?:\s*\(\s*|\s+)[\"\'](.+?)[\"\']\s*\)*/,
       find: 'templates = {}',
       replace: 'templates = '
     },
     includecoffee: {
       main: {
-        target: 'buildlast/webpanel.coffee',
-        dest: 'buildlast/webpanel.coffee',
+        target: 'buildlast/oktell-panel.coffee',
+        dest: 'buildlast/oktell-panel.coffee',
         regexp: /\#includecoffee\s+(.+?)[ \r\n]+/
       }
     },
@@ -38,14 +38,14 @@ module.exports = function(grunt) {
           bare: true
         },
         files: {
-          'buildlast/webpanel.js': 'buildlast/webpanel.coffee'
+          'buildlast/oktell-panel.js': 'buildlast/oktell-panel.coffee'
         }
       }
     },
     cssmin: {
       css: {
         files: {
-          'buildlast/webpanel.min.css': 'css/webpanel.css'
+          'buildlast/oktell-panel.min.css': 'css/oktell-panel.css'
         }
       }
     },
@@ -53,7 +53,7 @@ module.exports = function(grunt) {
       css: {
         files: [
           {
-            src: 'css/webpanel.css',
+            src: 'css/oktell-panel.css',
             dest: 'buildlast/',
             flatten: true,
             expand: true
@@ -67,7 +67,7 @@ module.exports = function(grunt) {
     uglify: {
       main: {
         files: {
-          'buildlast/webpanel.min.js': 'buildlast/webpanel.js'
+          'buildlast/oktell-panel.min.js': 'buildlast/oktell-panel.js'
         }
       }
     },
@@ -78,7 +78,7 @@ module.exports = function(grunt) {
     compress: {
       main: {
         options: {
-          archive: 'buildlast/webpanel.zip',
+          archive: 'buildlast/oktell-panel.zip',
           mode: 'zip',
           pretty: true
         },
