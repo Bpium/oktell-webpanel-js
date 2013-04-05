@@ -143,7 +143,7 @@ CUser = (function() {
     actions = this.loadOktellActions();
     action = (actions != null ? actions[0] : void 0) || '';
     if (this.buttonLastAction === action) {
-      return;
+      return actions;
     }
     if (this.buttonLastAction) {
       this.buttonEls.removeClass(this.firstLiCssPrefix + this.buttonLastAction.toLowerCase());

@@ -298,17 +298,19 @@ List = (function() {
   }
 
   List.prototype.getUserButtonForPlugin = function(phone) {
-    var actions, button, user,
+    var button, user,
       _this = this;
 
     user = this.getUser(phone);
     if (!this.oktellConnected) {
       this.usersWithBeforeConnectButtons.push(user);
     }
-    actions = user.loadActions();
     this.userWithGeneratedButtons[phone] = user;
     button = user.getButtonEl();
     button.find('.drop_down').bind('click', function() {
+      var actions;
+
+      actions = user.loadActions();
       return _this.showDropdown(user, button, actions);
     });
     return button;

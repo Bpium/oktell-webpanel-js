@@ -112,13 +112,13 @@ class CUser
 	loadOktellActions: ->
 		@oktell.getPhoneActions @id or @number
 
-	loadActions: ->
+	loadActions: ()->
 		actions = @loadOktellActions()
 		#log 'load action for user id='+@id+' number='+@number+' actions='+actions
 		#window.cuser = @
 		action = actions?[0] or ''
 		if @buttonLastAction is action
-			return
+			return actions
 
 		if @buttonLastAction
 			@buttonEls.removeClass @firstLiCssPrefix + @buttonLastAction.toLowerCase()

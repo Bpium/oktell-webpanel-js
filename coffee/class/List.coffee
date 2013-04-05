@@ -235,10 +235,10 @@ class List
 		if not @oktellConnected
 			@usersWithBeforeConnectButtons.push user
 		#log '!!! getUserButtonForPlugin for ' + user.getInfo()
-		actions = user.loadActions()
 		@userWithGeneratedButtons[phone] = user
 		button = user.getButtonEl()
 		button.find('.drop_down').bind 'click', =>
+			actions = user.loadActions()
 			@showDropdown user, button, actions
 		return button
 
