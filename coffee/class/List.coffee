@@ -33,6 +33,7 @@ class List
 		@panelUsersFiltered = []
 		@abonents = {}
 		@hold = {}
+		@queue = {}
 		@oktell = oktell
 		CUser.prototype.oktell = oktell
 		@filter = false
@@ -55,12 +56,19 @@ class List
 		@filterClearCross = @panelEl.find '.jInputClear_close'
 		debouncedSetFilter = false
 
+		@usersWithBeforeConnectButtons = []
+
 		@jScroll @usersListBlockEl
+		@usersScroller = @usersListBlockEl.find('.jscroll_scroller')
+		@userScrollerToTop = =>
+			@usersScroller.css({top:'0px'})
 
 		@filterClearCross.bind 'click', =>
 			@clearFilter()
 
 		@filterInput.bind 'keyup', (e)=>
+			if not @oktellConnected
+				return true
 			if not debouncedSetFilter
 				debouncedSetFilter = debounce =>
 					@setFilter @filterInput.val()
@@ -82,20 +90,32 @@ class List
 				debouncedSetFilter()
 			return true
 
-		@panelEl.bind 'mouseenter', '.b_contact', ->
+		@panelEl.bind 'mouseenter', ->
 			$(this).data('user')?.isHovered true
-		@panelEl.bind 'mouseleave', '.b_contact', ->
+		@panelEl.bind 'mouseleave', ->
 			$(this).data('user')?.isHovered false
 
-		@panelEl.bind 'click', '.b_contact .drop_down', (e)=>
-			dropdown = $(e.currentTarget)
-			user = dropdown.closest('.b_button_action').data('user')
+		@panelEl.bind 'click', (e)=>
+			target = $(e.target)
+			if not target.is('.b_contact .drop_down') and target.closest('.b_contact .drop_down').size() is 0
+				return true
+			buttonEl = target.closest('.b_button_action')
+			if buttonEl.size() is 0
+				return true
+			user = buttonEl.data('user')
 			if user
-				@showDropdown user, dropdown.closest('.b_button_action'), user.loadOktellActions(), true
+				@showDropdown user, buttonEl, user.loadOktellActions(), true
 
-		@dropdownEl.bind 'click', '[data-action]', (e) =>
-			actionEl = $(e.currentTarget)
+		@dropdownEl.bind 'click', (e) =>
+			target = $(e.target)
+			if target.is('[data-action]')
+				actionEl = target
+			else if target.closest('[data-action]').size() isnt 0
+				actionEl = target.closest('[data-action]')
+			else
+				return true
 			action = actionEl.data 'action'
+			if not action then return
 			user = @dropdownEl.data('user')
 			if action and user
 				user.doAction action
@@ -118,26 +138,35 @@ class List
 		@keypadEl.find('li').bind 'click', (e) =>
 			@filterInput.focus()
 			@filterInput.val( @filterInput.val() + $(e.currentTarget).find('button').data('num') )
-			@filterInput.keydown()
+			@filterInput.keyup()
 
 		@setUserListHeight = =>
 			@usersListBlockEl.css
 				height: $(window).height() - @usersListBlockEl[0].offsetTop + 'px'
 
 		@setUserListHeight()
-		usersScroller = @usersListBlockEl.find('.jscroll_scroller')
+
 		debouncedSetHeight = debounce =>
-			usersScroller.css({top:'0px'})
+			@userScrollerToTop()
 			@setUserListHeight()
 		, 50
 		$(window).bind 'resize', ->
 			debouncedSetHeight()
 
 		oktell.on 'disconnect', =>
-			oktellConnected = false
+			@oktellConnected = false
+			@usersByNumber = {}
+			@panelUsers = []
+			@setPanelUsersHtml []
+			@setAbonents []
+			@setHold {hasHold:false}
+			@filterInput.val('')
+			@setFilter '', true
+			@setQueue []
+
 
 		oktell.on 'connect', =>
-			oktellConnected = true
+			@oktellConnected = true
 			oInfo = oktell.getMyInfo()
 			oInfo.userid = oInfo.userid.toString().toLowerCase()
 			@myNumber = oInfo.number?.toString()
@@ -146,7 +175,7 @@ class List
 			CUser.prototype.defaultAvatar64 = oInfo.defaultAvatar64x64
 
 			oUsers = oktell.getUsers()
-			for oId, oUser of oUsers
+			for own oId, oUser of oUsers
 				strNumber = oUser.number?.toString() or ''
 				if @usersByNumber[strNumber]
 					user = @usersByNumber[strNumber]
@@ -189,23 +218,28 @@ class List
 			@setAbonents oktell.getAbonents()
 			@setHold oktell.getHoldInfo()
 
-			@setFilter ''
+			@setFilter '', true
 
-			setInterval =>
-				if oktellConnected
-					oktell.getQueue (data)=>
-						if data.result
-							@setQueue data.queue
-			, if debugMode then 999999999 else 5000
+			oktell.on 'queueChange', (queue) =>
+				@setQueue queue
+			oktell.getQueue (data) =>
+				@setQueue data.queue if data.result
+
+			for user in @usersWithBeforeConnectButtons
+				user.loadActions()
 
 			if typeof afterOktellConnect is 'function' then afterOktellConnect()
 
-	getUserButtonForPlagin: (phone) ->
+	getUserButtonForPlugin: (phone) ->
 		user = @getUser phone
+		if not @oktellConnected
+			@usersWithBeforeConnectButtons.push user
+		#log '!!! getUserButtonForPlugin for ' + user.getInfo()
+		actions = user.loadActions()
 		@userWithGeneratedButtons[phone] = user
 		button = user.getButtonEl()
 		button.find('.drop_down').bind 'click', =>
-			@showDropdown user, button, user.loadOktellActions()
+			@showDropdown user, button, actions
 		return button
 
 	clearFilter: ->
@@ -262,7 +296,7 @@ class List
 			@dropdownEl.hide()
 
 	logUsers: ->
-		for k,u of @panelUsersFiltered
+		for own k,u of @panelUsersFiltered
 			log u.getInfo()
 
 	syncAbonentsAndUserlist: (abonents, userlist) ->
@@ -279,7 +313,7 @@ class List
 					state: 5
 				userlist[u.number] = u
 
-		for uNumber, user of userlist
+		for own uNumber, user of userlist
 			if not absByNumber[user.number]
 				delete userlist[user.number]
 
@@ -289,6 +323,8 @@ class List
 
 	setQueue: (queue) ->
 		@syncAbonentsAndUserlist queue, @queue
+		for own key, user of @queue
+			user.loadActions()
 		@setQueueHtml()
 
 	setHold: (holdInfo) ->
@@ -300,6 +336,7 @@ class List
 
 	setPanelUsersHtml: (usersArray) ->
 		@_setUsersHtml usersArray, @usersListEl
+		@userScrollerToTop()
 
 	setAbonentsHtml: ->
 		@_setActivityPanelUserHtml @abonents, @abonentsListEl, @abonentsListBlock
@@ -312,7 +349,7 @@ class List
 
 	_setActivityPanelUserHtml: (users, listEl, blockEl) ->
 		usersArray = []
-		usersArray.push(u) for k,u of users
+		usersArray.push(u) for own k,u of users
 		@_setUsersHtml usersArray, listEl
 		if usersArray.length and blockEl.is(':not(:visible)')
 			blockEl.slideDown 200, @setUserListHeight
@@ -344,8 +381,8 @@ class List
 					else if a.name < b.name
 						-1
 
-	setFilter: (filter) ->
-		if @filter is filter then return false
+	setFilter: (filter, reloadAnyway) ->
+		if @filter is filter and not reloadAnyway then return false
 		oldFilter = @filter
 		@filter = filter
 #		if @filterInput.val() isnt @filter
@@ -396,7 +433,7 @@ class List
 
 	reloadActions: ->
 		setTimeout =>
-			for phone, user of @userWithGeneratedButtons
+			for own phone, user of @userWithGeneratedButtons
 				actions = user.loadActions()
-				log 'reload actions for ' + user.getInfo() + ' ' + actions
+				#log 'reload actions for ' + user.getInfo() + ' ' + actions
 		, 100

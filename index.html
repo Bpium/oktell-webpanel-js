@@ -4,7 +4,7 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 	<title>Тестовая страничка для вебпанели</title>
 
-	<link rel="stylesheet" href="/css/webpanel.css"/>
+	<link rel="stylesheet" href="/css/oktell-panel.css"/>
 
 	<script type="text/javascript" src="/jslib/vendor/jquery-1.9.1.js"></script>
 	<script type="text/javascript" src="/jslib/vendor/oktell.js"></script>
@@ -28,7 +28,7 @@
 		window.oktell = new Oktell
 	</script>
 
-	<script type="text/javascript" src="/coffee/webpanel.js"></script>
+	<script type="text/javascript" src="/coffee/oktell-panel.js"></script>
 
 	<script type="text/javascript">
 		$(function(){
@@ -40,14 +40,23 @@
 				stateEl.text('Ошибка')
 			});
 
+			var statesLogel = $('#webstate')
+			oktell.on('statusChange', function(newS, oldS){
+				var d = new Date();
+				statesLogel.append( '<p>Cтатус = "' + newS + '", предыдущий статус = "' + oldS + '", время смены ' + d.getHours()+':'+ d.getMinutes()+':'+ d.getSeconds() + '</p>' );
+			});
+
 			oktell.connect({
-				url: ['192.168.0.61', '127.0.0.1'],
-				login: 'a6',
-				password: 'a6',
+				//url: ['213.239.200.141'],
+				url: ['192.168.0.61'],
+				login: 'a3',
+				password: 'a3',
 				debugMode: true,
 				openTimeout: 5000,
+				webSocketSwfLocation: '/jslib/vendor/WebSocketMain.swf',
 				expires: 84600,
 				queryTimeout: 5000,
+				queueInterval: 999999,
 //				defaultAvatar: '/img/noavatar.png',
 //				defaultAvatar32x32: '/img/noavatar.png',
 //				defaultAvatar64x64: '/img/noavatar.png',
@@ -61,6 +70,7 @@
 				}
 			});
 
+			$('.setStatus').click(function(){ oktell.setStatus($(this).data('status'), false, 'break message')});
 
 			$.oktellPanel({
 				oktell: oktell,
@@ -76,15 +86,23 @@
 <body>
 	<div style="width: 500px; height: 500px;">
 		<style type="text/css">
-			/*.userPhone {*/
-				/*width: 80px;*/
-				/*height: 30px;*/
-				/*background-color: #e3dfdf;*/
-			/*}*/
+			.userPhone {
+				float: right;
+				display: inline-block;
+			}
+			.user {
+				width: 200px;
+				padding-bottom: 10px;
+			}
 		</style>
 		<span>Статус:</span> <span id="connectionState">Соединение</span><br>
-		103 <span class="userPhone" data-phone="103"></span><br>
-		101 <span class="userPhone" data-phone="101"></span><br>
+		<button class="setStatus" data-status="ready">set Ready</button><br>
+		<button class="setStatus" data-status="dnd">set DND</button><br>
+		<button class="setStatus" data-status="redirect">set Redirect</button><br>
+		<button class="setStatus" data-status="break">set Break with text</button><br>
+		<div id="webstate"></div><br>
+		<p class="user">Дмитрий Е. 103<span class="userPhone" data-phone="103"></span></p>
+		<p class="user">Алексей В. 101<span class="userPhone" data-phone="101"></span></p>
 		102 <span class="userPhone" data-phone="102"></span><br>
 		104 <span class="userPhone" data-phone="104"></span><br>
 		105 <span class="userPhone" data-phone="105"></span><br>
@@ -174,7 +192,7 @@
 				</li>
 			</ul><br>
 			<br>
-            <ul style="z-index: 999; padding: 0px; font-size: 13px; font-family: Tahoma; top: 80px; left: 350px; visibility: visible; display: inline-block" class="b_actions_group_list">
+            <ul style="z-index: 999; padding: 0px; font-size: 13px; font-family: Tahoma; top: 80px; left: 500px; visibility: visible; display: inline-block" class="b_actions_group_list">
                 <li class="i_call g_first" data-bind="click: $parent.doActionByClick, css: $data.css, hoverSelect: true" data-action="call">
                     <i></i>
                     <span data-bind="text: a.text">Позвонить</span>

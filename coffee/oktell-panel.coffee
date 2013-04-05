@@ -92,7 +92,8 @@ do ($)->
 		$("body").append(panelEl)
 
 		list = new List oktell, panelEl, actionListEl, afterOktellConnect, getOptions().debug
-		window.list = list
+		if getOptions().debug
+			window.wList = list
 
 		if panelPos is "right"
 			panelEl.addClass("right");
@@ -113,7 +114,6 @@ do ($)->
 		killPanelHideTimer = ->
 			clearTimeout panelHideTimer
 			panelHideTimer = false
-
 
 		panelEl.on "mouseenter", ->
 			mouseOnPanel = true
@@ -211,19 +211,15 @@ do ($)->
 				element.animate animOptHide, 100, "swing", ->
 					element.removeClass(openClass).addClass(closeClass)
 
-	elsForInitButtonAfterConnect = []
 
 	afterOktellConnect = ->
 		oktellConnected = true
-		for el in elsForInitButtonAfterConnect
-			addActionButtonToEl el
-		elsForInitButtonAfterConnect = []
 
 	initButtonOnElement = (el) ->
 		el.addClass(getOptions().buttonCss)
 		phone = el.attr('data-phone')
 		if phone
-			button = list.getUserButtonForPlagin phone
+			button = list.getUserButtonForPlugin phone
 			log 'generated button for ' + phone, button
 			el.html button
 

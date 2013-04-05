@@ -1,7 +1,7 @@
 class CUser
 
 	constructor: (data) ->
-		log 'create user', data
+		#log 'create user', data
 		@id = data.id?.toString().toLowerCase()
 		@isFantom = data.isFantom or false
 		@number = data.number?.toString() or ''
@@ -23,7 +23,7 @@ class CUser
 
 
 	init: (data) ->
-		log 'init user', data
+		#log 'init user', data
 		@id = data.id?.toString().toLowerCase()
 		@isFantom = data.isFantom or false
 		@number = data.number?.toString() or ''
@@ -61,7 +61,7 @@ class CUser
 			else
 				@els.removeClass('m_offline').removeClass('m_busy')
 		if @buttonEls.length
-			log 'LOAD actions after state change '
+			#log 'LOAD actions after state change '
 			@loadActions()
 			setTimeout =>
 				@loadActions()
@@ -114,8 +114,8 @@ class CUser
 
 	loadActions: ->
 		actions = @loadOktellActions()
-		log 'load action for user id='+@id+' number='+@number+' actions='+actions
-		window.cuser = @
+		#log 'load action for user id='+@id+' number='+@number+' actions='+actions
+		#window.cuser = @
 		action = actions?[0] or ''
 		if @buttonLastAction is action
 			return

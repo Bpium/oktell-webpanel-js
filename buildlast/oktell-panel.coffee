@@ -2,17 +2,13 @@ do ($)->
 	if not $
 		throw new Error('Error init oktell panel, jQuery ( $ ) is not defined')
 
-	templates = {'templates/actionButton.html':'<ul class="b_button_action"><li class="g_first"><i></i></li><li class="g_last drop_down"><i></i></li></ul>', 'templates/actionList.html':'<ul style="display: none; z-index: 999; padding: 0; font-size: 13px; font-family: Tahoma" class="b_actions_group_list" data-bind="foreach: { data: items, as: \'a\' }"><li class="{{css}}" data-bind="click: $parent.doActionByClick, css: $data.css, hoverSelect: true" data-action="{{action}}"><i></i><span data-bind="text: a.text">{{actionText}}</span></li></ul>', 'templates/user.html':'<tr class="b_contact" data-bind1="hoverSelect: true, actionBar: $data, css: { \'m_offline\': $data.isOffline, \'m_busy\': $data.isBusy }"><td class="b_contact_avatar {{css}}"><img data-bind="attr: { src: $data.avatarLink32x32 }" src="{{avatarLink32x32}}"><i></i><div class="o_busy"></div></td><td class="b_contact_title"><div class="wrapword"><a><b data-bind="text: $data.name">{{name}}</b><span class="o_number" data-bind="text: $data.showedNumber">{{number}}</span></a></div></td></tr>', 'templates/panel.html':'<div class="l_panel j_panel"><div class="i_panel_bookmark"><div class="i_panel_bookmark_bg"></div></div><div class="h_panel_bg"><div class="h_padding" style="height: 100%"><div class="b_marks i_conference j_abonents" style="display: none"><div class="b_marks_noise"><p class="b_marks_header"><span class="b_marks_label">{{inTalk}}</span><span class="b_marks_time"></span></p><table><tbody></tbody></table></div></div><div class="b_marks i_flash j_hold" style="display: none"><div class="b_marks_noise"><p class="b_marks_header"><span class="b_marks_label">{{onHold}}</span></p><table class="j_table_favorite"><tbody></tbody></table></div></div><div class="b_marks i_flash j_queue" style="display: none"><div class="b_marks_noise"><p class="b_marks_header"><span class="b_marks_label">{{queue}}</span></p><table class="j_table_queue"><tbody></tbody></table></div></div><div class="b_inconversation j_phone_block"><table class="j_table_phone" style="width: 100%"><tbody></tbody></table></div><div class="b_marks i_phone"><div class="h_shadow_bottom"><div class="h_phone_number_input"><div class="i_phone_state_bg"></div><div class="h_input_padding"><div class="i_phone_popup_button j_keypad_expand"><i></i></div><div class="jInputClear_hover"><input class="b_phone_number_input" type="text" placeholder="{{inputPlaceholder}}"><span class="jInputClear_close">&times;</span></div></div><div class="b_phone_keypad j_phone_keypad" style="display: none"><div class="l_column_group"><div class="h_phone_keypad"><ul class="b_phone_panel"><li class="g_top_left g_first"><button data-num="1" class="g_button m_big">1</button></li><li><button data-num="2" class="g_button m_big">2</button></li><li class="g_top_right g_right"><button data-num="3" class="g_button m_big">3</button></li><li class="g_float_celar g_first"><button data-num="4" class="g_button m_big">4</button></li><li><button data-num="5" class="g_button m_big">5</button></li><li class="g_right"><button data-num="6" class="g_button m_big">6</button></li><li class="g_float_celar g_first"><button data-num="7" class="g_button m_big">7</button></li><li><button data-num="8" class="g_button m_big">8</button></li><li class="g_right"><button data-num="9" class="g_button m_big">9</button></li><li class="g_bottom_left g_float_celar g_first"><button data-num="*" class="g_button m_big">&lowast;</button></li><li class="g_bottom_center"><button data-num="0" class="g_button m_big">0</button></li><li class="g_bottom_right g_right"><button data-num="#" class="g_button m_big">#</button></li></ul></div></div></div></div></div></div><div class="j_main_list" style="height: 100%; overflow: hidden"><table class="b_main_list"><tbody></tbody></table></div></div></div></div>', }
+	templates = {'templates/actionButton.html':'<ul class="b_button_action"><li class="g_first"><i></i></li><li class="g_last drop_down"><i></i></li></ul>', 'templates/actionList.html':'<ul style="display: none; z-index: 999; padding: 0; font-size: 13px; font-family: Tahoma" class="b_actions_group_list"><li class="{{css}}" data-action="{{action}}"><i></i><span>{{actionText}}</span></li></ul>', 'templates/user.html':'<tr class="b_contact"><td class="b_contact_avatar {{css}}"><img src="{{avatarLink32x32}}"><i></i><div class="o_busy"></div></td><td class="b_contact_title"><div class="wrapword"><a><b>{{name}}</b><span class="o_number">{{number}}</span></a></div></td></tr>', 'templates/panel.html':'<div class="l_panel j_panel"><div class="i_panel_bookmark"><div class="i_panel_bookmark_bg"></div></div><div class="h_panel_bg"><div class="h_padding" style="height: 100%"><div class="b_marks i_conference j_abonents" style="display: none"><div class="b_marks_noise"><p class="b_marks_header"><span class="b_marks_label">{{inTalk}}</span><span class="b_marks_time"></span></p><table><tbody></tbody></table></div></div><div class="b_marks i_flash j_hold" style="display: none"><div class="b_marks_noise"><p class="b_marks_header"><span class="b_marks_label">{{onHold}}</span></p><table class="j_table_favorite"><tbody></tbody></table></div></div><div class="b_marks i_flash j_queue" style="display: none"><div class="b_marks_noise"><p class="b_marks_header"><span class="b_marks_label">{{queue}}</span></p><table class="j_table_queue"><tbody></tbody></table></div></div><div class="b_inconversation j_phone_block"><table class="j_table_phone" style="width: 100%"><tbody></tbody></table></div><div class="b_marks i_phone"><div class="h_shadow_bottom"><div class="h_phone_number_input"><div class="i_phone_state_bg"></div><div class="h_input_padding"><div class="i_phone_popup_button j_keypad_expand"><i></i></div><div class="jInputClear_hover"><input class="b_phone_number_input" type="text" placeholder="{{inputPlaceholder}}"><span class="jInputClear_close">&times;</span></div></div><div class="b_phone_keypad j_phone_keypad" style="display: none"><div class="l_column_group"><div class="h_phone_keypad"><ul class="b_phone_panel"><li class="g_top_left g_first"><button data-num="1" class="g_button m_big">1</button></li><li><button data-num="2" class="g_button m_big">2</button></li><li class="g_top_right g_right"><button data-num="3" class="g_button m_big">3</button></li><li class="g_float_celar g_first"><button data-num="4" class="g_button m_big">4</button></li><li><button data-num="5" class="g_button m_big">5</button></li><li class="g_right"><button data-num="6" class="g_button m_big">6</button></li><li class="g_float_celar g_first"><button data-num="7" class="g_button m_big">7</button></li><li><button data-num="8" class="g_button m_big">8</button></li><li class="g_right"><button data-num="9" class="g_button m_big">9</button></li><li class="g_bottom_left g_float_celar g_first"><button data-num="*" class="g_button m_big">&lowast;</button></li><li class="g_bottom_center"><button data-num="0" class="g_button m_big">0</button></li><li class="g_bottom_right g_right"><button data-num="#" class="g_button m_big">#</button></li></ul></div></div></div></div></div></div><div class="j_main_list" style="height: 100%; overflow: hidden"><table class="b_main_list"><tbody></tbody></table></div></div></div></div>', }
 
 	#includecoffee coffee/utils.coffee
 	log = ->
 		try
 			console.log.apply(console, arguments);
 		catch e
-	
-	#	callFunc = (callback) ->
-	#		if typeof callback is 'function'
-	#			callback.apply(this, Array.prototype.slice.call( arguments, 1 ) )
 	
 	debounce = (func, wait, immediate) ->
 		timeout = ''
@@ -367,10 +363,11 @@ do ($)->
 	class CUser
 	
 		constructor: (data) ->
-	
+			#log 'create user', data
 			@id = data.id?.toString().toLowerCase()
+			@isFantom = data.isFantom or false
 			@number = data.number?.toString() or ''
-			@numberHtml = escapeHtml data.number
+			@numberHtml = escapeHtml @number
 			@name = data.name
 			@nameHtml = if data.name then escapeHtml(data.name) else @numberHtml
 			@state = false
@@ -388,9 +385,11 @@ do ($)->
 	
 	
 		init: (data) ->
+			#log 'init user', data
 			@id = data.id?.toString().toLowerCase()
+			@isFantom = data.isFantom or false
 			@number = data.number?.toString() or ''
-			@numberHtml = escapeHtml data.number
+			@numberHtml = escapeHtml @number
 			@name = data.name
 			@nameHtml = if data.name then escapeHtml(data.name) else @numberHtml
 			@avatarLink32x32 = data.avatarLink32x32 or @defaultAvatar32 or ''
@@ -416,8 +415,15 @@ do ($)->
 			if state is @state
 				return
 			@state = state
+			if @els.length
+				if @state is 0
+					@els.removeClass('m_busy').addClass('m_offline')
+				else if @state is 5
+					@els.removeClass('m_offline').addClass('m_busy')
+				else
+					@els.removeClass('m_offline').removeClass('m_busy')
 			if @buttonEls.length
-				log 'LOAD actions after state change '
+				#log 'LOAD actions after state change '
 				@loadActions()
 				setTimeout =>
 					@loadActions()
@@ -470,8 +476,8 @@ do ($)->
 	
 		loadActions: ->
 			actions = @loadOktellActions()
-			log 'load action for user id='+@id+' number='+@number+' actions='+actions
-			window.cuser = @
+			#log 'load action for user id='+@id+' number='+@number+' actions='+actions
+			#window.cuser = @
 			action = actions?[0] or ''
 			if @buttonLastAction is action
 				return
@@ -563,6 +569,7 @@ do ($)->
 			@panelUsersFiltered = []
 			@abonents = {}
 			@hold = {}
+			@queue = {}
 			@oktell = oktell
 			CUser.prototype.oktell = oktell
 			@filter = false
@@ -585,12 +592,19 @@ do ($)->
 			@filterClearCross = @panelEl.find '.jInputClear_close'
 			debouncedSetFilter = false
 	
+			@usersWithBeforeConnectButtons = []
+	
 			@jScroll @usersListBlockEl
+			@usersScroller = @usersListBlockEl.find('.jscroll_scroller')
+			@userScrollerToTop = =>
+				@usersScroller.css({top:'0px'})
 	
 			@filterClearCross.bind 'click', =>
 				@clearFilter()
 	
 			@filterInput.bind 'keyup', (e)=>
+				if not @oktellConnected
+					return true
 				if not debouncedSetFilter
 					debouncedSetFilter = debounce =>
 						@setFilter @filterInput.val()
@@ -612,20 +626,32 @@ do ($)->
 					debouncedSetFilter()
 				return true
 	
-			@panelEl.on 'mouseenter', '.b_contact', ->
+			@panelEl.bind 'mouseenter', ->
 				$(this).data('user')?.isHovered true
-			@panelEl.on 'mouseleave', '.b_contact', ->
+			@panelEl.bind 'mouseleave', ->
 				$(this).data('user')?.isHovered false
 	
-			@panelEl.on 'click', '.b_contact .drop_down', (e)=>
-				dropdown = $(e.currentTarget)
-				user = dropdown.closest('.b_button_action').data('user')
+			@panelEl.bind 'click', (e)=>
+				target = $(e.target)
+				if not target.is('.b_contact .drop_down') and target.closest('.b_contact .drop_down').size() is 0
+					return true
+				buttonEl = target.closest('.b_button_action')
+				if buttonEl.size() is 0
+					return true
+				user = buttonEl.data('user')
 				if user
-					@showDropdown user, dropdown.closest('.b_button_action'), user.loadOktellActions(), true
+					@showDropdown user, buttonEl, user.loadOktellActions(), true
 	
-			@dropdownEl.on 'click', '[data-action]', (e) =>
-				actionEl = $(e.currentTarget)
+			@dropdownEl.bind 'click', (e) =>
+				target = $(e.target)
+				if target.is('[data-action]')
+					actionEl = target
+				else if target.closest('[data-action]').size() isnt 0
+					actionEl = target.closest('[data-action]')
+				else
+					return true
 				action = actionEl.data 'action'
+				if not action then return
 				user = @dropdownEl.data('user')
 				if action and user
 					user.doAction action
@@ -648,7 +674,7 @@ do ($)->
 			@keypadEl.find('li').bind 'click', (e) =>
 				@filterInput.focus()
 				@filterInput.val( @filterInput.val() + $(e.currentTarget).find('button').data('num') )
-				@filterInput.keydown()
+				@filterInput.keyup()
 	
 			@setUserListHeight = =>
 				@usersListBlockEl.css
@@ -656,11 +682,27 @@ do ($)->
 	
 			@setUserListHeight()
 	
+			debouncedSetHeight = debounce =>
+				@userScrollerToTop()
+				@setUserListHeight()
+			, 50
+			$(window).bind 'resize', ->
+				debouncedSetHeight()
+	
 			oktell.on 'disconnect', =>
-				oktellConnected = false
+				@oktellConnected = false
+				@usersByNumber = {}
+				@panelUsers = []
+				@setPanelUsersHtml []
+				@setAbonents []
+				@setHold {hasHold:false}
+				@filterInput.val('')
+				@setFilter '', true
+				@setQueue []
+	
 	
 			oktell.on 'connect', =>
-				oktellConnected = true
+				@oktellConnected = true
 				oInfo = oktell.getMyInfo()
 				oInfo.userid = oInfo.userid.toString().toLowerCase()
 				@myNumber = oInfo.number?.toString()
@@ -669,10 +711,11 @@ do ($)->
 				CUser.prototype.defaultAvatar64 = oInfo.defaultAvatar64x64
 	
 				oUsers = oktell.getUsers()
-				for oId, oUser of oUsers
+				for own oId, oUser of oUsers
 					strNumber = oUser.number?.toString() or ''
 					if @usersByNumber[strNumber]
 						user = @usersByNumber[strNumber]
+						oUser.isFantom = false
 						user.init oUser
 					else
 						user = new CUser oUser
@@ -711,23 +754,28 @@ do ($)->
 				@setAbonents oktell.getAbonents()
 				@setHold oktell.getHoldInfo()
 	
-				@setFilter ''
+				@setFilter '', true
 	
-				setInterval =>
-					if oktellConnected
-						oktell.getQueue (data)=>
-							if data.result
-								@setQueue data.queue
-				, if debugMode then 999999999 else 5000
+				oktell.on 'queueChange', (queue) =>
+					@setQueue queue
+				oktell.getQueue (data) =>
+					@setQueue data.queue if data.result
+	
+				for user in @usersWithBeforeConnectButtons
+					user.loadActions()
 	
 				if typeof afterOktellConnect is 'function' then afterOktellConnect()
 	
-		getUserButtonForPlagin: (phone) ->
+		getUserButtonForPlugin: (phone) ->
 			user = @getUser phone
+			if not @oktellConnected
+				@usersWithBeforeConnectButtons.push user
+			#log '!!! getUserButtonForPlugin for ' + user.getInfo()
+			actions = user.loadActions()
 			@userWithGeneratedButtons[phone] = user
 			button = user.getButtonEl()
 			button.find('.drop_down').bind 'click', =>
-				@showDropdown user, button, user.loadOktellActions()
+				@showDropdown user, button, actions
 			return button
 	
 		clearFilter: ->
@@ -784,7 +832,7 @@ do ($)->
 				@dropdownEl.hide()
 	
 		logUsers: ->
-			for k,u of @panelUsersFiltered
+			for own k,u of @panelUsersFiltered
 				log u.getInfo()
 	
 		syncAbonentsAndUserlist: (abonents, userlist) ->
@@ -801,7 +849,7 @@ do ($)->
 						state: 5
 					userlist[u.number] = u
 	
-			for uNumber, user of userlist
+			for own uNumber, user of userlist
 				if not absByNumber[user.number]
 					delete userlist[user.number]
 	
@@ -811,6 +859,8 @@ do ($)->
 	
 		setQueue: (queue) ->
 			@syncAbonentsAndUserlist queue, @queue
+			for own key, user of @queue
+				user.loadActions()
 			@setQueueHtml()
 	
 		setHold: (holdInfo) ->
@@ -822,6 +872,7 @@ do ($)->
 	
 		setPanelUsersHtml: (usersArray) ->
 			@_setUsersHtml usersArray, @usersListEl
+			@userScrollerToTop()
 	
 		setAbonentsHtml: ->
 			@_setActivityPanelUserHtml @abonents, @abonentsListEl, @abonentsListBlock
@@ -834,7 +885,7 @@ do ($)->
 	
 		_setActivityPanelUserHtml: (users, listEl, blockEl) ->
 			usersArray = []
-			usersArray.push(u) for k,u of users
+			usersArray.push(u) for own k,u of users
 			@_setUsersHtml usersArray, listEl
 			if usersArray.length and blockEl.is(':not(:visible)')
 				blockEl.slideDown 200, @setUserListHeight
@@ -866,8 +917,8 @@ do ($)->
 						else if a.name < b.name
 							-1
 	
-		setFilter: (filter) ->
-			if @filter is filter then return false
+		setFilter: (filter, reloadAnyway) ->
+			if @filter is filter and not reloadAnyway then return false
 			oldFilter = @filter
 			@filter = filter
 	#		if @filterInput.val() isnt @filter
@@ -903,7 +954,7 @@ do ($)->
 				strNumber = data.number.toString()
 	
 			if @usersByNumber[strNumber]
-				@usersByNumber[strNumber].init(data)
+				@usersByNumber[strNumber].init(data) if @usersByNumber[strNumber].isFantom
 				return @usersByNumber[strNumber]
 	
 			fantom = new CUser
@@ -918,9 +969,9 @@ do ($)->
 	
 		reloadActions: ->
 			setTimeout =>
-				for phone, user of @userWithGeneratedButtons
+				for own phone, user of @userWithGeneratedButtons
 					actions = user.loadActions()
-					log 'reload actions for ' + user.getInfo() + ' ' + actions
+					#log 'reload actions for ' + user.getInfo() + ' ' + actions
 			, 100
 	
 	loadTemplate = (path) ->
@@ -1006,7 +1057,8 @@ do ($)->
 		$("body").append(panelEl)
 
 		list = new List oktell, panelEl, actionListEl, afterOktellConnect, getOptions().debug
-		window.list = list
+		if getOptions().debug
+			window.wList = list
 
 		if panelPos is "right"
 			panelEl.addClass("right");
@@ -1027,7 +1079,6 @@ do ($)->
 		killPanelHideTimer = ->
 			clearTimeout panelHideTimer
 			panelHideTimer = false
-
 
 		panelEl.on "mouseenter", ->
 			mouseOnPanel = true
@@ -1059,12 +1110,12 @@ do ($)->
 			mouseOnPanel = false
 			true
 
-		$('html').on 'mouseleave', (e) ->
+		$('html').bind 'mouseleave', (e) ->
 			killPanelHideTimer()
 			return true
 
 
-		$('html').on 'mousemove', (e) ->
+		$('html').bind 'mousemove', (e) ->
 			if not mouseOnPanel and panelHideTimer is false and not list.dropdownOpenedOnPanel
 				panelHideTimer = setTimeout ->
 					hidePanel()
@@ -1125,19 +1176,15 @@ do ($)->
 				element.animate animOptHide, 100, "swing", ->
 					element.removeClass(openClass).addClass(closeClass)
 
-	elsForInitButtonAfterConnect = []
 
 	afterOktellConnect = ->
 		oktellConnected = true
-		for el in elsForInitButtonAfterConnect
-			addActionButtonToEl el
-		elsForInitButtonAfterConnect = []
 
 	initButtonOnElement = (el) ->
 		el.addClass(getOptions().buttonCss)
 		phone = el.attr('data-phone')
 		if phone
-			button = list.getUserButtonForPlagin phone
+			button = list.getUserButtonForPlugin phone
 			log 'generated button for ' + phone, button
 			el.html button
 
@@ -1161,3 +1208,11 @@ do ($)->
 	$.fn.oktellButton = ->
 		$(this).each ->
 			addActionButtonToEl $(this)
+
+
+#	$.fn.oktellActions = ->
+#		$(this).each ->
+#			$(this).bind 'click', (e)->
+#				e.preventDefault()
+#				el = $(this)
+#				phone = el.data 'phone'
