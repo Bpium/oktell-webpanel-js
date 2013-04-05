@@ -7,7 +7,6 @@ CUser = (function() {
     this.doAction = __bind(this.doAction, this);
     var _ref, _ref1;
 
-    log('create user', data);
     this.id = (_ref = data.id) != null ? _ref.toString().toLowerCase() : void 0;
     this.isFantom = data.isFantom || false;
     this.number = ((_ref1 = data.number) != null ? _ref1.toString() : void 0) || '';
@@ -28,7 +27,6 @@ CUser = (function() {
   CUser.prototype.init = function(data) {
     var _ref, _ref1, _ref2;
 
-    log('init user', data);
     this.id = (_ref = data.id) != null ? _ref.toString().toLowerCase() : void 0;
     this.isFantom = data.isFantom || false;
     this.number = ((_ref1 = data.number) != null ? _ref1.toString() : void 0) || '';
@@ -72,7 +70,6 @@ CUser = (function() {
       }
     }
     if (this.buttonEls.length) {
-      log('LOAD actions after state change ');
       this.loadActions();
       return setTimeout(function() {
         return _this.loadActions();
@@ -144,8 +141,6 @@ CUser = (function() {
     var action, actions;
 
     actions = this.loadOktellActions();
-    log('load action for user id=' + this.id + ' number=' + this.number + ' actions=' + actions);
-    window.cuser = this;
     action = (actions != null ? actions[0] : void 0) || '';
     if (this.buttonLastAction === action) {
       return;

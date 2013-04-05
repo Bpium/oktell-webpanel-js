@@ -40,6 +40,12 @@
 				stateEl.text('Ошибка')
 			});
 
+			var statesLogel = $('#webstate')
+			oktell.on('statusChange', function(newS, oldS){
+				var d = new Date();
+				statesLogel.append( '<p>Cтатус = "' + newS + '", предыдущий статус = "' + oldS + '", время смены ' + d.getHours()+':'+ d.getMinutes()+':'+ d.getSeconds() + '</p>' );
+			});
+
 			oktell.connect({
 				//url: ['213.239.200.141'],
 				url: ['192.168.0.61'],
@@ -49,6 +55,7 @@
 				openTimeout: 5000,
 				expires: 84600,
 				queryTimeout: 5000,
+				queueInterval: 999999,
 //				defaultAvatar: '/img/noavatar.png',
 //				defaultAvatar32x32: '/img/noavatar.png',
 //				defaultAvatar64x64: '/img/noavatar.png',
@@ -62,6 +69,7 @@
 				}
 			});
 
+			$('.setStatus').click(function(){ oktell.setStatus($(this).data('status'), false, 'break message')});
 
 			$.oktellPanel({
 				oktell: oktell,
@@ -87,6 +95,11 @@
 			}
 		</style>
 		<span>Статус:</span> <span id="connectionState">Соединение</span><br>
+		<button class="setStatus" data-status="ready">set Ready</button><br>
+		<button class="setStatus" data-status="dnd">set DND</button><br>
+		<button class="setStatus" data-status="redirect">set Redirect</button><br>
+		<button class="setStatus" data-status="break">set Break with text</button><br>
+		<div id="webstate"></div><br>
 		<p class="user">Дмитрий Е. 103<span class="userPhone" data-phone="103"></span></p>
 		<p class="user">Алексей В. 101<span class="userPhone" data-phone="101"></span></p>
 		102 <span class="userPhone" data-phone="102"></span><br>
@@ -178,7 +191,7 @@
 				</li>
 			</ul><br>
 			<br>
-            <ul style="z-index: 999; padding: 0px; font-size: 13px; font-family: Tahoma; top: 80px; left: 350px; visibility: visible; display: inline-block" class="b_actions_group_list">
+            <ul style="z-index: 999; padding: 0px; font-size: 13px; font-family: Tahoma; top: 80px; left: 500px; visibility: visible; display: inline-block" class="b_actions_group_list">
                 <li class="i_call g_first" data-bind="click: $parent.doActionByClick, css: $data.css, hoverSelect: true" data-action="call">
                     <i></i>
                     <span data-bind="text: a.text">Позвонить</span>

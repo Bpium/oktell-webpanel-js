@@ -90,20 +90,32 @@ class List
 				debouncedSetFilter()
 			return true
 
-		@panelEl.bind 'mouseenter', '.b_contact', ->
+		@panelEl.bind 'mouseenter', ->
 			$(this).data('user')?.isHovered true
-		@panelEl.bind 'mouseleave', '.b_contact', ->
+		@panelEl.bind 'mouseleave', ->
 			$(this).data('user')?.isHovered false
 
-		@panelEl.bind 'click', '.b_contact .drop_down', (e)=>
-			dropdown = $(e.target)
-			user = dropdown.closest('.b_button_action').data('user')
+		@panelEl.bind 'click', (e)=>
+			target = $(e.target)
+			if not target.is('.b_contact .drop_down') and target.closest('.b_contact .drop_down').size() is 0
+				return true
+			buttonEl = target.closest('.b_button_action')
+			if buttonEl.size() is 0
+				return true
+			user = buttonEl.data('user')
 			if user
-				@showDropdown user, dropdown.closest('.b_button_action'), user.loadOktellActions(), true
+				@showDropdown user, buttonEl, user.loadOktellActions(), true
 
-		@dropdownEl.bind 'click', '[data-action]', (e) =>
-			actionEl = $(e.target)
+		@dropdownEl.bind 'click', (e) =>
+			target = $(e.target)
+			if target.is('[data-action]')
+				actionEl = target
+			else if target.closest('[data-action]').size() isnt 0
+				actionEl = target.closest('[data-action]')
+			else
+				return true
 			action = actionEl.data 'action'
+			if not action then return
 			user = @dropdownEl.data('user')
 			if action and user
 				user.doAction action
@@ -222,7 +234,7 @@ class List
 		user = @getUser phone
 		if not @oktellConnected
 			@usersWithBeforeConnectButtons.push user
-		log '!!! getUserButtonForPlugin for ' + user.getInfo()
+		#log '!!! getUserButtonForPlugin for ' + user.getInfo()
 		actions = user.loadActions()
 		@userWithGeneratedButtons[phone] = user
 		button = user.getButtonEl()
@@ -423,5 +435,5 @@ class List
 		setTimeout =>
 			for own phone, user of @userWithGeneratedButtons
 				actions = user.loadActions()
-				log 'reload actions for ' + user.getInfo() + ' ' + actions
+				#log 'reload actions for ' + user.getInfo() + ' ' + actions
 		, 100

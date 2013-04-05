@@ -131,13 +131,6 @@ class UsersService
 
 		@sa = setAbonents
 
-		setInterval =>
-			if oktellConnected
-				oktell.getQueue (data)=>
-					if data.result
-						@queueAbonents data.queue
-		, if debugMode then 999999999 else 5000
-
 		oktell.on 'disconnect', =>
 			oktellConnected = false
 

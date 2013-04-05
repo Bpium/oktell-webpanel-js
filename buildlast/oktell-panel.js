@@ -1,8 +1,9 @@
 var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; },
-  __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+  __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+  __hasProp = {}.hasOwnProperty;
 
 (function($) {
-  var CUser, List, actionButtonHtml, actionListEl, actionListHtml, addActionButtonToEl, afterOktellConnect, debounce, defaultOptions, elsForInitButtonAfterConnect, escapeHtml, getOptions, initActionButtons, initButtonOnElement, initPanel, jScroll, langs, list, loadTemplate, log, oktell, oktellConnected, options, panelEl, panelHtml, panelWasInitialized, templates, userTemplateHtml;
+  var CUser, List, actionButtonHtml, actionListEl, actionListHtml, addActionButtonToEl, afterOktellConnect, debounce, defaultOptions, escapeHtml, getOptions, initActionButtons, initButtonOnElement, initPanel, jScroll, langs, list, loadTemplate, log, oktell, oktellConnected, options, panelEl, panelHtml, panelWasInitialized, templates, userTemplateHtml;
 
   if (!$) {
     throw new Error('Error init oktell panel, jQuery ( $ ) is not defined');
@@ -370,7 +371,6 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
       this.doAction = __bind(this.doAction, this);
       var _ref, _ref1;
 
-      log('create user', data);
       this.id = (_ref = data.id) != null ? _ref.toString().toLowerCase() : void 0;
       this.isFantom = data.isFantom || false;
       this.number = ((_ref1 = data.number) != null ? _ref1.toString() : void 0) || '';
@@ -391,7 +391,6 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
     CUser.prototype.init = function(data) {
       var _ref, _ref1, _ref2;
 
-      log('init user', data);
       this.id = (_ref = data.id) != null ? _ref.toString().toLowerCase() : void 0;
       this.isFantom = data.isFantom || false;
       this.number = ((_ref1 = data.number) != null ? _ref1.toString() : void 0) || '';
@@ -435,7 +434,6 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
         }
       }
       if (this.buttonEls.length) {
-        log('LOAD actions after state change ');
         this.loadActions();
         return setTimeout(function() {
           return _this.loadActions();
@@ -507,8 +505,6 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
       var action, actions;
 
       actions = this.loadOktellActions();
-      log('load action for user id=' + this.id + ' number=' + this.number + ' actions=' + actions);
-      window.cuser = this;
       action = (actions != null ? actions[0] : void 0) || '';
       if (this.buttonLastAction === action) {
         return;
@@ -568,7 +564,7 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
   })();
   List = (function() {
     function List(oktell, panelEl, dropdownEl, afterOktellConnect, debugMode) {
-      var debouncedSetFilter, debouncedSetHeight, dropdownHideTimer, oktellConnected, usersScroller,
+      var debouncedSetFilter, debouncedSetHeight, dropdownHideTimer, oktellConnected,
         _this = this;
 
       this.allActions = {
@@ -626,6 +622,7 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
       this.panelUsersFiltered = [];
       this.abonents = {};
       this.hold = {};
+      this.queue = {};
       this.oktell = oktell;
       CUser.prototype.oktell = oktell;
       this.filter = false;
@@ -647,11 +644,21 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
       this.filterInput = this.panelEl.find('input');
       this.filterClearCross = this.panelEl.find('.jInputClear_close');
       debouncedSetFilter = false;
+      this.usersWithBeforeConnectButtons = [];
       this.jScroll(this.usersListBlockEl);
+      this.usersScroller = this.usersListBlockEl.find('.jscroll_scroller');
+      this.userScrollerToTop = function() {
+        return _this.usersScroller.css({
+          top: '0px'
+        });
+      };
       this.filterClearCross.bind('click', function() {
         return _this.clearFilter();
       });
       this.filterInput.bind('keyup', function(e) {
+        if (!_this.oktellConnected) {
+          return true;
+        }
         if (!debouncedSetFilter) {
           debouncedSetFilter = debounce(function() {
             return _this.setFilter(_this.filterInput.val());
@@ -676,30 +683,47 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
         }
         return true;
       });
-      this.panelEl.bind('mouseenter', '.b_contact', function() {
+      this.panelEl.bind('mouseenter', function() {
         var _ref;
 
         return (_ref = $(this).data('user')) != null ? _ref.isHovered(true) : void 0;
       });
-      this.panelEl.bind('mouseleave', '.b_contact', function() {
+      this.panelEl.bind('mouseleave', function() {
         var _ref;
 
         return (_ref = $(this).data('user')) != null ? _ref.isHovered(false) : void 0;
       });
-      this.panelEl.bind('click', '.b_contact .drop_down', function(e) {
-        var dropdown, user;
+      this.panelEl.bind('click', function(e) {
+        var buttonEl, target, user;
 
-        dropdown = $(e.currentTarget);
-        user = dropdown.closest('.b_button_action').data('user');
+        target = $(e.target);
+        if (!target.is('.b_contact .drop_down') && target.closest('.b_contact .drop_down').size() === 0) {
+          return true;
+        }
+        buttonEl = target.closest('.b_button_action');
+        if (buttonEl.size() === 0) {
+          return true;
+        }
+        user = buttonEl.data('user');
         if (user) {
-          return _this.showDropdown(user, dropdown.closest('.b_button_action'), user.loadOktellActions(), true);
+          return _this.showDropdown(user, buttonEl, user.loadOktellActions(), true);
         }
       });
-      this.dropdownEl.bind('click', '[data-action]', function(e) {
-        var action, actionEl, user;
+      this.dropdownEl.bind('click', function(e) {
+        var action, actionEl, target, user;
 
-        actionEl = $(e.currentTarget);
+        target = $(e.target);
+        if (target.is('[data-action]')) {
+          actionEl = target;
+        } else if (target.closest('[data-action]').size() !== 0) {
+          actionEl = target.closest('[data-action]');
+        } else {
+          return true;
+        }
         action = actionEl.data('action');
+        if (!action) {
+          return;
+        }
         user = _this.dropdownEl.data('user');
         if (action && user) {
           user.doAction(action);
@@ -723,7 +747,7 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
       this.keypadEl.find('li').bind('click', function(e) {
         _this.filterInput.focus();
         _this.filterInput.val(_this.filterInput.val() + $(e.currentTarget).find('button').data('num'));
-        return _this.filterInput.keydown();
+        return _this.filterInput.keyup();
       });
       this.setUserListHeight = function() {
         return _this.usersListBlockEl.css({
@@ -731,23 +755,30 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
         });
       };
       this.setUserListHeight();
-      usersScroller = this.usersListBlockEl.find('.jscroll_scroller');
       debouncedSetHeight = debounce(function() {
-        usersScroller.css({
-          top: '0px'
-        });
+        _this.userScrollerToTop();
         return _this.setUserListHeight();
       }, 50);
       $(window).bind('resize', function() {
         return debouncedSetHeight();
       });
       oktell.on('disconnect', function() {
-        return oktellConnected = false;
+        _this.oktellConnected = false;
+        _this.usersByNumber = {};
+        _this.panelUsers = [];
+        _this.setPanelUsersHtml([]);
+        _this.setAbonents([]);
+        _this.setHold({
+          hasHold: false
+        });
+        _this.filterInput.val('');
+        _this.setFilter('', true);
+        return _this.setQueue([]);
       });
       oktell.on('connect', function() {
-        var oId, oInfo, oUser, oUsers, strNumber, user, _ref, _ref1;
+        var oId, oInfo, oUser, oUsers, strNumber, user, _i, _len, _ref, _ref1, _ref2;
 
-        oktellConnected = true;
+        _this.oktellConnected = true;
         oInfo = oktell.getMyInfo();
         oInfo.userid = oInfo.userid.toString().toLowerCase();
         _this.myNumber = (_ref = oInfo.number) != null ? _ref.toString() : void 0;
@@ -756,6 +787,7 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
         CUser.prototype.defaultAvatar64 = oInfo.defaultAvatar64x64;
         oUsers = oktell.getUsers();
         for (oId in oUsers) {
+          if (!__hasProp.call(oUsers, oId)) continue;
           oUser = oUsers[oId];
           strNumber = ((_ref1 = oUser.number) != null ? _ref1.toString() : void 0) || '';
           if (_this.usersByNumber[strNumber]) {
@@ -805,31 +837,39 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
         });
         _this.setAbonents(oktell.getAbonents());
         _this.setHold(oktell.getHoldInfo());
-        _this.setFilter('');
-        setInterval(function() {
-          if (oktellConnected) {
-            return oktell.getQueue(function(data) {
-              if (data.result) {
-                return _this.setQueue(data.queue);
-              }
-            });
+        _this.setFilter('', true);
+        oktell.on('queueChange', function(queue) {
+          return _this.setQueue(queue);
+        });
+        oktell.getQueue(function(data) {
+          if (data.result) {
+            return _this.setQueue(data.queue);
           }
-        }, debugMode ? 999999999 : 5000);
+        });
+        _ref2 = _this.usersWithBeforeConnectButtons;
+        for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
+          user = _ref2[_i];
+          user.loadActions();
+        }
         if (typeof afterOktellConnect === 'function') {
           return afterOktellConnect();
         }
       });
     }
 
-    List.prototype.getUserButtonForPlagin = function(phone) {
-      var button, user,
+    List.prototype.getUserButtonForPlugin = function(phone) {
+      var actions, button, user,
         _this = this;
 
       user = this.getUser(phone);
+      if (!this.oktellConnected) {
+        this.usersWithBeforeConnectButtons.push(user);
+      }
+      actions = user.loadActions();
       this.userWithGeneratedButtons[phone] = user;
       button = user.getButtonEl();
       button.find('.drop_down').bind('click', function() {
-        return _this.showDropdown(user, button, user.loadOktellActions());
+        return _this.showDropdown(user, button, actions);
       });
       return button;
     };
@@ -907,6 +947,7 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
       _ref = this.panelUsersFiltered;
       _results = [];
       for (k in _ref) {
+        if (!__hasProp.call(_ref, k)) continue;
         u = _ref[k];
         _results.push(log(u.getInfo()));
       }
@@ -938,6 +979,7 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
       });
       _results = [];
       for (uNumber in userlist) {
+        if (!__hasProp.call(userlist, uNumber)) continue;
         user = userlist[uNumber];
         if (!absByNumber[user.number]) {
           _results.push(delete userlist[user.number]);
@@ -954,7 +996,15 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
     };
 
     List.prototype.setQueue = function(queue) {
+      var key, user, _ref;
+
       this.syncAbonentsAndUserlist(queue, this.queue);
+      _ref = this.queue;
+      for (key in _ref) {
+        if (!__hasProp.call(_ref, key)) continue;
+        user = _ref[key];
+        user.loadActions();
+      }
       return this.setQueueHtml();
     };
 
@@ -970,7 +1020,8 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
     };
 
     List.prototype.setPanelUsersHtml = function(usersArray) {
-      return this._setUsersHtml(usersArray, this.usersListEl);
+      this._setUsersHtml(usersArray, this.usersListEl);
+      return this.userScrollerToTop();
     };
 
     List.prototype.setAbonentsHtml = function() {
@@ -990,6 +1041,7 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
 
       usersArray = [];
       for (k in users) {
+        if (!__hasProp.call(users, k)) continue;
         u = users[k];
         usersArray.push(u);
       }
@@ -1034,10 +1086,10 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
       });
     };
 
-    List.prototype.setFilter = function(filter) {
+    List.prototype.setFilter = function(filter, reloadAnyway) {
       var exactMatch, filteredUsers, forFilter, oldFilter, u, _i, _len, _ref;
 
-      if (this.filter === filter) {
+      if (this.filter === filter && !reloadAnyway) {
         return false;
       }
       oldFilter = this.filter;
@@ -1113,9 +1165,9 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
         _ref = _this.userWithGeneratedButtons;
         _results = [];
         for (phone in _ref) {
+          if (!__hasProp.call(_ref, phone)) continue;
           user = _ref[phone];
-          actions = user.loadActions();
-          _results.push(log('reload actions for ' + user.getInfo() + ' ' + actions));
+          _results.push(actions = user.loadActions());
         }
         return _results;
       }, 100);
@@ -1206,7 +1258,9 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
     animOptHide[panelPos] = '-281px';
     $("body").append(panelEl);
     list = new List(oktell, panelEl, actionListEl, afterOktellConnect, getOptions().debug);
-    window.list = list;
+    if (getOptions().debug) {
+      window.wList = list;
+    }
     if (panelPos === "right") {
       panelEl.addClass("right");
     } else if (panelPos === "left") {
@@ -1334,16 +1388,8 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
       }
     }
   };
-  elsForInitButtonAfterConnect = [];
   afterOktellConnect = function() {
-    var el, _i, _len;
-
-    oktellConnected = true;
-    for (_i = 0, _len = elsForInitButtonAfterConnect.length; _i < _len; _i++) {
-      el = elsForInitButtonAfterConnect[_i];
-      addActionButtonToEl(el);
-    }
-    return elsForInitButtonAfterConnect = [];
+    return oktellConnected = true;
   };
   initButtonOnElement = function(el) {
     var button, phone;
@@ -1351,7 +1397,7 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
     el.addClass(getOptions().buttonCss);
     phone = el.attr('data-phone');
     if (phone) {
-      button = list.getUserButtonForPlagin(phone);
+      button = list.getUserButtonForPlugin(phone);
       log('generated button for ' + phone, button);
       return el.html(button);
     }

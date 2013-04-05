@@ -153,15 +153,6 @@ UsersService = (function() {
       }
     };
     this.sa = setAbonents;
-    setInterval(function() {
-      if (oktellConnected) {
-        return oktell.getQueue(function(data) {
-          if (data.result) {
-            return _this.queueAbonents(data.queue);
-          }
-        });
-      }
-    }, debugMode ? 999999999 : 5000);
     oktell.on('disconnect', function() {
       return oktellConnected = false;
     });

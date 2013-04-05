@@ -123,30 +123,47 @@ List = (function() {
       }
       return true;
     });
-    this.panelEl.bind('mouseenter', '.b_contact', function() {
+    this.panelEl.bind('mouseenter', function() {
       var _ref;
 
       return (_ref = $(this).data('user')) != null ? _ref.isHovered(true) : void 0;
     });
-    this.panelEl.bind('mouseleave', '.b_contact', function() {
+    this.panelEl.bind('mouseleave', function() {
       var _ref;
 
       return (_ref = $(this).data('user')) != null ? _ref.isHovered(false) : void 0;
     });
-    this.panelEl.bind('click', '.b_contact .drop_down', function(e) {
-      var dropdown, user;
+    this.panelEl.bind('click', function(e) {
+      var buttonEl, target, user;
 
-      dropdown = $(e.target);
-      user = dropdown.closest('.b_button_action').data('user');
+      target = $(e.target);
+      if (!target.is('.b_contact .drop_down') && target.closest('.b_contact .drop_down').size() === 0) {
+        return true;
+      }
+      buttonEl = target.closest('.b_button_action');
+      if (buttonEl.size() === 0) {
+        return true;
+      }
+      user = buttonEl.data('user');
       if (user) {
-        return _this.showDropdown(user, dropdown.closest('.b_button_action'), user.loadOktellActions(), true);
+        return _this.showDropdown(user, buttonEl, user.loadOktellActions(), true);
       }
     });
-    this.dropdownEl.bind('click', '[data-action]', function(e) {
-      var action, actionEl, user;
+    this.dropdownEl.bind('click', function(e) {
+      var action, actionEl, target, user;
 
-      actionEl = $(e.target);
+      target = $(e.target);
+      if (target.is('[data-action]')) {
+        actionEl = target;
+      } else if (target.closest('[data-action]').size() !== 0) {
+        actionEl = target.closest('[data-action]');
+      } else {
+        return true;
+      }
       action = actionEl.data('action');
+      if (!action) {
+        return;
+      }
       user = _this.dropdownEl.data('user');
       if (action && user) {
         user.doAction(action);
@@ -288,7 +305,6 @@ List = (function() {
     if (!this.oktellConnected) {
       this.usersWithBeforeConnectButtons.push(user);
     }
-    log('!!! getUserButtonForPlugin for ' + user.getInfo());
     actions = user.loadActions();
     this.userWithGeneratedButtons[phone] = user;
     button = user.getButtonEl();
@@ -591,8 +607,7 @@ List = (function() {
       for (phone in _ref) {
         if (!__hasProp.call(_ref, phone)) continue;
         user = _ref[phone];
-        actions = user.loadActions();
-        _results.push(log('reload actions for ' + user.getInfo() + ' ' + actions));
+        _results.push(actions = user.loadActions());
       }
       return _results;
     }, 100);

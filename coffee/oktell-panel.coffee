@@ -92,7 +92,8 @@ do ($)->
 		$("body").append(panelEl)
 
 		list = new List oktell, panelEl, actionListEl, afterOktellConnect, getOptions().debug
-		window.list = list
+		if getOptions().debug
+			window.wList = list
 
 		if panelPos is "right"
 			panelEl.addClass("right");
