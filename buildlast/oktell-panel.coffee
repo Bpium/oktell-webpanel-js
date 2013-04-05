@@ -2,7 +2,7 @@ do ($)->
 	if not $
 		throw new Error('Error init oktell panel, jQuery ( $ ) is not defined')
 
-	templates = {'templates/actionButton.html':'<ul class="b_button_action"><li class="g_first"><i></i></li><li class="g_last drop_down"><i></i></li></ul>', 'templates/actionList.html':'<ul style="display: none; z-index: 999; padding: 0; font-size: 13px; font-family: Tahoma" class="b_actions_group_list"><li class="{{css}}" data-action="{{action}}"><i></i><span>{{actionText}}</span></li></ul>', 'templates/user.html':'<tr class="b_contact"><td class="b_contact_avatar {{css}}"><img src="{{avatarLink32x32}}"><i></i><div class="o_busy"></div></td><td class="b_contact_title"><div class="wrapword"><a><b>{{name}}</b><span class="o_number">{{number}}</span></a></div></td></tr>', 'templates/panel.html':'<div class="l_panel j_panel"><div class="i_panel_bookmark"><div class="i_panel_bookmark_bg"></div></div><div class="h_panel_bg"><div class="h_padding" style="height: 100%"><div class="b_marks i_conference j_abonents" style="display: none"><div class="b_marks_noise"><p class="b_marks_header"><span class="b_marks_label">{{inTalk}}</span><span class="b_marks_time"></span></p><table><tbody></tbody></table></div></div><div class="b_marks i_flash j_hold" style="display: none"><div class="b_marks_noise"><p class="b_marks_header"><span class="b_marks_label">{{onHold}}</span></p><table class="j_table_favorite"><tbody></tbody></table></div></div><div class="b_marks i_flash j_queue" style="display: none"><div class="b_marks_noise"><p class="b_marks_header"><span class="b_marks_label">{{queue}}</span></p><table class="j_table_queue"><tbody></tbody></table></div></div><div class="b_inconversation j_phone_block"><table class="j_table_phone" style="width: 100%"><tbody></tbody></table></div><div class="b_marks i_phone"><div class="h_shadow_bottom"><div class="h_phone_number_input"><div class="i_phone_state_bg"></div><div class="h_input_padding"><div class="i_phone_popup_button j_keypad_expand"><i></i></div><div class="jInputClear_hover"><input class="b_phone_number_input" type="text" placeholder="{{inputPlaceholder}}"><span class="jInputClear_close">&times;</span></div></div><div class="b_phone_keypad j_phone_keypad" style="display: none"><div class="l_column_group"><div class="h_phone_keypad"><ul class="b_phone_panel"><li class="g_top_left g_first"><button data-num="1" class="g_button m_big">1</button></li><li><button data-num="2" class="g_button m_big">2</button></li><li class="g_top_right g_right"><button data-num="3" class="g_button m_big">3</button></li><li class="g_float_celar g_first"><button data-num="4" class="g_button m_big">4</button></li><li><button data-num="5" class="g_button m_big">5</button></li><li class="g_right"><button data-num="6" class="g_button m_big">6</button></li><li class="g_float_celar g_first"><button data-num="7" class="g_button m_big">7</button></li><li><button data-num="8" class="g_button m_big">8</button></li><li class="g_right"><button data-num="9" class="g_button m_big">9</button></li><li class="g_bottom_left g_float_celar g_first"><button data-num="*" class="g_button m_big">&lowast;</button></li><li class="g_bottom_center"><button data-num="0" class="g_button m_big">0</button></li><li class="g_bottom_right g_right"><button data-num="#" class="g_button m_big">#</button></li></ul></div></div></div></div></div></div><div class="j_main_list" style="height: 100%; overflow: hidden"><table class="b_main_list"><tbody></tbody></table></div></div></div></div>', }
+	templates = {'templates/actionButton.html':'<ul class="b_button_action"><li class="g_first"><i></i></li><li class="g_last drop_down"><i></i></li></ul>', 'templates/actionList.html':'<ul class="b_actions_group_list"><li class="{{css}}" data-action="{{action}}"><i></i><span>{{actionText}}</span></li></ul>', 'templates/user.html':'<tr class="b_contact"><td class="b_contact_avatar {{css}}"><img src="{{avatarLink32x32}}"><i></i><div class="o_busy"></div></td><td class="b_contact_title"><div class="wrapword"><a><b>{{name}}</b><span class="o_number">{{number}}</span></a></div></td></tr>', 'templates/panel.html':'<div class="l_panel j_panel"><div class="i_panel_bookmark"><div class="i_panel_bookmark_bg"></div></div><div class="h_panel_bg"><div class="h_padding"><div class="b_marks i_conference j_abonents"><div class="b_marks_noise"><p class="b_marks_header"><span class="b_marks_label">{{inTalk}}</span><span class="b_marks_time"></span></p><table><tbody></tbody></table></div></div><div class="b_marks i_flash j_hold"><div class="b_marks_noise"><p class="b_marks_header"><span class="b_marks_label">{{onHold}}</span></p><table class="j_table_favorite"><tbody></tbody></table></div></div><div class="b_marks i_flash j_queue"><div class="b_marks_noise"><p class="b_marks_header"><span class="b_marks_label">{{queue}}</span></p><table class="j_table_queue"><tbody></tbody></table></div></div><div class="b_inconversation j_phone_block"><table class="j_table_phone"><tbody></tbody></table></div><div class="b_marks i_phone"><div class="h_shadow_bottom"><div class="h_phone_number_input"><div class="i_phone_state_bg"></div><div class="h_input_padding"><div class="i_phone_popup_button j_keypad_expand"><i></i></div><div class="jInputClear_hover"><input class="b_phone_number_input" type="text" placeholder="{{inputPlaceholder}}"><span class="jInputClear_close">&times;</span></div></div><div class="b_phone_keypad j_phone_keypad"><div class="l_column_group"><div class="h_phone_keypad"><ul class="b_phone_panel"><li class="g_top_left g_first"><button data-num="1" class="g_button m_big">1</button></li><li><button data-num="2" class="g_button m_big">2</button></li><li class="g_top_right g_right"><button data-num="3" class="g_button m_big">3</button></li><li class="g_float_celar g_first"><button data-num="4" class="g_button m_big">4</button></li><li><button data-num="5" class="g_button m_big">5</button></li><li class="g_right"><button data-num="6" class="g_button m_big">6</button></li><li class="g_float_celar g_first"><button data-num="7" class="g_button m_big">7</button></li><li><button data-num="8" class="g_button m_big">8</button></li><li class="g_right"><button data-num="9" class="g_button m_big">9</button></li><li class="g_bottom_left g_float_celar g_first"><button data-num="*" class="g_button m_big">&lowast;</button></li><li class="g_bottom_center"><button data-num="0" class="g_button m_big">0</button></li><li class="g_bottom_right g_right"><button data-num="#" class="g_button m_big">#</button></li></ul></div></div></div></div></div></div><div class="h_main_list j_main_list"><table class="b_main_list"><tbody></tbody></table></div></div></div></div>', }
 
 	#includecoffee coffee/utils.coffee
 	log = ->
@@ -474,13 +474,13 @@ do ($)->
 		loadOktellActions: ->
 			@oktell.getPhoneActions @id or @number
 	
-		loadActions: ->
+		loadActions: ()->
 			actions = @loadOktellActions()
 			#log 'load action for user id='+@id+' number='+@number+' actions='+actions
 			#window.cuser = @
 			action = actions?[0] or ''
 			if @buttonLastAction is action
-				return
+				return actions
 	
 			if @buttonLastAction
 				@buttonEls.removeClass @firstLiCssPrefix + @buttonLastAction.toLowerCase()
@@ -771,10 +771,10 @@ do ($)->
 			if not @oktellConnected
 				@usersWithBeforeConnectButtons.push user
 			#log '!!! getUserButtonForPlugin for ' + user.getInfo()
-			actions = user.loadActions()
 			@userWithGeneratedButtons[phone] = user
 			button = user.getButtonEl()
 			button.find('.drop_down').bind 'click', =>
+				actions = user.loadActions()
 				@showDropdown user, button, actions
 			return button
 	
@@ -1189,9 +1189,6 @@ do ($)->
 			el.html button
 
 	addActionButtonToEl = (el) ->
-#		if not oktellConnected
-#			elsForInitButtonAfterConnect.push el
-#		else
 		initButtonOnElement el
 
 	initActionButtons = (selector) ->
