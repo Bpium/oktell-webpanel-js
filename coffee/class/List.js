@@ -140,7 +140,7 @@ List = (function() {
       if (!target.is('.b_contact .drop_down') && target.closest('.b_contact .drop_down').size() === 0) {
         return true;
       }
-      buttonEl = target.closest('.b_button_action');
+      buttonEl = target.closest('.oktell_button_action');
       if (buttonEl.size() === 0) {
         return true;
       }

@@ -30,18 +30,8 @@ class Panel
 
 		@afterRender = (el) =>
 			@el = $(el)
-			input = @el.find('input.b_phone_number_input') #$('#j_panel_number');
-			#			phonePopup = input.closest(".h_phone_number_bg").parent().find('div.b_phone_popup')
+			input = @el.find('input.b_phone_number_input')
 			phoneButtons = input.parent().find('div.i_phone_popup_button')
-
-			#			phonePopup.on 'click', '.b_phone_panel li a', (e) =>
-			#				e.preventDefault()
-			#				log actionList.panelNumber()
-			#				actionList.panelNumber actionList.panelNumber() + $(e.currentTarget).text()
-
-			#			$(".l_panel.g_hover").live "mouseleave", =>
-			#				@hidePopup()
-
 			input.keyup (e) =>
 				if e.keyCode is 13
 					#					phonePopup.find('.b_actions_group_list li:first').click()

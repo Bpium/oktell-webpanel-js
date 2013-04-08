@@ -98,7 +98,7 @@ CUser = (function() {
     $el = $(str);
     this.els = this.els.add($el);
     $el.data('user', this);
-    this.initButtonEl($el.find('.b_button_action'));
+    this.initButtonEl($el.find('.oktell_button_action'));
     return $el;
   };
 
@@ -134,7 +134,11 @@ CUser = (function() {
   };
 
   CUser.prototype.loadOktellActions = function() {
-    return this.oktell.getPhoneActions(this.id || this.number);
+    var actions;
+
+    actions = this.oktell.getPhoneActions(this.id || this.number);
+    this.log('actions for ' + this.getInfo(), actions);
+    return actions;
   };
 
   CUser.prototype.loadActions = function() {

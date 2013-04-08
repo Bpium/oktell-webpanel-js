@@ -1,8 +1,3 @@
-log = ->
-	try
-		console.log.apply(console, arguments);
-	catch e
-
 debounce = (func, wait, immediate) ->
 	timeout = ''
 	return ->

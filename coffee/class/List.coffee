@@ -99,7 +99,7 @@ class List
 			target = $(e.target)
 			if not target.is('.b_contact .drop_down') and target.closest('.b_contact .drop_down').size() is 0
 				return true
-			buttonEl = target.closest('.b_button_action')
+			buttonEl = target.closest('.oktell_button_action')
 			if buttonEl.size() is 0
 				return true
 			user = buttonEl.data('user')

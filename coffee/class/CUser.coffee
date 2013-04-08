@@ -1,7 +1,7 @@
 class CUser
 
 	constructor: (data) ->
-		#log 'create user', data
+		#@log 'create user', data
 		@id = data.id?.toString().toLowerCase()
 		@isFantom = data.isFantom or false
 		@number = data.number?.toString() or ''
@@ -23,7 +23,7 @@ class CUser
 
 
 	init: (data) ->
-		#log 'init user', data
+		#@log 'init user', data
 		@id = data.id?.toString().toLowerCase()
 		@isFantom = data.isFantom or false
 		@number = data.number?.toString() or ''
@@ -87,7 +87,7 @@ class CUser
 		$el = $(str)
 		@els = @els.add $el
 		$el.data 'user', @
-		@initButtonEl $el.find '.b_button_action'
+		@initButtonEl $el.find '.oktell_button_action'
 		return $el
 
 	initButtonEl: ($el) ->
@@ -110,7 +110,9 @@ class CUser
 			@loadActions()
 
 	loadOktellActions: ->
-		@oktell.getPhoneActions @id or @number
+		actions = @oktell.getPhoneActions @id or @number
+		@log 'actions for ' + @getInfo(), actions
+		actions
 
 	loadActions: ()->
 		actions = @loadOktellActions()

@@ -2,14 +2,50 @@ do ($)->
 	if not $
 		throw new Error('Error init oktell panel, jQuery ( $ ) is not defined')
 
-	templates = {}
-
 	#includecoffee coffee/utils.coffee
 	#includecoffee coffee/jScroll.coffee
 	#includecoffee coffee/class/CUser.coffee
 	#includecoffee coffee/class/List.coffee
 
+	defaultOptions =
+		position: 'right'
+		dynamic: true
+		#animateTimout: 200
+		oktell: window.oktell
+		#buttonCss: 'oktellActionButton'
+		debug: false
+		lang: 'ru'
+
+	langs = {
+		ru:
+			panel: { inTalk: 'В разговоре', onHold: 'На удержании', queue: 'Очередь ожидания', inputPlaceholder: 'введите имя или номер' },
+			actions: { call: 'Позвонить', conference: 'Конференция', transfer: 'Перевести', toggle: 'Переключиться', intercom: 'Интерком', endCall: 'Завершить', ghostListen: 'Прослушка', ghostHelp: 'Помощь' }
+		en:
+			panel: { inTalk: 'In conversation', onHold: 'On hold', queue: 'Wait queue', inputPlaceholder: 'Enter name or number' },
+			actions: { call: 'Dial', conference: 'Conference', transfer: 'Transfer', toggle: 'Switch', intercom: 'Intercom', endCall: 'End', ghostListen: 'Audition', ghostHelp: 'Help' }
+	}
+
+	options = null
+	actionListEl = null
+	oktell = null
+	oktellConnected = false
+	afterOktellConnect = null
+	list = null
+
+	getOptions = ->
+		options or defaultOptions
+
+	log = ->
+		if not getOptions().debug then return
+		try
+			console.log.apply(console, arguments);
+		catch e
+
+
+	templates = {}
+
 	loadTemplate = (path) ->
+		path = path.substr(1) if path[0] is '/'
 		if templates[path]?
 			return templates[path]
 		# for dev mode
@@ -21,49 +57,15 @@ do ($)->
 		html
 
 	actionButtonHtml = loadTemplate '/templates/actionButton.html'
-
-	defaultOptions =
-		position: 'right'
-		dynamic: true
-		animateTimout: 200
-		oktell: window.oktell
-		buttonCss: 'oktellActionButton'
-		debug: false
-
-	langs = {
-		panel: { inTalk: 'В разговоре', onHold: 'На удержании', queue: 'Очередь ожидания', inputPlaceholder: 'введите имя или номер' },
-		actions: { call: 'Позвонить', conference: 'Конференция', transfer: 'Перевести', toggle: 'Переключиться', intercom: 'Интерком', endCall: 'Завершить', ghostListen: 'Прослушка', ghostHelp: 'Помощь' }
-	}
-
-	options = null
-	actionListEl = null
-	oktell = null
-	oktellConnected = false
-	afterOktellConnect = null
-
-	list = null
-
-	getOptions = ->
-		options or defaultOptions
-
 	actionListHtml = loadTemplate '/templates/actionList.html'
+	userTemplateHtml = loadTemplate '/templates/user.html'
+	panelHtml = loadTemplate '/templates/panel.html'
+	popupHtml = loadTemplate '/templates/callPopup.html'
 
-	List.prototype.langs = langs.actions
 	List.prototype.jScroll = jScroll
 
-	userTemplateHtml = loadTemplate '/templates/user.html'
-
-	CUser.prototype.template = userTemplateHtml.replace '<!--button-->', actionButtonHtml
 	CUser.prototype.buttonTemplate = actionButtonHtml
-
-	panelHtml = loadTemplate '/templates/panel.html'
-
-	panelHtml = panelHtml.replace('{{inTalk}}',langs.panel.inTalk)
-		.replace('{{onHold}}',langs.panel.onHold)
-		.replace('{{queue}}',langs.panel.queue)
-		.replace('{{inputPlaceholder}}',langs.panel.inputPlaceholder)
-
-	panelEl = $(panelHtml)
+	CUser.prototype.log = log
 
 	panelWasInitialized = false
 
@@ -71,6 +73,18 @@ do ($)->
 		panelWasInitialized = true
 
 		options = $.extend defaultOptions, opts or {}
+
+		langs = langs[options.lang] or langs.ru
+		CUser.prototype.template = userTemplateHtml.replace '{{button}}', actionButtonHtml
+		panelHtml = panelHtml.replace('{{inTalk}}',langs.panel.inTalk)
+			.replace('{{onHold}}',langs.panel.onHold)
+			.replace('{{queue}}',langs.panel.queue)
+			.replace('{{inputPlaceholder}}',langs.panel.inputPlaceholder)
+		List.prototype.langs = langs.actions
+		panelEl = $(panelHtml)
+
+		popupEl = $(popupHtml)
+		$('body').append(popupEl)
 
 		$user = $(userTemplateHtml)
 		$userActionButton = $(actionButtonHtml)
