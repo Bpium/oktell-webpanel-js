@@ -1073,6 +1073,9 @@
                             background-repeat: no-repeat;
                             vertical-align: -2px;
                         }
+                    .oktell_panel_popup footer button{
+                        margin: 2px;
+                    }
             .oktell_panel_popup .m_popup_staff .btn i {
                 margin-top: 1px;
                 margin-right: 4px;
