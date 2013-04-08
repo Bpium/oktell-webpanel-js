@@ -1071,6 +1071,7 @@
                             display: inline-block;
                             background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAAK/INwWK6QAAABl0RVh0U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAADKSURBVHjaYoxdJMkABPxA3ADEBkB8AIgbGYgELFD6AFQzCDhA+QeJMYAJiO2RNDMgGcJArAHYAMUGMJBiALpfPwBxAakuuIAktgCIL5JqwAIksQRotJJswAcoWwCIJ5BqwEc0TSBXxJMaCyADHqCFRT0SXx6I86E0VgNArghA8goDNHmvh2p8gGTJfiD2BylghOYFZKAPTcoCRPhAAVtCughNiQ/INQBmiAHUCx9wqAGlnYMseEz/CM3WE6BhA3KVAlTuASy1AgQYAMumJ3E5CTqrAAAAAElFTkSuQmCC);
                             background-repeat: no-repeat;
+                            vertical-align: -2px;
                         }
             .oktell_panel_popup .m_popup_staff .btn i {
                 margin-top: 1px;
