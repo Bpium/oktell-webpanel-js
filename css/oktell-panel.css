@@ -1060,6 +1060,7 @@
                             }
                         .oktell_panel_popup .footer button{
                             margin: 2px;
+                            float: right;
                         }
                 .oktell_panel_popup .m_popup_staff .btn i {
                     margin-top: 1px;
