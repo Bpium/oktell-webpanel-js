@@ -1141,6 +1141,7 @@ do ($)->
 		animOptHide = {}
 		animOptHide[panelPos] = '-281px'
 
+
 		$("body").append(panelEl)
 
 		list = new List oktell, panelEl, actionListEl, afterOktellConnect, getOptions().debug
@@ -1157,7 +1158,11 @@ do ($)->
 			panelEl.addClass("dynamic");
 
 		panelBookmarkEl = panelEl.find('.i_panel_bookmark')
-
+		bookmarkAnimOptShow = {}
+		bookmarkPos = if panelPos is 'left' then 'right' else 'left'
+		bookmarkAnimOptShow[bookmarkPos] = '0px'
+		bookmarkAnimOptHide = {}
+		bookmarkAnimOptHide[bookmarkPos] = '-40px'
 
 		# Panel Bookmark hover
 		mouseOnPanel = false
@@ -1174,7 +1179,7 @@ do ($)->
 			if parseInt(panelEl.css(panelPos)) < 0 and ( panelStatus is 'closed' or panelStatus is 'closing' )
 				panelStatus = 'opening'
 				panelBookmarkEl.stop(true,true)
-				panelBookmarkEl.animate {left: '0px'}, 50, 'swing'
+				panelBookmarkEl.animate bookmarkAnimOptShow, 50, 'swing'
 				panelEl.stop true, true
 				panelEl.animate animOptShow, 100, "swing", ->
 					panelEl.addClass("g_hover")
@@ -1190,7 +1195,7 @@ do ($)->
 					panelEl.removeClass("g_hover");
 					panelStatus = 'closed'
 				setTimeout ->
-				   panelBookmarkEl.animate {left: '-40px'}, 50, 'swing'
+				   panelBookmarkEl.animate bookmarkAnimOptHide, 50, 'swing'
 				, 150
 
 

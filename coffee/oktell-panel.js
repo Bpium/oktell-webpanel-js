@@ -102,7 +102,7 @@
   CUser.prototype.log = log;
   panelWasInitialized = false;
   initPanel = function(opts) {
-    var $user, $userActionButton, animOptHide, animOptShow, closeClass, critWidth, cssPos, element, elementWidth, hidePanel, killPanelHideTimer, mouseOnPanel, newCssPos, oldBinding, openClass, panelBookmarkEl, panelEl, panelHideTimer, panelPos, panelStatus, popupEl, walkAway, xPos, xStartPos;
+    var $user, $userActionButton, animOptHide, animOptShow, bookmarkAnimOptHide, bookmarkAnimOptShow, bookmarkPos, closeClass, critWidth, cssPos, element, elementWidth, hidePanel, killPanelHideTimer, mouseOnPanel, newCssPos, oldBinding, openClass, panelBookmarkEl, panelEl, panelHideTimer, panelPos, panelStatus, popupEl, walkAway, xPos, xStartPos;
 
     panelWasInitialized = true;
     options = $.extend(defaultOptions, opts || {});
@@ -142,6 +142,11 @@
       panelEl.addClass("dynamic");
     }
     panelBookmarkEl = panelEl.find('.i_panel_bookmark');
+    bookmarkAnimOptShow = {};
+    bookmarkPos = panelPos === 'left' ? 'right' : 'left';
+    bookmarkAnimOptShow[bookmarkPos] = '0px';
+    bookmarkAnimOptHide = {};
+    bookmarkAnimOptHide[bookmarkPos] = '-40px';
     mouseOnPanel = false;
     panelHideTimer = false;
     panelStatus = 'closed';
@@ -155,9 +160,7 @@
       if (parseInt(panelEl.css(panelPos)) < 0 && (panelStatus === 'closed' || panelStatus === 'closing')) {
         panelStatus = 'opening';
         panelBookmarkEl.stop(true, true);
-        panelBookmarkEl.animate({
-          left: '0px'
-        }, 50, 'swing');
+        panelBookmarkEl.animate(bookmarkAnimOptShow, 50, 'swing');
         panelEl.stop(true, true);
         panelEl.animate(animOptShow, 100, "swing", function() {
           panelEl.addClass("g_hover");
@@ -178,9 +181,7 @@
           return panelStatus = 'closed';
         });
         return setTimeout(function() {
-          return panelBookmarkEl.animate({
-            left: '-40px'
-          }, 50, 'swing');
+          return panelBookmarkEl.animate(bookmarkAnimOptHide, 50, 'swing');
         }, 150);
       }
     };
