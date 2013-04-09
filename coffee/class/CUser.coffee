@@ -117,7 +117,7 @@ class CUser
 
 	loadOktellActions: ->
 		actions = @oktell.getPhoneActions @id or @number
-		@log 'actions for ' + @getInfo(), actions
+		#@log 'actions for ' + @getInfo(), actions
 		actions
 
 	loadActions: ()->

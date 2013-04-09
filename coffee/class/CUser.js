@@ -144,7 +144,6 @@ CUser = (function() {
     var actions;
 
     actions = this.oktell.getPhoneActions(this.id || this.number);
-    this.log('actions for ' + this.getInfo(), actions);
     return actions;
   };
 
