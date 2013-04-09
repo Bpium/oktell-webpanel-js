@@ -981,11 +981,10 @@
     font-size: 1em;
     font-family: Tahoma, Verdana, Arial, sans-serif;
     display: table;
-} /* TODO check on IE 7,8. Maybe it doesn't work with this browsers */
+} /* TODO check on IE 7. Maybe it doesn't work with this browsers */
     .oktell_panel_popup .m_popup_staff {
         display: table-cell;
         vertical-align: middle;
-
     }
         .oktell_panel_popup .m_popup_data {
             max-width: 500px;
@@ -993,6 +992,7 @@
             border: 1px solid #616C72;
             outline: 8px solid #7B7E80;
             margin: 0 auto;
+            overflow: hidden;
         }
             .oktell_panel_popup .m_popup_staff .o_close {
                 position: absolute;
@@ -1011,7 +1011,7 @@
                 opacity: 1;
             }
                     .oktell_panel_popup .m_popup_staff header {
-                        background: url('/img/bg/noise/7.png') #f0f1f3;
+                        background: /*url('/img/bg/noise/7.png')*/ #f0f1f3;
                         position: relative;
                     }
                         .oktell_panel_popup .m_popup_staff .h_header_bg {
@@ -1040,16 +1040,17 @@
                         .oktell_panel_popup .b_content .g_light {
                             color: #828180;
                         }
-                    .oktell_panel_popup footer {
+                    .oktell_panel_popup .footer {
                         overflow: hidden;
+                        zoom: 1;
                         padding: 19px 12px;
                     }
-                        .oktell_panel_popup footer .b_take_phone {
+                        .oktell_panel_popup .footer .b_take_phone {
                             display: inline-block;
                             float: left;
                             padding-top: 11px;
                         }
-                            .oktell_panel_popup footer .b_take_phone i{
+                            .oktell_panel_popup .footer .b_take_phone i{
                                 width: 16px;
                                 height: 16px;
                                 display: inline-block;
@@ -1057,7 +1058,7 @@
                                 background-repeat: no-repeat;
                                 vertical-align: -2px;
                             }
-                        .oktell_panel_popup footer button{
+                        .oktell_panel_popup .footer button{
                             margin: 2px;
                         }
                 .oktell_panel_popup .m_popup_staff .btn i {
@@ -1142,7 +1143,6 @@
     background: linear-gradient(to bottom,  #d28072 1%,#d15745 23%,#9a2828 53%,#9a2828 78%); /* W3C */
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#d28072', endColorstr='#9a2828',GradientType=0 ); /* IE6-8 */
     border-color: rgba(154, 50, 50, 0.5) rgba(154, 40, 40, 0.5) rgba(94, 21, 21, 0.5);
-    filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);
     background-repeat: no-repeat;
 }
 .btn.m_button_red,
