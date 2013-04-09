@@ -46,6 +46,7 @@ List = (function() {
     };
     this.actionCssPrefix = 'i_';
     this.lastDropdownUser = false;
+    this.filterFantomUserNumber = false;
     this.userWithGeneratedButtons = {};
     this.debugMode = debugMode;
     this.dropdownPaddingBottomLeft = 3;
@@ -58,6 +59,7 @@ List = (function() {
     oktellConnected = false;
     this.usersByNumber = {};
     this.me = false;
+    this.oktell = oktell;
     this.panelUsers = [];
     this.panelUsersFiltered = [];
     this.abonents = {};
@@ -203,6 +205,8 @@ List = (function() {
       return debouncedSetHeight();
     });
     oktell.on('disconnect', function() {
+      var phone, user, _ref, _results;
+
       _this.oktellConnected = false;
       _this.usersByNumber = {};
       _this.panelUsers = [];
@@ -213,7 +217,14 @@ List = (function() {
       });
       _this.filterInput.val('');
       _this.setFilter('', true);
-      return _this.setQueue([]);
+      _this.setQueue([]);
+      _ref = _this.userWithGeneratedButtons;
+      _results = [];
+      for (phone in _ref) {
+        user = _ref[phone];
+        _results.push(user.loadActions());
+      }
+      return _results;
     });
     oktell.on('connect', function() {
       var oId, oInfo, oUser, oUsers, strNumber, user, _i, _len, _ref, _ref1, _ref2;
@@ -404,6 +415,9 @@ List = (function() {
     $.each(abonents, function(i, ab) {
       var number, u;
 
+      if (!ab) {
+        return;
+      }
       number = ab.phone.toString() || '';
       if (!number) {
         return;
@@ -414,7 +428,7 @@ List = (function() {
           name: ab.name,
           number: ab.phone,
           id: ab.userid,
-          state: 5
+          state: 1
         });
         return userlist[u.number] = u;
       }
@@ -438,8 +452,16 @@ List = (function() {
   };
 
   List.prototype.setQueue = function(queue) {
-    var key, user, _ref;
+    var ab, key, user, _i, _len, _ref;
 
+    if (this.oktell.getState() === 'ring') {
+      for (key = _i = 0, _len = queue.length; _i < _len; key = ++_i) {
+        ab = queue[key];
+        if (this.abonents[ab.phone]) {
+          delete queue[key];
+        }
+      }
+    }
     this.syncAbonentsAndUserlist(queue, this.queue);
     _ref = this.queue;
     for (key in _ref) {
@@ -558,12 +580,15 @@ List = (function() {
         }
       }
     }
-    this.panelUsersFiltered = !exactMatch ? [
-      this.getUser({
+    if (!exactMatch) {
+      this.filterFantomUser = this.getUser({
         name: filter,
         number: filter
-      }, true)
-    ].concat(filteredUsers) : filteredUsers;
+      }, true);
+      this.panelUsersFiltered = [this.filterFantomUser].concat(filteredUsers);
+    } else {
+      this.panelUsersFiltered = filteredUsers;
+    }
     this.afterSetFilter(this.panelUsersFiltered);
     return this.panelUsersFiltered;
   };
@@ -573,12 +598,24 @@ List = (function() {
   };
 
   List.prototype.getUser = function(data, dontRemember) {
-    var fantom, strNumber;
+    var fantom, numberFormatted, strNumber, _ref;
 
     if (typeof data === 'string' || typeof data === 'number') {
       strNumber = data.toString();
+      data = {
+        number: strNumber
+      };
     } else {
       strNumber = data.number.toString();
+    }
+    numberFormatted = data.phoneFormatted || (typeof oktell.formatPhone === "function" ? oktell.formatPhone(strNumber) : void 0) || strNumber;
+    if (!data.numberFormatted) {
+      data.numberFormatted = numberFormatted;
+    }
+    if (!dontRemember && ((_ref = this.filterFantomUser) != null ? _ref.number : void 0) === strNumber) {
+      this.usersByNumber[strNumber] = this.filterFantomUser;
+      data.isFantom = true;
+      this.filterFantomUser = false;
     }
     if (this.usersByNumber[strNumber]) {
       if (this.usersByNumber[strNumber].isFantom) {
@@ -588,9 +625,10 @@ List = (function() {
     }
     fantom = new CUser({
       number: strNumber,
+      numberFormatted: numberFormatted,
       name: data.name,
       isFantom: true,
-      state: ((data != null ? data.state : void 0) != null ? data.state : 5)
+      state: ((data != null ? data.state : void 0) != null ? data.state : 1)
     });
     if (!dontRemember) {
       this.usersByNumber[strNumber] = fantom;
@@ -602,14 +640,29 @@ List = (function() {
     var _this = this;
 
     return setTimeout(function() {
-      var actions, phone, user, _ref, _results;
+      var actions, phone, user, _ref, _ref1, _ref2, _ref3, _results;
 
       _ref = _this.userWithGeneratedButtons;
-      _results = [];
       for (phone in _ref) {
         if (!__hasProp.call(_ref, phone)) continue;
         user = _ref[phone];
-        _results.push(actions = user.loadActions());
+        actions = user.loadActions();
+      }
+      _ref1 = _this.abonents;
+      for (phone in _ref1) {
+        user = _ref1[phone];
+        user.loadActions();
+      }
+      _ref2 = _this.queue;
+      for (phone in _ref2) {
+        user = _ref2[phone];
+        user.loadActions();
+      }
+      _ref3 = _this.panelUsersFiltered;
+      _results = [];
+      for (phone in _ref3) {
+        user = _ref3[phone];
+        _results.push(user.loadActions());
       }
       return _results;
     }, 100);

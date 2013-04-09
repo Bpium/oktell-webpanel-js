@@ -6,10 +6,11 @@ do ($)->
 	#includecoffee coffee/jScroll.coffee
 	#includecoffee coffee/class/CUser.coffee
 	#includecoffee coffee/class/List.coffee
+	#includecoffee coffee/class/Popup.coffee
 
 	defaultOptions =
 		position: 'right'
-		dynamic: true
+		dynamic: false
 		#animateTimout: 200
 		oktell: window.oktell
 		#buttonCss: 'oktellActionButton'
@@ -31,6 +32,7 @@ do ($)->
 	oktellConnected = false
 	afterOktellConnect = null
 	list = null
+	popup = null
 
 	getOptions = ->
 		options or defaultOptions
@@ -97,6 +99,8 @@ do ($)->
 
 		oktell = getOptions().oktell
 
+		popup = new Popup popupEl, oktell
+
 		panelPos = getOptions().position
 		animOptShow = {}
 		animOptShow[panelPos] = '0px'
@@ -108,6 +112,7 @@ do ($)->
 		list = new List oktell, panelEl, actionListEl, afterOktellConnect, getOptions().debug
 		if getOptions().debug
 			window.wList = list
+			window.wPopup = popup
 
 		if panelPos is "right"
 			panelEl.addClass("right");

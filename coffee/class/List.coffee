@@ -14,6 +14,8 @@ class List
 		@actionCssPrefix = 'i_'
 		@lastDropdownUser = false
 
+		@filterFantomUserNumber = false
+
 		@userWithGeneratedButtons = {}
 
 		@debugMode = debugMode
@@ -29,6 +31,7 @@ class List
 		oktellConnected = false
 		@usersByNumber = {}
 		@me = false
+		@oktell = oktell
 		@panelUsers = []
 		@panelUsersFiltered = []
 		@abonents = {}
@@ -163,6 +166,7 @@ class List
 			@filterInput.val('')
 			@setFilter '', true
 			@setQueue []
+			user.loadActions() for phone,user of @userWithGeneratedButtons
 
 
 		oktell.on 'connect', =>
@@ -302,6 +306,7 @@ class List
 	syncAbonentsAndUserlist: (abonents, userlist) ->
 		absByNumber = {}
 		$.each abonents, (i, ab) =>
+			if not ab then return
 			number = ab.phone.toString() or ''
 			if not number then return
 			absByNumber[number] = ab
@@ -310,7 +315,7 @@ class List
 					name: ab.name
 					number: ab.phone
 					id: ab.userid
-					state: 5
+					state: 1
 				userlist[u.number] = u
 
 		for own uNumber, user of userlist
@@ -322,6 +327,10 @@ class List
 		@setAbonentsHtml()
 
 	setQueue: (queue) ->
+		if @oktell.getState() is 'ring'
+			for ab, key in queue
+				if @abonents[ab.phone]
+					delete queue[key]
 		@syncAbonentsAndUserlist queue, @queue
 		for own key, user of @queue
 			user.loadActions()
@@ -404,7 +413,11 @@ class List
 				filteredUsers.push u
 				if u.number is filter and not exactMatch
 					exactMatch = u
-		@panelUsersFiltered = if not exactMatch then [@getUser({name:filter, number: filter}, true)].concat(filteredUsers) else filteredUsers
+		if not exactMatch
+			@filterFantomUser = @getUser({name:filter, number: filter}, true)
+			@panelUsersFiltered = [@filterFantomUser].concat(filteredUsers)
+		else
+			@panelUsersFiltered = filteredUsers
 		@afterSetFilter(@panelUsersFiltered)
 		@panelUsersFiltered
 
@@ -414,8 +427,17 @@ class List
 	getUser: (data, dontRemember) ->
 		if typeof data is 'string' or typeof data is 'number'
 			strNumber = data.toString()
+			data = {number:strNumber}
 		else
 			strNumber = data.number.toString()
+
+		numberFormatted = data.phoneFormatted or oktell.formatPhone?(strNumber) or strNumber
+		data.numberFormatted = numberFormatted unless data.numberFormatted
+
+		if not dontRemember and @filterFantomUser?.number is strNumber
+			@usersByNumber[strNumber] = @filterFantomUser
+			data.isFantom = true
+			@filterFantomUser = false
 
 		if @usersByNumber[strNumber]
 			@usersByNumber[strNumber].init(data) if @usersByNumber[strNumber].isFantom
@@ -423,9 +445,10 @@ class List
 
 		fantom = new CUser
 			number: strNumber
+			numberFormatted: numberFormatted
 			name: data.name
 			isFantom: true
-			state: ( if data?.state? then data.state else 5 )
+			state: ( if data?.state? then data.state else 1 )
 
 		if not dontRemember
 			@usersByNumber[strNumber] = fantom
@@ -436,4 +459,7 @@ class List
 			for own phone, user of @userWithGeneratedButtons
 				actions = user.loadActions()
 				#log 'reload actions for ' + user.getInfo() + ' ' + actions
+			user.loadActions() for phone, user of @abonents
+			user.loadActions() for phone, user of @queue
+			user.loadActions() for phone, user of @panelUsersFiltered
 		, 100

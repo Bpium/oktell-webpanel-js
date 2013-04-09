@@ -5,12 +5,13 @@ var CUser,
 CUser = (function() {
   function CUser(data) {
     this.doAction = __bind(this.doAction, this);
-    var _ref, _ref1;
+    var _ref, _ref1, _ref2;
 
     this.id = (_ref = data.id) != null ? _ref.toString().toLowerCase() : void 0;
     this.isFantom = data.isFantom || false;
     this.number = ((_ref1 = data.number) != null ? _ref1.toString() : void 0) || '';
-    this.numberHtml = escapeHtml(this.number);
+    this.numberFormatted = ((_ref2 = data.numberFormatted) != null ? _ref2.toString() : void 0) || this.number;
+    this.numberHtml = escapeHtml(this.numberFormatted);
     this.name = data.name;
     this.nameHtml = data.name ? escapeHtml(data.name) : this.numberHtml;
     this.state = false;
@@ -25,18 +26,19 @@ CUser = (function() {
   }
 
   CUser.prototype.init = function(data) {
-    var _ref, _ref1, _ref2;
+    var _ref, _ref1, _ref2, _ref3;
 
     this.id = (_ref = data.id) != null ? _ref.toString().toLowerCase() : void 0;
     this.isFantom = data.isFantom || false;
     this.number = ((_ref1 = data.number) != null ? _ref1.toString() : void 0) || '';
-    this.numberHtml = escapeHtml(this.number);
+    this.numberFormatted = ((_ref2 = data.numberFormatted) != null ? _ref2.toString() : void 0) || this.number;
+    this.numberHtml = escapeHtml(this.numberFormatted);
     this.name = data.name;
-    this.nameHtml = data.name ? escapeHtml(data.name) : this.numberHtml;
+    this.nameHtml = data.name && data.name.toString() !== this.number ? escapeHtml(data.name) : this.numberHtml;
     this.avatarLink32x32 = data.avatarLink32x32 || this.defaultAvatar32 || '';
     this.defaultAvatarCss = this.avatarLink32x32 ? '' : 'm_default';
     this.loadActions();
-    if (((_ref2 = data.numberObj) != null ? _ref2.state : void 0) != null) {
+    if (((_ref3 = data.numberObj) != null ? _ref3.state : void 0) != null) {
       return this.setState(data.numberObj.state);
     } else if (data.state != null) {
       return this.setState(data.state);
@@ -60,20 +62,24 @@ CUser = (function() {
       return;
     }
     this.state = state;
-    if (this.els.length) {
-      if (this.state === 0) {
-        this.els.removeClass('m_busy').addClass('m_offline');
-      } else if (this.state === 5) {
-        this.els.removeClass('m_offline').addClass('m_busy');
-      } else {
-        this.els.removeClass('m_offline').removeClass('m_busy');
-      }
-    }
+    this.setStateCss();
     if (this.buttonEls.length) {
       this.loadActions();
       return setTimeout(function() {
         return _this.loadActions();
       }, 100);
+    }
+  };
+
+  CUser.prototype.setStateCss = function() {
+    if (this.els.length) {
+      if (this.state === 0) {
+        return this.els.removeClass('m_busy').addClass('m_offline');
+      } else if (this.state === 5) {
+        return this.els.removeClass('m_offline').addClass('m_busy');
+      } else {
+        return this.els.removeClass('m_offline').removeClass('m_busy');
+      }
     }
   };
 
@@ -94,9 +100,10 @@ CUser = (function() {
   CUser.prototype.getEl = function() {
     var $el, str;
 
-    str = this.template.replace(this.regexps.name, this.nameHtml).replace(this.regexps.number, this.numberHtml).replace(this.regexps.avatarLink32x32, this.avatarLink32x32).replace(this.regexps.css, this.defaultAvatarCss);
+    str = this.template.replace(this.regexps.name, this.nameHtml).replace(this.regexps.number, this.numberHtml !== this.nameHtml ? this.numberHtml : '').replace(this.regexps.avatarLink32x32, this.avatarLink32x32).replace(this.regexps.css, this.defaultAvatarCss);
     $el = $(str);
     this.els = this.els.add($el);
+    this.setStateCss();
     $el.data('user', this);
     this.initButtonEl($el.find('.oktell_button_action'));
     return $el;

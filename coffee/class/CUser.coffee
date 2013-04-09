@@ -5,7 +5,8 @@ class CUser
 		@id = data.id?.toString().toLowerCase()
 		@isFantom = data.isFantom or false
 		@number = data.number?.toString() or ''
-		@numberHtml = escapeHtml @number
+		@numberFormatted = data.numberFormatted?.toString() or @number
+		@numberHtml = escapeHtml @numberFormatted
 		@name = data.name
 		@nameHtml = if data.name then escapeHtml(data.name) else @numberHtml
 		@state = false
@@ -27,9 +28,10 @@ class CUser
 		@id = data.id?.toString().toLowerCase()
 		@isFantom = data.isFantom or false
 		@number = data.number?.toString() or ''
-		@numberHtml = escapeHtml @number
+		@numberFormatted = data.numberFormatted?.toString() or @number
+		@numberHtml = escapeHtml @numberFormatted
 		@name = data.name
-		@nameHtml = if data.name then escapeHtml(data.name) else @numberHtml
+		@nameHtml = if data.name and data.name.toString() isnt @number then escapeHtml(data.name) else @numberHtml
 		@avatarLink32x32 = data.avatarLink32x32 or @defaultAvatar32 or ''
 		@defaultAvatarCss = if @avatarLink32x32 then '' else 'm_default'
 		@loadActions()
@@ -53,6 +55,15 @@ class CUser
 		if state is @state
 			return
 		@state = state
+		@setStateCss()
+		if @buttonEls.length
+			#log 'LOAD actions after state change '
+			@loadActions()
+			setTimeout =>
+				@loadActions()
+			, 100
+
+	setStateCss: ->
 		if @els.length
 			if @state is 0
 				@els.removeClass('m_busy').addClass('m_offline')
@@ -60,12 +71,6 @@ class CUser
 				@els.removeClass('m_offline').addClass('m_busy')
 			else
 				@els.removeClass('m_offline').removeClass('m_busy')
-		if @buttonEls.length
-			#log 'LOAD actions after state change '
-			@loadActions()
-			setTimeout =>
-				@loadActions()
-			, 100
 
 	getInfo: ->
 		'"'+@number+'" ' + @state + ' ' + @name
@@ -81,11 +86,12 @@ class CUser
 
 	getEl: ->
 		str = @template.replace( @regexps.name, @nameHtml)
-			.replace( @regexps.number, @numberHtml)
+			.replace( @regexps.number, if @numberHtml isnt @nameHtml then @numberHtml else '' )
 			.replace( @regexps.avatarLink32x32, @avatarLink32x32)
 			.replace( @regexps.css, @defaultAvatarCss )
 		$el = $(str)
 		@els = @els.add $el
+		@setStateCss()
 		$el.data 'user', @
 		@initButtonEl $el.find '.oktell_button_action'
 		return $el
