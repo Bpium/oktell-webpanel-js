@@ -29,19 +29,6 @@ Popup = (function() {
       _this.isBack101 = false;
       return _this.hide();
     });
-    oktell.on('connect', function() {
-      return oktell.onNativeEvent('phoneevent_ringstarted', function(data) {
-        if ((data != null ? data.callerdirection : void 0) === 'oktell_pbx' && (data != null ? data.callerlineid : void 0) === '00000000-0000-0000-0000-000000000000' && (data != null ? data.callerlinenum : void 0) === '00000' && (data != null ? data.callerinfo : void 0)) {
-          _this.isBack101 = data.callerinfo;
-          return _this.setAbonents([
-            {
-              name: _this.isBack101,
-              phone: ''
-            }
-          ]);
-        }
-      });
-    });
   }
 
   Popup.prototype.show = function() {
