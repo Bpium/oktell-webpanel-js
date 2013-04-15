@@ -978,7 +978,7 @@
     position: fixed;
     z-index: 20000;
     background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAAK/INwWK6QAAABl0RVh0U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAAAPSURBVHjaYmBgYDgDEGAAANEAzVtoW4UAAAAASUVORK5CYII=);
-    font-size: 1em;
+    font-size: 16px;
     font-family: Tahoma, Verdana, Arial, sans-serif;
     display: table;
 } /* TODO check on IE 7. Maybe it doesn't work with this browsers */

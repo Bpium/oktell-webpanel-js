@@ -8,6 +8,7 @@ Popup = (function() {
     this.el = popupEl;
     this.absContainer = this.el.find('.b_content');
     this.abonentEl = this.absContainer.find('.b_abonent').remove();
+    this.isBack101 = false;
     this.el.find('.j_abort_action').bind('click', function() {
       _this.hide();
       return oktell.endCall();
@@ -19,11 +20,27 @@ Popup = (function() {
       return _this.hide();
     });
     oktell.on('ringStart', function(abonents) {
-      _this.setAbonents(abonents);
+      if (!_this.isBack101) {
+        _this.setAbonents(abonents);
+      }
       return _this.show();
     });
     oktell.on('ringStop', function() {
+      _this.isBack101 = false;
       return _this.hide();
+    });
+    oktell.on('connect', function() {
+      return oktell.onNativeEvent('phoneevent_ringstarted', function(data) {
+        if ((data != null ? data.callerdirection : void 0) === 'oktell_pbx' && (data != null ? data.callerlineid : void 0) === '00000000-0000-0000-0000-000000000000' && (data != null ? data.callerlinenum : void 0) === '00000' && (data != null ? data.callerinfo : void 0)) {
+          _this.isBack101 = data.callerinfo;
+          return _this.setAbonents([
+            {
+              name: _this.isBack101,
+              phone: ''
+            }
+          ]);
+        }
+      });
     });
   }
 
@@ -32,7 +49,8 @@ Popup = (function() {
   };
 
   Popup.prototype.hide = function() {
-    return this.el.fadeOut(200);
+    this.el.fadeOut(200);
+    return this.isBack101 = false;
   };
 
   Popup.prototype.setAbonents = function(abonents) {

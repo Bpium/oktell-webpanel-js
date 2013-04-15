@@ -103,7 +103,7 @@ List = (function() {
       }
       if (!debouncedSetFilter) {
         debouncedSetFilter = debounce(function() {
-          return _this.setFilter(_this.filterInput.val());
+          return _this.setFilter(_this.filterInput.val().toString().toLowerCase());
         }, 100);
       }
       if (_this.filterInput.val()) {
@@ -274,10 +274,12 @@ List = (function() {
         return _results;
       });
       oktell.on('abonentsChange', function(abonents) {
-        return _this.setAbonents(abonents);
+        _this.setAbonents(abonents);
+        return _this.reloadActions();
       });
       oktell.on('holdStateChange', function(holdInfo) {
-        return _this.setHold(holdInfo);
+        _this.setHold(holdInfo);
+        return _this.reloadActions();
       });
       oktell.on('talkTimer', function(seconds, formattedTime) {
         if (seconds === false) {

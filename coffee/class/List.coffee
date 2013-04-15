@@ -74,7 +74,7 @@ class List
 				return true
 			if not debouncedSetFilter
 				debouncedSetFilter = debounce =>
-					@setFilter @filterInput.val()
+					@setFilter @filterInput.val().toString().toLowerCase()
 				, 100
 
 			if @filterInput.val()
@@ -207,10 +207,12 @@ class List
 
 			oktell.on 'abonentsChange', ( abonents ) =>
 				@setAbonents abonents
+				@reloadActions()
 
 			oktell.on 'holdStateChange', ( holdInfo ) =>
 				#log 'Oktell holdStateChange', holdInfo
 				@setHold holdInfo
+				@reloadActions()
 
 			oktell.on 'talkTimer', (seconds, formattedTime) =>
 				if seconds is false
