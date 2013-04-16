@@ -1336,10 +1336,10 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
     },
     cz: {
       panel: {
-        inTalk: 'In conversation',
-        onHold: 'On hold',
-        queue: 'Wait queue',
-        inputPlaceholder: 'Enter name or number'
+        inTalk: 'V rozhovoru',
+        onHold: 'Na hold',
+        queue: 'Fronta čekaní',
+        inputPlaceholder: 'zadejte jméno nebo číslo'
       },
       actions: {
         call: 'Zavolat',
