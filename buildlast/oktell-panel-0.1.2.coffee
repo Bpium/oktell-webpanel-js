@@ -1,3 +1,5 @@
+# Oktell-panel.js 0.1.2 http://js.oktell.ru/webpanel
+
 do ($)->
 	if not $
 		throw new Error('Error init oktell panel, jQuery ( $ ) is not defined')

@@ -1,4 +1,5 @@
 fs = require 'fs'
+_ = require 'lodash'
 
 module.exports = (grunt) ->
 
@@ -50,11 +51,17 @@ module.exports = (grunt) ->
 		compress:
 			main:
 				options: {
-					archive: 'buildlast/oktell-panel.zip'
+					archive: 'buildlast/oktell-panel.js-' + grunt.file.read('version.json') + '.zip'
 					mode: 'zip'
 					pretty: true
 				},
 				files: [{cwd: 'buildlast/', src: '*', dest: '', expand: true, filter: 'isFile', flatten: true}]
+		addVersion:
+			panel:
+				fileNames: ['buildlast/*.coffee', 'buildlast/*.js', 'buildlast/*.css']
+				find: /^(oktell-panel)(.+)/
+				replace:  '$1-' + grunt.file.read('version.json') + '$2'
+				comment: 'Oktell-panel.js ' + grunt.file.read('version.json') + " http://js.oktell.ru/webpanel"
 
 	grunt.loadNpmTasks 'grunt-contrib-htmlmin'
 	grunt.loadNpmTasks 'grunt-contrib-coffee'
@@ -64,7 +71,29 @@ module.exports = (grunt) ->
 	grunt.loadNpmTasks 'grunt-contrib-clean'
 	grunt.loadNpmTasks 'grunt-contrib-compress'
 
-	grunt.registerTask 'build', ['clean:buildlast', 'createbuildfolder', 'insertfilesasvars', 'includecoffee', 'coffee', 'uglify', 'cssmin', 'copy:css', 'compress', 'copy:main', 'clean:temp']
+	grunt.registerTask 'build', ['clean:buildlast', 'createbuildfolder', 'insertfilesasvars', 'includecoffee', 'coffee', 'uglify', 'cssmin', 'copy:css', 'addVersion', 'compress', 'copy:main', 'clean:temp']
+
+	grunt.registerMultiTask 'addVersion', 'Add version to file names and to file content', ->
+		config = @data
+		files = grunt.file.expand {filter:'isFile'}, config.fileNames
+		for file in files
+			pos = file.lastIndexOf '/'
+			fName = file.substr(pos+1)
+			path = file.substr(0, pos)
+			content = grunt.file.read(file)
+			fileExt = file.substr(file.lastIndexOf('.') + 1)
+			if fileExt is 'coffee'
+				content = '# ' + config.comment + "\n\n" + content
+			else if fileExt is 'html' or fileExt is 'html'
+				content = '<!-- ' + config.comment + " -->/\n" + content
+			else
+				content = '/* ' + config.comment + " */\n\n" + content
+			grunt.file.write file, content
+			fs.renameSync file, path + '/' + fName.replace( config.find, config.replace )
+#		curVersion = grunt.file.read('version.json').split('.')
+#		curVersion[3] = parseInt(curVersion[3]) + 1
+#		grunt.file.write 'version.json', curVersion.join('.')
+
 
 	grunt.registerTask 'createbuildfolder', 'Create new folder in builds path with date in name', ->
 		config = grunt.config.get this.name
