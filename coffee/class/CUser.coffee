@@ -2,16 +2,16 @@ class CUser
 
 	constructor: (data) ->
 		#@log 'create user', data
-		@id = data.id?.toString().toLowerCase()
-		@isFantom = data.isFantom or false
-		@number = data.number?.toString() or ''
-		@numberFormatted = data.numberFormatted?.toString() or @number
-		@numberHtml = escapeHtml @numberFormatted
-		@name = data.name
-		@nameHtml = if data.name then escapeHtml(data.name) else @numberHtml
+		#@id = data.id?.toString().toLowerCase()
+		#@isFantom = data.isFantom or false
+		#@number = data.number?.toString() or ''
+		#@numberFormatted = data.numberFormatted?.toString() or @number
+		#@numberHtml = escapeHtml @numberFormatted
+		#@name = data.name
+		#@nameHtml = if data.name then escapeHtml(data.name) else @numberHtml
 		@state = false
-		@avatarLink32x32 = data.avatarLink32x32 or @defaultAvatar32 or ''
-		@defaultAvatarCss = if @avatarLink32x32 then '' else 'm_default'
+		#@avatarLink32x32 = data.avatarLink32x32 or @defaultAvatar32 or ''
+		#@defaultAvatarCss = if @avatarLink32x32 then '' else 'm_default'
 		@hasHover = false
 		@buttonLastAction = ''
 		@firstLiCssPrefix = 'm_button_action_'
@@ -34,7 +34,9 @@ class CUser
 		@nameHtml = if data.name and data.name.toString() isnt @number then escapeHtml(data.name) else @numberHtml
 		@avatarLink32x32 = data.avatarLink32x32 or @defaultAvatar32 or ''
 		@defaultAvatarCss = if @avatarLink32x32 then '' else 'm_default'
-		@loadActions()
+		#@log 'depId ' + (data?.numberObj?.departmentid) + ' ' + data?.numberObj?.department, data
+		@departmentId = if data?.numberObj?.departmentid and data?.numberObj.departmentid isnt '00000000-0000-0000-0000-000000000000' then data?.numberObj.departmentid else 'www_without'
+		@department = if @departmentId is 'www_without' then @langs.panel.withoutDepartment else data?.numberObj?.department
 
 		if data.numberObj?.state?
 			@setState data.numberObj.state
@@ -43,6 +45,7 @@ class CUser
 		else
 			@setState 1
 
+		@loadActions()
 
 	regexps:
 		name: /\{\{name\}\}/

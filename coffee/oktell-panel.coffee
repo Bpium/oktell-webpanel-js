@@ -19,13 +19,13 @@ do ($)->
 
 	langs = {
 		ru:
-			panel: { inTalk: 'В разговоре', onHold: 'На удержании', queue: 'Очередь ожидания', inputPlaceholder: 'введите имя или номер' },
+			panel: { inTalk: 'В разговоре', onHold: 'На удержании', queue: 'Очередь ожидания', inputPlaceholder: 'введите имя или номер', withoutDepartment: 'без отдела' },
 			actions: { call: 'Позвонить', conference: 'Конференция', transfer: 'Перевести', toggle: 'Переключиться', intercom: 'Интерком', endCall: 'Завершить', ghostListen: 'Прослушка', ghostHelp: 'Помощь' }
 		en:
-			panel: { inTalk: 'In conversation', onHold: 'On hold', queue: 'Wait queue', inputPlaceholder: 'Enter name or number' },
+			panel: { inTalk: 'In conversation', onHold: 'On hold', queue: 'Wait queue', inputPlaceholder: 'Enter name or number', withoutDepartment: 'wihtout department' },
 			actions: { call: 'Dial', conference: 'Conference', transfer: 'Transfer', toggle: 'Switch', intercom: 'Intercom', endCall: 'End', ghostListen: 'Audition', ghostHelp: 'Help' }
 		cz:
-			panel: { inTalk: 'V rozhovoru', onHold: 'Na hold', queue: 'Fronta čekaní', inputPlaceholder: 'zadejte jméno nebo číslo' },
+			panel: { inTalk: 'V rozhovoru', onHold: 'Na hold', queue: 'Fronta čekaní', inputPlaceholder: 'zadejte jméno nebo číslo', withoutDepartment: '!!!!!!!' },
 			actions: { call: 'Zavolat', conference: 'Konference', transfer: 'Převést', toggle: 'Přepnout', intercom: 'Intercom', endCall: 'Ukončit', ghostListen: 'Odposlech', ghostHelp: 'Nápověda' }
 	}
 
@@ -64,6 +64,7 @@ do ($)->
 	actionButtonHtml = loadTemplate '/templates/actionButton.html'
 	actionListHtml = loadTemplate '/templates/actionList.html'
 	userTemplateHtml = loadTemplate '/templates/user.html'
+	departmentTemplateHtml = loadTemplate '/templates/department.html'
 	panelHtml = loadTemplate '/templates/panel.html'
 	popupHtml = loadTemplate '/templates/callPopup.html'
 
@@ -86,6 +87,8 @@ do ($)->
 			.replace('{{queue}}',langs.panel.queue)
 			.replace('{{inputPlaceholder}}',langs.panel.inputPlaceholder)
 		List.prototype.langs = langs.actions
+		List.prototype.departmentTemplate = departmentTemplateHtml
+		CUser.prototype.langs = langs
 		panelEl = $(panelHtml)
 
 		popupEl = $(popupHtml)

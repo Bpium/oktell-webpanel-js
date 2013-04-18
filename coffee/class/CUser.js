@@ -4,19 +4,7 @@ var CUser,
 
 CUser = (function() {
   function CUser(data) {
-    this.doAction = __bind(this.doAction, this);
-    var _ref, _ref1, _ref2;
-
-    this.id = (_ref = data.id) != null ? _ref.toString().toLowerCase() : void 0;
-    this.isFantom = data.isFantom || false;
-    this.number = ((_ref1 = data.number) != null ? _ref1.toString() : void 0) || '';
-    this.numberFormatted = ((_ref2 = data.numberFormatted) != null ? _ref2.toString() : void 0) || this.number;
-    this.numberHtml = escapeHtml(this.numberFormatted);
-    this.name = data.name;
-    this.nameHtml = data.name ? escapeHtml(data.name) : this.numberHtml;
-    this.state = false;
-    this.avatarLink32x32 = data.avatarLink32x32 || this.defaultAvatar32 || '';
-    this.defaultAvatarCss = this.avatarLink32x32 ? '' : 'm_default';
+    this.doAction = __bind(this.doAction, this);    this.state = false;
     this.hasHover = false;
     this.buttonLastAction = '';
     this.firstLiCssPrefix = 'm_button_action_';
@@ -26,7 +14,7 @@ CUser = (function() {
   }
 
   CUser.prototype.init = function(data) {
-    var _ref, _ref1, _ref2, _ref3;
+    var _ref, _ref1, _ref2, _ref3, _ref4, _ref5;
 
     this.id = (_ref = data.id) != null ? _ref.toString().toLowerCase() : void 0;
     this.isFantom = data.isFantom || false;
@@ -37,14 +25,16 @@ CUser = (function() {
     this.nameHtml = data.name && data.name.toString() !== this.number ? escapeHtml(data.name) : this.numberHtml;
     this.avatarLink32x32 = data.avatarLink32x32 || this.defaultAvatar32 || '';
     this.defaultAvatarCss = this.avatarLink32x32 ? '' : 'm_default';
-    this.loadActions();
-    if (((_ref3 = data.numberObj) != null ? _ref3.state : void 0) != null) {
-      return this.setState(data.numberObj.state);
+    this.departmentId = (data != null ? (_ref3 = data.numberObj) != null ? _ref3.departmentid : void 0 : void 0) && (data != null ? data.numberObj.departmentid : void 0) !== '00000000-0000-0000-0000-000000000000' ? data != null ? data.numberObj.departmentid : void 0 : 'www_without';
+    this.department = this.departmentId === 'www_without' ? this.langs.panel.withoutDepartment : data != null ? (_ref4 = data.numberObj) != null ? _ref4.department : void 0 : void 0;
+    if (((_ref5 = data.numberObj) != null ? _ref5.state : void 0) != null) {
+      this.setState(data.numberObj.state);
     } else if (data.state != null) {
-      return this.setState(data.state);
+      this.setState(data.state);
     } else {
-      return this.setState(1);
+      this.setState(1);
     }
+    return this.loadActions();
   };
 
   CUser.prototype.regexps = {

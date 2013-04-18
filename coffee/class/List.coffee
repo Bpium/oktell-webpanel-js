@@ -14,6 +14,10 @@ class List
 		@actionCssPrefix = 'i_'
 		@lastDropdownUser = false
 
+		@usersShowRules()
+
+		@depTemplates = {}
+
 		@filterFantomUserNumber = false
 
 		@userWithGeneratedButtons = {}
@@ -27,6 +31,7 @@ class List
 			actionText: /\{\{actionText\}\}/
 			action: /\{\{action\}\}/
 			css: /\{\{css\}\}/
+			dep: /\{\{department}\}/g
 
 		oktellConnected = false
 		@usersByNumber = {}
@@ -178,6 +183,8 @@ class List
 			CUser.prototype.defaultAvatar32 = oInfo.defaultAvatar32x32
 			CUser.prototype.defaultAvatar64 = oInfo.defaultAvatar64x64
 
+
+
 			oUsers = oktell.getUsers()
 			for own oId, oUser of oUsers
 				strNumber = oUser.number?.toString() or ''
@@ -235,6 +242,18 @@ class List
 				user.loadActions()
 
 			if typeof afterOktellConnect is 'function' then afterOktellConnect()
+
+	usersShowRules: ( showOffline, showDeps ) ->
+		showOfflineKey = 'oktell-panel-show-offline-users'
+		showDepsKey = 'oktell-panel-show-departments'
+
+		@showOffline = if showOffline? then showOffline else ( if cookie(showOfflineKey)? then cookie(showOfflineKey) else true )
+		@showDeps = if showDeps? then showDeps else ( if cookie(showDepsKey)? then cookie(showDepsKey) else true )
+
+		cookie showOfflineKey, @showOffline, {path:'/', expires: 1209600 }
+		cookie showDepsKey, @showDeps, {path:'/', expires: 1209600 }
+
+		return [@showOffline, @showDeps]
 
 	getUserButtonForPlugin: (phone) ->
 		user = @getUser phone
@@ -346,7 +365,7 @@ class List
 		@setHoldHtml()
 
 	setPanelUsersHtml: (usersArray) ->
-		@_setUsersHtml usersArray, @usersListEl
+		@_setUsersHtml usersArray, @usersListEl, @showOffline, @showDeps
 		@userScrollerToTop()
 
 	setAbonentsHtml: ->
@@ -368,11 +387,19 @@ class List
 			blockEl.slideUp 200, @setUserListHeight
 
 
-	_setUsersHtml: (usersArray, $el) ->
+	_setUsersHtml: (usersArray, $el, showOffline, showDeps) ->
 		html = []
+		lastDepId = null
 		for u in usersArray
 			#log 'render ' + u.getInfo()
-			html.push u.getEl()
+			uEl = null
+			if showOffline or ( not showOffline and u.state isnt 0 )
+				uEl = u.getEl()
+			if uEl and showDeps and u.departmentId and u.departmentId isnt lastDepId
+				html.push $( @depTemplates[u.departmentId] or (@depTemplates[u.departmentId] = @departmentTemplate.replace( @regexps.dep, u.department)) )
+			lastDepId = u.departmentId
+			if uEl
+				html.push uEl
 		$el.html html
 
 	sortPanelUsers: ( usersArray ) ->
@@ -415,7 +442,7 @@ class List
 				filteredUsers.push u
 				if u.number is filter and not exactMatch
 					exactMatch = u
-		if not exactMatch
+		if not exactMatch and filter.match /[0-9\(\)\+\-]/
 			@filterFantomUser = @getUser({name:filter, number: filter}, true)
 			@panelUsersFiltered = [@filterFantomUser].concat(filteredUsers)
 		else

@@ -46,6 +46,8 @@ List = (function() {
     };
     this.actionCssPrefix = 'i_';
     this.lastDropdownUser = false;
+    this.usersShowRules();
+    this.depTemplates = {};
     this.filterFantomUserNumber = false;
     this.userWithGeneratedButtons = {};
     this.debugMode = debugMode;
@@ -54,7 +56,8 @@ List = (function() {
     this.regexps = {
       actionText: /\{\{actionText\}\}/,
       action: /\{\{action\}\}/,
-      css: /\{\{css\}\}/
+      css: /\{\{css\}\}/,
+      dep: /\{\{department}\}/g
     };
     oktellConnected = false;
     this.usersByNumber = {};
@@ -310,6 +313,24 @@ List = (function() {
     });
   }
 
+  List.prototype.usersShowRules = function(showOffline, showDeps) {
+    var showDepsKey, showOfflineKey;
+
+    showOfflineKey = 'oktell-panel-show-offline-users';
+    showDepsKey = 'oktell-panel-show-departments';
+    this.showOffline = showOffline != null ? showOffline : (cookie(showOfflineKey) != null ? cookie(showOfflineKey) : true);
+    this.showDeps = showDeps != null ? showDeps : (cookie(showDepsKey) != null ? cookie(showDepsKey) : true);
+    cookie(showOfflineKey, this.showOffline, {
+      path: '/',
+      expires: 1209600
+    });
+    cookie(showDepsKey, this.showDeps, {
+      path: '/',
+      expires: 1209600
+    });
+    return [this.showOffline, this.showDeps];
+  };
+
   List.prototype.getUserButtonForPlugin = function(phone) {
     var button, user,
       _this = this;
@@ -486,7 +507,7 @@ List = (function() {
   };
 
   List.prototype.setPanelUsersHtml = function(usersArray) {
-    this._setUsersHtml(usersArray, this.usersListEl);
+    this._setUsersHtml(usersArray, this.usersListEl, this.showOffline, this.showDeps);
     return this.userScrollerToTop();
   };
 
@@ -519,13 +540,24 @@ List = (function() {
     }
   };
 
-  List.prototype._setUsersHtml = function(usersArray, $el) {
-    var html, u, _i, _len;
+  List.prototype._setUsersHtml = function(usersArray, $el, showOffline, showDeps) {
+    var html, lastDepId, u, uEl, _i, _len;
 
     html = [];
+    lastDepId = null;
     for (_i = 0, _len = usersArray.length; _i < _len; _i++) {
       u = usersArray[_i];
-      html.push(u.getEl());
+      uEl = null;
+      if (showOffline || (!showOffline && u.state !== 0)) {
+        uEl = u.getEl();
+      }
+      if (uEl && showDeps && u.departmentId && u.departmentId !== lastDepId) {
+        html.push($(this.depTemplates[u.departmentId] || (this.depTemplates[u.departmentId] = this.departmentTemplate.replace(this.regexps.dep, u.department))));
+      }
+      lastDepId = u.departmentId;
+      if (uEl) {
+        html.push(uEl);
+      }
     }
     return $el.html(html);
   };
@@ -582,7 +614,7 @@ List = (function() {
         }
       }
     }
-    if (!exactMatch) {
+    if (!exactMatch && filter.match(/[0-9\(\)\+\-]/)) {
       this.filterFantomUser = this.getUser({
         name: filter,
         number: filter
