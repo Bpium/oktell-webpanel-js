@@ -4,6 +4,7 @@ do ($)->
 
 	#includecoffee coffee/utils.coffee
 	#includecoffee coffee/jScroll.coffee
+	#includecoffee coffee/class/Department.coffee
 	#includecoffee coffee/class/CUser.coffee
 	#includecoffee coffee/class/List.coffee
 	#includecoffee coffee/class/Popup.coffee
@@ -65,6 +66,7 @@ do ($)->
 	actionListHtml = loadTemplate '/templates/actionList.html'
 	userTemplateHtml = loadTemplate '/templates/user.html'
 	departmentTemplateHtml = loadTemplate '/templates/department.html'
+	departmentTemplateHtml = loadTemplate '/templates/dep.html'
 	panelHtml = loadTemplate '/templates/panel.html'
 	popupHtml = loadTemplate '/templates/callPopup.html'
 
@@ -73,6 +75,8 @@ do ($)->
 	CUser.prototype.buttonTemplate = actionButtonHtml
 	CUser.prototype.log = log
 
+	Department.prototype.template = departmentTemplateHtml
+
 	panelWasInitialized = false
 
 	initPanel = (opts)->
@@ -80,6 +84,7 @@ do ($)->
 
 		options = $.extend defaultOptions, opts or {}
 
+		Department.prototype.withoutDepName = List.prototype.withoutDepName = 'zzzzz_without'
 		langs = langs[options.lang] or langs.ru
 		CUser.prototype.template = userTemplateHtml.replace '{{button}}', actionButtonHtml
 		panelHtml = panelHtml.replace('{{inTalk}}',langs.panel.inTalk)
@@ -89,7 +94,10 @@ do ($)->
 		List.prototype.langs = langs.actions
 		List.prototype.departmentTemplate = departmentTemplateHtml
 		CUser.prototype.langs = langs
+		Department.prototype.langs = langs
 		panelEl = $(panelHtml)
+
+
 
 		popupEl = $(popupHtml)
 		$('body').append(popupEl)

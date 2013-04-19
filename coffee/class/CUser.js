@@ -14,20 +14,24 @@ CUser = (function() {
   }
 
   CUser.prototype.init = function(data) {
-    var _ref, _ref1, _ref2, _ref3, _ref4, _ref5;
+    var _ref, _ref1, _ref2, _ref3, _ref4, _ref5, _ref6, _ref7;
 
     this.id = (_ref = data.id) != null ? _ref.toString().toLowerCase() : void 0;
     this.isFantom = data.isFantom || false;
     this.number = ((_ref1 = data.number) != null ? _ref1.toString() : void 0) || '';
+    if (!this.number) {
+      this.invisible = true;
+    }
     this.numberFormatted = ((_ref2 = data.numberFormatted) != null ? _ref2.toString() : void 0) || this.number;
     this.numberHtml = escapeHtml(this.numberFormatted);
     this.name = data.name;
     this.nameHtml = data.name && data.name.toString() !== this.number ? escapeHtml(data.name) : this.numberHtml;
     this.avatarLink32x32 = data.avatarLink32x32 || this.defaultAvatar32 || '';
     this.defaultAvatarCss = this.avatarLink32x32 ? '' : 'm_default';
-    this.departmentId = (data != null ? (_ref3 = data.numberObj) != null ? _ref3.departmentid : void 0 : void 0) && (data != null ? data.numberObj.departmentid : void 0) !== '00000000-0000-0000-0000-000000000000' ? data != null ? data.numberObj.departmentid : void 0 : 'www_without';
+    this.departmentId = (data != null ? (_ref3 = data.numberObj) != null ? _ref3.departmentid : void 0 : void 0) && (data != null ? data.numberObj.departmentid : void 0) !== '00000000-0000-0000-0000-000000000000' ? data != null ? data.numberObj.departmentid : void 0 : this.withoutDepName;
     this.department = this.departmentId === 'www_without' ? this.langs.panel.withoutDepartment : data != null ? (_ref4 = data.numberObj) != null ? _ref4.department : void 0 : void 0;
-    if (((_ref5 = data.numberObj) != null ? _ref5.state : void 0) != null) {
+    this.log('depId ' + (data != null ? (_ref5 = data.numberObj) != null ? _ref5.departmentid : void 0 : void 0) + ' ' + (data != null ? (_ref6 = data.numberObj) != null ? _ref6.department : void 0 : void 0) + ' : ' + this.departmentId + ' ' + this.department);
+    if (((_ref7 = data.numberObj) != null ? _ref7.state : void 0) != null) {
       this.setState(data.numberObj.state);
     } else if (data.state != null) {
       this.setState(data.state);

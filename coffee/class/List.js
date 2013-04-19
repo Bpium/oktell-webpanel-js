@@ -47,7 +47,7 @@ List = (function() {
     this.actionCssPrefix = 'i_';
     this.lastDropdownUser = false;
     this.usersShowRules();
-    this.depTemplates = {};
+    this.departments = [];
     this.filterFantomUserNumber = false;
     this.userWithGeneratedButtons = {};
     this.debugMode = debugMode;
@@ -230,7 +230,7 @@ List = (function() {
       return _results;
     });
     oktell.on('connect', function() {
-      var oId, oInfo, oUser, oUsers, strNumber, user, _i, _len, _ref, _ref1, _ref2;
+      var createdDeps, d, dep, depsEls, oId, oInfo, oUser, oUsers, otherDep, strNumber, user, _i, _j, _len, _len1, _ref, _ref1, _ref2, _ref3, _ref4;
 
       _this.oktellConnected = true;
       oInfo = oktell.getMyInfo();
@@ -239,11 +239,17 @@ List = (function() {
       CUser.prototype.defaultAvatar = oInfo.defaultAvatar;
       CUser.prototype.defaultAvatar32 = oInfo.defaultAvatar32x32;
       CUser.prototype.defaultAvatar64 = oInfo.defaultAvatar64x64;
+      _this.departments = [];
+      createdDeps = {};
+      otherDep = new Department();
       oUsers = oktell.getUsers();
       for (oId in oUsers) {
         if (!__hasProp.call(oUsers, oId)) continue;
         oUser = oUsers[oId];
         strNumber = ((_ref1 = oUser.number) != null ? _ref1.toString() : void 0) || '';
+        if (!strNumber) {
+          continue;
+        }
         if (_this.usersByNumber[strNumber]) {
           user = _this.usersByNumber[strNumber];
           oUser.isFantom = false;
@@ -256,23 +262,40 @@ List = (function() {
         }
         if (user.id !== oInfo.userid) {
           _this.panelUsers.push(user);
+          if (((_ref2 = user.numberObj) != null ? _ref2.departmentid : void 0) && user.numberObj.departmentid !== '00000000-0000-0000-0000-000000000000') {
+            dep = createdDeps[user.numberObj.departmentid] || (createdDeps[user.numberObj.departmentid] = new Department(user.numberObj.departmentid, user.numberObj.department));
+            dep.addUser(user);
+            _this.departments.push(deps);
+          } else {
+            otherDep.addUser(user);
+          }
         } else {
           _this.me = user;
         }
       }
+      _this.departments.sort(function(a, b) {
+        if (a.name > b.name) {
+          return 1;
+        } else if (b.name > a.name) {
+          return -1;
+        } else {
+          return 0;
+        }
+      });
+      _this.departments.push(otherDep);
       _this.sortPanelUsers(_this.panelUsers);
       oktell.on('stateChange', function(newState, oldState) {
         return _this.reloadActions();
       });
       oktell.onNativeEvent('pbxnumberstatechanged', function(data) {
-        var n, numStr, _i, _len, _ref2, _ref3, _results;
+        var n, numStr, _i, _len, _ref3, _ref4, _results;
 
-        _ref2 = data.numbers;
+        _ref3 = data.numbers;
         _results = [];
-        for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
-          n = _ref2[_i];
+        for (_i = 0, _len = _ref3.length; _i < _len; _i++) {
+          n = _ref3[_i];
           numStr = n.num.toString();
-          _results.push((_ref3 = _this.usersByNumber[numStr]) != null ? _ref3.setState(n.numstateid) : void 0);
+          _results.push((_ref4 = _this.usersByNumber[numStr]) != null ? _ref4.setState(n.numstateid) : void 0);
         }
         return _results;
       });
@@ -293,6 +316,13 @@ List = (function() {
       });
       _this.setAbonents(oktell.getAbonents());
       _this.setHold(oktell.getHoldInfo());
+      depsEls = $();
+      _ref3 = _this.departments;
+      for (_i = 0, _len = _ref3.length; _i < _len; _i++) {
+        d = _ref3[_i];
+        depsEls = depsEls.add(d.getEl());
+      }
+      _this.usersListBlockEl.html(depsEls);
       _this.setFilter('', true);
       oktell.on('queueChange', function(queue) {
         return _this.setQueue(queue);
@@ -302,9 +332,9 @@ List = (function() {
           return _this.setQueue(data.queue);
         }
       });
-      _ref2 = _this.usersWithBeforeConnectButtons;
-      for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
-        user = _ref2[_i];
+      _ref4 = _this.usersWithBeforeConnectButtons;
+      for (_j = 0, _len1 = _ref4.length; _j < _len1; _j++) {
+        user = _ref4[_j];
         user.loadActions();
       }
       if (typeof afterOktellConnect === 'function') {
@@ -541,43 +571,67 @@ List = (function() {
   };
 
   List.prototype._setUsersHtml = function(usersArray, $el, showOffline, showDeps) {
-    var html, lastDepId, u, uEl, _i, _len;
+    var depEl, depEls, html, lastDepId, u, uEl;
 
     html = [];
     lastDepId = null;
-    for (_i = 0, _len = usersArray.length; _i < _len; _i++) {
-      u = usersArray[_i];
-      uEl = null;
-      if (showOffline || (!showOffline && u.state !== 0)) {
-        uEl = u.getEl();
+    depEls = (function() {
+      var _i, _len, _results;
+
+      _results = [];
+      for (_i = 0, _len = usersArray.length; _i < _len; _i++) {
+        u = usersArray[_i];
+        uEl = null;
+        if (showOffline || (!showOffline && u.state !== 0)) {
+          uEl = u.getEl();
+        }
+        if (uEl && showDeps && u.departmentId && u.departmentId !== lastDepId) {
+          depEl = $(this.depTemplates[u.departmentId] || (this.depTemplates[u.departmentId] = this.departmentTemplate.replace(this.regexps.dep, u.department)));
+          depEls.push(depEl);
+          html.push(depEl);
+        }
+        lastDepId = u.departmentId;
+        if (uEl) {
+          _results.push(html.push(uEl));
+        } else {
+          _results.push(void 0);
+        }
       }
-      if (uEl && showDeps && u.departmentId && u.departmentId !== lastDepId) {
-        html.push($(this.depTemplates[u.departmentId] || (this.depTemplates[u.departmentId] = this.departmentTemplate.replace(this.regexps.dep, u.department))));
-      }
-      lastDepId = u.departmentId;
-      if (uEl) {
-        html.push(uEl);
-      }
-    }
+      return _results;
+    }).call(this);
     return $el.html(html);
   };
 
   List.prototype.sortPanelUsers = function(usersArray) {
+    var _this = this;
+
     return usersArray.sort(function(a, b) {
-      if (a.number && !b.number) {
-        return -1;
-      } else if (!a.number && b.number) {
+      if (a.departmentId === _this.withoutDepName && b.departmentId !== _this.withoutDepName) {
         return 1;
+      } else if (b.departmentId === _this.withoutDepName && a.departmentId !== _this.withoutDepName) {
+        return -1;
       } else {
-        if (a.state && !b.state) {
-          return -1;
-        } else if (!a.state && b.state) {
+        if (a.department > b.department) {
           return 1;
+        } else if (b.department > a.department) {
+          return -1;
         } else {
-          if (a.name > b.name) {
-            return 1;
-          } else if (a.name < b.name) {
+          if (a.number && !b.number) {
             return -1;
+          } else if (!a.number && b.number) {
+            return 1;
+          } else {
+            if (a.state && !b.state) {
+              return -1;
+            } else if (!a.state && b.state) {
+              return 1;
+            } else {
+              if (a.name > b.name) {
+                return 1;
+              } else if (a.name < b.name) {
+                return -1;
+              }
+            }
           }
         }
       }
@@ -585,46 +639,52 @@ List = (function() {
   };
 
   List.prototype.setFilter = function(filter, reloadAnyway) {
-    var exactMatch, filteredUsers, forFilter, oldFilter, u, _i, _len, _ref;
+    var dep, el, exactMatch, filteredUsers, oldFilter, u, users, _i, _j, _len, _len1, _ref, _ref1, _results;
 
     if (this.filter === filter && !reloadAnyway) {
       return false;
     }
     oldFilter = this.filter;
     this.filter = filter;
-    if (filter === '') {
-      this.panelUsersFiltered = [].concat(this.panelUsers);
+    if (this.showDeps) {
+      _ref = this.departments;
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        dep = _ref[_i];
+        el = dep.getEl();
+        _results.push(users = dep.getUsers(filter));
+      }
+      return _results;
+    } else {
+      if (filter === '') {
+        this.panelUsersFiltered = [].concat(this.panelUsers);
+        this.afterSetFilter(this.panelUsersFiltered);
+        return this.panelUsersFiltered;
+      }
+      filteredUsers = [];
+      exactMatch = false;
+      _ref1 = this.panelUsers;
+      for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+        u = _ref1[_j];
+        if (u.isFiltered(filter)) {
+          filteredUsers.push(u);
+          if (u.number === filter && !exactMatch) {
+            exactMatch = u;
+          }
+        }
+      }
+      if (!exactMatch && filter.match(/[0-9\(\)\+\-]/)) {
+        this.filterFantomUser = this.getUser({
+          name: filter,
+          number: filter
+        }, true);
+        this.panelUsersFiltered = [this.filterFantomUser].concat(filteredUsers);
+      } else {
+        this.panelUsersFiltered = filteredUsers;
+      }
       this.afterSetFilter(this.panelUsersFiltered);
       return this.panelUsersFiltered;
     }
-    filteredUsers = [];
-    exactMatch = false;
-    if (oldFilter.indexOf(this.filter) === 0) {
-      forFilter = this.panelUsersFiltered;
-    } else {
-      forFilter = this.panelUsers;
-    }
-    _ref = this.panelUsers;
-    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-      u = _ref[_i];
-      if (u.isFiltered(filter)) {
-        filteredUsers.push(u);
-        if (u.number === filter && !exactMatch) {
-          exactMatch = u;
-        }
-      }
-    }
-    if (!exactMatch && filter.match(/[0-9\(\)\+\-]/)) {
-      this.filterFantomUser = this.getUser({
-        name: filter,
-        number: filter
-      }, true);
-      this.panelUsersFiltered = [this.filterFantomUser].concat(filteredUsers);
-    } else {
-      this.panelUsersFiltered = filteredUsers;
-    }
-    this.afterSetFilter(this.panelUsersFiltered);
-    return this.panelUsersFiltered;
   };
 
   List.prototype.afterSetFilter = function(filteredUsersArray) {

@@ -16,7 +16,7 @@ class List
 
 		@usersShowRules()
 
-		@depTemplates = {}
+		@departments = []
 
 		@filterFantomUserNumber = false
 
@@ -63,6 +63,8 @@ class List
 		@filterInput = @panelEl.find 'input'
 		@filterClearCross = @panelEl.find '.jInputClear_close'
 		debouncedSetFilter = false
+
+
 
 		@usersWithBeforeConnectButtons = []
 
@@ -183,11 +185,17 @@ class List
 			CUser.prototype.defaultAvatar32 = oInfo.defaultAvatar32x32
 			CUser.prototype.defaultAvatar64 = oInfo.defaultAvatar64x64
 
+			@departments = []
+			createdDeps = {}
+
+			otherDep = new Department()
 
 
 			oUsers = oktell.getUsers()
 			for own oId, oUser of oUsers
 				strNumber = oUser.number?.toString() or ''
+				if not strNumber
+					continue
 				if @usersByNumber[strNumber]
 					user = @usersByNumber[strNumber]
 					oUser.isFantom = false
@@ -199,8 +207,23 @@ class List
 
 				if user.id isnt oInfo.userid
 					@panelUsers.push user
+					if user.numberObj?.departmentid and user.numberObj.departmentid isnt '00000000-0000-0000-0000-000000000000'
+						dep = createdDeps[user.numberObj.departmentid] or (createdDeps[user.numberObj.departmentid] = new Department( user.numberObj.departmentid, user.numberObj.department ) )
+						dep.addUser user
+						@departments.push deps
+					else
+						otherDep.addUser user
 				else
 					@me = user
+
+			@departments.sort (a,b)=>
+				if a.name > b.name
+					1
+				else if b.name > a.name
+					-1
+				else 0
+
+			@departments.push otherDep
 
 			@sortPanelUsers @panelUsers
 
@@ -230,6 +253,12 @@ class List
 
 			@setAbonents oktell.getAbonents()
 			@setHold oktell.getHoldInfo()
+
+			depsEls = $()
+			for d in @departments
+				depsEls = depsEls.add d.getEl()
+
+			@usersListBlockEl.html depsEls
 
 			@setFilter '', true
 
@@ -390,65 +419,83 @@ class List
 	_setUsersHtml: (usersArray, $el, showOffline, showDeps) ->
 		html = []
 		lastDepId = null
+		depEls =
 		for u in usersArray
 			#log 'render ' + u.getInfo()
 			uEl = null
 			if showOffline or ( not showOffline and u.state isnt 0 )
 				uEl = u.getEl()
 			if uEl and showDeps and u.departmentId and u.departmentId isnt lastDepId
-				html.push $( @depTemplates[u.departmentId] or (@depTemplates[u.departmentId] = @departmentTemplate.replace( @regexps.dep, u.department)) )
+				depEl = $( @depTemplates[u.departmentId] or (@depTemplates[u.departmentId] = @departmentTemplate.replace( @regexps.dep, u.department)) )
+				depEls.push depEl
+				html.push depEl
 			lastDepId = u.departmentId
 			if uEl
 				html.push uEl
 		$el.html html
 
 	sortPanelUsers: ( usersArray ) ->
-		usersArray.sort (a,b) ->
-			if a.number and not b.number
-				-1
-			else if not a.number and b.number
+		usersArray.sort (a,b) =>
+			if a.departmentId is @withoutDepName and b.departmentId isnt @withoutDepName
 				1
+			else if b.departmentId is @withoutDepName and a.departmentId isnt @withoutDepName
+				-1
 			else
-				if a.state and not b.state
-					-1
-				else if not a.state and b.state
+				if a.department > b.department
 					1
+				else if b.department > a.department
+					-1
 				else
-					if a.name > b.name
-						1
-					else if a.name < b.name
+					if a.number and not b.number
 						-1
+					else if not a.number and b.number
+						1
+					else
+						if a.state and not b.state
+							-1
+						else if not a.state and b.state
+							1
+						else
+							if a.name > b.name
+								1
+							else if a.name < b.name
+								-1
 
 	setFilter: (filter, reloadAnyway) ->
 		if @filter is filter and not reloadAnyway then return false
 		oldFilter = @filter
 		@filter = filter
-#		if @filterInput.val() isnt @filter
-#			@filterInput.val @filter
-		if filter is ''
-			@panelUsersFiltered = [].concat @panelUsers
+
+		if @showDeps
+
+			for dep in @departments
+				el = dep.getEl()
+				users = dep.getUsers(filter)
+
+
+		else
+
+	#		if @filterInput.val() isnt @filter
+	#			@filterInput.val @filter
+			if filter is ''
+				@panelUsersFiltered = [].concat @panelUsers
+				@afterSetFilter(@panelUsersFiltered)
+				return @panelUsersFiltered
+			filteredUsers = []
+			exactMatch = false
+
+			for u in @panelUsers
+				if u.isFiltered filter
+					filteredUsers.push u
+					if u.number is filter and not exactMatch
+						exactMatch = u
+			if not exactMatch and filter.match /[0-9\(\)\+\-]/
+				@filterFantomUser = @getUser({name:filter, number: filter}, true)
+				@panelUsersFiltered = [@filterFantomUser].concat(filteredUsers)
+			else
+				@panelUsersFiltered = filteredUsers
 			@afterSetFilter(@panelUsersFiltered)
-			return @panelUsersFiltered
-		filteredUsers = []
-		exactMatch = false
-
-		if oldFilter.indexOf(@filter) is 0
-			forFilter = @panelUsersFiltered
-		else
-			forFilter = @panelUsers
-
-		for u in @panelUsers
-			if u.isFiltered filter
-				filteredUsers.push u
-				if u.number is filter and not exactMatch
-					exactMatch = u
-		if not exactMatch and filter.match /[0-9\(\)\+\-]/
-			@filterFantomUser = @getUser({name:filter, number: filter}, true)
-			@panelUsersFiltered = [@filterFantomUser].concat(filteredUsers)
-		else
-			@panelUsersFiltered = filteredUsers
-		@afterSetFilter(@panelUsersFiltered)
-		@panelUsersFiltered
+			@panelUsersFiltered
 
 	afterSetFilter: (filteredUsersArray) ->
 		@setPanelUsersHtml filteredUsersArray

@@ -117,23 +117,27 @@
   actionListHtml = loadTemplate('/templates/actionList.html');
   userTemplateHtml = loadTemplate('/templates/user.html');
   departmentTemplateHtml = loadTemplate('/templates/department.html');
+  departmentTemplateHtml = loadTemplate('/templates/dep.html');
   panelHtml = loadTemplate('/templates/panel.html');
   popupHtml = loadTemplate('/templates/callPopup.html');
   List.prototype.jScroll = jScroll;
   CUser.prototype.buttonTemplate = actionButtonHtml;
   CUser.prototype.log = log;
+  Department.prototype.template = departmentTemplateHtml;
   panelWasInitialized = false;
   initPanel = function(opts) {
     var $user, $userActionButton, animOptHide, animOptShow, bookmarkAnimOptHide, bookmarkAnimOptShow, bookmarkPos, closeClass, critWidth, cssPos, element, elementWidth, hidePanel, killPanelHideTimer, mouseOnPanel, newCssPos, oldBinding, openClass, panelBookmarkEl, panelEl, panelHideTimer, panelPos, panelStatus, popupEl, walkAway, xPos, xStartPos;
 
     panelWasInitialized = true;
     options = $.extend(defaultOptions, opts || {});
+    Department.prototype.withoutDepName = List.prototype.withoutDepName = 'zzzzz_without';
     langs = langs[options.lang] || langs.ru;
     CUser.prototype.template = userTemplateHtml.replace('{{button}}', actionButtonHtml);
     panelHtml = panelHtml.replace('{{inTalk}}', langs.panel.inTalk).replace('{{onHold}}', langs.panel.onHold).replace('{{queue}}', langs.panel.queue).replace('{{inputPlaceholder}}', langs.panel.inputPlaceholder);
     List.prototype.langs = langs.actions;
     List.prototype.departmentTemplate = departmentTemplateHtml;
     CUser.prototype.langs = langs;
+    Department.prototype.langs = langs;
     panelEl = $(panelHtml);
     popupEl = $(popupHtml);
     $('body').append(popupEl);
