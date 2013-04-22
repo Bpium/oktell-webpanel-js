@@ -48,6 +48,7 @@ List = (function() {
     this.lastDropdownUser = false;
     this.usersShowRules();
     this.departments = [];
+    this.simpleListEl = $(this.usersTableTemplate);
     this.filterFantomUserNumber = false;
     this.userWithGeneratedButtons = {};
     this.debugMode = debugMode;
@@ -78,7 +79,7 @@ List = (function() {
     this.keypadEl = this.panelEl.find('.j_phone_keypad');
     this.keypadIsVisible = false;
     this.usersListBlockEl = this.panelEl.find('.j_main_list');
-    this.usersListEl = this.usersListBlockEl.find('tbody');
+    this.usersListEl = this.simpleListEl.find('tbody');
     this.abonentsListBlock = this.panelEl.find('.j_abonents');
     this.abonentsListEl = this.abonentsListBlock.find('tbody');
     this.talkTimeEl = this.abonentsListBlock.find('.b_marks_time');
@@ -90,9 +91,11 @@ List = (function() {
     this.filterClearCross = this.panelEl.find('.jInputClear_close');
     debouncedSetFilter = false;
     this.usersWithBeforeConnectButtons = [];
-    this.jScroll(this.usersListBlockEl);
-    this.usersScroller = this.usersListBlockEl.find('.jscroll_scroller');
     this.userScrollerToTop = function() {
+      if (!_this._jScrolled) {
+        _this.jScroll(_this.usersListBlockEl);
+        _this.usersScroller = _this.usersListBlockEl.find('.jscroll_scroller');
+      }
       return _this.usersScroller.css({
         top: '0px'
       });
@@ -645,10 +648,18 @@ List = (function() {
           allDeps = allDeps.add(el);
         }
       }
-      this.usersListEl.html(allDeps);
+      this.usersListBlockEl.html(allDeps);
+      if (!exactMatch && filter.match(/[0-9\(\)\+\-]/)) {
+        this.filterFantomUser = this.getUser({
+          name: filter,
+          number: filter
+        }, true);
+        this.usersListEl.prepend;
+      }
       this.userScrollerToTop();
       return this.timer(true);
     } else {
+      this.usersListBlockEl.html(this.simpleListEl);
       if (filter === '') {
         this.panelUsersFiltered = [].concat(this.panelUsers);
         this.afterSetFilter(this.panelUsersFiltered);

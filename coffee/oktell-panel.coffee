@@ -67,10 +67,12 @@ do ($)->
 	userTemplateHtml = loadTemplate '/templates/user.html'
 	departmentTemplateHtml = loadTemplate '/templates/department.html'
 	departmentTemplateHtml = loadTemplate '/templates/dep.html'
+	usersTableHtml = loadTemplate '/templates/usersTable.html'
 	panelHtml = loadTemplate '/templates/panel.html'
 	popupHtml = loadTemplate '/templates/callPopup.html'
 
 	List.prototype.jScroll = jScroll
+	List.prototype.usersTableTemplate = usersTableHtml
 
 	CUser.prototype.buttonTemplate = actionButtonHtml
 	CUser.prototype.log = log

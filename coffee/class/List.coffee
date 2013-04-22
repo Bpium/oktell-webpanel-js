@@ -19,6 +19,8 @@ class List
 
 		@departments = []
 
+		@simpleListEl = $(@usersTableTemplate)
+
 		@filterFantomUserNumber = false
 
 		@userWithGeneratedButtons = {}
@@ -53,7 +55,7 @@ class List
 		@keypadEl = @panelEl.find '.j_phone_keypad'
 		@keypadIsVisible = false
 		@usersListBlockEl = @panelEl.find '.j_main_list'
-		@usersListEl = @usersListBlockEl.find 'tbody'
+		@usersListEl = @simpleListEl.find 'tbody'
 		@abonentsListBlock = @panelEl.find '.j_abonents'
 		@abonentsListEl = @abonentsListBlock.find 'tbody'
 		@talkTimeEl = @abonentsListBlock.find '.b_marks_time'
@@ -69,9 +71,12 @@ class List
 
 		@usersWithBeforeConnectButtons = []
 
-		@jScroll @usersListBlockEl
-		@usersScroller = @usersListBlockEl.find('.jscroll_scroller')
+
+
 		@userScrollerToTop = =>
+			if not @_jScrolled
+				@jScroll @usersListBlockEl
+				@usersScroller = @usersListBlockEl.find('.jscroll_scroller')
 			@usersScroller.css({top:'0px'})
 
 		@filterClearCross.bind 'click', =>
@@ -476,11 +481,12 @@ class List
 					@_setUsersHtml users, el.find('tbody'), @showOffline
 					allDeps = allDeps.add el
 
-			@usersListEl.html allDeps
 
-#			if not exactMatch and filter.match /[0-9\(\)\+\-]/
-#				@filterFantomUser = @getUser({name:filter, number: filter}, true)
-#				@usersListEl.prepend 
+			@usersListBlockEl.html allDeps
+
+			if not exactMatch and filter.match /[0-9\(\)\+\-]/
+				@filterFantomUser = @getUser({name:filter, number: filter}, true)
+				@usersListEl.prepend
 
 			@userScrollerToTop()
 
@@ -489,8 +495,8 @@ class List
 
 		else
 
-	#		if @filterInput.val() isnt @filter
-	#			@filterInput.val @filter
+			@usersListBlockEl.html @simpleListEl
+
 			if filter is ''
 				@panelUsersFiltered = [].concat @panelUsers
 				@afterSetFilter(@panelUsersFiltered)
