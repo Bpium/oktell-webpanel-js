@@ -15,9 +15,12 @@ class List
 		@actionCssPrefix = 'i_'
 		@lastDropdownUser = false
 
-		@usersShowRules()
+
 
 		@departments = []
+		@departmentsById = {}
+		@allUserDep = new Department 'all_user_dep', 'allUsers'
+		@allUserDep.template = @usersTableTemplate
 
 		@simpleListEl = $(@usersTableTemplate)
 
@@ -66,6 +69,18 @@ class List
 		@filterInput = @panelEl.find 'input'
 		@filterClearCross = @panelEl.find '.jInputClear_close'
 		debouncedSetFilter = false
+
+		@buttonShowOffline = @panelEl.find '.b_list_filter .i_online'
+		@buttonShowDeps = @panelEl.find '.b_list_filter .i_group'
+		@usersShowRules()
+
+		@buttonShowOffline.bind 'click', =>
+			@usersShowRules not @showOffline, @showDeps
+			@setFilter @filter, true
+
+		@buttonShowDeps.bind 'click', =>
+			@usersShowRules @showOffline, not @showDeps
+			@setFilter @filter, true
 
 
 
@@ -192,6 +207,7 @@ class List
 			CUser.prototype.defaultAvatar64 = oInfo.defaultAvatar64x64
 
 			@departments = []
+			@departmentsById = {}
 			createdDeps = {}
 
 			otherDep = new Department()
@@ -219,9 +235,11 @@ class List
 						else
 							dep = createdDeps[user.departmentId] = new Department( user.departmentId, user.department )
 							@departments.push dep
+							@departmentsById[user.departmentId] = dep
 						dep.addUser user
 					else
 						otherDep.addUser user
+					@allUserDep.addUser user
 				else
 					@me = user
 
@@ -242,7 +260,10 @@ class List
 			oktell.onNativeEvent 'pbxnumberstatechanged', (data) =>
 				for n in data.numbers
 					numStr = n.num.toString()
-					@usersByNumber[numStr]?.setState n.numstateid
+					user = @usersByNumber[numStr]
+					if user
+						user.setState n.numstateid
+						@departmentsById[user.departmentId].userStateChange user
 
 			oktell.on 'abonentsChange', ( abonents ) =>
 				@setAbonents abonents
@@ -290,6 +311,9 @@ class List
 
 		cookie showOfflineKey, @showOffline, {path:'/', expires: 1209600 }
 		cookie showDepsKey, @showDeps, {path:'/', expires: 1209600 }
+
+		@buttonShowOffline.toggleClass 'g_active', not @showOffline
+		@buttonShowDeps.toggleClass 'g_active', @showDeps
 
 		return [@showOffline, @showDeps]
 
@@ -430,10 +454,11 @@ class List
 		lastDepId = null
 		for u in usersArray
 			#log 'render ' + u.getInfo()
-			uEl = null
-			if showOffline or ( not showOffline and u.state isnt 0 )
-				uEl = u.getEl()
-				html.push uEl
+			if showOffline?
+				if showOffline or ( not showOffline and u.state isnt 0 )
+					html.push u.getEl()
+			else
+				html.push u.getEl()
 		$el.html html
 
 	sortPanelUsers: ( usersArray ) ->
@@ -470,55 +495,59 @@ class List
 		exactMatch = false
 		@timer()
 
+
+		allDeps = $()
+		renderDep = (dep) =>
+			el = dep.getEl()
+			depExactMatch = false
+			[ users, depExactMatch ] = dep.getUsers filter, @showOffline
+			if users.length isnt 0
+				if not exactMatch then exactMatch = depExactMatch
+				@_setUsersHtml users, el.find('tbody')
+				allDeps = allDeps.add el
 		if @showDeps
-			allDeps = $()
 			for dep in @departments
-				el = dep.getEl()
-				depExactMatch = false
-				[ users, depExactMatch ] = dep.getUsers filter
-				if users.length isnt 0
-					if not exactMatch then exactMatch = depExactMatch
-					@_setUsersHtml users, el.find('tbody'), @showOffline
-					allDeps = allDeps.add el
-
-
-			@usersListBlockEl.html allDeps
-
-			if not exactMatch and filter.match /[0-9\(\)\+\-]/
-				@filterFantomUser = @getUser({name:filter, number: filter}, true)
-				@usersListEl.prepend
-
-			@userScrollerToTop()
-
-			@timer true
-
-
+				renderDep dep
 		else
+			renderDep @allUserDep
 
-			@usersListBlockEl.html @simpleListEl
+		@usersListBlockEl.html allDeps
 
-			if filter is ''
-				@panelUsersFiltered = [].concat @panelUsers
-				@afterSetFilter(@panelUsersFiltered)
-				return @panelUsersFiltered
-			filteredUsers = []
-			exactMatch = false
+		if not exactMatch and filter.match /[0-9\(\)\+\-]/
+			@filterFantomUser = @getUser({name:filter, number: filter}, true)
+			@usersListEl.prepend
 
-			for u in @panelUsers
-				if u.isFiltered filter
-					filteredUsers.push u
-					if u.number is filter and not exactMatch
-						exactMatch = u
-			if not exactMatch and filter.match /[0-9\(\)\+\-]/
-				@filterFantomUser = @getUser({name:filter, number: filter}, true)
-				@panelUsersFiltered = [@filterFantomUser].concat(filteredUsers)
-			else
-				@panelUsersFiltered = filteredUsers
-			@afterSetFilter(@panelUsersFiltered)
+		@userScrollerToTop()
 
-			@timer true
+		@timer true
 
-			@panelUsersFiltered
+
+#		else
+#
+#			@usersListBlockEl.html @simpleListEl
+#
+#			if filter is ''
+#				@panelUsersFiltered = [].concat @panelUsers
+#				@afterSetFilter(@panelUsersFiltered)
+#				return @panelUsersFiltered
+#			filteredUsers = []
+#			exactMatch = false
+#
+#			for u in @panelUsers
+#				if u.isFiltered filter
+#					filteredUsers.push u
+#					if u.number is filter and not exactMatch
+#						exactMatch = u
+#			if not exactMatch and filter.match /[0-9\(\)\+\-]/
+#				@filterFantomUser = @getUser({name:filter, number: filter}, true)
+#				@panelUsersFiltered = [@filterFantomUser].concat(filteredUsers)
+#			else
+#				@panelUsersFiltered = filteredUsers
+#			@afterSetFilter(@panelUsersFiltered)
+#
+#			@timer true
+#
+#			@panelUsersFiltered
 
 	afterSetFilter: (filteredUsersArray) ->
 		@setPanelUsersHtml filteredUsersArray

@@ -38,8 +38,8 @@ Department = (function() {
     return this.visible = false;
   };
 
-  Department.prototype.getUsers = function(filter) {
-    var exactMatch, u, users, _i, _len, _ref;
+  Department.prototype.getUsers = function(filter, showOffline) {
+    var exactMatch, u, users, _i, _j, _len, _len1, _ref, _ref1;
 
     if (!this.isSorted) {
       this.sortUsers();
@@ -47,12 +47,22 @@ Department = (function() {
     users = [];
     exactMatch = false;
     if (filter === '') {
-      users = [].concat(this.users);
+      if (showOffline) {
+        users = [].concat(this.users);
+      } else {
+        _ref = this.users;
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          u = _ref[_i];
+          if (u.state !== 0) {
+            users.push(u);
+          }
+        }
+      }
     } else {
-      _ref = this.users;
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        u = _ref[_i];
-        if (u.isFiltered(filter)) {
+      _ref1 = this.users;
+      for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+        u = _ref1[_j];
+        if ((showOffline || (!showOffline && u.state !== 0)) && u.isFiltered(filter)) {
           users.push(u);
           if (u.number === filter && !exactMatch) {
             exactMatch = u;

@@ -26,17 +26,22 @@ class Department
 			@el.hide()
 		@visible = false
 
-	getUsers: (filter) ->
+	getUsers: (filter, showOffline) ->
 		if not @isSorted
 			@sortUsers()
 
 		users = []
 		exactMatch = false
 		if filter is ''
-			users = [].concat @users
+			if showOffline
+				users = [].concat @users
+			else
+				for u in @users
+					if u.state isnt 0
+						users.push u
 		else
 			for u in @users
-				if u.isFiltered filter
+				if ( showOffline or ( not showOffline and u.state isnt 0 ) ) and u.isFiltered filter
 					users.push u
 					if u.number is filter and not exactMatch
 						exactMatch = u
