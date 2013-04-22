@@ -1,6 +1,7 @@
 class List
 
 	constructor: (oktell, panelEl, dropdownEl, afterOktellConnect, debugMode) ->
+
 		@allActions =
 			call: { icon: '/img/icons/action/call.png', iconWhite: '/img/icons/action/white/call.png', text: @langs.call }
 			conference : { icon: '/img/icons/action/confinvite.png', iconWhite: '/img/icons/action/white/confinvite.png', text: @langs.conference }
@@ -207,10 +208,13 @@ class List
 
 				if user.id isnt oInfo.userid
 					@panelUsers.push user
-					if user.numberObj?.departmentid and user.numberObj.departmentid isnt '00000000-0000-0000-0000-000000000000'
-						dep = createdDeps[user.numberObj.departmentid] or (createdDeps[user.numberObj.departmentid] = new Department( user.numberObj.departmentid, user.numberObj.department ) )
+					if user.departmentId and user.departmentId isnt '00000000-0000-0000-0000-000000000000'
+						if createdDeps[user.departmentId]
+							dep = createdDeps[user.departmentId]
+						else
+							dep = createdDeps[user.departmentId] = new Department( user.departmentId, user.department )
+							@departments.push dep
 						dep.addUser user
-						@departments.push deps
 					else
 						otherDep.addUser user
 				else
@@ -254,11 +258,11 @@ class List
 			@setAbonents oktell.getAbonents()
 			@setHold oktell.getHoldInfo()
 
-			depsEls = $()
-			for d in @departments
-				depsEls = depsEls.add d.getEl()
-
-			@usersListBlockEl.html depsEls
+#			depsEls = $()
+#			for d in @departments
+#				depsEls = depsEls.add d.getEl()
+#
+#			@usersListBlockEl.html depsEls
 
 			@setFilter '', true
 
@@ -416,21 +420,14 @@ class List
 			blockEl.slideUp 200, @setUserListHeight
 
 
-	_setUsersHtml: (usersArray, $el, showOffline, showDeps) ->
+	_setUsersHtml: (usersArray, $el, showOffline ) ->
 		html = []
 		lastDepId = null
-		depEls =
 		for u in usersArray
 			#log 'render ' + u.getInfo()
 			uEl = null
 			if showOffline or ( not showOffline and u.state isnt 0 )
 				uEl = u.getEl()
-			if uEl and showDeps and u.departmentId and u.departmentId isnt lastDepId
-				depEl = $( @depTemplates[u.departmentId] or (@depTemplates[u.departmentId] = @departmentTemplate.replace( @regexps.dep, u.department)) )
-				depEls.push depEl
-				html.push depEl
-			lastDepId = u.departmentId
-			if uEl
 				html.push uEl
 		$el.html html
 
@@ -465,12 +462,29 @@ class List
 		if @filter is filter and not reloadAnyway then return false
 		oldFilter = @filter
 		@filter = filter
+		exactMatch = false
+		@timer()
 
 		if @showDeps
-
+			allDeps = $()
 			for dep in @departments
 				el = dep.getEl()
-				users = dep.getUsers(filter)
+				depExactMatch = false
+				[ users, depExactMatch ] = dep.getUsers filter
+				if users.length isnt 0
+					if not exactMatch then exactMatch = depExactMatch
+					@_setUsersHtml users, el.find('tbody'), @showOffline
+					allDeps = allDeps.add el
+
+			@usersListEl.html allDeps
+
+#			if not exactMatch and filter.match /[0-9\(\)\+\-]/
+#				@filterFantomUser = @getUser({name:filter, number: filter}, true)
+#				@usersListEl.prepend 
+
+			@userScrollerToTop()
+
+			@timer true
 
 
 		else
@@ -495,6 +509,9 @@ class List
 			else
 				@panelUsersFiltered = filteredUsers
 			@afterSetFilter(@panelUsersFiltered)
+
+			@timer true
+
 			@panelUsersFiltered
 
 	afterSetFilter: (filteredUsersArray) ->
@@ -539,3 +556,10 @@ class List
 			user.loadActions() for phone, user of @queue
 			user.loadActions() for phone, user of @panelUsersFiltered
 		, 100
+
+	timer: (stop) ->
+		if stop and @_time
+			log 'List timer stop: ' + ( Date.now() - @_time )
+		if not stop
+			@_time = Date.now()
+			log 'List timer start'

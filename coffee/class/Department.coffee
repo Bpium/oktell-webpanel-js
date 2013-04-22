@@ -29,9 +29,20 @@ class Department
 	getUsers: (filter) ->
 		if not @isSorted
 			@sortUsers()
+
+		users = []
+		exactMatch = false
 		if filter is ''
-			[].concat @users
+			users = [].concat @users
 		else
+			for u in @users
+				if u.isFiltered filter
+					users.push u
+					if u.number is filter and not exactMatch
+						exactMatch = u
+
+		[users, exactMatch]
+
 
 
 	sortUsers: ->

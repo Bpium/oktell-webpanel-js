@@ -18,6 +18,11 @@ debounce = (func, wait, immediate) ->
 escapeHtml = (string) ->
 	(''+string).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#x27;').replace(/\//g,'&#x2F;')
 
+log = ->
+	try
+		console.log.apply(console, arguments);
+	catch e
+
 cookie = (key, value, options) ->
 
 	# key and at least value given, set cookie...
