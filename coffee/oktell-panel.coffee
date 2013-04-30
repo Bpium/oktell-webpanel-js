@@ -7,6 +7,7 @@ do ($)->
 	#includecoffee coffee/class/CUser.coffee
 	#includecoffee coffee/class/List.coffee
 	#includecoffee coffee/class/Popup.coffee
+	#includecoffee coffee/class/PermissionsPopup.coffee
 
 	defaultOptions =
 		position: 'right'
@@ -16,6 +17,7 @@ do ($)->
 		#buttonCss: 'oktellActionButton'
 		debug: false
 		lang: 'ru'
+		jsSIPUA: false
 
 	langs = {
 		ru:
@@ -36,16 +38,35 @@ do ($)->
 	afterOktellConnect = null
 	list = null
 	popup = null
+	permissionsPopup = null
 
 	getOptions = ->
 		options or defaultOptions
 
+	logStr = ''
+
 	log = ->
 		if not getOptions().debug then return
+		d = new Date()
+		dd =  d.getFullYear() + '-' + (if d.getMonth()<10 then '0' else '') + d.getMonth() + '-' + (if d.getDate()<10 then '0' else '') + d.getDate();
+		t = (if d.getHours()<10 then '0' else '') + d.getHours() + ':' + (if d.getMinutes()<10 then '0' else '')+d.getMinutes() + ':' +  (if d.getSeconds()<10 then '0' else '')+d.getSeconds() + ':' +
+			(d.getMilliseconds() + 1000).toString().substr(1)
+		logStr += dd + ' ' + t + ' | '
+		args = ['Oktell-Panel ' + t + ' |']
+		for val in arguments
+			if typeof val == 'object'
+				try
+					logStr += JSON.stringify(val)
+				catch e
+					logStr += val.toString()
+			else
+				logStr += val
+			logStr += ' | '
+			args.push val
+		logStr += "\n\n"
 		try
-			console.log.apply(console, arguments);
+			console.log.apply( console, args || [])
 		catch e
-
 
 	templates = {}
 
@@ -66,11 +87,15 @@ do ($)->
 	userTemplateHtml = loadTemplate '/templates/user.html'
 	panelHtml = loadTemplate '/templates/panel.html'
 	popupHtml = loadTemplate '/templates/callPopup.html'
+	permissionsPopupHtml = loadTemplate '/templates/permissionsPopup.html'
 
 	List.prototype.jScroll = jScroll
 
 	CUser.prototype.buttonTemplate = actionButtonHtml
 	CUser.prototype.log = log
+	List.prototype.log = log
+	Popup.prototype.log = log
+	PermissionsPopup.prototype.log = log
 
 	panelWasInitialized = false
 
@@ -90,6 +115,8 @@ do ($)->
 
 		popupEl = $(popupHtml)
 		$('body').append(popupEl)
+		permissionsPopupEl = $(permissionsPopupHtml)
+		$('body').append(permissionsPopupEl)
 
 		$user = $(userTemplateHtml)
 		$userActionButton = $(actionButtonHtml)
@@ -103,6 +130,7 @@ do ($)->
 		oktell = getOptions().oktell
 
 		popup = new Popup popupEl, oktell
+		permissionsPopup = new PermissionsPopup permissionsPopupEl, oktell
 
 		panelPos = getOptions().position
 		animOptShow = {}
@@ -247,7 +275,7 @@ do ($)->
 		phone = el.attr('data-phone')
 		if phone
 			button = list.getUserButtonForPlugin phone
-			log 'generated button for ' + phone, button
+			#log 'generated button for ' + phone, button
 			el.html button
 
 	addActionButtonToEl = (el) ->

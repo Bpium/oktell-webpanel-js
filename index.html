@@ -4,14 +4,16 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 	<title>Тестовая страничка для вебпанели</title>
 
-	<link rel="stylesheet" href="/css/oktell-panel.css"/>
+	<link rel="stylesheet" href="css/oktell-panel.css"/>
 
-	<script type="text/javascript" src="/jslib/vendor/jquery-1.9.1.js"></script>
-	<script type="text/javascript" src="/jslib/vendor/oktell-1.5.2.js"></script>
-	<script type="text/javascript" src="/jslib/jqueryPlugins/iScroll.js"></script>
+	<script type="text/javascript" src="jslib/vendor/jquery-1.9.1.js"></script>
+	<script type="text/javascript" src="jslib/vendor/oktell-1.5.2-dev.js"></script>
+	<script type="text/javascript" src="js/jssip-0.3.0.js"></script>
+	<script type="text/javascript" src="js/SIPml-api.js"></script>
+	<script type="text/javascript" src="jslib/jqueryPlugins/iScroll.js"></script>
 
 
-	<script type="text/javascript" src="/coffee/utils.js"></script>
+	<script type="text/javascript" src="coffee/utils.js"></script>
 	<!--<script type="text/javascript" src="/coffee/koBindings/hoverSelect.js"></script>-->
 	<!--<script type="text/javascript" src="/coffee/koBindings/inputClear.js"></script>-->
 	<!--<script type="text/javascript" src="/coffee/koBindings/jScroll.js"></script>-->
@@ -19,20 +21,30 @@
 	<!--<script type="text/javascript" src="/coffee/class/Panel.js"></script>-->
 	<!--<script type="text/javascript" src="/coffee/class/User.js"></script>-->
 	<!--<script type="text/javascript" src="/coffee/class/UsersService.js"></script>-->
-	<script type="text/javascript" src="/coffee/class/List.js"></script>
-	<script type="text/javascript" src="/coffee/class/CUser.js"></script>
-	<script type="text/javascript" src="/coffee/class/Popup.js"></script>
-	<script type="text/javascript" src="/coffee/jScroll.js"></script>
+	<script type="text/javascript" src="coffee/class/List.js"></script>
+	<script type="text/javascript" src="coffee/class/CUser.js"></script>
+	<script type="text/javascript" src="coffee/class/Popup.js"></script>
+	<script type="text/javascript" src="coffee/class/PermissionsPopup.js"></script>
+	<script type="text/javascript" src="coffee/jScroll.js"></script>
 
 
 	<script type="text/javascript">
 		window.oktell = new Oktell
 	</script>
 
-	<script type="text/javascript" src="/coffee/oktell-panel.js"></script>
+	<script type="text/javascript" src="coffee/oktell-panel.js"></script>
+	<script type="text/javascript" src="coffee/oktell-voice.js"></script>
 
 	<script type="text/javascript">
 		$(function(){
+
+			$('#j_login').val( localStorage.demoLogin || '' )
+			$('#j_pass').val( localStorage.demoPass || '' )
+			$('#j_server').val( localStorage.demoServer || '192.168.0.61' )
+
+			$('#j_login').focus();
+
+
 			var stateEl = $('#connectionState');
 			stateEl.text('Соединение');
 			var oktell = window.oktell
@@ -47,28 +59,372 @@
 				statesLogel.append( '<p>Cтатус = "' + newS + '", предыдущий статус = "' + oldS + '", время смены ' + d.getHours()+':'+ d.getMinutes()+':'+ d.getSeconds() + '</p>' );
 			});
 
-			oktell.connect({
-				//url: ['213.239.200.141'],
-				url: ['192.168.0.61'], login: 'a3', password: 'a3',
-				//url: ['192.168.0.12'], login: 'leader', password: '123', // звонить на 183
-				debugMode: true,
-				openTimeout: 5000,
-				webSocketSwfLocation: '/jslib/vendor/WebSocketMain.swf',
-				expires: 84600,
-				queryTimeout: 5000,
-				queueInterval: 9999999,
-//				defaultAvatar: '/img/noavatar.png',
-//				defaultAvatar32x32: '/img/noavatar.png',
-//				defaultAvatar64x64: '/img/noavatar.png',
-				callback: function(data) {
-					if ( data.result ) {
-						stateEl.text('Онлайн')
-						oktell.trigger('oktellConnected')
-					} else {
-						stateEl.text('Ошибка')
+
+
+
+			/*var createFantomAbonent = function(newSession) {
+				var caller = typeof newSession == 'string' || typeof newSession == 'number' ? newSession : newSession.getRemoteFriendlyName();
+				var abonents = [{phone: caller, name: caller}];
+				return abonents;
+			}
+
+			var SIPmlConnected = false;
+			currentSession = false;
+			sipStack = false;
+			var sipStackEventsListener = function(e){
+				console.info('sipStack event = ' + e.type);
+				switch ( e.type ) {
+					case 'started':
+						login();
+						break;
+					case 'i_new_call':
+						var abonents = createFantomAbonent(e.newSession)
+						oktell.trigger('phoneRingStart', abonents);
+						oktell.trigger('abonentsChange', abonents);
+						currentSession = e.newSession;
+						var session = currentSession;
+						session.setConfiguration({
+							events_listener: {
+								events: '*',
+								listener: function(e) {
+									console.log('INCOMING session event!!! ' + e.type);
+									if (e.type == 'connected') {
+										var abonents = createFantomAbonent(session);
+										oktell.trigger('phoneTalkStart');
+									} else if (e.type == 'terminated') {
+										oktell.trigger('phoneSessionStop');
+									}
+								}
+							}
+						});
+						break;
+					case 'm_permission_requested':
+						// TODO show popup with info about permissions
+						break;
+				}
+			}
+
+			startWebRtcClient = function(login, pass, server) {
+				server = server.split(':')[0];
+				SIPml.init(function(e){
+					sipStack = new SIPml.Stack({
+						realm: server, // mandatory: domain name
+						impi: login, // mandatory: authorization name (IMS Private Identity)
+						impu: 'sip:' + login + '@' + server, // mandatory: valid SIP Uri (IMS Public Identity)
+						password: pass, // optional
+						display_name: login, // optional
+						ice_servers: [{"url":"stun:stun.l.google.com:19302"}],
+						websocket_proxy_url: 'ws://'+server+':5061', // optional
+						outbound_proxy_url: 'udp://'+server+':5061', // optional
+						enable_rtcweb_breaker: false, // optional
+						events_listener: { events: '*', listener: sipStackEventsListener }, // optional: '*' means all events
+						sip_headers: [ // optional
+							{ name: 'User-Agent', value: 'IM-client/OMA1.0 sipML5-v1.0.0.0' },
+							{ name: 'Organization', value: 'Oktell' }
+						]
+					});
+					sipStack.start();
+				}, function(e){
+					console.error('Failed to initialize the engine: ' + e.message);
+				});
+			}
+
+
+			var registerSession;
+			var registerSessionEventsListener = function(e){
+				console.info('registerSession event = ' + e.type);
+				if ( e.session == registerSession){
+					if (e.type == 'connected') {
+						SIPmlConnected = true;
+						oktell.trigger('phoneRegistered');
+					} else if (e.type == 'terminated') {
+						SIPmlConnected = false;
+						oktell.trigger('phoneUnregistered');
+					}
+					//makeCall();
+					//sendMessage();
+					//publishPresence();
+					//subscribePresence('johndoe'); // watch johndoe's presence status change
+				}
+			}
+			var login = function(){
+				registerSession = sipStack.newSession('register', {
+					events_listener: { events: '*', listener: registerSessionEventsListener } // optional: '*' means all events
+				});
+				registerSession.register();
+			}
+
+
+			var callSession;
+			var callSessionEventsListener = function(e){
+				if (currentSession == e.session) {
+					console.info('!! callSession event = ' + e.type);
+					if (e.type == 'terminated') {
+						currentSession = false;
+						oktell.trigger('phoneSessionStop');
+					} else if (e.type == 'connected') {
+						var abonents = createFantomAbonent(e.session);
+						oktell.trigger('phoneTalkStart');
 					}
 				}
+			}
+
+			var acceptCall = function(e){
+				e.newSession.accept(); // e.newSession.reject() to reject the call
+			}
+
+			$('body').append('<audio id="audio-remote"></audio>');
+
+			var oldCall = oktell.call;
+			oktell.call = function(number) {
+				if ( sipStack ) {
+					currentSession = sipStack.newSession('call-audio', {
+						//video_local: document.getElementById('video-local'),
+						//video_remote: document.getElementById('video-remote'),
+						audio_remote: document.getElementById('audio-remote'),
+						events_listener: { events: '*', listener: callSessionEventsListener } // optional: '*' means all events
+					});
+					var abonents = createFantomAbonent(number);
+					oktell.trigger('phoneCallStart', abonents);
+					oktell.startCallWebRTC(number);
+					currentSession.call(number);
+				}
+			}
+
+			oktell.answer = function() {
+				if ( currentSession ) {
+					currentSession.accept();
+				}
+			}
+
+			var oldEndCall = oktell.endCall;
+			oktell.endCall = function() {
+				if ( currentSession && arguments.length == 0 ) {
+					currentSession.hangup();
+				} else {
+					oldEndCall.apply(oktell, arguments);
+				}
+			}*/
+
+
+
+
+
+			/*var ua;
+			var useVideo = false
+			$('body').append('<video id="jssipVideoElRemote" autoplay="" hidden="true"></video>');
+			$('body').append('<video id="jssipVideoElSelf" autoplay="" hidden="true"></video>');
+			var videoElSelf = $('#jssipVideoElSelf')[0]
+			var videoElRemote = $('#jssipVideoElRemote')[0]
+			var jssipConnected = false;
+			var currentSession = false;
+
+			var oldCall = oktell.call;
+			oktell.call = function(number) {
+
+				if ( ua ) {
+					ua.call( number, {
+						selfView: videoElSelf,
+						remoteView: videoElRemote
+					}, {
+						mediaTypes: {
+							audio: true,
+							video: useVideo
+						},
+						eventHandlers: {
+							connecting: function(e) {
+								//@trigger 'callConnecting', number, e
+							},
+							progress: function(e) {
+								//@trigger 'callProgress', number, e
+							},
+							failed: function(e) {
+								//@trigger 'callFailed', number, e
+							},
+							started: function(e) {
+								//trigger 'callStarted', number, e
+							},
+							ended: function(e){
+								//@trigger 'callEnded', number, e
+							}
+						}
+					});
+				} else {
+					oldCall.apply(oktell, arguments);
+				}
+			}
+
+			oktell.mediaSession = function(session, isRemote) {
+				if ( typeof session !== 'undefined' ) {
+					if ( session ) {
+						currentSession = session;
+						currentSession.on('started', function(e){
+							if (e.data.originator == 'remote') {
+								oktell.trigger('phoneCallStart');
+							} else {
+
+							}
+						});
+						currentSession.on('ended', function(e){
+							oktell.trigger('phoneCallEnd');
+							oktell.trigger('abonentsChange', []);
+							// TODO разные причины завершения разговора e.data.response http://www.jssip.net/documentation/devel/api/causes/
+							if (e.data.originator == 'remote') {
+
+							} else {
+
+							}
+						});
+
+						if ( isRemote ) {
+							var caller = currentSession.remote_identity.toString().match(/^sip:(.+?)@.+$/);
+							caller = caller && caller[1] ? caller[1] : ''
+							// TODO in oktell-voice need to find oktell user if exist, then create abonent object
+							var abonents = [{phone:caller, name: caller}];
+							oktell.trigger('phoneRingStart', abonents);
+							oktell.trigger('abonentsChange', abonents);
+						}
+					} else {
+						currentSession = false;
+					}
+				}
+				return currentSession;
+			}
+
+			oktell.answer = function() {
+				var session = oktell.mediaSession();
+				if ( session ) {
+					session.answer();
+				}
+			}
+
+			var oldEndCall = oktell.endCall;
+			oktell.endCall = function() {
+				var session = oktell.mediaSession();
+				if ( session ) {
+					session.terminate();
+				} else {
+					oldEndCall.apply(oktell, arguments);
+				}
+			}
+
+//			var oldTransfer = oktell.transfer;
+//			oktell.transfer = function() {
+//				var session = oktell.mediaSession();
+//				if ( session ) {
+//					session.terminate();
+//				} else {
+//					oldEndCall.apply(oktell, arguments);
+//				}
+//			}*/
+
+
+			$('#j_form').on('submit', function(e){
+				e.preventDefault();
+
+
+				var login = $('#j_login').val()
+				var pass = $('#j_pass').val()
+				var server = $('#j_server').val()
+
+				//startWebRtcClient(login,pass,server);
+
+				localStorage.demoLogin = login
+				localStorage.demoPass = pass
+				localStorage.demoServer = server
+
+//				OktellVoice.connect({
+//					login: login,
+//					pass: pass,
+//					server: server + ':5061',
+//					debugMode: true,
+//					useOktelljs: oktell
+//				});
+
+				oktell.connect({
+					//url: ['213.239.200.141'],
+					//url: ['192.168.0.61'], login: 'a4', password: 'a4',
+					//url: ['192.168.0.12'], login: 'leader', password: '123', // звонить на 183
+					url: server, login: login, password: pass,
+					debugMode: true,
+					openTimeout: 5000,
+					OktellVoice: true,
+					webSocketSwfLocation: '/jslib/vendor/WebSocketMain.swf',
+					//expires: 84600,
+					queryTimeout: 5000,
+					queueInterval: 300000,
+					//				defaultAvatar: '/img/noavatar.png',
+					//				defaultAvatar32x32: '/img/noavatar.png',
+					//				defaultAvatar64x64: '/img/noavatar.png',
+					callback: function(data) {
+
+						if ( data.result ) {
+							stateEl.text('Онлайн')
+							oktell.trigger('oktellConnected')
+							$('#j_form_block').slideUp();
+						} else {
+							stateEl.text('Ошибка')
+						}
+					}
+				});
+
+				/*if ( window.JsSIP && JsSIP.UA ) {
+
+					ua = new JsSIP.UA({
+						uri: 'sip:' + login + '@192.168.0.61:5061',
+						ws_servers: 'ws://192.168.0.61:5061',
+						display_name: login,
+						password: pass,
+						authorization_user: login,
+						register: true,
+						register_expires: '',
+						registrar_server: '',
+						no_answer_timeout: '',
+						trace_sip: true,
+						stun_servers:'',
+						turn_servers:'',
+						use_preloaded_route:'',
+						connection_recovery_min_interval:'',
+						connection_recovery_max_interval:'',
+						hack_via_tcp:'',
+						hack_ip_in_contact: ''
+					});
+
+					ua.on('newRTCSession', function(e){
+						//answer
+						//e.data.session.answer();
+						oktell.mediaSession(e.data.session, e.data.originator == 'remote');
+						// reject
+						// e.data.session.terminate();
+
+					});
+
+					ua.on('registered', function(e){
+						jssipConnected = true;
+						oktell.trigger('phoneRegistered');
+					});
+
+					ua.on('unregistered', function(e){
+						jssipConnected = false;
+						oktell.trigger('phoneUnregistered');
+					});
+
+					ua.on('disconnected', function(e){
+						jssipConnected = false;
+					});
+
+
+
+
+
+
+				}
+
+				ua.start()
+
+				$.oktellPanel({jsSIPUA: ua});*/
 			});
+
 
 			$('.setStatus').click(function(){ oktell.setStatus($(this).data('status'), false, 'break message')});
 
@@ -95,23 +451,53 @@
 				padding-bottom: 10px;
 			}
 		</style>
+		<div id="j_form_block">
+			<form id="j_form">
+				<table>
+					<tbody>
+						<tr>
+							<td>Логин</td>
+							<td><input type="text" id="j_login"/></td>
+						</tr>
+						<tr>
+							<td>Пароль</td>
+							<td><input type="password" id="j_pass"/></td>
+						</tr>
+						<tr>
+							<td>Сервер</td>
+							<td><input type="text" id="j_server" value="192.168.0.61"/></td>
+						</tr>
+						<tr>
+							<td></td>
+							<td><input type="submit" /></td>
+						</tr>
+					</tbody>
+				</table>
+			</form>
+
+
+		</div>
+		<br>
 		<span>Статус:</span> <span id="connectionState">Соединение</span><br>
-		<button class="setStatus" data-status="ready">set Ready</button><br>
-		<button class="setStatus" data-status="dnd">set DND</button><br>
-		<button class="setStatus" data-status="redirect">set Redirect</button><br>
-		<button class="setStatus" data-status="break">set Break with text</button><br>
-		<div id="webstate"></div><br>
+		<div style="display: none;">
+			<button class="setStatus" data-status="ready">set Ready</button><br>
+			<button class="setStatus" data-status="dnd">set DND</button><br>
+			<button class="setStatus" data-status="redirect">set Redirect</button><br>
+			<button class="setStatus" data-status="break">set Break with text</button><br>
+			<div id="webstate"></div><br>
+		</div>
+
 		<p class="user">Дмитрий Е. 103<span class="userPhone" data-phone="103"></span></p>
 		<p class="user">Алексей В. 101<span class="userPhone" data-phone="101"></span></p>
-		102 <span class="userPhone" data-phone="102"></span><br>
-		104 <span class="userPhone" data-phone="104"></span><br>
-		105 <span class="userPhone" data-phone="105"></span><br>
-		106 <span class="userPhone" data-phone="106"></span><br>
+		<p class="user">Рамиль Г. 135<span class="userPhone" data-phone="135"></span></p>
+		<p class="user">Оператор 106<span class="userPhone" data-phone="106"></span></p>
+		<p class="user">Абонент 104<span class="userPhone" data-phone="104"></span></p>
 
 		<br>
 		<br>
-		Вид кнопок
-		<div>
+
+		<div style="display: none;">
+			Вид кнопок
 			Call
 			<ul class="b_button_action m_button_action_call">
 				<li class="g_first">

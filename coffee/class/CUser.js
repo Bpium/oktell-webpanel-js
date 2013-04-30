@@ -98,13 +98,20 @@ CUser = (function() {
   };
 
   CUser.prototype.getEl = function() {
-    var $el, str;
+    var $el, str,
+      _this = this;
 
     str = this.template.replace(this.regexps.name, this.nameHtml).replace(this.regexps.number, this.numberHtml !== this.nameHtml ? this.numberHtml : '').replace(this.regexps.avatarLink32x32, this.avatarLink32x32).replace(this.regexps.css, this.defaultAvatarCss);
     $el = $(str);
     this.els = this.els.add($el);
     this.setStateCss();
     $el.data('user', this);
+    $el.bind('mouseenter', function() {
+      return _this.isHovered(true);
+    });
+    $el.bind('mouseleave', function() {
+      return _this.isHovered(false);
+    });
     this.initButtonEl($el.find('.oktell_button_action'));
     return $el;
   };
@@ -136,7 +143,7 @@ CUser = (function() {
     }
     this.hasHover = isHovered;
     if (this.hasHover) {
-      return this.loadActions();
+      return this.loadActions(true);
     }
   };
 

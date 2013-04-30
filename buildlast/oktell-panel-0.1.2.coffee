@@ -414,7 +414,7 @@ do ($)->
 			@state = state
 			@setStateCss()
 			if @buttonEls.length
-				#log 'LOAD actions after state change '
+				#@log 'LOAD actions after state change '
 				@loadActions()
 				setTimeout =>
 					@loadActions()
@@ -450,6 +450,10 @@ do ($)->
 			@els = @els.add $el
 			@setStateCss()
 			$el.data 'user', @
+			$el.bind 'mouseenter', =>
+				@isHovered true
+			$el.bind 'mouseleave', =>
+				@isHovered false
 			@initButtonEl $el.find '.oktell_button_action'
 			return $el
 	
@@ -479,7 +483,7 @@ do ($)->
 	
 		loadActions: ()->
 			actions = @loadOktellActions()
-			#log 'load action for user id='+@id+' number='+@number+' actions='+actions
+			#@log 'load action for user id='+@id+' number='+@number+' actions='+actions
 			#window.cuser = @
 			action = actions?[0] or ''
 			if @buttonLastAction is action
@@ -631,10 +635,10 @@ do ($)->
 					debouncedSetFilter()
 				return true
 	
-			@panelEl.bind 'mouseenter', ->
-				$(this).data('user')?.isHovered true
-			@panelEl.bind 'mouseleave', ->
-				$(this).data('user')?.isHovered false
+	#		@panelEl.bind 'mouseenter', (e)->
+	#			$(this).data('user')?.isHovered true
+	#		@panelEl.bind 'mouseleave', ->
+	#			$(this).data('user')?.isHovered false
 	
 			@panelEl.bind 'click', (e)=>
 				target = $(e.target)
@@ -748,7 +752,7 @@ do ($)->
 					@reloadActions()
 	
 				oktell.on 'holdStateChange', ( holdInfo ) =>
-					#log 'Oktell holdStateChange', holdInfo
+					#@log 'Oktell holdStateChange', holdInfo
 					@setHold holdInfo
 					@reloadActions()
 	
@@ -778,7 +782,7 @@ do ($)->
 			user = @getUser phone
 			if not @oktellConnected
 				@usersWithBeforeConnectButtons.push user
-			#log '!!! getUserButtonForPlugin for ' + user.getInfo()
+			#@log '!!! getUserButtonForPlugin for ' + user.getInfo()
 			@userWithGeneratedButtons[phone] = user
 			button = user.getButtonEl()
 			button.find('.drop_down').bind 'click', =>
@@ -841,7 +845,7 @@ do ($)->
 	
 		logUsers: ->
 			for own k,u of @panelUsersFiltered
-				log u.getInfo()
+				@log u.getInfo()
 	
 		syncAbonentsAndUserlist: (abonents, userlist) ->
 			absByNumber = {}
@@ -909,7 +913,7 @@ do ($)->
 		_setUsersHtml: (usersArray, $el) ->
 			html = []
 			for u in usersArray
-				#log 'render ' + u.getInfo()
+				#@log 'render ' + u.getInfo()
 				html.push u.getEl()
 			$el.html html
 	
@@ -998,7 +1002,7 @@ do ($)->
 			setTimeout =>
 				for own phone, user of @userWithGeneratedButtons
 					actions = user.loadActions()
-					#log 'reload actions for ' + user.getInfo() + ' ' + actions
+					#@log 'reload actions for ' + user.getInfo() + ' ' + actions
 				user.loadActions() for phone, user of @abonents
 				user.loadActions() for phone, user of @queue
 				user.loadActions() for phone, user of @panelUsersFiltered
@@ -1012,12 +1016,17 @@ do ($)->
 			@absContainer = @el.find('.b_content')
 			@abonentEl = @absContainer.find('.b_abonent').remove()
 	
-			@isBack101 = false
+			@answerActive = false
+			@answerButttonEl = @el.find '.j_answer'
+			@puckupEl = @el.find '.j_pickup'
 	
 	
 			@el.find('.j_abort_action').bind 'click', =>
 				@hide()
-				oktell.endCall()
+				oktell.endCall();
+			@el.find('.j_answer').bind 'click', =>
+				@hide()
+				oktell.answer();
 	
 			@el.find('.j_close_action').bind 'click', =>
 				@hide()
@@ -1025,46 +1034,44 @@ do ($)->
 			@el.find('i.o_close').bind 'click', =>
 				@hide()
 	
-			oktell.on 'ringStart', (abonents) =>
-				if not @isBack101
-					@setAbonents abonents
+			oktell.on 'phoneRegistered', =>
+				@answerButtonVisible true
+	
+			oktell.on 'phoneUnregistered', =>
+				@answerButtonVisible false
+	
+			oktell.on 'phoneRingStart', (abonents) =>
+				@log 'OKTELL phoneRingStart', abonents
+				@setAbonents abonents
 				@show()
 	
-			oktell.on 'ringStop', =>
-				@isBack101 = false
+			oktell.on 'phoneCallStart', (abonents) =>
+				@log 'OKTELL phoneCallStart', abonents
+				@hide()
+			oktell.on 'phoneTalkStart', (abonents) =>
+				@log 'OKTELL phoneTalkStart', abonents
+				@hide()
+			oktell.on 'phoneSessionStop', (abonents) =>
+				@log 'OKTELL phoneSessionStop', abonents
 				@hide()
 	
-	#		oktell.on 'connect', =>
-	#			oktell.onNativeEvent 'phoneevent_ringstarted', (data) =>
-	##				callercomment: ""
-	##				callerdescription: ""
-	##				callerdirection: "oktell_pbx"
-	##				callerid: ""
-	##				callerinfo: "Автодозвон. Обратный вызов.↵Абонент: 89274513158"
-	##				callerlineid: "00000000-0000-0000-0000-000000000000"
-	##				callerlinenum: "00000"
-	##				callername: ""
-	##				canfax: false
-	##				canvideo: false
-	##				chainid: "c6ed99c1-c53a-4224-b4e5-cd58682c8b87"
-	##				connectionindex: 4
-	##				isconference: false
-	##				isextline: false
-	##				istask: false
-	##				qid: "e2382a55-53c1-45bc-be80-13910f31082e"
-	##				userid: "d8af50ea-74a6-4a57-b0d5-451962f6c042"
-	##				userlogin: "airato"
-	#				if data?.callerdirection is 'oktell_pbx' and data?.callerlineid is '00000000-0000-0000-0000-000000000000' and data?.callerlinenum is '00000' and data?.callerinfo
-	#					@isBack101 = data.callerinfo
-	#					@setAbonents [{name:@isBack101, phone: ''}]
+			oktell.on 'ringStart', (abonents) =>
+				if not @answerActive
+					@setAbonents abonents
+					@show()
+	
+			oktell.on 'ringStop', =>
+				if not @answerActive
+					@hide()
 	
 	
-		show: ->
+	
+		show: (abonents) ->
+			@log 'Popup show! ', abonents
 			@el.fadeIn 200
 	
 		hide: ->
 			@el.fadeOut 200
-			@isBack101 = false
 	
 		setAbonents: (abonents) ->
 			@absContainer.empty()
@@ -1076,6 +1083,21 @@ do ($)->
 				el.find('span:first').text(name)
 				el.find('span:last').text(phone)
 				@absContainer.append el
+	
+		answerButtonVisible: (val) ->
+			if val
+				@answerActive = true
+				@answerButttonEl.show()
+				@puckupEl.hide()
+			else
+				@answerActive = false
+				@answerButttonEl.hide()
+				@puckupEl.show()
+	
+		setCallbacks: (onAnswer, onTerminate) ->
+			@onAnswer = onAnswer
+			@onTerminate = onTerminate
+	
 	defaultOptions =
 		position: 'right'
 		dynamic: false
@@ -1084,6 +1106,7 @@ do ($)->
 		#buttonCss: 'oktellActionButton'
 		debug: false
 		lang: 'ru'
+		jsSIPUA: false
 
 	langs = {
 		ru:
@@ -1104,18 +1127,37 @@ do ($)->
 	afterOktellConnect = null
 	list = null
 	popup = null
+	jssipUA = null
 
 	getOptions = ->
 		options or defaultOptions
 
+	logStr = ''
+
 	log = ->
-		if not getOptions().debug then return
+		if not getOptions().debug then enerated buttonreturn
+		d = new Date()
+		dd =  d.getFullYear() + '-' + (if d.getMonth()<10 then '0' else '') + d.getMonth() + '-' + (if d.getDate()<10 then '0' else '') + d.getDate();
+		t = (if d.getHours()<10 then '0' else '') + d.getHours() + ':' + (if d.getMinutes()<10 then '0' else '')+d.getMinutes() + ':' +  (if d.getSeconds()<10 then '0' else '')+d.getSeconds() + ':' +
+			(d.getMilliseconds() + 1000).toString().substr(1)
+		logStr += dd + ' ' + t + ' | '
+		args = ['Oktell-Panel ' + t + ' |']
+		for val in arguments
+			if typeof val == 'object'
+				try
+					logStr += JSON.stringify(val)
+				catch e
+					logStr += val.toString()
+			else
+				logStr += val
+			logStr += ' | '
+			args.push val
+		logStr += "\n\n"
 		try
-			console.log.apply(console, arguments);
+			console.log.apply( console, args || [])
 		catch e
 
-
-	templates = {'templates/actionButton.html':'<ul class="oktell_button_action"><li class="g_first"><i></i></li><li class="g_last drop_down"><i></i></li></ul>', 'templates/actionList.html':'<ul class="oktell_actions_group_list"><li class="{{css}}" data-action="{{action}}"><i></i><span>{{actionText}}</span></li></ul>', 'templates/user.html':'<tr class="b_contact"><td class="b_contact_avatar {{css}}"><img src="{{avatarLink32x32}}"><i></i><div class="o_busy"></div></td><td class="b_contact_title"><div class="wrapword"><a><b>{{name}}</b><span class="o_number">{{number}}</span></a></div>{{button}}</td></tr>', 'templates/panel.html':'<div class="oktell_panel"><div class="i_panel_bookmark"><div class="i_panel_bookmark_bg"></div></div><div class="h_panel_bg"><div class="h_padding"><div class="b_marks i_conference j_abonents"><div class="b_marks_noise"><p class="b_marks_header"><span class="b_marks_label">{{inTalk}}</span><span class="b_marks_time"></span></p><table><tbody></tbody></table></div></div><div class="b_marks i_flash j_hold"><div class="b_marks_noise"><p class="b_marks_header"><span class="b_marks_label">{{onHold}}</span></p><table class="j_table_favorite"><tbody></tbody></table></div></div><div class="b_marks i_flash j_queue"><div class="b_marks_noise"><p class="b_marks_header"><span class="b_marks_label">{{queue}}</span></p><table class="j_table_queue"><tbody></tbody></table></div></div><div class="b_inconversation j_phone_block"><table class="j_table_phone"><tbody></tbody></table></div><div class="b_marks i_phone"><div class="h_shadow_bottom"><div class="h_phone_number_input"><div class="i_phone_state_bg"></div><div class="h_input_padding"><div class="i_phone_popup_button j_keypad_expand"><i></i></div><div class="jInputClear_hover"><input class="b_phone_number_input" type="text" placeholder="{{inputPlaceholder}}"><span class="jInputClear_close">&times;</span></div></div><div class="b_phone_keypad j_phone_keypad"><div class="l_column_group"><div class="h_phone_keypad"><ul class="b_phone_panel"><li class="g_top_left g_first"><button data-num="1" class="g_button m_big">1</button></li><li><button data-num="2" class="g_button m_big">2</button></li><li class="g_top_right g_right"><button data-num="3" class="g_button m_big">3</button></li><li class="g_float_celar g_first"><button data-num="4" class="g_button m_big">4</button></li><li><button data-num="5" class="g_button m_big">5</button></li><li class="g_right"><button data-num="6" class="g_button m_big">6</button></li><li class="g_float_celar g_first"><button data-num="7" class="g_button m_big">7</button></li><li><button data-num="8" class="g_button m_big">8</button></li><li class="g_right"><button data-num="9" class="g_button m_big">9</button></li><li class="g_bottom_left g_float_celar g_first"><button data-num="*" class="g_button m_big">&lowast;</button></li><li class="g_bottom_center"><button data-num="0" class="g_button m_big">0</button></li><li class="g_bottom_right g_right"><button data-num="#" class="g_button m_big">#</button></li></ul></div></div></div></div></div></div><div class="h_main_list j_main_list"><table class="b_main_list"><tbody></tbody></table></div></div></div></div>', 'templates/callPopup.html':'<div class="oktell_panel_popup" style="display: none"><div class="m_popup_staff"><div class="m_popup_data"><header><div class="h_header_bg"><i class="o_close"></i><h2>Входящий вызов</h2></div></header><div class="b_content"><div class="b_abonent"><span data-bind="text: name"></span>&nbsp;<span class="g_light" data-bind="textPhone: number"></span></div></div><div class="footer"><div class="b_take_phone"><i></i>&nbsp;<span>Поднимите трубку</span></div><button class="oktell_panel_btn m_big j_close_action">Скрыть</button><button class="oktell_panel_btn m_big m_button_red j_abort_action"><i></i>Отклонить</button></div></div></div></div>', }
+	templates = {'templates/actionButton.html':'<ul class="oktell_button_action"><li class="g_first"><i></i></li><li class="g_last drop_down"><i></i></li></ul>', 'templates/actionList.html':'<ul class="oktell_actions_group_list"><li class="{{css}}" data-action="{{action}}"><i></i><span>{{actionText}}</span></li></ul>', 'templates/user.html':'<tr class="b_contact"><td class="b_contact_avatar {{css}}"><img src="{{avatarLink32x32}}"><i></i><div class="o_busy"></div></td><td class="b_contact_title"><div class="wrapword"><a><b>{{name}}</b><span class="o_number">{{number}}</span></a></div>{{button}}</td></tr>', 'templates/panel.html':'<div class="oktell_panel"><div class="i_panel_bookmark"><div class="i_panel_bookmark_bg"></div></div><div class="h_panel_bg"><div class="h_padding"><div class="b_marks i_conference j_abonents"><div class="b_marks_noise"><p class="b_marks_header"><span class="b_marks_label">{{inTalk}}</span><span class="b_marks_time"></span></p><table><tbody></tbody></table></div></div><div class="b_marks i_flash j_hold"><div class="b_marks_noise"><p class="b_marks_header"><span class="b_marks_label">{{onHold}}</span></p><table class="j_table_favorite"><tbody></tbody></table></div></div><div class="b_marks i_flash j_queue"><div class="b_marks_noise"><p class="b_marks_header"><span class="b_marks_label">{{queue}}</span></p><table class="j_table_queue"><tbody></tbody></table></div></div><div class="b_inconversation j_phone_block"><table class="j_table_phone"><tbody></tbody></table></div><div class="b_marks i_phone"><div class="h_shadow_bottom"><div class="h_phone_number_input"><div class="i_phone_state_bg"></div><div class="h_input_padding"><div class="i_phone_popup_button j_keypad_expand"><i></i></div><div class="jInputClear_hover"><input class="b_phone_number_input" type="text" placeholder="{{inputPlaceholder}}"><span class="jInputClear_close">&times;</span></div></div><div class="b_phone_keypad j_phone_keypad"><div class="l_column_group"><div class="h_phone_keypad"><ul class="b_phone_panel"><li class="g_top_left g_first"><button data-num="1" class="g_button m_big">1</button></li><li><button data-num="2" class="g_button m_big">2</button></li><li class="g_top_right g_right"><button data-num="3" class="g_button m_big">3</button></li><li class="g_float_celar g_first"><button data-num="4" class="g_button m_big">4</button></li><li><button data-num="5" class="g_button m_big">5</button></li><li class="g_right"><button data-num="6" class="g_button m_big">6</button></li><li class="g_float_celar g_first"><button data-num="7" class="g_button m_big">7</button></li><li><button data-num="8" class="g_button m_big">8</button></li><li class="g_right"><button data-num="9" class="g_button m_big">9</button></li><li class="g_bottom_left g_float_celar g_first"><button data-num="*" class="g_button m_big">&lowast;</button></li><li class="g_bottom_center"><button data-num="0" class="g_button m_big">0</button></li><li class="g_bottom_right g_right"><button data-num="#" class="g_button m_big">#</button></li></ul></div></div></div></div></div></div><div class="h_main_list j_main_list"><table class="b_main_list"><tbody></tbody></table></div></div></div></div>', 'templates/callPopup.html':'<div class="oktell_panel_popup" style="display: none"><div class="m_popup_staff"><div class="m_popup_data"><header><div class="h_header_bg"><i class="o_close"></i><h2>Входящий вызов</h2></div></header><div class="b_content"><div class="b_abonent"><span data-bind="text: name"></span>&nbsp;<span class="g_light" data-bind="textPhone: number"></span></div></div><div class="footer"><div class="b_take_phone j_pickup"><i></i>&nbsp;<span>Поднимите трубку</span></div><button class="oktell_panel_btn m_big m_button_green j_answer" style="margin-right: 20px; float: left"><i style="background: url(\'/img/icons/action/white/call.png\') no-repeat; vertical-align: -2px"></i>ответить</button><button class="oktell_panel_btn m_big j_close_action">Скрыть</button><button class="oktell_panel_btn m_big m_button_red j_abort_action"><i></i>Отклонить</button></div></div></div></div>', }
 
 	loadTemplate = (path) ->
 		path = path.substr(1) if path[0] is '/'
@@ -1139,8 +1181,28 @@ do ($)->
 
 	CUser.prototype.buttonTemplate = actionButtonHtml
 	CUser.prototype.log = log
+	List.prototype.log = log
+	Popup.prototype.log = log
 
 	panelWasInitialized = false
+
+	onJsSIPNewSession = (e) ->
+		log 'onJsSIPNewSession ', e
+		if e?.data?.originator is "remote" and popup?
+			popup.answerButtonVisible true
+			popup.setCallbacks ->
+				e.data.session.answer()
+			, ->
+				e.data.session.terminate()
+			popup.show()
+
+	initJsSIP = (ua) ->
+		if jssipUA
+			jssipUA.off 'newSession', onJsSIPNewSession
+
+		if ua
+			jssipUA = ua
+			jssipUA.on 'newSession', onJsSIPNewSession
 
 	initPanel = (opts)->
 		panelWasInitialized = true
@@ -1306,6 +1368,8 @@ do ($)->
 				element.animate animOptHide, 100, "swing", ->
 					element.removeClass(openClass).addClass(closeClass)
 
+		initJsSIP getOptions().jsSIPUA
+
 
 	afterOktellConnect = ->
 		oktellConnected = true
@@ -1329,6 +1393,9 @@ do ($)->
 		if typeof arg is 'string'
 			if panelWasInitialized
 				initActionButtons(arg)
+			if arg?.jsSIPUA
+				initJsSIP arg.jsSIPUA
+
 		else if not panelWasInitialized
 			initPanel(arg)
 

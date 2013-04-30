@@ -93,10 +93,10 @@ class List
 				debouncedSetFilter()
 			return true
 
-		@panelEl.bind 'mouseenter', ->
-			$(this).data('user')?.isHovered true
-		@panelEl.bind 'mouseleave', ->
-			$(this).data('user')?.isHovered false
+#		@panelEl.bind 'mouseenter', (e)->
+#			$(this).data('user')?.isHovered true
+#		@panelEl.bind 'mouseleave', ->
+#			$(this).data('user')?.isHovered false
 
 		@panelEl.bind 'click', (e)=>
 			target = $(e.target)
@@ -201,16 +201,20 @@ class List
 				@reloadActions()
 
 			oktell.onNativeEvent 'pbxnumberstatechanged', (data) =>
-				for n in data.numbers
-					numStr = n.num.toString()
-					@usersByNumber[numStr]?.setState n.numstateid
+				setTimeout =>
+					for n in data.numbers
+						numStr = n.num.toString()
+						if @usersByNumber[numStr]
+							@usersByNumber[numStr].setState n.numstateid
+							@usersByNumber[numStr].loadActions(true)
+				, 200
 
 			oktell.on 'abonentsChange', ( abonents ) =>
 				@setAbonents abonents
 				@reloadActions()
 
 			oktell.on 'holdStateChange', ( holdInfo ) =>
-				#log 'Oktell holdStateChange', holdInfo
+				#@log 'Oktell holdStateChange', holdInfo
 				@setHold holdInfo
 				@reloadActions()
 
@@ -240,7 +244,7 @@ class List
 		user = @getUser phone
 		if not @oktellConnected
 			@usersWithBeforeConnectButtons.push user
-		#log '!!! getUserButtonForPlugin for ' + user.getInfo()
+		#@log '!!! getUserButtonForPlugin for ' + user.getInfo()
 		@userWithGeneratedButtons[phone] = user
 		button = user.getButtonEl()
 		button.find('.drop_down').bind 'click', =>
@@ -303,7 +307,7 @@ class List
 
 	logUsers: ->
 		for own k,u of @panelUsersFiltered
-			log u.getInfo()
+			@log u.getInfo()
 
 	syncAbonentsAndUserlist: (abonents, userlist) ->
 		absByNumber = {}
@@ -371,7 +375,7 @@ class List
 	_setUsersHtml: (usersArray, $el) ->
 		html = []
 		for u in usersArray
-			#log 'render ' + u.getInfo()
+			#@log 'render ' + u.getInfo()
 			html.push u.getEl()
 		$el.html html
 
@@ -460,7 +464,7 @@ class List
 		setTimeout =>
 			for own phone, user of @userWithGeneratedButtons
 				actions = user.loadActions()
-				#log 'reload actions for ' + user.getInfo() + ' ' + actions
+				#@log 'reload actions for ' + user.getInfo() + ' ' + actions
 			user.loadActions() for phone, user of @abonents
 			user.loadActions() for phone, user of @queue
 			user.loadActions() for phone, user of @panelUsersFiltered

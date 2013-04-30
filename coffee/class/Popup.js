@@ -8,10 +8,16 @@ Popup = (function() {
     this.el = popupEl;
     this.absContainer = this.el.find('.b_content');
     this.abonentEl = this.absContainer.find('.b_abonent').remove();
-    this.isBack101 = false;
+    this.answerActive = false;
+    this.answerButttonEl = this.el.find('.j_answer');
+    this.puckupEl = this.el.find('.j_pickup');
     this.el.find('.j_abort_action').bind('click', function() {
       _this.hide();
       return oktell.endCall();
+    });
+    this.el.find('.j_answer').bind('click', function() {
+      _this.hide();
+      return oktell.answer();
     });
     this.el.find('.j_close_action').bind('click', function() {
       return _this.hide();
@@ -20,24 +26,22 @@ Popup = (function() {
       return _this.hide();
     });
     oktell.on('ringStart', function(abonents) {
-      if (!_this.isBack101) {
-        _this.setAbonents(abonents);
-      }
+      _this.setAbonents(abonents);
+      _this.answerButtonVisible(oktell.webphoneIsActive());
       return _this.show();
     });
     oktell.on('ringStop', function() {
-      _this.isBack101 = false;
       return _this.hide();
     });
   }
 
-  Popup.prototype.show = function() {
+  Popup.prototype.show = function(abonents) {
+    this.log('Popup show! ', abonents);
     return this.el.fadeIn(200);
   };
 
   Popup.prototype.hide = function() {
-    this.el.fadeOut(200);
-    return this.isBack101 = false;
+    return this.el.fadeOut(200);
   };
 
   Popup.prototype.setAbonents = function(abonents) {
@@ -57,6 +61,24 @@ Popup = (function() {
       el.find('span:last').text(phone);
       return _this.absContainer.append(el);
     });
+  };
+
+  Popup.prototype.answerButtonVisible = function(val) {
+    if (val) {
+      this.answerActive = true;
+      this.answerButttonEl.show();
+      this.puckupEl.hide();
+    } else {
+      this.answerActive = false;
+      this.answerButttonEl.hide();
+      this.puckupEl.show();
+    }
+    return this.answerActive;
+  };
+
+  Popup.prototype.setCallbacks = function(onAnswer, onTerminate) {
+    this.onAnswer = onAnswer;
+    return this.onTerminate = onTerminate;
   };
 
   return Popup;

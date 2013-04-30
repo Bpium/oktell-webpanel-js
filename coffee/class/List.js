@@ -125,16 +125,6 @@ List = (function() {
       }
       return true;
     });
-    this.panelEl.bind('mouseenter', function() {
-      var _ref;
-
-      return (_ref = $(this).data('user')) != null ? _ref.isHovered(true) : void 0;
-    });
-    this.panelEl.bind('mouseleave', function() {
-      var _ref;
-
-      return (_ref = $(this).data('user')) != null ? _ref.isHovered(false) : void 0;
-    });
     this.panelEl.bind('click', function(e) {
       var buttonEl, target, user;
 
@@ -262,16 +252,23 @@ List = (function() {
         return _this.reloadActions();
       });
       oktell.onNativeEvent('pbxnumberstatechanged', function(data) {
-        var n, numStr, _i, _len, _ref2, _ref3, _results;
+        return setTimeout(function() {
+          var n, numStr, _i, _len, _ref2, _results;
 
-        _ref2 = data.numbers;
-        _results = [];
-        for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
-          n = _ref2[_i];
-          numStr = n.num.toString();
-          _results.push((_ref3 = _this.usersByNumber[numStr]) != null ? _ref3.setState(n.numstateid) : void 0);
-        }
-        return _results;
+          _ref2 = data.numbers;
+          _results = [];
+          for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
+            n = _ref2[_i];
+            numStr = n.num.toString();
+            if (_this.usersByNumber[numStr]) {
+              _this.usersByNumber[numStr].setState(n.numstateid);
+              _results.push(_this.usersByNumber[numStr].loadActions(true));
+            } else {
+              _results.push(void 0);
+            }
+          }
+          return _results;
+        }, 200);
       });
       oktell.on('abonentsChange', function(abonents) {
         _this.setAbonents(abonents);
@@ -404,7 +401,7 @@ List = (function() {
     for (k in _ref) {
       if (!__hasProp.call(_ref, k)) continue;
       u = _ref[k];
-      _results.push(log(u.getInfo()));
+      _results.push(this.log(u.getInfo()));
     }
     return _results;
   };

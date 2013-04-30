@@ -57,7 +57,7 @@ class CUser
 		@state = state
 		@setStateCss()
 		if @buttonEls.length
-			#log 'LOAD actions after state change '
+			#@log 'LOAD actions after state change '
 			@loadActions()
 			setTimeout =>
 				@loadActions()
@@ -93,6 +93,10 @@ class CUser
 		@els = @els.add $el
 		@setStateCss()
 		$el.data 'user', @
+		$el.bind 'mouseenter', =>
+			@isHovered true
+		$el.bind 'mouseleave', =>
+			@isHovered false
 		@initButtonEl $el.find '.oktell_button_action'
 		return $el
 
@@ -113,7 +117,7 @@ class CUser
 		if @hasHover is isHovered then return
 		@hasHover = isHovered
 		if @hasHover
-			@loadActions()
+			@loadActions(true)
 
 	loadOktellActions: ->
 		actions = @oktell.getPhoneActions @id or @number
@@ -122,7 +126,7 @@ class CUser
 
 	loadActions: ()->
 		actions = @loadOktellActions()
-		#log 'load action for user id='+@id+' number='+@number+' actions='+actions
+		#@log 'load action for user id='+@id+' number='+@number+' actions='+actions
 		#window.cuser = @
 		action = actions?[0] or ''
 		if @buttonLastAction is action
