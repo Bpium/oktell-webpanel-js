@@ -10,7 +10,8 @@
     dynamic: false,
     oktell: window.oktell,
     debug: false,
-    lang: 'ru'
+    lang: 'ru',
+    noavatar: true
   };
   langs = {
     ru: {
@@ -141,6 +142,9 @@
     CUser.prototype.langs = langs;
     Department.prototype.langs = langs;
     panelEl = $(panelHtml);
+    if (getOptions().noavatar) {
+      panelEl.addClass('noavatar');
+    }
     popupEl = $(popupHtml);
     $('body').append(popupEl);
     $user = $(userTemplateHtml);

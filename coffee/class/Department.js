@@ -3,6 +3,7 @@ var Department;
 
 Department = (function() {
   function Department(id, name) {
+    this.lastFilteredUsers = [];
     this.isSorted = false;
     this.visible = true;
     this.users = [];
@@ -12,6 +13,14 @@ Department = (function() {
 
   Department.prototype.getEl = function() {
     return this.el || (this.el = $(this.template.replace(/\{\{department}\}/g, escapeHtml(this.name))));
+  };
+
+  Department.prototype.getContainer = function() {
+    return this.el.find('tbody');
+  };
+
+  Department.prototype.getInfo = function() {
+    return this.name + ' ' + this.id;
   };
 
   Department.prototype.show = function(withAnimation) {
@@ -62,7 +71,7 @@ Department = (function() {
       _ref1 = this.users;
       for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
         u = _ref1[_j];
-        if ((showOffline || (!showOffline && u.state !== 0)) && u.isFiltered(filter)) {
+        if (u.isFiltered(filter, showOffline)) {
           users.push(u);
           if (u.number === filter && !exactMatch) {
             exactMatch = u;
@@ -70,13 +79,34 @@ Department = (function() {
         }
       }
     }
+    this.lastFilteredUsers = users;
     return [users, exactMatch];
   };
 
-  Department.prototype.sortUsers = function() {};
+  Department.prototype.sortUsers = function() {
+    return this.users.sort(this.sortFn);
+  };
+
+  Department.prototype.sortFn = function(a, b) {
+    if (a.nameLower > b.nameLower) {
+      return 1;
+    } else if (a.nameLower < b.nameLower) {
+      return -1;
+    } else {
+      if (a.number > b.number) {
+        return 1;
+      } else if (a.number < b.number) {
+        return -1;
+      } else {
+        return 0;
+      }
+    }
+  };
 
   Department.prototype.addUser = function(user) {
-    return this.users.push(user);
+    if (user.number) {
+      return this.users.push(user);
+    }
   };
 
   return Department;

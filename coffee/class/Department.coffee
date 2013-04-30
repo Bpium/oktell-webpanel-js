@@ -1,6 +1,6 @@
 class Department
 	constructor: ( id, name )->
-
+		@lastFilteredUsers = []
 		@isSorted = false
 
 		@visible = true
@@ -10,6 +10,11 @@ class Department
 
 	getEl: ->
 		@el or (@el = $(@template.replace /\{\{department}\}/g, escapeHtml(@name)))
+	getContainer: ->
+		@el.find('tbody')
+
+	getInfo: ->
+		@name + ' ' + @id
 
 	show: (withAnimation) ->
 		if not @el or @visible then return
@@ -41,21 +46,35 @@ class Department
 						users.push u
 		else
 			for u in @users
-				if ( showOffline or ( not showOffline and u.state isnt 0 ) ) and u.isFiltered filter
+				if u.isFiltered filter, showOffline
 					users.push u
 					if u.number is filter and not exactMatch
 						exactMatch = u
-
+		@lastFilteredUsers = users
 		[users, exactMatch]
 
 
 
 	sortUsers: ->
+		@users.sort @sortFn
+
+	sortFn: (a,b)->
+		if a.nameLower > b.nameLower
+			1
+		else if a.nameLower < b.nameLower
+			-1
+		else
+			if a.number > b.number
+				1
+			else if	a.number < b.number
+				-1
+			else
+				0
+
 
 	addUser: ( user ) ->
-		@users.push user
-
-
+		if user.number
+			@users.push user
 
 
 

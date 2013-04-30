@@ -29,7 +29,7 @@ cookie = (key, value, options) ->
 	if arguments.length > 1 and String(value) isnt "[object Object]"
 		options = $.extend {}, options
 
-		if value?
+		if not value?
 			options.expires = -1
 
 		if typeof options.expires is 'number'

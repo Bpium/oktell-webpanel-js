@@ -47,7 +47,7 @@ cookie = function(key, value, options) {
 
   if (arguments.length > 1 && String(value) !== "[object Object]") {
     options = $.extend({}, options);
-    if (value != null) {
+    if (value == null) {
       options.expires = -1;
     }
     if (typeof options.expires === 'number') {

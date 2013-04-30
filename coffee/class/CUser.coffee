@@ -16,7 +16,7 @@ class CUser
 		@buttonLastAction = ''
 		@firstLiCssPrefix = 'm_button_action_'
 
-		@els = $()
+		#@els = $()
 		@buttonEls = $()
 
 #		@separateButtonEls = $()
@@ -31,7 +31,9 @@ class CUser
 		@invisible = true unless @number
 		@numberFormatted = data.numberFormatted?.toString() or @number
 		@numberHtml = escapeHtml @numberFormatted
-		@name = data.name
+		@name = data.name?.toString() or ''
+		@nameLower = @name.toLowerCase()
+		@letter = @name[0]?.toUpperCase() or @number?[0].toString().toLowerCase()
 		@nameHtml = if data.name and data.name.toString() isnt @number then escapeHtml(data.name) else @numberHtml
 		@avatarLink32x32 = data.avatarLink32x32 or @defaultAvatar32 or ''
 		@defaultAvatarCss = if @avatarLink32x32 then '' else 'm_default'
@@ -53,6 +55,7 @@ class CUser
 		number: /\{\{number\}\}/
 		avatarLink32x32: /\{\{avatarLink32x32\}\}/
 		css: /\{\{css\}\}/
+		letter: /\{\{letter\}\}/
 
 	setState: (state) ->
 		state = parseInt state
@@ -68,37 +71,40 @@ class CUser
 			, 100
 
 	setStateCss: ->
-		if @els.length
+		if @el and @el.length
 			if @state is 0
-				@els.removeClass('m_busy').addClass('m_offline')
+				@el.removeClass('m_busy').addClass('m_offline')
 			else if @state is 5
-				@els.removeClass('m_offline').addClass('m_busy')
+				@el.removeClass('m_offline').addClass('m_busy')
 			else
-				@els.removeClass('m_offline').removeClass('m_busy')
+				@el.removeClass('m_offline').removeClass('m_busy')
 
 	getInfo: ->
 		'"'+@number+'" ' + @state + ' ' + @name
 
-	isFiltered: (filter) ->
+	isFiltered: (filter, showOffline) ->
 		if not filter or typeof filter isnt 'string'
 			return true
 
-		if ( @number and @number.indexOf(filter) isnt -1 ) or ( ' ' + @name ).toLowerCase().indexOf(filter) isnt -1
+		if ( showOffline or ( not showOffline and @state isnt 0 ) ) and ( ( @number and @number.indexOf(filter) isnt -1 ) or ( ' ' + @name ).toLowerCase().indexOf(filter) isnt -1 )
 			return true
 
 		return false
 
-	getEl: ->
+	getEl: (showLetter) ->
 		str = @template.replace( @regexps.name, @nameHtml)
 			.replace( @regexps.number, if @numberHtml isnt @nameHtml then @numberHtml else '' )
 			.replace( @regexps.avatarLink32x32, @avatarLink32x32)
 			.replace( @regexps.css, @defaultAvatarCss )
-		$el = $(str)
-		@els = @els.add $el
+			.replace( @regexps.letter, if showLetter then @letter else '' )
+		if @el
+			@el.remove()
+		@el = $(str)
+		#@els = @els.add $el
 		@setStateCss()
-		$el.data 'user', @
-		@initButtonEl $el.find '.oktell_button_action'
-		return $el
+		@el.data 'user', @
+		@initButtonEl @el.find '.oktell_button_action'
+		return @el
 
 	initButtonEl: ($el) ->
 		@buttonEls = @buttonEls.add $el
@@ -182,3 +188,10 @@ class CUser
 			@doAction @buttonLastAction
 			true
 		else false
+
+	letterVisibility: (show)->
+		if @el and @el.length
+			if show
+				@el.find('.b_capital_letter span').text @letter
+			else
+				@el.find('.b_capital_letter span').text ''

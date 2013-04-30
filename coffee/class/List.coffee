@@ -252,7 +252,7 @@ class List
 
 			@departments.push otherDep
 
-			@sortPanelUsers @panelUsers
+			#@sortPanelUsers @panelUsers
 
 			oktell.on 'stateChange', ( newState, oldState ) =>
 				@reloadActions()
@@ -262,8 +262,49 @@ class List
 					numStr = n.num.toString()
 					user = @usersByNumber[numStr]
 					if user
+						@log ''
+						@log 'start user state change from ' + user.state + ' to ' + n.numstateid + ' for ' + user.getInfo()
+						if @showDeps
+							dep = @departmentsById[user.departmentId]
+						else
+							dep = @allUserDep
+						@log 'current visibility settings are ShowDeps='+@showDeps+' and ShowOffline=' + @showOffline
+						wasFiltered = dep.lastFilteredUsers.indexOf(user) isnt -1
+						@log 'user was filtered earlier = ' + wasFiltered
 						user.setState n.numstateid
-						@departmentsById[user.departmentId].userStateChange user
+						@log 'after user.setState'
+						if not user.isFiltered @filter, @showOffline
+							@log 'now user isnt filtered, so remove his html element'
+							user.el?.remove?()
+							@log 'after remove html'
+						else if not wasFiltered
+							@log 'user now filtered and was not filtered before state change'
+							dep.getUsers @filter, @showOffline
+							@log 'refilter all user of department ' + dep.getInfo()
+							index = dep.lastFilteredUsers.indexOf user
+							@log 'index of user in refiltered users list is ' + index
+							if index isnt -1
+								if index is 0
+									@log 'add user html to start of department container'
+									dep.getContainer().prepend user.getEl()
+								else
+									@log 'add user html after prev user html element'
+									dep.lastFilteredUsers[index-1]?.el?.after user.getEl()
+
+								if dep.lastFilteredUsers[index-1]?.letter is user.letter
+									@log 'hide user letter because it is like prev user letter ' + user.letter
+									user.letterVisibility false
+								else if dep.lastFilteredUsers[index+1]?.letter is user.letter
+									@log 'hide prev user letter because it is like user letter ' + user.letter
+									dep.lastFilteredUsers[index+1].letterVisibility false
+
+
+
+
+
+
+
+
 
 			oktell.on 'abonentsChange', ( abonents ) =>
 				@setAbonents abonents
@@ -303,14 +344,14 @@ class List
 			if typeof afterOktellConnect is 'function' then afterOktellConnect()
 
 	usersShowRules: ( showOffline, showDeps ) ->
-		showOfflineKey = 'oktell-panel-show-offline-users'
-		showDepsKey = 'oktell-panel-show-departments'
+		showOfflineKey = 'oktell_panel_show_offline_users'
+		showDepsKey = 'oktell_panel_show_departments'
 
-		@showOffline = if showOffline? then showOffline else ( if cookie(showOfflineKey)? then cookie(showOfflineKey) else true )
-		@showDeps = if showDeps? then showDeps else ( if cookie(showDepsKey)? then cookie(showDepsKey) else true )
+		@showOffline = if showOffline? then showOffline else ( if cookie(showOfflineKey)? then Boolean(parseInt(cookie(showOfflineKey))) else true )
+		@showDeps = if showDeps? then showDeps else ( if cookie(showDepsKey)? then Boolean(parseInt(cookie(showDepsKey))) else true )
 
-		cookie showOfflineKey, @showOffline, {path:'/', expires: 1209600 }
-		cookie showDepsKey, @showDeps, {path:'/', expires: 1209600 }
+		cookie showOfflineKey, (if @showOffline then '1' else '0'), {path:'/', expires: 1209600 }
+		cookie showDepsKey, (if @showDeps then '1' else '0'), {path:'/', expires: 1209600 }
 
 		@buttonShowOffline.toggleClass 'g_active', not @showOffline
 		@buttonShowDeps.toggleClass 'g_active', @showDeps
@@ -452,41 +493,40 @@ class List
 	_setUsersHtml: (usersArray, $el, showOffline ) ->
 		html = []
 		lastDepId = null
+		prevLetter = ''
 		for u in usersArray
 			#log 'render ' + u.getInfo()
-			if showOffline?
-				if showOffline or ( not showOffline and u.state isnt 0 )
-					html.push u.getEl()
-			else
-				html.push u.getEl()
+			showLetter = if prevLetter isnt u.letter then true else false
+			html.push u.getEl showLetter
+			prevLetter = u.letter
 		$el.html html
 
-	sortPanelUsers: ( usersArray ) ->
-		usersArray.sort (a,b) =>
-			if a.departmentId is @withoutDepName and b.departmentId isnt @withoutDepName
-				1
-			else if b.departmentId is @withoutDepName and a.departmentId isnt @withoutDepName
-				-1
-			else
-				if a.department > b.department
-					1
-				else if b.department > a.department
-					-1
-				else
-					if a.number and not b.number
-						-1
-					else if not a.number and b.number
-						1
-					else
-						if a.state and not b.state
-							-1
-						else if not a.state and b.state
-							1
-						else
-							if a.name > b.name
-								1
-							else if a.name < b.name
-								-1
+#	sortPanelUsers: ( usersArray ) ->
+#		usersArray.sort (a,b) =>
+#			if a.departmentId is @withoutDepName and b.departmentId isnt @withoutDepName
+#				1
+#			else if b.departmentId is @withoutDepName and a.departmentId isnt @withoutDepName
+#				-1
+#			else
+#				if a.department > b.department
+#					1
+#				else if b.department > a.department
+#					-1
+#				else
+#					if a.number and not b.number
+#						-1
+#					else if not a.number and b.number
+#						1
+#					else
+#						if a.state and not b.state
+#							-1
+#						else if not a.state and b.state
+#							1
+#						else
+#							if a.name > b.name
+#								1
+#							else if a.name < b.name
+#								-1
 
 	setFilter: (filter, reloadAnyway) ->
 		if @filter is filter and not reloadAnyway then return false
@@ -503,7 +543,7 @@ class List
 			[ users, depExactMatch ] = dep.getUsers filter, @showOffline
 			if users.length isnt 0
 				if not exactMatch then exactMatch = depExactMatch
-				@_setUsersHtml users, el.find('tbody')
+				@_setUsersHtml users, dep.getContainer()
 				allDeps = allDeps.add el
 		if @showDeps
 			for dep in @departments
@@ -598,3 +638,5 @@ class List
 		if not stop
 			@_time = Date.now()
 			log 'List timer start'
+
+

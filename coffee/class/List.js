@@ -306,12 +306,11 @@ List = (function() {
         }
       });
       _this.departments.push(otherDep);
-      _this.sortPanelUsers(_this.panelUsers);
       oktell.on('stateChange', function(newState, oldState) {
         return _this.reloadActions();
       });
       oktell.onNativeEvent('pbxnumberstatechanged', function(data) {
-        var n, numStr, _i, _len, _ref2, _results;
+        var index, n, numStr, wasFiltered, _i, _len, _ref2, _ref3, _ref4, _ref5, _ref6, _ref7, _results;
 
         _ref2 = data.numbers;
         _results = [];
@@ -320,8 +319,59 @@ List = (function() {
           numStr = n.num.toString();
           user = _this.usersByNumber[numStr];
           if (user) {
+            _this.log('');
+            _this.log('start user state change from ' + user.state + ' to ' + n.numstateid + ' for ' + user.getInfo());
+            if (_this.showDeps) {
+              dep = _this.departmentsById[user.departmentId];
+            } else {
+              dep = _this.allUserDep;
+            }
+            _this.log('current visibility settings are ShowDeps=' + _this.showDeps + ' and ShowOffline=' + _this.showOffline);
+            wasFiltered = dep.lastFilteredUsers.indexOf(user) !== -1;
+            _this.log('user was filtered earlier = ' + wasFiltered);
             user.setState(n.numstateid);
-            _results.push(_this.departmentsById[user.departmentId].userStateChange(user));
+            _this.log('after user.setState');
+            if (!user.isFiltered(_this.filter, _this.showOffline)) {
+              _this.log('now user isnt filtered, so remove his html element');
+              if ((_ref3 = user.el) != null) {
+                if (typeof _ref3.remove === "function") {
+                  _ref3.remove();
+                }
+              }
+              _results.push(_this.log('after remove html'));
+            } else if (!wasFiltered) {
+              _this.log('user now filtered and was not filtered before state change');
+              dep.getUsers(_this.filter, _this.showOffline);
+              _this.log('refilter all user of department ' + dep.getInfo());
+              index = dep.lastFilteredUsers.indexOf(user);
+              _this.log('index of user in refiltered users list is ' + index);
+              if (index !== -1) {
+                if (index === 0) {
+                  _this.log('add user html to start of department container');
+                  dep.getContainer().prepend(user.getEl());
+                } else {
+                  _this.log('add user html after prev user html element');
+                  if ((_ref4 = dep.lastFilteredUsers[index - 1]) != null) {
+                    if ((_ref5 = _ref4.el) != null) {
+                      _ref5.after(user.getEl());
+                    }
+                  }
+                }
+                if (((_ref6 = dep.lastFilteredUsers[index - 1]) != null ? _ref6.letter : void 0) === user.letter) {
+                  _this.log('hide user letter because it is like prev user letter ' + user.letter);
+                  _results.push(user.letterVisibility(false));
+                } else if (((_ref7 = dep.lastFilteredUsers[index + 1]) != null ? _ref7.letter : void 0) === user.letter) {
+                  _this.log('hide prev user letter because it is like user letter ' + user.letter);
+                  _results.push(dep.lastFilteredUsers[index + 1].letterVisibility(false));
+                } else {
+                  _results.push(void 0);
+                }
+              } else {
+                _results.push(void 0);
+              }
+            } else {
+              _results.push(void 0);
+            }
           } else {
             _results.push(void 0);
           }
@@ -368,15 +418,15 @@ List = (function() {
   List.prototype.usersShowRules = function(showOffline, showDeps) {
     var showDepsKey, showOfflineKey;
 
-    showOfflineKey = 'oktell-panel-show-offline-users';
-    showDepsKey = 'oktell-panel-show-departments';
-    this.showOffline = showOffline != null ? showOffline : (cookie(showOfflineKey) != null ? cookie(showOfflineKey) : true);
-    this.showDeps = showDeps != null ? showDeps : (cookie(showDepsKey) != null ? cookie(showDepsKey) : true);
-    cookie(showOfflineKey, this.showOffline, {
+    showOfflineKey = 'oktell_panel_show_offline_users';
+    showDepsKey = 'oktell_panel_show_departments';
+    this.showOffline = showOffline != null ? showOffline : (cookie(showOfflineKey) != null ? Boolean(parseInt(cookie(showOfflineKey))) : true);
+    this.showDeps = showDeps != null ? showDeps : (cookie(showDepsKey) != null ? Boolean(parseInt(cookie(showDepsKey))) : true);
+    cookie(showOfflineKey, (this.showOffline ? '1' : '0'), {
       path: '/',
       expires: 1209600
     });
-    cookie(showDepsKey, this.showDeps, {
+    cookie(showDepsKey, (this.showDeps ? '1' : '0'), {
       path: '/',
       expires: 1209600
     });
@@ -595,57 +645,18 @@ List = (function() {
   };
 
   List.prototype._setUsersHtml = function(usersArray, $el, showOffline) {
-    var html, lastDepId, u, _i, _len;
+    var html, lastDepId, prevLetter, showLetter, u, _i, _len;
 
     html = [];
     lastDepId = null;
+    prevLetter = '';
     for (_i = 0, _len = usersArray.length; _i < _len; _i++) {
       u = usersArray[_i];
-      if (showOffline != null) {
-        if (showOffline || (!showOffline && u.state !== 0)) {
-          html.push(u.getEl());
-        }
-      } else {
-        html.push(u.getEl());
-      }
+      showLetter = prevLetter !== u.letter ? true : false;
+      html.push(u.getEl(showLetter));
+      prevLetter = u.letter;
     }
     return $el.html(html);
-  };
-
-  List.prototype.sortPanelUsers = function(usersArray) {
-    var _this = this;
-
-    return usersArray.sort(function(a, b) {
-      if (a.departmentId === _this.withoutDepName && b.departmentId !== _this.withoutDepName) {
-        return 1;
-      } else if (b.departmentId === _this.withoutDepName && a.departmentId !== _this.withoutDepName) {
-        return -1;
-      } else {
-        if (a.department > b.department) {
-          return 1;
-        } else if (b.department > a.department) {
-          return -1;
-        } else {
-          if (a.number && !b.number) {
-            return -1;
-          } else if (!a.number && b.number) {
-            return 1;
-          } else {
-            if (a.state && !b.state) {
-              return -1;
-            } else if (!a.state && b.state) {
-              return 1;
-            } else {
-              if (a.name > b.name) {
-                return 1;
-              } else if (a.name < b.name) {
-                return -1;
-              }
-            }
-          }
-        }
-      }
-    });
   };
 
   List.prototype.setFilter = function(filter, reloadAnyway) {
@@ -670,7 +681,7 @@ List = (function() {
         if (!exactMatch) {
           exactMatch = depExactMatch;
         }
-        _this._setUsersHtml(users, el.find('tbody'));
+        _this._setUsersHtml(users, dep.getContainer());
         return allDeps = allDeps.add(el);
       }
     };

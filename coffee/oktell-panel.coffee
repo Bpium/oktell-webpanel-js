@@ -17,6 +17,7 @@ do ($)->
 		#buttonCss: 'oktellActionButton'
 		debug: false
 		lang: 'ru'
+		noavatar: true
 
 	langs = {
 		ru:
@@ -99,10 +100,13 @@ do ($)->
 		Department.prototype.langs = langs
 		panelEl = $(panelHtml)
 
+		if getOptions().noavatar
+			panelEl.addClass('noavatar')
 
 
 		popupEl = $(popupHtml)
 		$('body').append(popupEl)
+
 
 		$user = $(userTemplateHtml)
 		$userActionButton = $(actionButtonHtml)

@@ -8,13 +8,12 @@ CUser = (function() {
     this.hasHover = false;
     this.buttonLastAction = '';
     this.firstLiCssPrefix = 'm_button_action_';
-    this.els = $();
     this.buttonEls = $();
     this.init(data);
   }
 
   CUser.prototype.init = function(data) {
-    var _ref, _ref1, _ref2, _ref3, _ref4, _ref5, _ref6, _ref7;
+    var _ref, _ref1, _ref10, _ref2, _ref3, _ref4, _ref5, _ref6, _ref7, _ref8, _ref9;
 
     this.id = (_ref = data.id) != null ? _ref.toString().toLowerCase() : void 0;
     this.isFantom = data.isFantom || false;
@@ -24,14 +23,16 @@ CUser = (function() {
     }
     this.numberFormatted = ((_ref2 = data.numberFormatted) != null ? _ref2.toString() : void 0) || this.number;
     this.numberHtml = escapeHtml(this.numberFormatted);
-    this.name = data.name;
+    this.name = ((_ref3 = data.name) != null ? _ref3.toString() : void 0) || '';
+    this.nameLower = this.name.toLowerCase();
+    this.letter = ((_ref4 = this.name[0]) != null ? _ref4.toUpperCase() : void 0) || ((_ref5 = this.number) != null ? _ref5[0].toString().toLowerCase() : void 0);
     this.nameHtml = data.name && data.name.toString() !== this.number ? escapeHtml(data.name) : this.numberHtml;
     this.avatarLink32x32 = data.avatarLink32x32 || this.defaultAvatar32 || '';
     this.defaultAvatarCss = this.avatarLink32x32 ? '' : 'm_default';
-    this.departmentId = (data != null ? (_ref3 = data.numberObj) != null ? _ref3.departmentid : void 0 : void 0) && (data != null ? data.numberObj.departmentid : void 0) !== '00000000-0000-0000-0000-000000000000' ? data != null ? data.numberObj.departmentid : void 0 : this.withoutDepName;
-    this.department = this.departmentId === 'www_without' ? this.langs.panel.withoutDepartment : data != null ? (_ref4 = data.numberObj) != null ? _ref4.department : void 0 : void 0;
-    this.log('depId ' + (data != null ? (_ref5 = data.numberObj) != null ? _ref5.departmentid : void 0 : void 0) + ' ' + (data != null ? (_ref6 = data.numberObj) != null ? _ref6.department : void 0 : void 0) + ' : ' + this.departmentId + ' ' + this.department);
-    if (((_ref7 = data.numberObj) != null ? _ref7.state : void 0) != null) {
+    this.departmentId = (data != null ? (_ref6 = data.numberObj) != null ? _ref6.departmentid : void 0 : void 0) && (data != null ? data.numberObj.departmentid : void 0) !== '00000000-0000-0000-0000-000000000000' ? data != null ? data.numberObj.departmentid : void 0 : this.withoutDepName;
+    this.department = this.departmentId === 'www_without' ? this.langs.panel.withoutDepartment : data != null ? (_ref7 = data.numberObj) != null ? _ref7.department : void 0 : void 0;
+    this.log('depId ' + (data != null ? (_ref8 = data.numberObj) != null ? _ref8.departmentid : void 0 : void 0) + ' ' + (data != null ? (_ref9 = data.numberObj) != null ? _ref9.department : void 0 : void 0) + ' : ' + this.departmentId + ' ' + this.department);
+    if (((_ref10 = data.numberObj) != null ? _ref10.state : void 0) != null) {
       this.setState(data.numberObj.state);
     } else if (data.state != null) {
       this.setState(data.state);
@@ -45,7 +46,8 @@ CUser = (function() {
     name: /\{\{name\}\}/,
     number: /\{\{number\}\}/,
     avatarLink32x32: /\{\{avatarLink32x32\}\}/,
-    css: /\{\{css\}\}/
+    css: /\{\{css\}\}/,
+    letter: /\{\{letter\}\}/
   };
 
   CUser.prototype.setState = function(state) {
@@ -66,13 +68,13 @@ CUser = (function() {
   };
 
   CUser.prototype.setStateCss = function() {
-    if (this.els.length) {
+    if (this.el && this.el.length) {
       if (this.state === 0) {
-        return this.els.removeClass('m_busy').addClass('m_offline');
+        return this.el.removeClass('m_busy').addClass('m_offline');
       } else if (this.state === 5) {
-        return this.els.removeClass('m_offline').addClass('m_busy');
+        return this.el.removeClass('m_offline').addClass('m_busy');
       } else {
-        return this.els.removeClass('m_offline').removeClass('m_busy');
+        return this.el.removeClass('m_offline').removeClass('m_busy');
       }
     }
   };
@@ -81,26 +83,28 @@ CUser = (function() {
     return '"' + this.number + '" ' + this.state + ' ' + this.name;
   };
 
-  CUser.prototype.isFiltered = function(filter) {
+  CUser.prototype.isFiltered = function(filter, showOffline) {
     if (!filter || typeof filter !== 'string') {
       return true;
     }
-    if ((this.number && this.number.indexOf(filter) !== -1) || (' ' + this.name).toLowerCase().indexOf(filter) !== -1) {
+    if ((showOffline || (!showOffline && this.state !== 0)) && ((this.number && this.number.indexOf(filter) !== -1) || (' ' + this.name).toLowerCase().indexOf(filter) !== -1)) {
       return true;
     }
     return false;
   };
 
-  CUser.prototype.getEl = function() {
-    var $el, str;
+  CUser.prototype.getEl = function(showLetter) {
+    var str;
 
-    str = this.template.replace(this.regexps.name, this.nameHtml).replace(this.regexps.number, this.numberHtml !== this.nameHtml ? this.numberHtml : '').replace(this.regexps.avatarLink32x32, this.avatarLink32x32).replace(this.regexps.css, this.defaultAvatarCss);
-    $el = $(str);
-    this.els = this.els.add($el);
+    str = this.template.replace(this.regexps.name, this.nameHtml).replace(this.regexps.number, this.numberHtml !== this.nameHtml ? this.numberHtml : '').replace(this.regexps.avatarLink32x32, this.avatarLink32x32).replace(this.regexps.css, this.defaultAvatarCss).replace(this.regexps.letter, showLetter ? this.letter : '');
+    if (this.el) {
+      this.el.remove();
+    }
+    this.el = $(str);
     this.setStateCss();
-    $el.data('user', this);
-    this.initButtonEl($el.find('.oktell_button_action'));
-    return $el;
+    this.el.data('user', this);
+    this.initButtonEl(this.el.find('.oktell_button_action'));
+    return this.el;
   };
 
   CUser.prototype.initButtonEl = function($el) {
@@ -196,6 +200,16 @@ CUser = (function() {
       return true;
     } else {
       return false;
+    }
+  };
+
+  CUser.prototype.letterVisibility = function(show) {
+    if (this.el && this.el.length) {
+      if (show) {
+        return this.el.find('.b_capital_letter span').text(this.letter);
+      } else {
+        return this.el.find('.b_capital_letter span').text('');
+      }
     }
   };
 
