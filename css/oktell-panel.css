@@ -234,7 +234,7 @@
         box-sizing: border-box;
     }
 .oktell_panel .b_department_header {
-    padding: 6px 10px;
+    padding: 3px 10px;
     border-top: 1px solid #bebebe;
     border-bottom: 1px solid #bebebe;
     background: rgb(212,211,204); /* Old browsers */
@@ -248,11 +248,13 @@
     background: linear-gradient(to bottom,  rgb(212,211,204) 0%,rgb(222,220,213) 20%,rgb(222,220,213) 80%,rgb(212,211,204) 100%); /* W3C */
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#d4d3cc', endColorstr='#d4d3cc',GradientType=0 ); /* IE6-8 */
     overflow: hidden;
-}.oktell_panel .b_department_header.g_first {
+}
+.oktell_panel .b_department_header.g_first {
     border-top: none;
 }
     .oktell_panel .b_department_header span {
         color: #8f8f8d;
+        font-size: 0.875em;
     }
 /* Phone number input fields
 ---------------------------------------------------------------*/
@@ -569,12 +571,15 @@
     width: 100%;
 }
 .oktell_panel .b_contact {
-    height: 37px;
+    height: 35px;
+    display: block;
+    margin-top: -3px;
+    clear: both;
 }
     .oktell_panel .b_contact td.b_contact_avatar,
     .oktell_panel .b_contact td.b_capital_letter {
         width: 24px;
-        padding: 6px 0 6px 12px;
+        padding: 5px 0 5px 12px;
         position: relative;
         float: left;
     }
@@ -589,7 +594,7 @@
         font-size: 1.1em;
         cursor: pointer;
         position: relative;
-        padding: 10px 26px 6px 7px;
+        padding: 9px 26px 5px 7px;
         vertical-align: middle;
         overflow: hidden;
         display: block;
@@ -656,9 +661,10 @@
 .oktell_panel .h_main_list {
     height: 100%;
     overflow: hidden;
+    margin-top: -1px;
 }
     .oktell_panel .b_main_list {
-        margin-top: 6px;
+        margin-top: 9px;
     }
         .oktell_panel .b_main_list .b_contact.m_busy .b_contact_avatar img {
             opacity: 0.5;
