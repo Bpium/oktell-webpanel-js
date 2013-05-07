@@ -248,6 +248,7 @@
     background: linear-gradient(to bottom,  rgb(212,211,204) 0%,rgb(222,220,213) 20%,rgb(222,220,213) 80%,rgb(212,211,204) 100%); /* W3C */
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#d4d3cc', endColorstr='#d4d3cc',GradientType=0 ); /* IE6-8 */
     overflow: hidden;
+    cursor: pointer;
 }
 .oktell_panel .b_department_header.g_first {
     border-top: none;
