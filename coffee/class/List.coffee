@@ -2,6 +2,11 @@ class List
 
 	constructor: (oktell, panelEl, dropdownEl, afterOktellConnect, debugMode) ->
 
+		@defaultConfig =
+			departmentVisibility: {}
+			showDeps: true
+			showOffline: false
+
 		@allActions =
 			call: { icon: '/img/icons/action/call.png', iconWhite: '/img/icons/action/white/call.png', text: @langs.call }
 			conference : { icon: '/img/icons/action/confinvite.png', iconWhite: '/img/icons/action/white/confinvite.png', text: @langs.conference }
@@ -14,13 +19,12 @@ class List
 
 		@actionCssPrefix = 'i_'
 		@lastDropdownUser = false
-
-
+		self = @
+		CUser.prototype.beforeAction = (action)->
+			self.beforeUserAction this, action
 
 		@departments = []
 		@departmentsById = {}
-		@allUserDep = new Department 'all_user_dep', 'allUsers'
-		@allUserDep.template = @usersTableTemplate
 
 		@simpleListEl = $(@usersTableTemplate)
 
@@ -72,20 +76,33 @@ class List
 
 		@buttonShowOffline = @panelEl.find '.b_list_filter .i_online'
 		@buttonShowDeps = @panelEl.find '.b_list_filter .i_group'
-		@usersShowRules()
 
 		@buttonShowOffline.bind 'click', =>
-			@usersShowRules not @showOffline, @showDeps
+			@config
+				showOffline: not @showOffline
 			@setFilter @filter, true
 
 		@buttonShowDeps.bind 'click', =>
-			@usersShowRules @showOffline, not @showDeps
+			@config
+				showDeps: not @showDeps
 			@setFilter @filter, true
 
 
 
 		@usersWithBeforeConnectButtons = []
 
+
+
+		@config()
+
+		Department.prototype.config = (args...)=>
+			@config.apply @, args
+
+		@allUserDep = new Department 'all_user_dep', 'allUsers'
+		@allUserDep.template = @usersTableTemplate
+
+		@exactMatchUserDep = new Department 'exact_match_user_dep', 'exactUser'
+		@exactMatchUserDep.template = @usersTableTemplate
 
 
 		@userScrollerToTop = =>
@@ -113,29 +130,42 @@ class List
 			if e.keyCode is 13
 				@filterInput.blur()
 				setTimeout =>
-					user = @panelUsersFiltered[0]
-					user.doLastFirstAction()
+					@usersListBlockEl.find('tr:first').data('user')?.doLastFirstAction()
 					@clearFilter()
 				, 50
 			else
 				debouncedSetFilter()
 			return true
 
-		@panelEl.bind 'mouseenter', ->
-			$(this).data('user')?.isHovered true
-		@panelEl.bind 'mouseleave', ->
-			$(this).data('user')?.isHovered false
+#		@panelEl.bind 'mouseenter', (e)=>
+#			#$(this).data('user')?.isHovered true
+#			#@log 'Mouse enter to ' + e.target
+#		@panelEl.bind 'mouseleave', ->
+#			$(this).data('user')?.isHovered false
 
 		@panelEl.bind 'click', (e)=>
 			target = $(e.target)
-			if not target.is('.b_contact .drop_down') and target.closest('.b_contact .drop_down').size() is 0
+			if target.is('.oktell_button_action .g_first')
+				actionButton = target.parent()
+			else if target.is('.oktell_button_action .g_first i')
+				actionButton = target.parent().parent()
+			else if target.is('.b_contact .drop_down')
+				buttonEl = target.parent()
+			else if target.is('.b_contact .drop_down i')
+				buttonEl = target.parent().parent()
+			if (not actionButton? and not buttonEl?) or ( actionButton and actionButton.size() is 0 ) or ( buttonEl and buttonEl.size() is 0 )
 				return true
-			buttonEl = target.closest('.oktell_button_action')
-			if buttonEl.size() is 0
+
+			if actionButton? and actionButton.size()
+				user = actionButton.data('user')
+				user?.doLastFirstAction()
 				return true
-			user = buttonEl.data('user')
-			if user
-				@showDropdown user, buttonEl, user.loadOktellActions(), true
+
+			if buttonEl? and buttonEl.size()
+				user = buttonEl.data('user')
+				if user
+					@showDropdown user, buttonEl, user.loadOktellActions(), true
+				return true
 
 		@dropdownEl.bind 'click', (e) =>
 			target = $(e.target)
@@ -269,14 +299,19 @@ class List
 						else
 							dep = @allUserDep
 						@log 'current visibility settings are ShowDeps='+@showDeps+' and ShowOffline=' + @showOffline
-						wasFiltered = dep.lastFilteredUsers.indexOf(user) isnt -1
+						wasFiltered = user.isFiltered @filter, @showOffline
 						@log 'user was filtered earlier = ' + wasFiltered
 						user.setState n.numstateid
-						@log 'after user.setState'
-						if not user.isFiltered @filter, @showOffline
-							@log 'now user isnt filtered, so remove his html element'
-							user.el?.remove?()
-							@log 'after remove html'
+						userNowIsFiltered = user.isFiltered @filter, @showOffline
+						@log 'after user.setState, now user filtered = ' + userNowIsFiltered
+						if not userNowIsFiltered
+							@log 'now user isnt filtered'
+							if dep.getContainer().children().length is 1
+								@log 'container contains only users el, so refilter all list'
+								@setFilter @filter, true
+							else
+								@log 'remove his html element'
+								user.el?.remove?()
 						else if not wasFiltered
 							@log 'user now filtered and was not filtered before state change'
 							dep.getUsers @filter, @showOffline
@@ -284,21 +319,26 @@ class List
 							index = dep.lastFilteredUsers.indexOf user
 							@log 'index of user in refiltered users list is ' + index
 							if index isnt -1
-								if index is 0
-									@log 'add user html to start of department container'
-									dep.getContainer().prepend user.getEl()
+								if not dep.getContainer().is(':visible')
+									@log 'dep container is hidden, so, refilter all users list'
+									@setFilter @filter, true
 								else
-									@log 'add user html after prev user html element'
-									dep.lastFilteredUsers[index-1]?.el?.after user.getEl()
+									if index is 0
+										@log 'add user html to start of department container'
+										dep.getContainer().prepend user.getEl()
+									else
+										@log 'add user html after prev user html element'
+										dep.lastFilteredUsers[index-1]?.el?.after user.getEl()
 
-								if dep.lastFilteredUsers[index-1]?.letter is user.letter
-									@log 'hide user letter because it is like prev user letter ' + user.letter
-									user.letterVisibility false
-								else if dep.lastFilteredUsers[index+1]?.letter is user.letter
-									@log 'hide prev user letter because it is like user letter ' + user.letter
-									dep.lastFilteredUsers[index+1].letterVisibility false
+									if dep.lastFilteredUsers[index-1]?.letter is user.letter
+										@log 'hide user letter because it is like prev user letter ' + user.letter
+										user.letterVisibility false
+									else if dep.lastFilteredUsers[index+1]?.letter is user.letter
+										@log 'hide prev user letter because it is like user letter ' + user.letter
+										dep.lastFilteredUsers[index+1].letterVisibility false
 
-
+						@log 'end user state change'
+						@log ''
 
 
 
@@ -343,21 +383,6 @@ class List
 
 			if typeof afterOktellConnect is 'function' then afterOktellConnect()
 
-	usersShowRules: ( showOffline, showDeps ) ->
-		showOfflineKey = 'oktell_panel_show_offline_users'
-		showDepsKey = 'oktell_panel_show_departments'
-
-		@showOffline = if showOffline? then showOffline else ( if cookie(showOfflineKey)? then Boolean(parseInt(cookie(showOfflineKey))) else true )
-		@showDeps = if showDeps? then showDeps else ( if cookie(showDepsKey)? then Boolean(parseInt(cookie(showDepsKey))) else true )
-
-		cookie showOfflineKey, (if @showOffline then '1' else '0'), {path:'/', expires: 1209600 }
-		cookie showDepsKey, (if @showDeps then '1' else '0'), {path:'/', expires: 1209600 }
-
-		@buttonShowOffline.toggleClass 'g_active', not @showOffline
-		@buttonShowDeps.toggleClass 'g_active', @showDeps
-
-		return [@showOffline, @showDeps]
-
 	getUserButtonForPlugin: (phone) ->
 		user = @getUser phone
 		if not @oktellConnected
@@ -383,9 +408,15 @@ class List
 			@keypadIsVisible = Boolean(visible)
 			@keypadEl.stop true, true
 			if @keypadIsVisible
-				@keypadEl.slideDown 200, @setUserListHeight
+				@keypadEl.slideDown
+					duration: 200
+					easing: 'linear'
+					done: @setUserListHeight
 			else
-				@keypadEl.slideUp 200, @setUserListHeight
+				@keypadEl.slideUp
+					duration: 200
+					easing: 'linear'
+					done: @setUserListHeight
 
 	addEventListenersForButton: (user, button) ->
 		button.bind 'click', =>
@@ -468,7 +499,7 @@ class List
 		@setHoldHtml()
 
 	setPanelUsersHtml: (usersArray) ->
-		@_setUsersHtml usersArray, @usersListEl, @showOffline, @showDeps
+		@_setUsersHtml usersArray, @usersListEl
 		@userScrollerToTop()
 
 	setAbonentsHtml: ->
@@ -483,22 +514,24 @@ class List
 	_setActivityPanelUserHtml: (users, listEl, blockEl) ->
 		usersArray = []
 		usersArray.push(u) for own k,u of users
-		@_setUsersHtml usersArray, listEl
+		@_setUsersHtml usersArray, listEl, true
 		if usersArray.length and blockEl.is(':not(:visible)')
 			blockEl.slideDown 200, @setUserListHeight
 		else if usersArray.length is 0 and blockEl.is(':visible')
 			blockEl.slideUp 200, @setUserListHeight
 
 
-	_setUsersHtml: (usersArray, $el, showOffline ) ->
+	_setUsersHtml: (usersArray, $el, useIndependentCopies ) ->
 		html = []
 		lastDepId = null
 		prevLetter = ''
 		for u in usersArray
 			#log 'render ' + u.getInfo()
-			showLetter = if prevLetter isnt u.letter then true else false
-			html.push u.getEl showLetter
+			html.push u.getEl useIndependentCopies
+			#html = html.add u.getEl useIndependentCopies
+			u.showLetter if prevLetter isnt u.letter then true else false
 			prevLetter = u.letter
+		$el.children().detach()
 		$el.html html
 
 #	sortPanelUsers: ( usersArray ) ->
@@ -535,27 +568,45 @@ class List
 		exactMatch = false
 		@timer()
 
-
-		allDeps = $()
+		allDeps = []
 		renderDep = (dep) =>
-			el = dep.getEl()
+			el = dep.getEl filter isnt ''
 			depExactMatch = false
 			[ users, depExactMatch ] = dep.getUsers filter, @showOffline
 			if users.length isnt 0
 				if not exactMatch then exactMatch = depExactMatch
 				@_setUsersHtml users, dep.getContainer()
-				allDeps = allDeps.add el
+				if depExactMatch and exactMatch is depExactMatch
+					allDeps.unshift el
+				else
+					allDeps.push el
 		if @showDeps
 			for dep in @departments
 				renderDep dep
 		else
 			renderDep @allUserDep
 
-		@usersListBlockEl.html allDeps
+#		allDeps.find('tr').bind 'mouseenter', (e)=>
+#			@log 'Mouse enter tr ', e.currentTarget
+#			$(e.currentTarget).data('user')?.isHovered true
+#		allDeps.find('tr').bind 'mouseleave', (e)=>
+#			@log 'Mouse leave tr ', e.currentTarget
+#			$(e.currentTarget).data('user')?.isHovered true
 
 		if not exactMatch and filter.match /[0-9\(\)\+\-]/
 			@filterFantomUser = @getUser({name:filter, number: filter}, true)
-			@usersListEl.prepend
+			@exactMatchUserDep.clearUsers()
+			@exactMatchUserDep.addUser @filterFantomUser
+			el = @exactMatchUserDep.getEl()
+			@_setUsersHtml [@filterFantomUser], @exactMatchUserDep.getContainer()
+			@filterFantomUser.showLetter false
+			allDeps.unshift el
+		else
+			@filterFantomUser = false
+
+		@usersListBlockEl.children().detach()
+		@usersListBlockEl.html allDeps
+
 
 		@userScrollerToTop()
 
@@ -634,9 +685,37 @@ class List
 
 	timer: (stop) ->
 		if stop and @_time
-			log 'List timer stop: ' + ( Date.now() - @_time )
+			@log 'List timer stop: ' + ( Date.now() - @_time )
 		if not stop
 			@_time = Date.now()
 			log 'List timer start'
 
+	beforeUserAction: (user, action)->
+		if @filterFantomUser and user is @filterFantomUser
+			@clearFilter()
+
+	config: (data)->
+		if not @_config
+			if localStorage?.oktellPanel and JSON?.parse
+				try
+					@_config = JSON.parse(localStorage.oktellPanel)
+				catch e
+				@_config = {} if not @_config? or typeof @_config isnt 'object'
+			else
+				@_config = {}
+			for own k,v of @defaultConfig
+				if not @_config[k]?
+					@_config[k] = v
+
+		if data?
+			for own k,v of data
+				@_config[k] = v
+			if localStorage and JSON?.stringify
+				localStorage.setItem 'oktellPanel', JSON.stringify @_config
+
+		@showDeps = @_config.showDeps
+		@showOffline = @_config.showOffline
+		@buttonShowOffline.toggleClass 'g_active', not @showOffline
+		@buttonShowDeps.toggleClass 'g_active', @showDeps
+		@_config
 

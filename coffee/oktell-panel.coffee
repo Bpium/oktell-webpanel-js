@@ -23,12 +23,15 @@ do ($)->
 		ru:
 			panel: { inTalk: 'В разговоре', onHold: 'На удержании', queue: 'Очередь ожидания', inputPlaceholder: 'введите имя или номер', withoutDepartment: 'без отдела' },
 			actions: { call: 'Позвонить', conference: 'Конференция', transfer: 'Перевести', toggle: 'Переключиться', intercom: 'Интерком', endCall: 'Завершить', ghostListen: 'Прослушка', ghostHelp: 'Помощь' }
+			callPopup: { title: 'Входящий вызов', hide: 'Скрыть', answer: 'Ответить', reject: 'Отклонить', undefinedNumber: 'Номер не определен', goPickup: 'Поднимите трубку' }
 		en:
 			panel: { inTalk: 'In conversation', onHold: 'On hold', queue: 'Wait queue', inputPlaceholder: 'Enter name or number', withoutDepartment: 'wihtout department' },
 			actions: { call: 'Dial', conference: 'Conference', transfer: 'Transfer', toggle: 'Switch', intercom: 'Intercom', endCall: 'End', ghostListen: 'Audition', ghostHelp: 'Help' }
+			callPopup: { title: 'Incoming call', hide: 'Hide', answer: 'Answer', reject: 'Decline', undefinedNumber: 'Phone number is not defined', goPickup: 'Pick up the phone' }
 		cz:
 			panel: { inTalk: 'V rozhovoru', onHold: 'Na hold', queue: 'Fronta čekaní', inputPlaceholder: 'zadejte jméno nebo číslo', withoutDepartment: '!!!!!!!' },
 			actions: { call: 'Zavolat', conference: 'Konference', transfer: 'Převést', toggle: 'Přepnout', intercom: 'Intercom', endCall: 'Ukončit', ghostListen: 'Odposlech', ghostHelp: 'Nápověda' }
+			callPopup: { title: 'Příchozí hovor', hide: 'Schovat', answer: 'Odpovědět', reject: 'Odmítnout', undefinedNumber: '', goPickup: 'Zvedněte sluchátko' }
 	}
 
 	options = null
@@ -42,12 +45,30 @@ do ($)->
 	getOptions = ->
 		options or defaultOptions
 
+	logStr = ''
+
 	log = ->
 		if not getOptions().debug then return
+		d = new Date()
+		dd =  d.getFullYear() + '-' + (if d.getMonth()<10 then '0' else '') + d.getMonth() + '-' + (if d.getDate()<10 then '0' else '') + d.getDate();
+		t = (if d.getHours()<10 then '0' else '') + d.getHours() + ':' + (if d.getMinutes()<10 then '0' else '')+d.getMinutes() + ':' +  (if d.getSeconds()<10 then '0' else '')+d.getSeconds() + ':' +
+			(d.getMilliseconds() + 1000).toString().substr(1)
+		logStr += dd + ' ' + t + ' | '
+		args = ['Oktell-Panel ' + t + ' |']
+		for val in arguments
+			if typeof val == 'object'
+				try
+					logStr += JSON.stringify(val)
+				catch e
+					logStr += val.toString()
+			else
+				logStr += val
+			logStr += ' | '
+			args.push val
+		logStr += "\n\n"
 		try
-			console.log.apply(console, arguments);
+			console.log.apply( console, args || [])
 		catch e
-
 
 	templates = {}
 
@@ -77,6 +98,9 @@ do ($)->
 
 	CUser.prototype.buttonTemplate = actionButtonHtml
 	CUser.prototype.log = log
+	List.prototype.log = log
+	Popup.prototype.log = log
+	Department.prototype.log = log
 
 	Department.prototype.template = departmentTemplateHtml
 
@@ -103,6 +127,10 @@ do ($)->
 		if getOptions().noavatar
 			panelEl.addClass('noavatar')
 
+		popupHtml = popupHtml.replace('{{title}}', langs.callPopup.title)
+			.replace('{{goPickup}}', langs.callPopup.goPickup)
+			.replace('{{hide}}', langs.callPopup.hide)
+			.replace('{{reject}}', langs.callPopup.reject)
 
 		popupEl = $(popupHtml)
 		$('body').append(popupEl)
@@ -118,6 +146,7 @@ do ($)->
 		$('body').append actionListEl
 
 		oktell = getOptions().oktell
+		CUser.prototype.formatPhone = oktell.formatPhone
 
 		popup = new Popup popupEl, oktell
 
@@ -264,7 +293,7 @@ do ($)->
 		phone = el.attr('data-phone')
 		if phone
 			button = list.getUserButtonForPlugin phone
-			log 'generated button for ' + phone, button
+			#log 'generated button for ' + phone, button
 			el.html button
 
 	addActionButtonToEl = (el) ->

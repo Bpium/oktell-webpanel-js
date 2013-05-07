@@ -3,24 +3,71 @@ var Department;
 
 Department = (function() {
   function Department(id, name) {
+    this.usersVisibilityCss = 'invisible';
     this.lastFilteredUsers = [];
     this.isSorted = false;
     this.visible = true;
     this.users = [];
     this.id = id && id !== '00000000-0000-0000-0000-000000000000' ? id : this.withoutDepName;
     this.name = this.id === this.withoutDepName || !name ? this.langs.panel.withoutDepartment : name;
+    this.isOpen = this.config().departmentVisibility[this.id] != null ? this.config().departmentVisibility[this.id] : true;
   }
 
-  Department.prototype.getEl = function() {
-    return this.el || (this.el = $(this.template.replace(/\{\{department}\}/g, escapeHtml(this.name))));
+  Department.prototype.getEl = function(usersVisible) {
+    var _this = this;
+
+    this.log('get el, usersVisible - ' + usersVisible + ' , for department ' + this.getInfo());
+    if (!this.el) {
+      this.el = $(this.template.replace(/\{\{department}\}/g, escapeHtml(this.name)));
+      this.el.find('.b_department_header').bind('click', function() {
+        return _this.showUsers();
+      });
+    }
+    if (usersVisible) {
+      this._oldIsOpen = this.isOpen;
+      this.showUsers(true, true);
+    } else {
+      this.showUsers(this._oldIsOpen != null ? this._oldIsOpen : this.isOpen);
+    }
+    return this.el;
   };
 
   Department.prototype.getContainer = function() {
     return this.el.find('tbody');
   };
 
+  Department.prototype.showUsers = function(val, notSave) {
+    var c;
+
+    if (typeof val === 'undefined') {
+      val = !this.isOpen;
+    }
+    if (!this.hideEl) {
+      this.hideEl = this.el.find('table');
+    }
+    this.log('department users visibility set ' + val + ' , without save - ' + notSave + '. For ' + this.getInfo());
+    this.hideEl.stop(true, true);
+    if (!notSave) {
+      this.isOpen = val;
+      c = this.config();
+      c.departmentVisibility[this.id] = this.isOpen;
+      this.config(c);
+    }
+    if (val) {
+      this.hideEl.toggleClass(this.usersVisibilityCss, false);
+      return this.hideEl.show();
+    } else {
+      this.hideEl.toggleClass(this.usersVisibilityCss, true);
+      return this.hideEl.hide();
+    }
+  };
+
   Department.prototype.getInfo = function() {
     return this.name + ' ' + this.id;
+  };
+
+  Department.prototype.clearUsers = function() {
+    return this.users = [];
   };
 
   Department.prototype.show = function(withAnimation) {

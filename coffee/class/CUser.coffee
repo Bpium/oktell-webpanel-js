@@ -16,7 +16,7 @@ class CUser
 		@buttonLastAction = ''
 		@firstLiCssPrefix = 'm_button_action_'
 
-		#@els = $()
+		@els = $()
 		@buttonEls = $()
 
 #		@separateButtonEls = $()
@@ -35,11 +35,17 @@ class CUser
 		@nameLower = @name.toLowerCase()
 		@letter = @name[0]?.toUpperCase() or @number?[0].toString().toLowerCase()
 		@nameHtml = if data.name and data.name.toString() isnt @number then escapeHtml(data.name) else @numberHtml
+		lastHtml = @elNumberHtml
+		@elNumberHtml = if @numberHtml isnt @nameHtml then @numberHtml else ''
+		if @elNumberHtml isnt lastHtml and @el?
+			@el.find('.o_number').text @elNumberHtml
+		@el?.find('.b_contact_title b').text @nameHtml
+
 		@avatarLink32x32 = data.avatarLink32x32 or @defaultAvatar32 or ''
 		@defaultAvatarCss = if @avatarLink32x32 then '' else 'm_default'
 		@departmentId = if data?.numberObj?.departmentid and data?.numberObj.departmentid isnt '00000000-0000-0000-0000-000000000000' then data?.numberObj.departmentid else @withoutDepName
 		@department = if @departmentId is 'www_without' then @langs.panel.withoutDepartment else data?.numberObj?.department
-		@log 'depId ' + (data?.numberObj?.departmentid) + ' ' + data?.numberObj?.department + ' : ' + @departmentId + ' ' + @department
+		#@log 'depId ' + (data?.numberObj?.departmentid) + ' ' + data?.numberObj?.department + ' : ' + @departmentId + ' ' + @department
 
 		if data.numberObj?.state?
 			@setState data.numberObj.state
@@ -71,19 +77,19 @@ class CUser
 			, 100
 
 	setStateCss: ->
-		if @el and @el.length
+		if @els.length
 			if @state is 0
-				@el.removeClass('m_busy').addClass('m_offline')
+				@els.removeClass('m_busy').addClass('m_offline')
 			else if @state is 5
-				@el.removeClass('m_offline').addClass('m_busy')
+				@els.removeClass('m_offline').addClass('m_busy')
 			else
-				@el.removeClass('m_offline').removeClass('m_busy')
+				@els.removeClass('m_offline').removeClass('m_busy')
 
 	getInfo: ->
 		'"'+@number+'" ' + @state + ' ' + @name
 
 	isFiltered: (filter, showOffline) ->
-		if not filter or typeof filter isnt 'string'
+		if ( not filter or typeof filter isnt 'string' ) and ( showOffline or ( not showOffline and @state isnt 0 ) )
 			return true
 
 		if ( showOffline or ( not showOffline and @state isnt 0 ) ) and ( ( @number and @number.indexOf(filter) isnt -1 ) or ( ' ' + @name ).toLowerCase().indexOf(filter) isnt -1 )
@@ -91,22 +97,27 @@ class CUser
 
 		return false
 
-	getEl: (showLetter) ->
-		str = @template.replace( @regexps.name, @nameHtml)
-			.replace( @regexps.number, if @numberHtml isnt @nameHtml then @numberHtml else '' )
-			.replace( @regexps.avatarLink32x32, @avatarLink32x32)
-			.replace( @regexps.css, @defaultAvatarCss )
-			.replace( @regexps.letter, if showLetter then @letter else '' )
-		if @el
-			@el.remove()
-		@el = $(str)
-		#@els = @els.add $el
-		@setStateCss()
-		@el.data 'user', @
-		@initButtonEl @el.find '.oktell_button_action'
-		return @el
+	showLetter: (show)->
+		@el?.find('.b_capital_letter span').text if show then @letter else ''
+
+	getEl: ( createIndependent) ->
+		if not @el or createIndependent
+			str = @template.replace( @regexps.name, @nameHtml)
+				.replace( @regexps.number, if @numberHtml isnt @nameHtml then @numberHtml else '' )
+				.replace( @regexps.avatarLink32x32, @avatarLink32x32)
+				.replace( @regexps.css, @defaultAvatarCss )
+			$el = $(str)
+			$el.data 'user', @
+			@initButtonEl $el.find '.oktell_button_action'
+			@els = @els.add $el
+			@setStateCss()
+			if not @el
+				@el = $el
+		$el = $el or @el
+		return $el
 
 	initButtonEl: ($el) ->
+		@log 'init button el for ' + @getInfo()
 		@buttonEls = @buttonEls.add $el
 		$el.data 'user', @
 		$el.children(':first').bind 'click', =>
@@ -161,6 +172,8 @@ class CUser
 			return
 
 		target = @number
+
+		@beforeAction?(action)
 
 		switch action
 			when 'call'

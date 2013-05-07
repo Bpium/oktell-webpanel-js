@@ -1,20 +1,59 @@
 class Department
+
 	constructor: ( id, name )->
+		@usersVisibilityCss = 'invisible'
 		@lastFilteredUsers = []
 		@isSorted = false
-
 		@visible = true
 		@users = []
 		@id = if id and id isnt '00000000-0000-0000-0000-000000000000' then id else @withoutDepName
 		@name = if @id is @withoutDepName or not name then @langs.panel.withoutDepartment else name
+		@isOpen = if @config().departmentVisibility[@id]? then @config().departmentVisibility[@id] else true
 
-	getEl: ->
-		@el or (@el = $(@template.replace /\{\{department}\}/g, escapeHtml(@name)))
+	getEl: (usersVisible)->
+		@log 'get el, usersVisible - ' + usersVisible + ' , for department ' + @getInfo()
+		if not @el
+			@el = $(@template.replace /\{\{department}\}/g, escapeHtml(@name))
+			@el.find('.b_department_header').bind 'click', =>
+				@showUsers()
+		if usersVisible
+			@_oldIsOpen = @isOpen
+			@showUsers true, true
+		else
+			@showUsers if @_oldIsOpen? then @_oldIsOpen else @isOpen
+		@el
 	getContainer: ->
 		@el.find('tbody')
 
+	showUsers: (val, notSave)->
+		if typeof val is 'undefined'
+			val = ! @isOpen
+		if not @hideEl
+			@hideEl = @el.find 'table'
+		@log 'department users visibility set ' + val + ' , without save - ' + notSave + '. For ' + @getInfo()
+
+		@hideEl.stop true, true
+		if not notSave
+			@isOpen = val
+			c = @config()
+			c.departmentVisibility[@id] = @isOpen
+			@config c
+		if val
+			#@hideEl.slideDown 200
+			@hideEl.toggleClass @usersVisibilityCss, false
+			@hideEl.show()
+		else
+			#@hideEl.slideUp 200
+			@hideEl.toggleClass @usersVisibilityCss, true
+			@hideEl.hide()
+
+
+
 	getInfo: ->
 		@name + ' ' + @id
+
+	clearUsers: ->
+		@users = []
 
 	show: (withAnimation) ->
 		if not @el or @visible then return
