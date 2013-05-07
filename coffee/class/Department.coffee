@@ -40,11 +40,11 @@ class Department
 			@config c
 		if val
 			#@hideEl.slideDown 200
-			@hideEl.toggleClass @usersVisibilityCss, false
+			@el.toggleClass @usersVisibilityCss, false
 			@hideEl.show()
 		else
 			#@hideEl.slideUp 200
-			@hideEl.toggleClass @usersVisibilityCss, true
+			@el.toggleClass @usersVisibilityCss, true
 			@hideEl.hide()
 
 

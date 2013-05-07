@@ -54,10 +54,10 @@ Department = (function() {
       this.config(c);
     }
     if (val) {
-      this.hideEl.toggleClass(this.usersVisibilityCss, false);
+      this.el.toggleClass(this.usersVisibilityCss, false);
       return this.hideEl.show();
     } else {
-      this.hideEl.toggleClass(this.usersVisibilityCss, true);
+      this.el.toggleClass(this.usersVisibilityCss, true);
       return this.hideEl.hide();
     }
   };
