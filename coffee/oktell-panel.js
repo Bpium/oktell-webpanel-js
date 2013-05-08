@@ -210,7 +210,7 @@
     CUser.prototype.formatPhone = oktell.formatPhone;
     popup = new Popup(popupEl, oktell);
     errorEl = $(errorHtml);
-    panelEl.append(errorEl);
+    panelEl.find('.h_panel_bg:first').append(errorEl);
     error = new Error(errorEl, oktell);
     panelPos = getOptions().position;
     animOptShow = {};

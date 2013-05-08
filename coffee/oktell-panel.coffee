@@ -153,7 +153,7 @@ do ($)->
 		popup = new Popup popupEl, oktell
 
 		errorEl = $(errorHtml)
-		panelEl.append errorEl
+		panelEl.find('.h_panel_bg:first').append errorEl
 		#errorEl.hide()
 		error = new Error errorEl, oktell
 
