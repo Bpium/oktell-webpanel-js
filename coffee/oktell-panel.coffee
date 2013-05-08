@@ -8,6 +8,7 @@ do ($)->
 	#includecoffee coffee/class/CUser.coffee
 	#includecoffee coffee/class/List.coffee
 	#includecoffee coffee/class/Popup.coffee
+	#includecoffee coffee/class/Error.coffee
 
 	defaultOptions =
 		position: 'right'
@@ -41,6 +42,7 @@ do ($)->
 	afterOktellConnect = null
 	list = null
 	popup = null
+	error = null
 
 	getOptions = ->
 		options or defaultOptions
@@ -92,6 +94,7 @@ do ($)->
 	usersTableHtml = loadTemplate '/templates/usersTable.html'
 	panelHtml = loadTemplate '/templates/panel.html'
 	popupHtml = loadTemplate '/templates/callPopup.html'
+	errorHtml = loadTemplate '/templates/error.html'
 
 	List.prototype.jScroll = jScroll
 	List.prototype.usersTableTemplate = usersTableHtml
@@ -135,7 +138,6 @@ do ($)->
 		popupEl = $(popupHtml)
 		$('body').append(popupEl)
 
-
 		$user = $(userTemplateHtml)
 		$userActionButton = $(actionButtonHtml)
 		oldBinding = $userActionButton.attr 'data-bind'
@@ -150,6 +152,11 @@ do ($)->
 
 		popup = new Popup popupEl, oktell
 
+		errorEl = $(errorHtml)
+		panelEl.append errorEl
+		#errorEl.hide()
+		error = new Error errorEl, oktell
+
 		panelPos = getOptions().position
 		animOptShow = {}
 		animOptShow[panelPos] = '0px'
@@ -163,6 +170,7 @@ do ($)->
 		if getOptions().debug
 			window.wList = list
 			window.wPopup = popup
+			window.wError = error
 
 		if panelPos is "right"
 			panelEl.addClass("right");
