@@ -1297,3 +1297,35 @@
     -moz-border-radius: 5px;
     border-radius: 5px;
 }
+
+/* Forms & error blocks
+---------------------------------------------------------------*/
+
+.oktell_panel .b_error {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #e0e4e7;
+    background-image: -webkit-gradient(linear, left top, left bottom, from(#e0e4e7), color-stop(100%, #c7cfd6));
+    background-image: -moz-linear-gradient(90deg, #c7cfd6 0%, #e0e4e7);
+}
+    .oktell_panel .b_error .h_padding {
+        padding: 20px !important;
+    }
+        .oktell_panel .b_error .h_padding h4 {
+            color: rgba(190, 27, 26, 1);
+            margin-bottom: 2px;
+            font-size: 1.125em;
+        }
+        .oktell_panel .b_error .h_padding p {
+            margin-bottom: 16px;
+        }
+        .oktell_panel .b_error .h_padding p.g_light {
+            color: #828180;
+        }
+        .oktell_panel .b_error .h_padding p.b_error_alert {
+            font-weight: bold;
+            font-size: 1.125em;
+        }
