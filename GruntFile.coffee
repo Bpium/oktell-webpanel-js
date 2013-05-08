@@ -73,6 +73,8 @@ module.exports = (grunt) ->
 
 	grunt.registerTask 'build', ['clean:buildlast', 'createbuildfolder', 'insertfilesasvars', 'includecoffee', 'coffee', 'uglify', 'cssmin', 'copy:css', 'addVersion', 'compress', 'copy:main', 'clean:temp']
 
+	grunt.registerTask 'default', ['build']
+
 	grunt.registerMultiTask 'addVersion', 'Add version to file names and to file content', ->
 		config = @data
 		files = grunt.file.expand {filter:'isFile'}, config.fileNames
