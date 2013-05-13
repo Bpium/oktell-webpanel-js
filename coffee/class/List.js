@@ -4,6 +4,8 @@ var List,
   __hasProp = {}.hasOwnProperty;
 
 List = (function() {
+  List.prototype.logGroup = 'List';
+
   function List(oktell, panelEl, dropdownEl, afterOktellConnect, debugMode) {
     var debouncedSetFilter, debouncedSetHeight, dropdownHideTimer, oktellConnected, self,
       _this = this;

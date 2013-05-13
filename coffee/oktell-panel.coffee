@@ -25,14 +25,29 @@ do ($)->
 			panel: { inTalk: 'В разговоре', onHold: 'На удержании', queue: 'Очередь ожидания', inputPlaceholder: 'введите имя или номер', withoutDepartment: 'без отдела' },
 			actions: { call: 'Позвонить', conference: 'Конференция', transfer: 'Перевести', toggle: 'Переключиться', intercom: 'Интерком', endCall: 'Завершить', ghostListen: 'Прослушка', ghostHelp: 'Помощь' }
 			callPopup: { title: 'Входящий вызов', hide: 'Скрыть', answer: 'Ответить', reject: 'Отклонить', undefinedNumber: 'Номер не определен', goPickup: 'Поднимите трубку' }
+			error:
+				usingOktellClient: { header: 'Пользователь «%username%» использует стандартный Oktell-клиент.', message: 'Одновременная работа двух типов клиентских приложений невозможна.', message2: 'Закройте стандартный Oktell-клиент и повторите попытку.' }
+				loginPass: { header: 'Пароль для пользователя «%username%» не подходит.', message: 'Проверьте правильность имени пользователя и пароля.' }
+				unavailable: { header: 'Сервер телефонии Oktell не доступен.', message: 'Убедитесь что сервер телефонии работает и проверьте настройки соединения.'}
+				#tryAgain: 'Повторить попытку'
 		en:
 			panel: { inTalk: 'In conversation', onHold: 'On hold', queue: 'Wait queue', inputPlaceholder: 'Enter name or number', withoutDepartment: 'wihtout department' },
 			actions: { call: 'Dial', conference: 'Conference', transfer: 'Transfer', toggle: 'Switch', intercom: 'Intercom', endCall: 'End', ghostListen: 'Audition', ghostHelp: 'Help' }
 			callPopup: { title: 'Incoming call', hide: 'Hide', answer: 'Answer', reject: 'Decline', undefinedNumber: 'Phone number is not defined', goPickup: 'Pick up the phone' }
+			error:
+				usingOktellClient: { header: 'User «%username%» uses standard Oktell client applications.', message: 'Simultaneous work of two types of client applications is not possible..', message2: 'Close standard Oktell client application and try again.' }
+				loginPass: { header: 'Wrong password for user «%username%».', message: 'Make sure that the username and password are correct.' }
+				unavailable: { header: 'Oktell server is not available.', message: 'Make sure that Oktell server is running and check your connections.'}
+				#tryAgain: 'Try again'
 		cz:
 			panel: { inTalk: 'V rozhovoru', onHold: 'Na hold', queue: 'Fronta čekaní', inputPlaceholder: 'zadejte jméno nebo číslo', withoutDepartment: '!!!!!!!' },
 			actions: { call: 'Zavolat', conference: 'Konference', transfer: 'Převést', toggle: 'Přepnout', intercom: 'Intercom', endCall: 'Ukončit', ghostListen: 'Odposlech', ghostHelp: 'Nápověda' }
 			callPopup: { title: 'Příchozí hovor', hide: 'Schovat', answer: 'Odpovědět', reject: 'Odmítnout', undefinedNumber: '', goPickup: 'Zvedněte sluchátko' }
+			error:
+				usingOktellClient: { header: 'User «%username%» uses standard Oktell client applications.', message: 'Simultaneous work of two types of client applications is not possible..', message2: 'Close standard Oktell client application and try again.' }
+				loginPass: { header: 'Wrong password for user «%username%».', message: 'Make sure that the username and password are correct.' }
+				unavailable: { header: 'Oktell server is not available.', message: 'Make sure that Oktell server is running and check your connections.'}
+				#tryAgain: 'Try again'
 	}
 
 	options = null
@@ -49,15 +64,16 @@ do ($)->
 
 	logStr = ''
 
-	log = ->
+	log = (args...)->
 		if not getOptions().debug then return
 		d = new Date()
 		dd =  d.getFullYear() + '-' + (if d.getMonth()<10 then '0' else '') + d.getMonth() + '-' + (if d.getDate()<10 then '0' else '') + d.getDate();
-		t = (if d.getHours()<10 then '0' else '') + d.getHours() + ':' + (if d.getMinutes()<10 then '0' else '')+d.getMinutes() + ':' +  (if d.getSeconds()<10 then '0' else '')+d.getSeconds() + ':' +
-			(d.getMilliseconds() + 1000).toString().substr(1)
+		t = (if d.getHours()<10 then '0' else '') + d.getHours() + ':' + (if d.getMinutes()<10 then '0' else '')+d.getMinutes() + ':' +  (if d.getSeconds()<10 then '0' else '')+d.getSeconds() + ':' +	(d.getMilliseconds() + 1000).toString().substr(1)
 		logStr += dd + ' ' + t + ' | '
-		args = ['Oktell-Panel ' + t + ' |']
-		for val in arguments
+		fnName = 'log'
+		if args[0].toString().toLowerCase() is 'error'
+			fnName = 'error'
+		for val, i in args
 			if typeof val == 'object'
 				try
 					logStr += JSON.stringify(val)
@@ -66,10 +82,10 @@ do ($)->
 			else
 				logStr += val
 			logStr += ' | '
-			args.push val
 		logStr += "\n\n"
+		args.unshift 'Oktell-Panel.js ' + t + ' |' + ( if typeof @logGroup is 'string' then ' ' + @logGroup + ' |' else '' )
 		try
-			console.log.apply( console, args || [])
+			console[fnName].apply( console, args || [])
 		catch e
 
 	templates = {}
@@ -104,6 +120,7 @@ do ($)->
 	List.prototype.log = log
 	Popup.prototype.log = log
 	Department.prototype.log = log
+	Error.prototype.log = log
 
 	Department.prototype.template = departmentTemplateHtml
 
@@ -123,6 +140,7 @@ do ($)->
 			.replace('{{inputPlaceholder}}',langs.panel.inputPlaceholder)
 		List.prototype.langs = langs.actions
 		List.prototype.departmentTemplate = departmentTemplateHtml
+		Error.prototype.langs = langs.error
 		CUser.prototype.langs = langs
 		Department.prototype.langs = langs
 		panelEl = $(panelHtml)
@@ -152,10 +170,11 @@ do ($)->
 
 		popup = new Popup popupEl, oktell
 
-		errorEl = $(errorHtml)
-		panelEl.find('.h_panel_bg:first').append errorEl
-		#errorEl.hide()
-		error = new Error errorEl, oktell
+		if not getOptions().withoutError
+			errorEl = $(errorHtml)
+			panelEl.find('.h_panel_bg:first').append errorEl
+			#errorEl.hide()
+			error = new Error errorEl, oktell
 
 		panelPos = getOptions().position
 		animOptShow = {}

@@ -1,5 +1,5 @@
 class Department
-
+	logGroup: 'Department'
 	constructor: ( id, name )->
 		@usersVisibilityCss = 'invisible'
 		@lastFilteredUsers = []

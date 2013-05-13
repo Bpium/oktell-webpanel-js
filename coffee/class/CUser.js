@@ -3,6 +3,8 @@ var CUser,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
 CUser = (function() {
+  CUser.prototype.logGroup = 'User';
+
   function CUser(data) {
     this.doAction = __bind(this.doAction, this);    this.state = false;
     this.hasHover = false;
@@ -128,7 +130,6 @@ CUser = (function() {
   CUser.prototype.initButtonEl = function($el) {
     var _this = this;
 
-    this.log('init button el for ' + this.getInfo());
     this.buttonEls = this.buttonEls.add($el);
     $el.data('user', this);
     $el.children(':first').bind('click', function() {

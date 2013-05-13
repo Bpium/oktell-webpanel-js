@@ -400,7 +400,7 @@ do ($)->
 	
 	#includecoffee coffee/class/Department.coffee
 	class Department
-	
+		logGroup: 'Department'
 		constructor: ( id, name )->
 			@usersVisibilityCss = 'invisible'
 			@lastFilteredUsers = []
@@ -525,7 +525,7 @@ do ($)->
 	
 	#includecoffee coffee/class/CUser.coffee
 	class CUser
-	
+		logGroup: 'User'
 		constructor: (data) ->
 			#@log 'create user', data
 			#@id = data.id?.toString().toLowerCase()
@@ -643,7 +643,7 @@ do ($)->
 			return $el
 	
 		initButtonEl: ($el) ->
-			@log 'init button el for ' + @getInfo()
+			#@log 'init button el for ' + @getInfo()
 			@buttonEls = @buttonEls.add $el
 			$el.data 'user', @
 			$el.children(':first').bind 'click', =>
@@ -736,7 +736,7 @@ do ($)->
 					@el.find('.b_capital_letter span').text ''
 	#includecoffee coffee/class/List.coffee
 	class List
-	
+		logGroup: 'List'
 		constructor: (oktell, panelEl, dropdownEl, afterOktellConnect, debugMode) ->
 	
 			@defaultConfig =
@@ -961,7 +961,8 @@ do ($)->
 				@filterInput.val('')
 				@setFilter '', true
 				@setQueue []
-				user.loadActions() for phone,user of @userWithGeneratedButtons
+				for phone,user of @userWithGeneratedButtons
+					user.loadActions()
 	
 	
 			oktell.on 'connect', =>
@@ -1459,6 +1460,7 @@ do ($)->
 	
 	#includecoffee coffee/class/Popup.coffee
 	class Popup
+		logGroup: 'Popup'
 		constructor: (popupEl, oktell)->
 			@el = popupEl
 			@absContainer = @el.find('.b_content')
@@ -1531,15 +1533,32 @@ do ($)->
 	#includecoffee coffee/class/Error.coffee
 
 	class Error
+		logGroup: 'Error'
 		errorTypes:
-			1: 'desktopClient'
-			2: 'errorLoginPass'
-			3: 'errorConnection'
+			1: 'usingOktellClient'
+			2: 'loginPass'
+			3: 'unavailable'
 		constructor: (errorEl, oktell)->
 			@el = errorEl
 	
-		show: (errorType) ->
+			oktell.on 'disconnect', (reason)=>
+				@log 'disconnect with reason ' + reason.code + ' ' + reason.message
+				if reason.code is 12
+					@show 3, oktell.getMyInfo().login
+	
+			oktell.on 'connectError', (error)=>
+				@log 'connect error ' + error.errorCode + ' ' + error.errorMessage
+				switch error.errorCode
+					when 12 then @show 1, oktell.getMyInfo().login
+					when 13 then @show 2, oktell.getMyInfo().login
+	
+		show: (errorType, username) ->
 			if not @errorTypes[errorType] then return false
+			@log 'show ' + errorType
+			type = @errorTypes[errorType]
+			@el.find('p:eq(0)').text @langs[type].header.replace('%username%', username )
+			@el.find('p:eq(1)').text @langs[type].message?.replace('%username%', username ) or ''
+			@el.find('p:eq(3)').text @langs[type].message2?.replace('%username%', username ) or ''
 			@el.fadeIn 200
 	
 		hide: ->
@@ -1561,14 +1580,29 @@ do ($)->
 			panel: { inTalk: 'В разговоре', onHold: 'На удержании', queue: 'Очередь ожидания', inputPlaceholder: 'введите имя или номер', withoutDepartment: 'без отдела' },
 			actions: { call: 'Позвонить', conference: 'Конференция', transfer: 'Перевести', toggle: 'Переключиться', intercom: 'Интерком', endCall: 'Завершить', ghostListen: 'Прослушка', ghostHelp: 'Помощь' }
 			callPopup: { title: 'Входящий вызов', hide: 'Скрыть', answer: 'Ответить', reject: 'Отклонить', undefinedNumber: 'Номер не определен', goPickup: 'Поднимите трубку' }
+			error:
+				usingOktellClient: { header: 'Пользователь «%username%» использует стандартный Oktell-клиент.', message: 'Одновременная работа двух типов клиентских приложений невозможна.', message2: 'Закройте стандартный Oktell-клиент и повторите попытку.' }
+				loginPass: { header: 'Пароль для пользователя «%username%» не подходит.', message: 'Проверьте правильность имени пользователя и пароля.' }
+				unavailable: { header: 'Сервер телефонии Oktell не доступен.', message: 'Убедитесь что сервер телефонии работает и проверьте настройки соединения.'}
+				#tryAgain: 'Повторить попытку'
 		en:
 			panel: { inTalk: 'In conversation', onHold: 'On hold', queue: 'Wait queue', inputPlaceholder: 'Enter name or number', withoutDepartment: 'wihtout department' },
 			actions: { call: 'Dial', conference: 'Conference', transfer: 'Transfer', toggle: 'Switch', intercom: 'Intercom', endCall: 'End', ghostListen: 'Audition', ghostHelp: 'Help' }
 			callPopup: { title: 'Incoming call', hide: 'Hide', answer: 'Answer', reject: 'Decline', undefinedNumber: 'Phone number is not defined', goPickup: 'Pick up the phone' }
+			error:
+				usingOktellClient: { header: 'User «%username%» uses standard Oktell client applications.', message: 'Simultaneous work of two types of client applications is not possible..', message2: 'Close standard Oktell client application and try again.' }
+				loginPass: { header: 'Wrong password for user «%username%».', message: 'Make sure that the username and password are correct.' }
+				unavailable: { header: 'Oktell server is not available.', message: 'Make sure that Oktell server is running and check your connections.'}
+				#tryAgain: 'Try again'
 		cz:
 			panel: { inTalk: 'V rozhovoru', onHold: 'Na hold', queue: 'Fronta čekaní', inputPlaceholder: 'zadejte jméno nebo číslo', withoutDepartment: '!!!!!!!' },
 			actions: { call: 'Zavolat', conference: 'Konference', transfer: 'Převést', toggle: 'Přepnout', intercom: 'Intercom', endCall: 'Ukončit', ghostListen: 'Odposlech', ghostHelp: 'Nápověda' }
 			callPopup: { title: 'Příchozí hovor', hide: 'Schovat', answer: 'Odpovědět', reject: 'Odmítnout', undefinedNumber: '', goPickup: 'Zvedněte sluchátko' }
+			error:
+				usingOktellClient: { header: 'User «%username%» uses standard Oktell client applications.', message: 'Simultaneous work of two types of client applications is not possible..', message2: 'Close standard Oktell client application and try again.' }
+				loginPass: { header: 'Wrong password for user «%username%».', message: 'Make sure that the username and password are correct.' }
+				unavailable: { header: 'Oktell server is not available.', message: 'Make sure that Oktell server is running and check your connections.'}
+				#tryAgain: 'Try again'
 	}
 
 	options = null
@@ -1585,15 +1619,16 @@ do ($)->
 
 	logStr = ''
 
-	log = ->
+	log = (args...)->
 		if not getOptions().debug then return
 		d = new Date()
 		dd =  d.getFullYear() + '-' + (if d.getMonth()<10 then '0' else '') + d.getMonth() + '-' + (if d.getDate()<10 then '0' else '') + d.getDate();
-		t = (if d.getHours()<10 then '0' else '') + d.getHours() + ':' + (if d.getMinutes()<10 then '0' else '')+d.getMinutes() + ':' +  (if d.getSeconds()<10 then '0' else '')+d.getSeconds() + ':' +
-			(d.getMilliseconds() + 1000).toString().substr(1)
+		t = (if d.getHours()<10 then '0' else '') + d.getHours() + ':' + (if d.getMinutes()<10 then '0' else '')+d.getMinutes() + ':' +  (if d.getSeconds()<10 then '0' else '')+d.getSeconds() + ':' +	(d.getMilliseconds() + 1000).toString().substr(1)
 		logStr += dd + ' ' + t + ' | '
-		args = ['Oktell-Panel ' + t + ' |']
-		for val in arguments
+		fnName = 'log'
+		if args[0].toString().toLowerCase() is 'error'
+			fnName = 'error'
+		for val, i in args
 			if typeof val == 'object'
 				try
 					logStr += JSON.stringify(val)
@@ -1602,13 +1637,13 @@ do ($)->
 			else
 				logStr += val
 			logStr += ' | '
-			args.push val
 		logStr += "\n\n"
+		args.unshift 'Oktell-Panel.js ' + t + ' |' + ( if typeof @logGroup is 'string' then ' ' + @logGroup + ' |' else '' )
 		try
-			console.log.apply( console, args || [])
+			console[fnName].apply( console, args || [])
 		catch e
 
-	templates = {'templates/actionButton.html':'<ul class="oktell_button_action"><li class="g_first"><i></i></li><li class="g_last drop_down"><i></i></li></ul>', 'templates/actionList.html':'<ul class="oktell_actions_group_list"><li class="{{css}}" data-action="{{action}}"><i></i><span>{{actionText}}</span></li></ul>', 'templates/user.html':'<tr class="b_contact"><td class="b_contact_avatar {{css}}"><img src="{{avatarLink32x32}}"><i></i><div class="o_busy"></div></td><td class="b_capital_letter"><span></span></td><td class="b_contact_title"><div class="wrapword"><a><b>{{name}}</b><span class="o_number">{{number}}</span></a></div>{{button}}</td></tr>', 'templates/department.html':'<tr class="b_contact"><td class="b_contact_department" colspan="3">{{department}}</td></tr>', 'templates/dep.html':'<div><div class="b_department_header"><span>{{department}}</span></div><table class="b_main_list"><tbody></tbody></table></div>', 'templates/usersTable.html':'<table class="b_main_list"><tbody></tbody></table>', 'templates/panel.html':'<div class="oktell_panel"><div class="i_panel_bookmark"><div class="i_panel_bookmark_bg"></div></div><div class="h_panel_bg"><div class="b_header"><ul class="b_list_filter"><li class="i_group"></li><li class="i_online"></li></ul></div><div class="h_padding"><div class="b_marks i_conference j_abonents"><div class="b_marks_noise"><p class="b_marks_header"><span class="b_marks_label">{{inTalk}}</span><span class="b_marks_time"></span></p><table><tbody></tbody></table></div></div><div class="b_marks i_flash j_hold"><div class="b_marks_noise"><p class="b_marks_header"><span class="b_marks_label">{{onHold}}</span></p><table class="j_table_favorite"><tbody></tbody></table></div></div><div class="b_marks i_flash j_queue"><div class="b_marks_noise"><p class="b_marks_header"><span class="b_marks_label">{{queue}}</span></p><table class="j_table_queue"><tbody></tbody></table></div></div><div class="b_inconversation j_phone_block"><table class="j_table_phone"><tbody></tbody></table></div><div class="b_marks i_phone"><div class="h_shadow_bottom"><div class="h_phone_number_input"><div class="i_phone_state_bg"></div><div class="h_input_padding"><div class="i_phone_popup_button j_keypad_expand"><i></i></div><div class="jInputClear_hover"><input class="b_phone_number_input" type="text" placeholder="{{inputPlaceholder}}"><span class="jInputClear_close">&times;</span></div></div><div class="b_phone_keypad j_phone_keypad"><div class="l_column_group"><div class="h_phone_keypad"><ul class="b_phone_panel"><li class="g_top_left g_first"><button data-num="1" class="g_button m_big">1</button></li><li><button data-num="2" class="g_button m_big">2</button></li><li class="g_top_right g_right"><button data-num="3" class="g_button m_big">3</button></li><li class="g_float_celar g_first"><button data-num="4" class="g_button m_big">4</button></li><li><button data-num="5" class="g_button m_big">5</button></li><li class="g_right"><button data-num="6" class="g_button m_big">6</button></li><li class="g_float_celar g_first"><button data-num="7" class="g_button m_big">7</button></li><li><button data-num="8" class="g_button m_big">8</button></li><li class="g_right"><button data-num="9" class="g_button m_big">9</button></li><li class="g_bottom_left g_float_celar g_first"><button data-num="*" class="g_button m_big">&lowast;</button></li><li class="g_bottom_center"><button data-num="0" class="g_button m_big">0</button></li><li class="g_bottom_right g_right"><button data-num="#" class="g_button m_big">#</button></li></ul></div></div></div></div></div></div><div class="h_main_list j_main_list"></div></div></div></div>', 'templates/callPopup.html':'<div class="oktell_panel_popup" style="display: none"><div class="m_popup_staff"><div class="m_popup_data"><header><div class="h_header_bg"><i class="o_close"></i><h2>{{title}}</h2></div></header><div class="b_content"><div class="b_abonent"><span data-bind="text: name"></span>&nbsp;<span class="g_light" data-bind="textPhone: number"></span></div></div><div class="footer"><div class="b_take_phone"><i></i>&nbsp;<span>{{goPickup}}</span></div><button class="oktell_panel_btn m_big j_close_action">{{hide}}</button><button class="oktell_panel_btn m_big m_button_red j_abort_action"><i></i>{{reject}}</button></div></div></div></div>', 'templates/error.html':'<div class="b_error"><div class="h_padding"><h4>Ошибка</h4><p class="b_error_alert">Пользователь «airato» использует стандартный Oktell-клиент.</p><p class="g_light">Одновременная работа двух типов клиентских приложений невозможна.</p><p class="g_light">Закройте стандартный Oktell-клиент и повторите попытку.</p><p><button class="oktell_panel_btn">Повторить попытку</button></p></div></div>', }
+	templates = {'templates/actionButton.html':'<ul class="oktell_button_action"><li class="g_first"><i></i></li><li class="g_last drop_down"><i></i></li></ul>', 'templates/actionList.html':'<ul class="oktell_actions_group_list"><li class="{{css}}" data-action="{{action}}"><i></i><span>{{actionText}}</span></li></ul>', 'templates/user.html':'<tr class="b_contact"><td class="b_contact_avatar {{css}}"><img src="{{avatarLink32x32}}"><i></i><div class="o_busy"></div></td><td class="b_capital_letter"><span></span></td><td class="b_contact_title"><div class="wrapword"><a><b>{{name}}</b><span class="o_number">{{number}}</span></a></div>{{button}}</td></tr>', 'templates/department.html':'<tr class="b_contact"><td class="b_contact_department" colspan="3">{{department}}</td></tr>', 'templates/dep.html':'<div><div class="b_department_header"><span>{{department}}</span></div><table class="b_main_list"><tbody></tbody></table></div>', 'templates/usersTable.html':'<table class="b_main_list"><tbody></tbody></table>', 'templates/panel.html':'<div class="oktell_panel"><div class="i_panel_bookmark"><div class="i_panel_bookmark_bg"></div></div><div class="h_panel_bg"><div class="b_header"><ul class="b_list_filter"><li class="i_group"></li><li class="i_online"></li></ul></div><div class="h_padding"><div class="b_marks i_conference j_abonents"><div class="b_marks_noise"><p class="b_marks_header"><span class="b_marks_label">{{inTalk}}</span><span class="b_marks_time"></span></p><table><tbody></tbody></table></div></div><div class="b_marks i_flash j_hold"><div class="b_marks_noise"><p class="b_marks_header"><span class="b_marks_label">{{onHold}}</span></p><table class="j_table_favorite"><tbody></tbody></table></div></div><div class="b_marks i_flash j_queue"><div class="b_marks_noise"><p class="b_marks_header"><span class="b_marks_label">{{queue}}</span></p><table class="j_table_queue"><tbody></tbody></table></div></div><div class="b_inconversation j_phone_block"><table class="j_table_phone"><tbody></tbody></table></div><div class="b_marks i_phone"><div class="h_shadow_bottom"><div class="h_phone_number_input"><div class="i_phone_state_bg"></div><div class="h_input_padding"><div class="i_phone_popup_button j_keypad_expand"><i></i></div><div class="jInputClear_hover"><input class="b_phone_number_input" type="text" placeholder="{{inputPlaceholder}}"><span class="jInputClear_close">&times;</span></div></div><div class="b_phone_keypad j_phone_keypad"><div class="l_column_group"><div class="h_phone_keypad"><ul class="b_phone_panel"><li class="g_top_left g_first"><button data-num="1" class="g_button m_big">1</button></li><li><button data-num="2" class="g_button m_big">2</button></li><li class="g_top_right g_right"><button data-num="3" class="g_button m_big">3</button></li><li class="g_float_celar g_first"><button data-num="4" class="g_button m_big">4</button></li><li><button data-num="5" class="g_button m_big">5</button></li><li class="g_right"><button data-num="6" class="g_button m_big">6</button></li><li class="g_float_celar g_first"><button data-num="7" class="g_button m_big">7</button></li><li><button data-num="8" class="g_button m_big">8</button></li><li class="g_right"><button data-num="9" class="g_button m_big">9</button></li><li class="g_bottom_left g_float_celar g_first"><button data-num="*" class="g_button m_big">&lowast;</button></li><li class="g_bottom_center"><button data-num="0" class="g_button m_big">0</button></li><li class="g_bottom_right g_right"><button data-num="#" class="g_button m_big">#</button></li></ul></div></div></div></div></div></div><div class="h_main_list j_main_list"></div></div></div></div>', 'templates/callPopup.html':'<div class="oktell_panel_popup" style="display: none"><div class="m_popup_staff"><div class="m_popup_data"><header><div class="h_header_bg"><i class="o_close"></i><h2>{{title}}</h2></div></header><div class="b_content"><div class="b_abonent"><span data-bind="text: name"></span>&nbsp;<span class="g_light" data-bind="textPhone: number"></span></div></div><div class="footer"><div class="b_take_phone"><i></i>&nbsp;<span>{{goPickup}}</span></div><button class="oktell_panel_btn m_big j_close_action">{{hide}}</button><button class="oktell_panel_btn m_big m_button_red j_abort_action"><i></i>{{reject}}</button></div></div></div></div>', 'templates/error.html':'<div class="b_error" style="display: none"><div class="h_padding"><h4>Ошибка</h4><p class="b_error_alert"></p><p class="g_light"></p><p class="g_light"></p></div></div>', }
 
 	loadTemplate = (path) ->
 		path = path.substr(1) if path[0] is '/'
@@ -1640,6 +1675,7 @@ do ($)->
 	List.prototype.log = log
 	Popup.prototype.log = log
 	Department.prototype.log = log
+	Error.prototype.log = log
 
 	Department.prototype.template = departmentTemplateHtml
 
@@ -1659,6 +1695,7 @@ do ($)->
 			.replace('{{inputPlaceholder}}',langs.panel.inputPlaceholder)
 		List.prototype.langs = langs.actions
 		List.prototype.departmentTemplate = departmentTemplateHtml
+		Error.prototype.langs = langs.error
 		CUser.prototype.langs = langs
 		Department.prototype.langs = langs
 		panelEl = $(panelHtml)
@@ -1688,10 +1725,11 @@ do ($)->
 
 		popup = new Popup popupEl, oktell
 
-		errorEl = $(errorHtml)
-		panelEl.find('.h_panel_bg:first').append errorEl
-		#errorEl.hide()
-		error = new Error errorEl, oktell
+		if not getOptions().withoutError
+			errorEl = $(errorHtml)
+			panelEl.find('.h_panel_bg:first').append errorEl
+			#errorEl.hide()
+			error = new Error errorEl, oktell
 
 		panelPos = getOptions().position
 		animOptShow = {}

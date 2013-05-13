@@ -1,5 +1,5 @@
 class CUser
-
+	logGroup: 'User'
 	constructor: (data) ->
 		#@log 'create user', data
 		#@id = data.id?.toString().toLowerCase()
@@ -117,7 +117,7 @@ class CUser
 		return $el
 
 	initButtonEl: ($el) ->
-		@log 'init button el for ' + @getInfo()
+		#@log 'init button el for ' + @getInfo()
 		@buttonEls = @buttonEls.add $el
 		$el.data 'user', @
 		$el.children(':first').bind 'click', =>

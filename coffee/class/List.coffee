@@ -1,5 +1,5 @@
 class List
-
+	logGroup: 'List'
 	constructor: (oktell, panelEl, dropdownEl, afterOktellConnect, debugMode) ->
 
 		@defaultConfig =
@@ -224,7 +224,8 @@ class List
 			@filterInput.val('')
 			@setFilter '', true
 			@setQueue []
-			user.loadActions() for phone,user of @userWithGeneratedButtons
+			for phone,user of @userWithGeneratedButtons
+				user.loadActions()
 
 
 		oktell.on 'connect', =>
