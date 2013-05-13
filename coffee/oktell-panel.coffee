@@ -153,9 +153,6 @@ do ($)->
 			.replace('{{hide}}', langs.callPopup.hide)
 			.replace('{{reject}}', langs.callPopup.reject)
 
-		popupEl = $(popupHtml)
-		$('body').append(popupEl)
-
 		$user = $(userTemplateHtml)
 		$userActionButton = $(actionButtonHtml)
 		oldBinding = $userActionButton.attr 'data-bind'
@@ -168,7 +165,10 @@ do ($)->
 		oktell = getOptions().oktell
 		CUser.prototype.formatPhone = oktell.formatPhone
 
-		popup = new Popup popupEl, oktell
+		if not getOptions().withoutCallPopup
+			popupEl = $(popupHtml)
+			$('body').append(popupEl)
+			popup = new Popup popupEl, oktell
 
 		if not getOptions().withoutError
 			errorEl = $(errorHtml)

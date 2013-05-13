@@ -250,8 +250,6 @@ var __slice = [].slice;
       panelEl.addClass('noavatar');
     }
     popupHtml = popupHtml.replace('{{title}}', langs.callPopup.title).replace('{{goPickup}}', langs.callPopup.goPickup).replace('{{hide}}', langs.callPopup.hide).replace('{{reject}}', langs.callPopup.reject);
-    popupEl = $(popupHtml);
-    $('body').append(popupEl);
     $user = $(userTemplateHtml);
     $userActionButton = $(actionButtonHtml);
     oldBinding = $userActionButton.attr('data-bind');
@@ -261,7 +259,11 @@ var __slice = [].slice;
     $('body').append(actionListEl);
     oktell = getOptions().oktell;
     CUser.prototype.formatPhone = oktell.formatPhone;
-    popup = new Popup(popupEl, oktell);
+    if (!getOptions().withoutCallPopup) {
+      popupEl = $(popupHtml);
+      $('body').append(popupEl);
+      popup = new Popup(popupEl, oktell);
+    }
     if (!getOptions().withoutError) {
       errorEl = $(errorHtml);
       panelEl.find('.h_panel_bg:first').append(errorEl);

@@ -5,7 +5,7 @@ Department = (function() {
   Department.prototype.logGroup = 'Department';
 
   function Department(id, name) {
-    this.usersVisibilityCss = 'invisible';
+    this.usersVisibilityCss = 'invisibleDep';
     this.lastFilteredUsers = [];
     this.isSorted = false;
     this.visible = true;
