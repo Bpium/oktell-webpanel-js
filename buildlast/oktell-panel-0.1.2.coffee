@@ -527,17 +527,7 @@ do ($)->
 	class CUser
 		logGroup: 'User'
 		constructor: (data) ->
-			#@log 'create user', data
-			#@id = data.id?.toString().toLowerCase()
-			#@isFantom = data.isFantom or false
-			#@number = data.number?.toString() or ''
-			#@numberFormatted = data.numberFormatted?.toString() or @number
-			#@numberHtml = escapeHtml @numberFormatted
-			#@name = data.name
-			#@nameHtml = if data.name then escapeHtml(data.name) else @numberHtml
 			@state = false
-			#@avatarLink32x32 = data.avatarLink32x32 or @defaultAvatar32 or ''
-			#@defaultAvatarCss = if @avatarLink32x32 then '' else 'm_default'
 			@hasHover = false
 			@buttonLastAction = ''
 			@firstLiCssPrefix = 'm_button_action_'
@@ -623,22 +613,6 @@ do ($)->
 	
 			return false
 	
-<<<<<<< HEAD
-		getEl: ->
-			str = @template.replace( @regexps.name, @nameHtml)
-				.replace( @regexps.number, if @numberHtml isnt @nameHtml then @numberHtml else '' )
-				.replace( @regexps.avatarLink32x32, @avatarLink32x32)
-				.replace( @regexps.css, @defaultAvatarCss )
-			$el = $(str)
-			@els = @els.add $el
-			@setStateCss()
-			$el.data 'user', @
-			$el.bind 'mouseenter', =>
-				@isHovered true
-			$el.bind 'mouseleave', =>
-				@isHovered false
-			@initButtonEl $el.find '.oktell_button_action'
-=======
 		showLetter: (show)->
 			@el?.find('.b_capital_letter span').text if show then @letter else ''
 	
@@ -656,7 +630,6 @@ do ($)->
 				if not @el
 					@el = $el
 			$el = $el or @el
->>>>>>> develop
 			return $el
 	
 		initButtonEl: ($el) ->
@@ -677,7 +650,7 @@ do ($)->
 			if @hasHover is isHovered then return
 			@hasHover = isHovered
 			if @hasHover
-				@loadActions()
+				@loadActions(true)
 	
 		loadOktellActions: ->
 			actions = @oktell.getPhoneActions @id or @number
@@ -751,6 +724,7 @@ do ($)->
 					@el.find('.b_capital_letter span').text @letter
 				else
 					@el.find('.b_capital_letter span').text ''
+	
 	#includecoffee coffee/class/List.coffee
 	class List
 		logGroup: 'List'
@@ -891,14 +865,9 @@ do ($)->
 					debouncedSetFilter()
 				return true
 	
-<<<<<<< HEAD
-	#		@panelEl.bind 'mouseenter', (e)->
-	#			$(this).data('user')?.isHovered true
-=======
 	#		@panelEl.bind 'mouseenter', (e)=>
 	#			#$(this).data('user')?.isHovered true
 	#			#@log 'Mouse enter to ' + e.target
->>>>>>> develop
 	#		@panelEl.bind 'mouseleave', ->
 	#			$(this).data('user')?.isHovered false
 	
@@ -1048,6 +1017,7 @@ do ($)->
 					@reloadActions()
 	
 				oktell.onNativeEvent 'pbxnumberstatechanged', (data) =>
+	
 					for n in data.numbers
 						numStr = n.num.toString()
 						user = @usersByNumber[numStr]
@@ -1099,11 +1069,6 @@ do ($)->
 	
 							@log 'end user state change'
 							@log ''
-	
-	
-	
-	
-	
 	
 	
 				oktell.on 'abonentsChange', ( abonents ) =>
@@ -1286,17 +1251,12 @@ do ($)->
 			lastDepId = null
 			prevLetter = ''
 			for u in usersArray
-<<<<<<< HEAD
-				#@log 'render ' + u.getInfo()
-				html.push u.getEl()
-=======
 				#log 'render ' + u.getInfo()
 				html.push u.getEl useIndependentCopies
 				#html = html.add u.getEl useIndependentCopies
 				u.showLetter if prevLetter isnt u.letter then true else false
 				prevLetter = u.letter
 			$el.children().detach()
->>>>>>> develop
 			$el.html html
 	
 	#	sortPanelUsers: ( usersArray ) ->
@@ -1511,35 +1471,13 @@ do ($)->
 			@el.find('i.o_close').bind 'click', =>
 				@hide()
 	
-			oktell.on 'phoneRegistered', =>
-				@answerButtonVisible true
-	
-			oktell.on 'phoneUnregistered', =>
-				@answerButtonVisible false
-	
-			oktell.on 'phoneRingStart', (abonents) =>
-				@log 'OKTELL phoneRingStart', abonents
+			oktell.on 'ringStart', (abonents) =>
 				@setAbonents abonents
+				@answerButtonVisible oktell.webphoneIsActive()
 				@show()
 	
-			oktell.on 'phoneCallStart', (abonents) =>
-				@log 'OKTELL phoneCallStart', abonents
-				@hide()
-			oktell.on 'phoneTalkStart', (abonents) =>
-				@log 'OKTELL phoneTalkStart', abonents
-				@hide()
-			oktell.on 'phoneSessionStop', (abonents) =>
-				@log 'OKTELL phoneSessionStop', abonents
-				@hide()
-	
-			oktell.on 'ringStart', (abonents) =>
-				if not @answerActive
-					@setAbonents abonents
-					@show()
-	
 			oktell.on 'ringStop', =>
-				if not @answerActive
-					@hide()
+				@hide()
 	
 	
 	
@@ -1560,7 +1498,6 @@ do ($)->
 				el.find('span:first').text(name)
 				el.find('span:last').text(phone)
 				@absContainer.append el
-<<<<<<< HEAD
 	
 		answerButtonVisible: (val) ->
 			if val
@@ -1571,11 +1508,35 @@ do ($)->
 				@answerActive = false
 				@answerButttonEl.hide()
 				@puckupEl.show()
+			@answerActive
 	
 		setCallbacks: (onAnswer, onTerminate) ->
 			@onAnswer = onAnswer
 			@onTerminate = onTerminate
-=======
+	
+	#includecoffee coffee/class/PermissionsPopup.coffee
+	class PermissionsPopup
+		constructor: (popupEl, oktell)->
+			@el = popupEl
+			oktell.on 'mediaPermissionsRequest', (abonents) =>
+				@show()
+	
+			oktell.on 'mediaPermissionsAccept', =>
+				@hide()
+	
+			oktell.on 'mediaPermissionsRefuse', =>
+				oktell.endCall();
+				@hide()
+	
+	
+	
+		show: ->
+			@log 'Permissions Popup show!'
+			@el.fadeIn 200
+	
+		hide: ->
+			@el.fadeOut 200
+	
 	#includecoffee coffee/class/Error.coffee
 
 	class Error
@@ -1610,7 +1571,6 @@ do ($)->
 		hide: ->
 			@el.fadeOut 200
 	
->>>>>>> develop
 	
 	defaultOptions =
 		position: 'right'
@@ -1620,11 +1580,7 @@ do ($)->
 		#buttonCss: 'oktellActionButton'
 		debug: false
 		lang: 'ru'
-<<<<<<< HEAD
-		jsSIPUA: false
-=======
 		noavatar: true
->>>>>>> develop
 
 	langs = {
 		ru:
@@ -1663,28 +1619,14 @@ do ($)->
 	afterOktellConnect = null
 	list = null
 	popup = null
-<<<<<<< HEAD
-	jssipUA = null
-=======
+	permissionsPopup = null
 	error = null
->>>>>>> develop
 
 	getOptions = ->
 		options or defaultOptions
 
 	logStr = ''
 
-<<<<<<< HEAD
-	log = ->
-		if not getOptions().debug then enerated buttonreturn
-		d = new Date()
-		dd =  d.getFullYear() + '-' + (if d.getMonth()<10 then '0' else '') + d.getMonth() + '-' + (if d.getDate()<10 then '0' else '') + d.getDate();
-		t = (if d.getHours()<10 then '0' else '') + d.getHours() + ':' + (if d.getMinutes()<10 then '0' else '')+d.getMinutes() + ':' +  (if d.getSeconds()<10 then '0' else '')+d.getSeconds() + ':' +
-			(d.getMilliseconds() + 1000).toString().substr(1)
-		logStr += dd + ' ' + t + ' | '
-		args = ['Oktell-Panel ' + t + ' |']
-		for val in arguments
-=======
 	log = (args...)->
 		if not getOptions().debug then return
 		d = new Date()
@@ -1695,7 +1637,6 @@ do ($)->
 		if args[0].toString().toLowerCase() is 'error'
 			fnName = 'error'
 		for val, i in args
->>>>>>> develop
 			if typeof val == 'object'
 				try
 					logStr += JSON.stringify(val)
@@ -1704,23 +1645,13 @@ do ($)->
 			else
 				logStr += val
 			logStr += ' | '
-<<<<<<< HEAD
-			args.push val
-		logStr += "\n\n"
-		try
-			console.log.apply( console, args || [])
-		catch e
-
-	templates = {'templates/actionButton.html':'<ul class="oktell_button_action"><li class="g_first"><i></i></li><li class="g_last drop_down"><i></i></li></ul>', 'templates/actionList.html':'<ul class="oktell_actions_group_list"><li class="{{css}}" data-action="{{action}}"><i></i><span>{{actionText}}</span></li></ul>', 'templates/user.html':'<tr class="b_contact"><td class="b_contact_avatar {{css}}"><img src="{{avatarLink32x32}}"><i></i><div class="o_busy"></div></td><td class="b_contact_title"><div class="wrapword"><a><b>{{name}}</b><span class="o_number">{{number}}</span></a></div>{{button}}</td></tr>', 'templates/panel.html':'<div class="oktell_panel"><div class="i_panel_bookmark"><div class="i_panel_bookmark_bg"></div></div><div class="h_panel_bg"><div class="h_padding"><div class="b_marks i_conference j_abonents"><div class="b_marks_noise"><p class="b_marks_header"><span class="b_marks_label">{{inTalk}}</span><span class="b_marks_time"></span></p><table><tbody></tbody></table></div></div><div class="b_marks i_flash j_hold"><div class="b_marks_noise"><p class="b_marks_header"><span class="b_marks_label">{{onHold}}</span></p><table class="j_table_favorite"><tbody></tbody></table></div></div><div class="b_marks i_flash j_queue"><div class="b_marks_noise"><p class="b_marks_header"><span class="b_marks_label">{{queue}}</span></p><table class="j_table_queue"><tbody></tbody></table></div></div><div class="b_inconversation j_phone_block"><table class="j_table_phone"><tbody></tbody></table></div><div class="b_marks i_phone"><div class="h_shadow_bottom"><div class="h_phone_number_input"><div class="i_phone_state_bg"></div><div class="h_input_padding"><div class="i_phone_popup_button j_keypad_expand"><i></i></div><div class="jInputClear_hover"><input class="b_phone_number_input" type="text" placeholder="{{inputPlaceholder}}"><span class="jInputClear_close">&times;</span></div></div><div class="b_phone_keypad j_phone_keypad"><div class="l_column_group"><div class="h_phone_keypad"><ul class="b_phone_panel"><li class="g_top_left g_first"><button data-num="1" class="g_button m_big">1</button></li><li><button data-num="2" class="g_button m_big">2</button></li><li class="g_top_right g_right"><button data-num="3" class="g_button m_big">3</button></li><li class="g_float_celar g_first"><button data-num="4" class="g_button m_big">4</button></li><li><button data-num="5" class="g_button m_big">5</button></li><li class="g_right"><button data-num="6" class="g_button m_big">6</button></li><li class="g_float_celar g_first"><button data-num="7" class="g_button m_big">7</button></li><li><button data-num="8" class="g_button m_big">8</button></li><li class="g_right"><button data-num="9" class="g_button m_big">9</button></li><li class="g_bottom_left g_float_celar g_first"><button data-num="*" class="g_button m_big">&lowast;</button></li><li class="g_bottom_center"><button data-num="0" class="g_button m_big">0</button></li><li class="g_bottom_right g_right"><button data-num="#" class="g_button m_big">#</button></li></ul></div></div></div></div></div></div><div class="h_main_list j_main_list"><table class="b_main_list"><tbody></tbody></table></div></div></div></div>', 'templates/callPopup.html':'<div class="oktell_panel_popup" style="display: none"><div class="m_popup_staff"><div class="m_popup_data"><header><div class="h_header_bg"><i class="o_close"></i><h2>Входящий вызов</h2></div></header><div class="b_content"><div class="b_abonent"><span data-bind="text: name"></span>&nbsp;<span class="g_light" data-bind="textPhone: number"></span></div></div><div class="footer"><div class="b_take_phone j_pickup"><i></i>&nbsp;<span>Поднимите трубку</span></div><button class="oktell_panel_btn m_big m_button_green j_answer" style="margin-right: 20px; float: left"><i style="background: url(\'/img/icons/action/white/call.png\') no-repeat; vertical-align: -2px"></i>ответить</button><button class="oktell_panel_btn m_big j_close_action">Скрыть</button><button class="oktell_panel_btn m_big m_button_red j_abort_action"><i></i>Отклонить</button></div></div></div></div>', }
-=======
 		logStr += "\n\n"
 		args.unshift 'Oktell-Panel.js ' + t + ' |' + ( if typeof @logGroup is 'string' then ' ' + @logGroup + ' |' else '' )
 		try
 			console[fnName].apply( console, args || [])
 		catch e
 
-	templates = {'templates/actionButton.html':'<ul class="oktell_button_action"><li class="g_first"><i></i></li><li class="g_last drop_down"><i></i></li></ul>', 'templates/actionList.html':'<ul class="oktell_actions_group_list"><li class="{{css}}" data-action="{{action}}"><i></i><span>{{actionText}}</span></li></ul>', 'templates/user.html':'<tr class="b_contact"><td class="b_contact_avatar {{css}}"><img src="{{avatarLink32x32}}"><i></i><div class="o_busy"></div></td><td class="b_capital_letter"><span></span></td><td class="b_contact_title"><div class="wrapword"><a><b>{{name}}</b><span class="o_number">{{number}}</span></a></div>{{button}}</td></tr>', 'templates/department.html':'<tr class="b_contact"><td class="b_contact_department" colspan="3">{{department}}</td></tr>', 'templates/dep.html':'<div><div class="b_department_header"><span>{{department}}</span></div><table class="b_main_list"><tbody></tbody></table></div>', 'templates/usersTable.html':'<table class="b_main_list"><tbody></tbody></table>', 'templates/panel.html':'<div class="oktell_panel"><div class="i_panel_bookmark"><div class="i_panel_bookmark_bg"></div></div><div class="h_panel_bg"><div class="b_header"><ul class="b_list_filter"><li class="i_group"></li><li class="i_online"></li></ul></div><div class="h_padding"><div class="b_marks i_conference j_abonents"><div class="b_marks_noise"><p class="b_marks_header"><span class="b_marks_label">{{inTalk}}</span><span class="b_marks_time"></span></p><table><tbody></tbody></table></div></div><div class="b_marks i_flash j_hold"><div class="b_marks_noise"><p class="b_marks_header"><span class="b_marks_label">{{onHold}}</span></p><table class="j_table_favorite"><tbody></tbody></table></div></div><div class="b_marks i_flash j_queue"><div class="b_marks_noise"><p class="b_marks_header"><span class="b_marks_label">{{queue}}</span></p><table class="j_table_queue"><tbody></tbody></table></div></div><div class="b_inconversation j_phone_block"><table class="j_table_phone"><tbody></tbody></table></div><div class="b_marks i_phone"><div class="h_shadow_bottom"><div class="h_phone_number_input"><div class="i_phone_state_bg"></div><div class="h_input_padding"><div class="i_phone_popup_button j_keypad_expand"><i></i></div><div class="jInputClear_hover"><input class="b_phone_number_input" type="text" placeholder="{{inputPlaceholder}}"><span class="jInputClear_close">&times;</span></div></div><div class="b_phone_keypad j_phone_keypad"><div class="l_column_group"><div class="h_phone_keypad"><ul class="b_phone_panel"><li class="g_top_left g_first"><button data-num="1" class="g_button m_big">1</button></li><li><button data-num="2" class="g_button m_big">2</button></li><li class="g_top_right g_right"><button data-num="3" class="g_button m_big">3</button></li><li class="g_float_celar g_first"><button data-num="4" class="g_button m_big">4</button></li><li><button data-num="5" class="g_button m_big">5</button></li><li class="g_right"><button data-num="6" class="g_button m_big">6</button></li><li class="g_float_celar g_first"><button data-num="7" class="g_button m_big">7</button></li><li><button data-num="8" class="g_button m_big">8</button></li><li class="g_right"><button data-num="9" class="g_button m_big">9</button></li><li class="g_bottom_left g_float_celar g_first"><button data-num="*" class="g_button m_big">&lowast;</button></li><li class="g_bottom_center"><button data-num="0" class="g_button m_big">0</button></li><li class="g_bottom_right g_right"><button data-num="#" class="g_button m_big">#</button></li></ul></div></div></div></div></div></div><div class="h_main_list j_main_list"></div></div></div></div>', 'templates/callPopup.html':'<div class="oktell_panel_popup" style="display: none"><div class="m_popup_staff"><div class="m_popup_data"><header><div class="h_header_bg"><i class="o_close"></i><h2>{{title}}</h2></div></header><div class="b_content"><div class="b_abonent"><span data-bind="text: name"></span>&nbsp;<span class="g_light" data-bind="textPhone: number"></span></div></div><div class="footer"><div class="b_take_phone"><i></i>&nbsp;<span>{{goPickup}}</span></div><button class="oktell_panel_btn m_big j_close_action">{{hide}}</button><button class="oktell_panel_btn m_big m_button_red j_abort_action"><i></i>{{reject}}</button></div></div></div></div>', 'templates/error.html':'<div class="b_error" style="display: none"><div class="h_padding"><h4>Ошибка</h4><p class="b_error_alert"></p><p class="g_light"></p><p class="g_light"></p></div></div>', }
->>>>>>> develop
+	templates = {'templates/actionButton.html':'<ul class="oktell_button_action"><li class="g_first"><i></i></li><li class="g_last drop_down"><i></i></li></ul>', 'templates/actionList.html':'<ul class="oktell_actions_group_list"><li class="{{css}}" data-action="{{action}}"><i></i><span>{{actionText}}</span></li></ul>', 'templates/user.html':'<tr class="b_contact"><td class="b_contact_avatar {{css}}"><img src="{{avatarLink32x32}}"><i></i><div class="o_busy"></div></td><td class="b_capital_letter"><span></span></td><td class="b_contact_title"><div class="wrapword"><a><b>{{name}}</b><span class="o_number">{{number}}</span></a></div>{{button}}</td></tr>', 'templates/department.html':'<tr class="b_contact"><td class="b_contact_department" colspan="3">{{department}}</td></tr>', 'templates/dep.html':'<div><div class="b_department_header"><span>{{department}}</span></div><table class="b_main_list"><tbody></tbody></table></div>', 'templates/usersTable.html':'<table class="b_main_list"><tbody></tbody></table>', 'templates/panel.html':'<div class="oktell_panel"><div class="i_panel_bookmark"><div class="i_panel_bookmark_bg"></div></div><div class="h_panel_bg"><div class="b_header"><ul class="b_list_filter"><li class="i_group"></li><li class="i_online"></li></ul></div><div class="h_padding"><div class="b_marks i_conference j_abonents"><div class="b_marks_noise"><p class="b_marks_header"><span class="b_marks_label">{{inTalk}}</span><span class="b_marks_time"></span></p><table><tbody></tbody></table></div></div><div class="b_marks i_flash j_hold"><div class="b_marks_noise"><p class="b_marks_header"><span class="b_marks_label">{{onHold}}</span></p><table class="j_table_favorite"><tbody></tbody></table></div></div><div class="b_marks i_flash j_queue"><div class="b_marks_noise"><p class="b_marks_header"><span class="b_marks_label">{{queue}}</span></p><table class="j_table_queue"><tbody></tbody></table></div></div><div class="b_inconversation j_phone_block"><table class="j_table_phone"><tbody></tbody></table></div><div class="b_marks i_phone"><div class="h_shadow_bottom"><div class="h_phone_number_input"><div class="i_phone_state_bg"></div><div class="h_input_padding"><div class="i_phone_popup_button j_keypad_expand"><i></i></div><div class="jInputClear_hover"><input class="b_phone_number_input" type="text" placeholder="{{inputPlaceholder}}"><span class="jInputClear_close">&times;</span></div></div><div class="b_phone_keypad j_phone_keypad"><div class="l_column_group"><div class="h_phone_keypad"><ul class="b_phone_panel"><li class="g_top_left g_first"><button data-num="1" class="g_button m_big">1</button></li><li><button data-num="2" class="g_button m_big">2</button></li><li class="g_top_right g_right"><button data-num="3" class="g_button m_big">3</button></li><li class="g_float_celar g_first"><button data-num="4" class="g_button m_big">4</button></li><li><button data-num="5" class="g_button m_big">5</button></li><li class="g_right"><button data-num="6" class="g_button m_big">6</button></li><li class="g_float_celar g_first"><button data-num="7" class="g_button m_big">7</button></li><li><button data-num="8" class="g_button m_big">8</button></li><li class="g_right"><button data-num="9" class="g_button m_big">9</button></li><li class="g_bottom_left g_float_celar g_first"><button data-num="*" class="g_button m_big">&lowast;</button></li><li class="g_bottom_center"><button data-num="0" class="g_button m_big">0</button></li><li class="g_bottom_right g_right"><button data-num="#" class="g_button m_big">#</button></li></ul></div></div></div></div></div></div><div class="h_main_list j_main_list"></div></div></div></div>', 'templates/callPopup.html':'<div class="oktell_panel_popup" style="display: none"><div class="m_popup_staff"><div class="m_popup_data"><header><div class="h_header_bg"><i class="o_close"></i><h2>{{title}}</h2></div></header><div class="b_content"><div class="b_abonent"><span data-bind="text: name"></span>&nbsp;<span class="g_light" data-bind="textPhone: number"></span></div></div><div class="footer"><div class="b_take_phone j_pickup"><i></i>&nbsp;<span>{{goPickup}}</span></div><button class="oktell_panel_btn m_big m_button_green j_answer" style="margin-right: 20px; float: left"><i style="background: url(\'/img/icons/action/white/call.png\') no-repeat; vertical-align: -2px"></i>Ответить</button><button class="oktell_panel_btn m_big j_close_action">{{hide}}</button><button class="oktell_panel_btn m_big m_button_red j_abort_action"><i></i>{{reject}}</button></div></div></div></div>', 'templates/permissionsPopup.html':'<div class="oktell_panel_popup" style="display: none"><div class="m_popup_staff"><div class="m_popup_data"><header><div class="h_header_bg"><h2>Запрос на доступ до микрофона</h2></div></header><div class="b_content"><p>Для использования веб-телефона необходимо разрешить доступ до микрофона.</p></div></div></div></div>', 'templates/error.html':'<div class="b_error" style="display: none"><div class="h_padding"><h4>Ошибка</h4><p class="b_error_alert"></p><p class="g_light"></p><p class="g_light"></p></div></div>', }
 
 	loadTemplate = (path) ->
 		path = path.substr(1) if path[0] is '/'
@@ -1742,6 +1673,7 @@ do ($)->
 	usersTableHtml = loadTemplate '/templates/usersTable.html'
 	panelHtml = loadTemplate '/templates/panel.html'
 	popupHtml = loadTemplate '/templates/callPopup.html'
+	permissionsPopupHtml = loadTemplate '/templates/permissionsPopup.html'
 	errorHtml = loadTemplate '/templates/error.html'
 
 	List.prototype.jScroll = jScroll
@@ -1751,33 +1683,13 @@ do ($)->
 	CUser.prototype.log = log
 	List.prototype.log = log
 	Popup.prototype.log = log
-<<<<<<< HEAD
-=======
+	PermissionsPopup.prototype.log = log
 	Department.prototype.log = log
 	Error.prototype.log = log
 
 	Department.prototype.template = departmentTemplateHtml
->>>>>>> develop
 
 	panelWasInitialized = false
-
-	onJsSIPNewSession = (e) ->
-		log 'onJsSIPNewSession ', e
-		if e?.data?.originator is "remote" and popup?
-			popup.answerButtonVisible true
-			popup.setCallbacks ->
-				e.data.session.answer()
-			, ->
-				e.data.session.terminate()
-			popup.show()
-
-	initJsSIP = (ua) ->
-		if jssipUA
-			jssipUA.off 'newSession', onJsSIPNewSession
-
-		if ua
-			jssipUA = ua
-			jssipUA.on 'newSession', onJsSIPNewSession
 
 	initPanel = (opts)->
 		panelWasInitialized = true
@@ -1801,11 +1713,6 @@ do ($)->
 		if getOptions().noavatar
 			panelEl.addClass('noavatar')
 
-		popupHtml = popupHtml.replace('{{title}}', langs.callPopup.title)
-			.replace('{{goPickup}}', langs.callPopup.goPickup)
-			.replace('{{hide}}', langs.callPopup.hide)
-			.replace('{{reject}}', langs.callPopup.reject)
-
 		$user = $(userTemplateHtml)
 		$userActionButton = $(actionButtonHtml)
 		oldBinding = $userActionButton.attr 'data-bind'
@@ -1819,9 +1726,20 @@ do ($)->
 		CUser.prototype.formatPhone = oktell.formatPhone
 
 		if not getOptions().withoutCallPopup
+			popupHtml = popupHtml.replace('{{title}}', langs.callPopup.title)
+				.replace('{{goPickup}}', langs.callPopup.goPickup)
+				.replace('{{hide}}', langs.callPopup.hide)
+				.replace('{{reject}}', langs.callPopup.reject)
+
 			popupEl = $(popupHtml)
 			$('body').append(popupEl)
 			popup = new Popup popupEl, oktell
+
+		# TODO перевести пермишнз попап
+		if not getOptions().withoutPermissionsPopup
+			permissionsPopupEl = $(permissionsPopupHtml)
+			$('body').append(permissionsPopupEl)
+			permissionsPopup = new PermissionsPopup permissionsPopupEl, oktell
 
 		if not getOptions().withoutError
 			errorEl = $(errorHtml)
@@ -1964,8 +1882,6 @@ do ($)->
 				element.animate animOptHide, 100, "swing", ->
 					element.removeClass(openClass).addClass(closeClass)
 
-		initJsSIP getOptions().jsSIPUA
-
 
 	afterOktellConnect = ->
 		oktellConnected = true
@@ -1989,9 +1905,6 @@ do ($)->
 		if typeof arg is 'string'
 			if panelWasInitialized
 				initActionButtons(arg)
-			if arg?.jsSIPUA
-				initJsSIP arg.jsSIPUA
-
 		else if not panelWasInitialized
 			initPanel(arg)
 
