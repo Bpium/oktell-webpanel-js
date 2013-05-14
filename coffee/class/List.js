@@ -696,6 +696,7 @@ List = (function() {
     this.filter = filter;
     exactMatch = false;
     this.timer();
+    this.panelUsersFiltered = [];
     allDeps = [];
     renderDep = function(dep) {
       var depExactMatch, el, users, _ref;
@@ -703,6 +704,7 @@ List = (function() {
       el = dep.getEl(filter !== '');
       depExactMatch = false;
       _ref = dep.getUsers(filter, _this.showOffline), users = _ref[0], depExactMatch = _ref[1];
+      _this.panelUsersFiltered = _this.panelUsersFiltered.concat(users);
       if (users.length !== 0) {
         if (!exactMatch) {
           exactMatch = depExactMatch;

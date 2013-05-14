@@ -1305,12 +1305,14 @@ do ($)->
 			@filter = filter
 			exactMatch = false
 			@timer()
+			@panelUsersFiltered = []
 	
 			allDeps = []
 			renderDep = (dep) =>
 				el = dep.getEl filter isnt ''
 				depExactMatch = false
 				[ users, depExactMatch ] = dep.getUsers filter, @showOffline
+				@panelUsersFiltered = @panelUsersFiltered.concat users
 				if users.length isnt 0
 					if not exactMatch then exactMatch = depExactMatch
 					@_setUsersHtml users, dep.getContainer()
