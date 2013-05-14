@@ -503,7 +503,9 @@ JsSIPAccount = (function(_super) {
 
 })(Account);
 
-OktellVoice = {};
+OktellVoice = {
+  isOktellVoice: true
+};
 
 extend(OktellVoice, events);
 

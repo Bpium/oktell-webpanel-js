@@ -2,6 +2,8 @@
 var Popup;
 
 Popup = (function() {
+  Popup.prototype.logGroup = 'Popup';
+
   function Popup(popupEl, oktell) {
     var _this = this;
 

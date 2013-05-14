@@ -4,10 +4,12 @@ do ($)->
 
 	#includecoffee coffee/utils.coffee
 	#includecoffee coffee/jScroll.coffee
+	#includecoffee coffee/class/Department.coffee
 	#includecoffee coffee/class/CUser.coffee
 	#includecoffee coffee/class/List.coffee
 	#includecoffee coffee/class/Popup.coffee
 	#includecoffee coffee/class/PermissionsPopup.coffee
+	#includecoffee coffee/class/Error.coffee
 
 	defaultOptions =
 		position: 'right'
@@ -17,18 +19,36 @@ do ($)->
 		#buttonCss: 'oktellActionButton'
 		debug: false
 		lang: 'ru'
-		jsSIPUA: false
+		noavatar: true
 
 	langs = {
 		ru:
-			panel: { inTalk: 'В разговоре', onHold: 'На удержании', queue: 'Очередь ожидания', inputPlaceholder: 'введите имя или номер' },
+			panel: { inTalk: 'В разговоре', onHold: 'На удержании', queue: 'Очередь ожидания', inputPlaceholder: 'введите имя или номер', withoutDepartment: 'без отдела' },
 			actions: { call: 'Позвонить', conference: 'Конференция', transfer: 'Перевести', toggle: 'Переключиться', intercom: 'Интерком', endCall: 'Завершить', ghostListen: 'Прослушка', ghostHelp: 'Помощь' }
+			callPopup: { title: 'Входящий вызов', hide: 'Скрыть', answer: 'Ответить', reject: 'Отклонить', undefinedNumber: 'Номер не определен', goPickup: 'Поднимите трубку' }
+			error:
+				usingOktellClient: { header: 'Пользователь «%username%» использует стандартный Oktell-клиент.', message: 'Одновременная работа двух типов клиентских приложений невозможна.', message2: 'Закройте стандартный Oktell-клиент и повторите попытку.' }
+				loginPass: { header: 'Пароль для пользователя «%username%» не подходит.', message: 'Проверьте правильность имени пользователя и пароля.' }
+				unavailable: { header: 'Сервер телефонии Oktell не доступен.', message: 'Убедитесь что сервер телефонии работает и проверьте настройки соединения.'}
+				#tryAgain: 'Повторить попытку'
 		en:
-			panel: { inTalk: 'In conversation', onHold: 'On hold', queue: 'Wait queue', inputPlaceholder: 'Enter name or number' },
+			panel: { inTalk: 'In conversation', onHold: 'On hold', queue: 'Wait queue', inputPlaceholder: 'Enter name or number', withoutDepartment: 'wihtout department' },
 			actions: { call: 'Dial', conference: 'Conference', transfer: 'Transfer', toggle: 'Switch', intercom: 'Intercom', endCall: 'End', ghostListen: 'Audition', ghostHelp: 'Help' }
+			callPopup: { title: 'Incoming call', hide: 'Hide', answer: 'Answer', reject: 'Decline', undefinedNumber: 'Phone number is not defined', goPickup: 'Pick up the phone' }
+			error:
+				usingOktellClient: { header: 'User «%username%» uses standard Oktell client applications.', message: 'Simultaneous work of two types of client applications is not possible..', message2: 'Close standard Oktell client application and try again.' }
+				loginPass: { header: 'Wrong password for user «%username%».', message: 'Make sure that the username and password are correct.' }
+				unavailable: { header: 'Oktell server is not available.', message: 'Make sure that Oktell server is running and check your connections.'}
+				#tryAgain: 'Try again'
 		cz:
-			panel: { inTalk: 'V rozhovoru', onHold: 'Na hold', queue: 'Fronta čekaní', inputPlaceholder: 'zadejte jméno nebo číslo' },
+			panel: { inTalk: 'V rozhovoru', onHold: 'Na hold', queue: 'Fronta čekaní', inputPlaceholder: 'zadejte jméno nebo číslo', withoutDepartment: '!!!!!!!' },
 			actions: { call: 'Zavolat', conference: 'Konference', transfer: 'Převést', toggle: 'Přepnout', intercom: 'Intercom', endCall: 'Ukončit', ghostListen: 'Odposlech', ghostHelp: 'Nápověda' }
+			callPopup: { title: 'Příchozí hovor', hide: 'Schovat', answer: 'Odpovědět', reject: 'Odmítnout', undefinedNumber: '', goPickup: 'Zvedněte sluchátko' }
+			error:
+				usingOktellClient: { header: 'User «%username%» uses standard Oktell client applications.', message: 'Simultaneous work of two types of client applications is not possible..', message2: 'Close standard Oktell client application and try again.' }
+				loginPass: { header: 'Wrong password for user «%username%».', message: 'Make sure that the username and password are correct.' }
+				unavailable: { header: 'Oktell server is not available.', message: 'Make sure that Oktell server is running and check your connections.'}
+				#tryAgain: 'Try again'
 	}
 
 	options = null
@@ -39,21 +59,23 @@ do ($)->
 	list = null
 	popup = null
 	permissionsPopup = null
+	error = null
 
 	getOptions = ->
 		options or defaultOptions
 
 	logStr = ''
 
-	log = ->
+	log = (args...)->
 		if not getOptions().debug then return
 		d = new Date()
 		dd =  d.getFullYear() + '-' + (if d.getMonth()<10 then '0' else '') + d.getMonth() + '-' + (if d.getDate()<10 then '0' else '') + d.getDate();
-		t = (if d.getHours()<10 then '0' else '') + d.getHours() + ':' + (if d.getMinutes()<10 then '0' else '')+d.getMinutes() + ':' +  (if d.getSeconds()<10 then '0' else '')+d.getSeconds() + ':' +
-			(d.getMilliseconds() + 1000).toString().substr(1)
+		t = (if d.getHours()<10 then '0' else '') + d.getHours() + ':' + (if d.getMinutes()<10 then '0' else '')+d.getMinutes() + ':' +  (if d.getSeconds()<10 then '0' else '')+d.getSeconds() + ':' +	(d.getMilliseconds() + 1000).toString().substr(1)
 		logStr += dd + ' ' + t + ' | '
-		args = ['Oktell-Panel ' + t + ' |']
-		for val in arguments
+		fnName = 'log'
+		if args[0].toString().toLowerCase() is 'error'
+			fnName = 'error'
+		for val, i in args
 			if typeof val == 'object'
 				try
 					logStr += JSON.stringify(val)
@@ -62,10 +84,10 @@ do ($)->
 			else
 				logStr += val
 			logStr += ' | '
-			args.push val
 		logStr += "\n\n"
+		args.unshift 'Oktell-Panel.js ' + t + ' |' + ( if typeof @logGroup is 'string' then ' ' + @logGroup + ' |' else '' )
 		try
-			console.log.apply( console, args || [])
+			console[fnName].apply( console, args || [])
 		catch e
 
 	templates = {}
@@ -85,17 +107,26 @@ do ($)->
 	actionButtonHtml = loadTemplate '/templates/actionButton.html'
 	actionListHtml = loadTemplate '/templates/actionList.html'
 	userTemplateHtml = loadTemplate '/templates/user.html'
+	departmentTemplateHtml = loadTemplate '/templates/department.html'
+	departmentTemplateHtml = loadTemplate '/templates/dep.html'
+	usersTableHtml = loadTemplate '/templates/usersTable.html'
 	panelHtml = loadTemplate '/templates/panel.html'
 	popupHtml = loadTemplate '/templates/callPopup.html'
 	permissionsPopupHtml = loadTemplate '/templates/permissionsPopup.html'
+	errorHtml = loadTemplate '/templates/error.html'
 
 	List.prototype.jScroll = jScroll
+	List.prototype.usersTableTemplate = usersTableHtml
 
 	CUser.prototype.buttonTemplate = actionButtonHtml
 	CUser.prototype.log = log
 	List.prototype.log = log
 	Popup.prototype.log = log
 	PermissionsPopup.prototype.log = log
+	Department.prototype.log = log
+	Error.prototype.log = log
+
+	Department.prototype.template = departmentTemplateHtml
 
 	panelWasInitialized = false
 
@@ -104,6 +135,7 @@ do ($)->
 
 		options = $.extend defaultOptions, opts or {}
 
+		Department.prototype.withoutDepName = List.prototype.withoutDepName = 'zzzzz_without'
 		langs = langs[options.lang] or langs.ru
 		CUser.prototype.template = userTemplateHtml.replace '{{button}}', actionButtonHtml
 		panelHtml = panelHtml.replace('{{inTalk}}',langs.panel.inTalk)
@@ -111,12 +143,14 @@ do ($)->
 			.replace('{{queue}}',langs.panel.queue)
 			.replace('{{inputPlaceholder}}',langs.panel.inputPlaceholder)
 		List.prototype.langs = langs.actions
+		List.prototype.departmentTemplate = departmentTemplateHtml
+		Error.prototype.langs = langs.error
+		CUser.prototype.langs = langs
+		Department.prototype.langs = langs
 		panelEl = $(panelHtml)
 
-		popupEl = $(popupHtml)
-		$('body').append(popupEl)
-		permissionsPopupEl = $(permissionsPopupHtml)
-		$('body').append(permissionsPopupEl)
+		if getOptions().noavatar
+			panelEl.addClass('noavatar')
 
 		$user = $(userTemplateHtml)
 		$userActionButton = $(actionButtonHtml)
@@ -128,9 +162,29 @@ do ($)->
 		$('body').append actionListEl
 
 		oktell = getOptions().oktell
+		CUser.prototype.formatPhone = oktell.formatPhone
 
-		popup = new Popup popupEl, oktell
-		permissionsPopup = new PermissionsPopup permissionsPopupEl, oktell
+		if not getOptions().withoutCallPopup
+			popupHtml = popupHtml.replace('{{title}}', langs.callPopup.title)
+				.replace('{{goPickup}}', langs.callPopup.goPickup)
+				.replace('{{hide}}', langs.callPopup.hide)
+				.replace('{{reject}}', langs.callPopup.reject)
+
+			popupEl = $(popupHtml)
+			$('body').append(popupEl)
+			popup = new Popup popupEl, oktell
+
+		# TODO перевести пермишнз попап
+		if not getOptions().withoutPermissionsPopup
+			permissionsPopupEl = $(permissionsPopupHtml)
+			$('body').append(permissionsPopupEl)
+			permissionsPopup = new PermissionsPopup permissionsPopupEl, oktell
+
+		if not getOptions().withoutError
+			errorEl = $(errorHtml)
+			panelEl.find('.h_panel_bg:first').append errorEl
+			#errorEl.hide()
+			error = new Error errorEl, oktell
 
 		panelPos = getOptions().position
 		animOptShow = {}
@@ -145,6 +199,7 @@ do ($)->
 		if getOptions().debug
 			window.wList = list
 			window.wPopup = popup
+			window.wError = error
 
 		if panelPos is "right"
 			panelEl.addClass("right");

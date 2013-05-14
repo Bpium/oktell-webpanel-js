@@ -1,17 +1,7 @@
 class CUser
-
+	logGroup: 'User'
 	constructor: (data) ->
-		#@log 'create user', data
-		@id = data.id?.toString().toLowerCase()
-		@isFantom = data.isFantom or false
-		@number = data.number?.toString() or ''
-		@numberFormatted = data.numberFormatted?.toString() or @number
-		@numberHtml = escapeHtml @numberFormatted
-		@name = data.name
-		@nameHtml = if data.name then escapeHtml(data.name) else @numberHtml
 		@state = false
-		@avatarLink32x32 = data.avatarLink32x32 or @defaultAvatar32 or ''
-		@defaultAvatarCss = if @avatarLink32x32 then '' else 'm_default'
 		@hasHover = false
 		@buttonLastAction = ''
 		@firstLiCssPrefix = 'm_button_action_'
@@ -28,13 +18,24 @@ class CUser
 		@id = data.id?.toString().toLowerCase()
 		@isFantom = data.isFantom or false
 		@number = data.number?.toString() or ''
+		@invisible = true unless @number
 		@numberFormatted = data.numberFormatted?.toString() or @number
 		@numberHtml = escapeHtml @numberFormatted
-		@name = data.name
+		@name = data.name?.toString() or ''
+		@nameLower = @name.toLowerCase()
+		@letter = @name[0]?.toUpperCase() or @number?[0].toString().toLowerCase()
 		@nameHtml = if data.name and data.name.toString() isnt @number then escapeHtml(data.name) else @numberHtml
+		lastHtml = @elNumberHtml
+		@elNumberHtml = if @numberHtml isnt @nameHtml then @numberHtml else ''
+		if @elNumberHtml isnt lastHtml and @el?
+			@el.find('.o_number').text @elNumberHtml
+		@el?.find('.b_contact_title b').text @nameHtml
+
 		@avatarLink32x32 = data.avatarLink32x32 or @defaultAvatar32 or ''
 		@defaultAvatarCss = if @avatarLink32x32 then '' else 'm_default'
-		@loadActions()
+		@departmentId = if data?.numberObj?.departmentid and data?.numberObj.departmentid isnt '00000000-0000-0000-0000-000000000000' then data?.numberObj.departmentid else @withoutDepName
+		@department = if @departmentId is 'www_without' then @langs.panel.withoutDepartment else data?.numberObj?.department
+		#@log 'depId ' + (data?.numberObj?.departmentid) + ' ' + data?.numberObj?.department + ' : ' + @departmentId + ' ' + @department
 
 		if data.numberObj?.state?
 			@setState data.numberObj.state
@@ -43,12 +44,14 @@ class CUser
 		else
 			@setState 1
 
+		@loadActions()
 
 	regexps:
 		name: /\{\{name\}\}/
 		number: /\{\{number\}\}/
 		avatarLink32x32: /\{\{avatarLink32x32\}\}/
 		css: /\{\{css\}\}/
+		letter: /\{\{letter\}\}/
 
 	setState: (state) ->
 		state = parseInt state
@@ -75,32 +78,36 @@ class CUser
 	getInfo: ->
 		'"'+@number+'" ' + @state + ' ' + @name
 
-	isFiltered: (filter) ->
-		if not filter or typeof filter isnt 'string'
+	isFiltered: (filter, showOffline) ->
+		if ( not filter or typeof filter isnt 'string' ) and ( showOffline or ( not showOffline and @state isnt 0 ) )
 			return true
 
-		if ( @number and @number.indexOf(filter) isnt -1 ) or ( ' ' + @name ).toLowerCase().indexOf(filter) isnt -1
+		if ( showOffline or ( not showOffline and @state isnt 0 ) ) and ( ( @number and @number.indexOf(filter) isnt -1 ) or ( ' ' + @name ).toLowerCase().indexOf(filter) isnt -1 )
 			return true
 
 		return false
 
-	getEl: ->
-		str = @template.replace( @regexps.name, @nameHtml)
-			.replace( @regexps.number, if @numberHtml isnt @nameHtml then @numberHtml else '' )
-			.replace( @regexps.avatarLink32x32, @avatarLink32x32)
-			.replace( @regexps.css, @defaultAvatarCss )
-		$el = $(str)
-		@els = @els.add $el
-		@setStateCss()
-		$el.data 'user', @
-		$el.bind 'mouseenter', =>
-			@isHovered true
-		$el.bind 'mouseleave', =>
-			@isHovered false
-		@initButtonEl $el.find '.oktell_button_action'
+	showLetter: (show)->
+		@el?.find('.b_capital_letter span').text if show then @letter else ''
+
+	getEl: ( createIndependent) ->
+		if not @el or createIndependent
+			str = @template.replace( @regexps.name, @nameHtml)
+				.replace( @regexps.number, if @numberHtml isnt @nameHtml then @numberHtml else '' )
+				.replace( @regexps.avatarLink32x32, @avatarLink32x32)
+				.replace( @regexps.css, @defaultAvatarCss )
+			$el = $(str)
+			$el.data 'user', @
+			@initButtonEl $el.find '.oktell_button_action'
+			@els = @els.add $el
+			@setStateCss()
+			if not @el
+				@el = $el
+		$el = $el or @el
 		return $el
 
 	initButtonEl: ($el) ->
+		#@log 'init button el for ' + @getInfo()
 		@buttonEls = @buttonEls.add $el
 		$el.data 'user', @
 		$el.children(':first').bind 'click', =>
@@ -156,6 +163,8 @@ class CUser
 
 		target = @number
 
+		@beforeAction?(action)
+
 		switch action
 			when 'call'
 				@oktell.call target
@@ -182,3 +191,10 @@ class CUser
 			@doAction @buttonLastAction
 			true
 		else false
+
+	letterVisibility: (show)->
+		if @el and @el.length
+			if show
+				@el.find('.b_capital_letter span').text @letter
+			else
+				@el.find('.b_capital_letter span').text ''

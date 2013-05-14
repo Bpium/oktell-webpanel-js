@@ -21,11 +21,13 @@
 	<!--<script type="text/javascript" src="/coffee/class/Panel.js"></script>-->
 	<!--<script type="text/javascript" src="/coffee/class/User.js"></script>-->
 	<!--<script type="text/javascript" src="/coffee/class/UsersService.js"></script>-->
-	<script type="text/javascript" src="coffee/class/List.js"></script>
-	<script type="text/javascript" src="coffee/class/CUser.js"></script>
-	<script type="text/javascript" src="coffee/class/Popup.js"></script>
-	<script type="text/javascript" src="coffee/class/PermissionsPopup.js"></script>
-	<script type="text/javascript" src="coffee/jScroll.js"></script>
+	<script type="text/javascript" src="/coffee/class/List.js"></script>
+	<script type="text/javascript" src="/coffee/class/CUser.js"></script>
+	<script type="text/javascript" src="/coffee/class/PermissionsPopup.js"></script>
+	<script type="text/javascript" src="/coffee/class/Department.js"></script>
+	<script type="text/javascript" src="/coffee/class/Popup.js"></script>
+	<script type="text/javascript" src="/coffee/class/Error.js"></script>
+	<script type="text/javascript" src="/coffee/jScroll.js"></script>
 
 
 	<script type="text/javascript">
@@ -58,6 +60,7 @@
 				var d = new Date();
 				statesLogel.append( '<p>Cтатус = "' + newS + '", предыдущий статус = "' + oldS + '", время смены ' + d.getHours()+':'+ d.getMinutes()+':'+ d.getSeconds() + '</p>' );
 			});
+
 
 
 
@@ -284,6 +287,7 @@
 							oktell.trigger('phoneRingStart', abonents);
 							oktell.trigger('abonentsChange', abonents);
 						}
+
 					} else {
 						currentSession = false;
 					}
@@ -347,8 +351,9 @@
 					//url: ['192.168.0.12'], login: 'leader', password: '123', // звонить на 183
 					url: server, login: login, password: pass,
 					debugMode: true,
+					oktellVoiceUrl: server.split(':')[0] + ':5061',
 					openTimeout: 5000,
-					OktellVoice: true,
+					oktellVoice: true,
 					webSocketSwfLocation: '/jslib/vendor/WebSocketMain.swf',
 					//expires: 84600,
 					queryTimeout: 5000,

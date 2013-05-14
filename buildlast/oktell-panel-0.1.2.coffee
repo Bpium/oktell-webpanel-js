@@ -24,6 +24,50 @@ do ($)->
 	
 	escapeHtml = (string) ->
 		(''+string).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#x27;').replace(/\//g,'&#x2F;')
+	
+	log = ->
+		try
+			console.log.apply(console, arguments);
+		catch e
+	
+	cookie = (key, value, options) ->
+	
+		# key and at least value given, set cookie...
+		if arguments.length > 1 and String(value) isnt "[object Object]"
+			options = $.extend {}, options
+	
+			if not value?
+				options.expires = -1
+	
+			if typeof options.expires is 'number'
+				seconds = options.expires
+				t = options.expires = new Date()
+				t.setSeconds t.getSeconds() + seconds
+	
+			value = String value
+	
+			return document.cookie = [
+				encodeURIComponent(key), '=',
+				if options.raw then value else encodeURIComponent(value),
+				if options.expires then '; expires=' + options.expires.toUTCString() else '', # use expires attribute, max-age is not supported by IE
+				if options.path then '; path=' + options.path else '',
+				if options.domain then '; domain=' + options.domain else '',
+				if options.secure then '; secure' else ''
+			].join('')
+	
+	
+		# key and possibly options given, get cookie...
+		options = value or {}
+		result = ''
+		if options.raw
+			decode = (s) -> s
+		else
+			decode = decodeURIComponent
+	
+		if (result = new RegExp('(?:^|; )' + encodeURIComponent(key) + '=([^;]*)').exec(document.cookie))
+			decode(result[1])
+		else
+			null
 	#includecoffee coffee/jScroll.coffee
 	jScroll = ( $el )->
 		wrapper = ''
@@ -354,21 +398,146 @@ do ($)->
 			return false
 	
 	
+	#includecoffee coffee/class/Department.coffee
+	class Department
+		logGroup: 'Department'
+		constructor: ( id, name )->
+			@usersVisibilityCss = 'invisibleDep'
+			@lastFilteredUsers = []
+			@isSorted = false
+			@visible = true
+			@users = []
+			@id = if id and id isnt '00000000-0000-0000-0000-000000000000' then id else @withoutDepName
+			@name = if @id is @withoutDepName or not name then @langs.panel.withoutDepartment else name
+			@isOpen = if @config().departmentVisibility[@id]? then @config().departmentVisibility[@id] else true
+	
+		getEl: (usersVisible)->
+			@log 'get el, usersVisible - ' + usersVisible + ' , for department ' + @getInfo()
+			if not @el
+				@el = $(@template.replace /\{\{department}\}/g, escapeHtml(@name))
+				@el.find('.b_department_header').bind 'click', =>
+					@showUsers()
+			if usersVisible
+				@_oldIsOpen = @isOpen
+				@showUsers true, true
+			else
+				@showUsers if @_oldIsOpen? then @_oldIsOpen else @isOpen
+			@el
+		getContainer: ->
+			@el.find('tbody')
+	
+		showUsers: (val, notSave)->
+			if typeof val is 'undefined'
+				val = ! @isOpen
+			if not @hideEl
+				@hideEl = @el.find 'table'
+			@log 'department users visibility set ' + val + ' , without save - ' + notSave + '. For ' + @getInfo()
+	
+			@hideEl.stop true, true
+			if not notSave
+				@isOpen = val
+				c = @config()
+				c.departmentVisibility[@id] = @isOpen
+				@config c
+			if val
+				#@hideEl.slideDown 200
+				@el.toggleClass @usersVisibilityCss, false
+				@hideEl.show()
+			else
+				#@hideEl.slideUp 200
+				@el.toggleClass @usersVisibilityCss, true
+				@hideEl.hide()
+	
+	
+	
+		getInfo: ->
+			@name + ' ' + @id
+	
+		clearUsers: ->
+			@users = []
+	
+		show: (withAnimation) ->
+			if not @el or @visible then return
+			if withAnimation
+				@el.slideDown 200
+			else
+				@el.show()
+			@visible = true
+		hide: (withAnimation) ->
+			if not @el or not @visible then return
+			if withAnimation
+				@el.slideUp 200
+			else
+				@el.hide()
+			@visible = false
+	
+		getUsers: (filter, showOffline) ->
+			if not @isSorted
+				@sortUsers()
+	
+			users = []
+			exactMatch = false
+			if filter is ''
+				if showOffline
+					users = [].concat @users
+				else
+					for u in @users
+						if u.state isnt 0
+							users.push u
+			else
+				for u in @users
+					if u.isFiltered filter, showOffline
+						users.push u
+						if u.number is filter and not exactMatch
+							exactMatch = u
+			@lastFilteredUsers = users
+			[users, exactMatch]
+	
+	
+	
+		sortUsers: ->
+			@users.sort @sortFn
+	
+		sortFn: (a,b)->
+			if a.nameLower > b.nameLower
+				1
+			else if a.nameLower < b.nameLower
+				-1
+			else
+				if a.number > b.number
+					1
+				else if	a.number < b.number
+					-1
+				else
+					0
+	
+	
+		addUser: ( user ) ->
+			if user.number
+				@users.push user
+	
+	
+	
+	
+	
+	
+	
+	
 	#includecoffee coffee/class/CUser.coffee
 	class CUser
-	
+		logGroup: 'User'
 		constructor: (data) ->
 			#@log 'create user', data
-			@id = data.id?.toString().toLowerCase()
-			@isFantom = data.isFantom or false
-			@number = data.number?.toString() or ''
-			@numberFormatted = data.numberFormatted?.toString() or @number
-			@numberHtml = escapeHtml @numberFormatted
-			@name = data.name
-			@nameHtml = if data.name then escapeHtml(data.name) else @numberHtml
+			#@id = data.id?.toString().toLowerCase()
+			#@isFantom = data.isFantom or false
+			#@number = data.number?.toString() or ''
+			#@numberFormatted = data.numberFormatted?.toString() or @number
+			#@numberHtml = escapeHtml @numberFormatted
+			#@name = data.name
+			#@nameHtml = if data.name then escapeHtml(data.name) else @numberHtml
 			@state = false
-			@avatarLink32x32 = data.avatarLink32x32 or @defaultAvatar32 or ''
-			@defaultAvatarCss = if @avatarLink32x32 then '' else 'm_default'
+			#@avatarLink32x32 = data.avatarLink32x32 or @defaultAvatar32 or ''
+			#@defaultAvatarCss = if @avatarLink32x32 then '' else 'm_default'
 			@hasHover = false
 			@buttonLastAction = ''
 			@firstLiCssPrefix = 'm_button_action_'
@@ -385,13 +554,24 @@ do ($)->
 			@id = data.id?.toString().toLowerCase()
 			@isFantom = data.isFantom or false
 			@number = data.number?.toString() or ''
+			@invisible = true unless @number
 			@numberFormatted = data.numberFormatted?.toString() or @number
 			@numberHtml = escapeHtml @numberFormatted
-			@name = data.name
+			@name = data.name?.toString() or ''
+			@nameLower = @name.toLowerCase()
+			@letter = @name[0]?.toUpperCase() or @number?[0].toString().toLowerCase()
 			@nameHtml = if data.name and data.name.toString() isnt @number then escapeHtml(data.name) else @numberHtml
+			lastHtml = @elNumberHtml
+			@elNumberHtml = if @numberHtml isnt @nameHtml then @numberHtml else ''
+			if @elNumberHtml isnt lastHtml and @el?
+				@el.find('.o_number').text @elNumberHtml
+			@el?.find('.b_contact_title b').text @nameHtml
+	
 			@avatarLink32x32 = data.avatarLink32x32 or @defaultAvatar32 or ''
 			@defaultAvatarCss = if @avatarLink32x32 then '' else 'm_default'
-			@loadActions()
+			@departmentId = if data?.numberObj?.departmentid and data?.numberObj.departmentid isnt '00000000-0000-0000-0000-000000000000' then data?.numberObj.departmentid else @withoutDepName
+			@department = if @departmentId is 'www_without' then @langs.panel.withoutDepartment else data?.numberObj?.department
+			#@log 'depId ' + (data?.numberObj?.departmentid) + ' ' + data?.numberObj?.department + ' : ' + @departmentId + ' ' + @department
 	
 			if data.numberObj?.state?
 				@setState data.numberObj.state
@@ -400,12 +580,14 @@ do ($)->
 			else
 				@setState 1
 	
+			@loadActions()
 	
 		regexps:
 			name: /\{\{name\}\}/
 			number: /\{\{number\}\}/
 			avatarLink32x32: /\{\{avatarLink32x32\}\}/
 			css: /\{\{css\}\}/
+			letter: /\{\{letter\}\}/
 	
 		setState: (state) ->
 			state = parseInt state
@@ -432,15 +614,16 @@ do ($)->
 		getInfo: ->
 			'"'+@number+'" ' + @state + ' ' + @name
 	
-		isFiltered: (filter) ->
-			if not filter or typeof filter isnt 'string'
+		isFiltered: (filter, showOffline) ->
+			if ( not filter or typeof filter isnt 'string' ) and ( showOffline or ( not showOffline and @state isnt 0 ) )
 				return true
 	
-			if ( @number and @number.indexOf(filter) isnt -1 ) or ( ' ' + @name ).toLowerCase().indexOf(filter) isnt -1
+			if ( showOffline or ( not showOffline and @state isnt 0 ) ) and ( ( @number and @number.indexOf(filter) isnt -1 ) or ( ' ' + @name ).toLowerCase().indexOf(filter) isnt -1 )
 				return true
 	
 			return false
 	
+<<<<<<< HEAD
 		getEl: ->
 			str = @template.replace( @regexps.name, @nameHtml)
 				.replace( @regexps.number, if @numberHtml isnt @nameHtml then @numberHtml else '' )
@@ -455,9 +638,29 @@ do ($)->
 			$el.bind 'mouseleave', =>
 				@isHovered false
 			@initButtonEl $el.find '.oktell_button_action'
+=======
+		showLetter: (show)->
+			@el?.find('.b_capital_letter span').text if show then @letter else ''
+	
+		getEl: ( createIndependent) ->
+			if not @el or createIndependent
+				str = @template.replace( @regexps.name, @nameHtml)
+					.replace( @regexps.number, if @numberHtml isnt @nameHtml then @numberHtml else '' )
+					.replace( @regexps.avatarLink32x32, @avatarLink32x32)
+					.replace( @regexps.css, @defaultAvatarCss )
+				$el = $(str)
+				$el.data 'user', @
+				@initButtonEl $el.find '.oktell_button_action'
+				@els = @els.add $el
+				@setStateCss()
+				if not @el
+					@el = $el
+			$el = $el or @el
+>>>>>>> develop
 			return $el
 	
 		initButtonEl: ($el) ->
+			#@log 'init button el for ' + @getInfo()
 			@buttonEls = @buttonEls.add $el
 			$el.data 'user', @
 			$el.children(':first').bind 'click', =>
@@ -513,6 +716,8 @@ do ($)->
 	
 			target = @number
 	
+			@beforeAction?(action)
+	
 			switch action
 				when 'call'
 					@oktell.call target
@@ -539,10 +744,23 @@ do ($)->
 				@doAction @buttonLastAction
 				true
 			else false
+	
+		letterVisibility: (show)->
+			if @el and @el.length
+				if show
+					@el.find('.b_capital_letter span').text @letter
+				else
+					@el.find('.b_capital_letter span').text ''
 	#includecoffee coffee/class/List.coffee
 	class List
-	
+		logGroup: 'List'
 		constructor: (oktell, panelEl, dropdownEl, afterOktellConnect, debugMode) ->
+	
+			@defaultConfig =
+				departmentVisibility: {}
+				showDeps: true
+				showOffline: false
+	
 			@allActions =
 				call: { icon: '/img/icons/action/call.png', iconWhite: '/img/icons/action/white/call.png', text: @langs.call }
 				conference : { icon: '/img/icons/action/confinvite.png', iconWhite: '/img/icons/action/white/confinvite.png', text: @langs.conference }
@@ -555,6 +773,14 @@ do ($)->
 	
 			@actionCssPrefix = 'i_'
 			@lastDropdownUser = false
+			self = @
+			CUser.prototype.beforeAction = (action)->
+				self.beforeUserAction this, action
+	
+			@departments = []
+			@departmentsById = {}
+	
+			@simpleListEl = $(@usersTableTemplate)
 	
 			@filterFantomUserNumber = false
 	
@@ -569,6 +795,7 @@ do ($)->
 				actionText: /\{\{actionText\}\}/
 				action: /\{\{action\}\}/
 				css: /\{\{css\}\}/
+				dep: /\{\{department}\}/g
 	
 			oktellConnected = false
 			@usersByNumber = {}
@@ -589,7 +816,7 @@ do ($)->
 			@keypadEl = @panelEl.find '.j_phone_keypad'
 			@keypadIsVisible = false
 			@usersListBlockEl = @panelEl.find '.j_main_list'
-			@usersListEl = @usersListBlockEl.find 'tbody'
+			@usersListEl = @simpleListEl.find 'tbody'
 			@abonentsListBlock = @panelEl.find '.j_abonents'
 			@abonentsListEl = @abonentsListBlock.find 'tbody'
 			@talkTimeEl = @abonentsListBlock.find '.b_marks_time'
@@ -601,11 +828,41 @@ do ($)->
 			@filterClearCross = @panelEl.find '.jInputClear_close'
 			debouncedSetFilter = false
 	
+			@buttonShowOffline = @panelEl.find '.b_list_filter .i_online'
+			@buttonShowDeps = @panelEl.find '.b_list_filter .i_group'
+	
+			@buttonShowOffline.bind 'click', =>
+				@config
+					showOffline: not @showOffline
+				@setFilter @filter, true
+	
+			@buttonShowDeps.bind 'click', =>
+				@config
+					showDeps: not @showDeps
+				@setFilter @filter, true
+	
+	
+	
 			@usersWithBeforeConnectButtons = []
 	
-			@jScroll @usersListBlockEl
-			@usersScroller = @usersListBlockEl.find('.jscroll_scroller')
+	
+	
+			@config()
+	
+			Department.prototype.config = (args...)=>
+				@config.apply @, args
+	
+			@allUserDep = new Department 'all_user_dep', 'allUsers'
+			@allUserDep.template = @usersTableTemplate
+	
+			@exactMatchUserDep = new Department 'exact_match_user_dep', 'exactUser'
+			@exactMatchUserDep.template = @usersTableTemplate
+	
+	
 			@userScrollerToTop = =>
+				if not @_jScrolled
+					@jScroll @usersListBlockEl
+					@usersScroller = @usersListBlockEl.find('.jscroll_scroller')
 				@usersScroller.css({top:'0px'})
 	
 			@filterClearCross.bind 'click', =>
@@ -627,29 +884,47 @@ do ($)->
 				if e.keyCode is 13
 					@filterInput.blur()
 					setTimeout =>
-						user = @panelUsersFiltered[0]
-						user.doLastFirstAction()
+						@usersListBlockEl.find('tr:first').data('user')?.doLastFirstAction()
 						@clearFilter()
 					, 50
 				else
 					debouncedSetFilter()
 				return true
 	
+<<<<<<< HEAD
 	#		@panelEl.bind 'mouseenter', (e)->
 	#			$(this).data('user')?.isHovered true
+=======
+	#		@panelEl.bind 'mouseenter', (e)=>
+	#			#$(this).data('user')?.isHovered true
+	#			#@log 'Mouse enter to ' + e.target
+>>>>>>> develop
 	#		@panelEl.bind 'mouseleave', ->
 	#			$(this).data('user')?.isHovered false
 	
 			@panelEl.bind 'click', (e)=>
 				target = $(e.target)
-				if not target.is('.b_contact .drop_down') and target.closest('.b_contact .drop_down').size() is 0
+				if target.is('.oktell_button_action .g_first')
+					actionButton = target.parent()
+				else if target.is('.oktell_button_action .g_first i')
+					actionButton = target.parent().parent()
+				else if target.is('.b_contact .drop_down')
+					buttonEl = target.parent()
+				else if target.is('.b_contact .drop_down i')
+					buttonEl = target.parent().parent()
+				if (not actionButton? and not buttonEl?) or ( actionButton and actionButton.size() is 0 ) or ( buttonEl and buttonEl.size() is 0 )
 					return true
-				buttonEl = target.closest('.oktell_button_action')
-				if buttonEl.size() is 0
+	
+				if actionButton? and actionButton.size()
+					user = actionButton.data('user')
+					user?.doLastFirstAction()
 					return true
-				user = buttonEl.data('user')
-				if user
-					@showDropdown user, buttonEl, user.loadOktellActions(), true
+	
+				if buttonEl? and buttonEl.size()
+					user = buttonEl.data('user')
+					if user
+						@showDropdown user, buttonEl, user.loadOktellActions(), true
+					return true
 	
 			@dropdownEl.bind 'click', (e) =>
 				target = $(e.target)
@@ -708,7 +983,8 @@ do ($)->
 				@filterInput.val('')
 				@setFilter '', true
 				@setQueue []
-				user.loadActions() for phone,user of @userWithGeneratedButtons
+				for phone,user of @userWithGeneratedButtons
+					user.loadActions()
 	
 	
 			oktell.on 'connect', =>
@@ -720,9 +996,18 @@ do ($)->
 				CUser.prototype.defaultAvatar32 = oInfo.defaultAvatar32x32
 				CUser.prototype.defaultAvatar64 = oInfo.defaultAvatar64x64
 	
+				@departments = []
+				@departmentsById = {}
+				createdDeps = {}
+	
+				otherDep = new Department()
+	
+	
 				oUsers = oktell.getUsers()
 				for own oId, oUser of oUsers
 					strNumber = oUser.number?.toString() or ''
+					if not strNumber
+						continue
 					if @usersByNumber[strNumber]
 						user = @usersByNumber[strNumber]
 						oUser.isFantom = false
@@ -734,10 +1019,30 @@ do ($)->
 	
 					if user.id isnt oInfo.userid
 						@panelUsers.push user
+						if user.departmentId and user.departmentId isnt '00000000-0000-0000-0000-000000000000'
+							if createdDeps[user.departmentId]
+								dep = createdDeps[user.departmentId]
+							else
+								dep = createdDeps[user.departmentId] = new Department( user.departmentId, user.department )
+								@departments.push dep
+								@departmentsById[user.departmentId] = dep
+							dep.addUser user
+						else
+							otherDep.addUser user
+						@allUserDep.addUser user
 					else
 						@me = user
 	
-				@sortPanelUsers @panelUsers
+				@departments.sort (a,b)=>
+					if a.name > b.name
+						1
+					else if b.name > a.name
+						-1
+					else 0
+	
+				@departments.push otherDep
+	
+				#@sortPanelUsers @panelUsers
 	
 				oktell.on 'stateChange', ( newState, oldState ) =>
 					@reloadActions()
@@ -745,7 +1050,61 @@ do ($)->
 				oktell.onNativeEvent 'pbxnumberstatechanged', (data) =>
 					for n in data.numbers
 						numStr = n.num.toString()
-						@usersByNumber[numStr]?.setState n.numstateid
+						user = @usersByNumber[numStr]
+						if user
+							@log ''
+							@log 'start user state change from ' + user.state + ' to ' + n.numstateid + ' for ' + user.getInfo()
+							if @showDeps
+								dep = @departmentsById[user.departmentId]
+							else
+								dep = @allUserDep
+							@log 'current visibility settings are ShowDeps='+@showDeps+' and ShowOffline=' + @showOffline
+							wasFiltered = user.isFiltered @filter, @showOffline
+							@log 'user was filtered earlier = ' + wasFiltered
+							user.setState n.numstateid
+							userNowIsFiltered = user.isFiltered @filter, @showOffline
+							@log 'after user.setState, now user filtered = ' + userNowIsFiltered
+							if not userNowIsFiltered
+								@log 'now user isnt filtered'
+								if dep.getContainer().children().length is 1
+									@log 'container contains only users el, so refilter all list'
+									@setFilter @filter, true
+								else
+									@log 'remove his html element'
+									user.el?.remove?()
+							else if not wasFiltered
+								@log 'user now filtered and was not filtered before state change'
+								dep.getUsers @filter, @showOffline
+								@log 'refilter all user of department ' + dep.getInfo()
+								index = dep.lastFilteredUsers.indexOf user
+								@log 'index of user in refiltered users list is ' + index
+								if index isnt -1
+									if not dep.getContainer().is(':visible')
+										@log 'dep container is hidden, so, refilter all users list'
+										@setFilter @filter, true
+									else
+										if index is 0
+											@log 'add user html to start of department container'
+											dep.getContainer().prepend user.getEl()
+										else
+											@log 'add user html after prev user html element'
+											dep.lastFilteredUsers[index-1]?.el?.after user.getEl()
+	
+										if dep.lastFilteredUsers[index-1]?.letter is user.letter
+											@log 'hide user letter because it is like prev user letter ' + user.letter
+											user.letterVisibility false
+										else if dep.lastFilteredUsers[index+1]?.letter is user.letter
+											@log 'hide prev user letter because it is like user letter ' + user.letter
+											dep.lastFilteredUsers[index+1].letterVisibility false
+	
+							@log 'end user state change'
+							@log ''
+	
+	
+	
+	
+	
+	
 	
 				oktell.on 'abonentsChange', ( abonents ) =>
 					@setAbonents abonents
@@ -765,6 +1124,12 @@ do ($)->
 	
 				@setAbonents oktell.getAbonents()
 				@setHold oktell.getHoldInfo()
+	
+	#			depsEls = $()
+	#			for d in @departments
+	#				depsEls = depsEls.add d.getEl()
+	#
+	#			@usersListBlockEl.html depsEls
 	
 				@setFilter '', true
 	
@@ -803,9 +1168,15 @@ do ($)->
 				@keypadIsVisible = Boolean(visible)
 				@keypadEl.stop true, true
 				if @keypadIsVisible
-					@keypadEl.slideDown 200, @setUserListHeight
+					@keypadEl.slideDown
+						duration: 200
+						easing: 'linear'
+						done: @setUserListHeight
 				else
-					@keypadEl.slideUp 200, @setUserListHeight
+					@keypadEl.slideUp
+						duration: 200
+						easing: 'linear'
+						done: @setUserListHeight
 	
 		addEventListenersForButton: (user, button) ->
 			button.bind 'click', =>
@@ -903,67 +1274,136 @@ do ($)->
 		_setActivityPanelUserHtml: (users, listEl, blockEl) ->
 			usersArray = []
 			usersArray.push(u) for own k,u of users
-			@_setUsersHtml usersArray, listEl
+			@_setUsersHtml usersArray, listEl, true
 			if usersArray.length and blockEl.is(':not(:visible)')
 				blockEl.slideDown 200, @setUserListHeight
 			else if usersArray.length is 0 and blockEl.is(':visible')
 				blockEl.slideUp 200, @setUserListHeight
 	
 	
-		_setUsersHtml: (usersArray, $el) ->
+		_setUsersHtml: (usersArray, $el, useIndependentCopies ) ->
 			html = []
+			lastDepId = null
+			prevLetter = ''
 			for u in usersArray
+<<<<<<< HEAD
 				#@log 'render ' + u.getInfo()
 				html.push u.getEl()
+=======
+				#log 'render ' + u.getInfo()
+				html.push u.getEl useIndependentCopies
+				#html = html.add u.getEl useIndependentCopies
+				u.showLetter if prevLetter isnt u.letter then true else false
+				prevLetter = u.letter
+			$el.children().detach()
+>>>>>>> develop
 			$el.html html
 	
-		sortPanelUsers: ( usersArray ) ->
-			usersArray.sort (a,b) ->
-				if a.number and not b.number
-					-1
-				else if not a.number and b.number
-					1
-				else
-					if a.state and not b.state
-						-1
-					else if not a.state and b.state
-						1
-					else
-						if a.name > b.name
-							1
-						else if a.name < b.name
-							-1
+	#	sortPanelUsers: ( usersArray ) ->
+	#		usersArray.sort (a,b) =>
+	#			if a.departmentId is @withoutDepName and b.departmentId isnt @withoutDepName
+	#				1
+	#			else if b.departmentId is @withoutDepName and a.departmentId isnt @withoutDepName
+	#				-1
+	#			else
+	#				if a.department > b.department
+	#					1
+	#				else if b.department > a.department
+	#					-1
+	#				else
+	#					if a.number and not b.number
+	#						-1
+	#					else if not a.number and b.number
+	#						1
+	#					else
+	#						if a.state and not b.state
+	#							-1
+	#						else if not a.state and b.state
+	#							1
+	#						else
+	#							if a.name > b.name
+	#								1
+	#							else if a.name < b.name
+	#								-1
 	
 		setFilter: (filter, reloadAnyway) ->
 			if @filter is filter and not reloadAnyway then return false
 			oldFilter = @filter
 			@filter = filter
-	#		if @filterInput.val() isnt @filter
-	#			@filterInput.val @filter
-			if filter is ''
-				@panelUsersFiltered = [].concat @panelUsers
-				@afterSetFilter(@panelUsersFiltered)
-				return @panelUsersFiltered
-			filteredUsers = []
 			exactMatch = false
+			@timer()
 	
-			if oldFilter.indexOf(@filter) is 0
-				forFilter = @panelUsersFiltered
+			allDeps = []
+			renderDep = (dep) =>
+				el = dep.getEl filter isnt ''
+				depExactMatch = false
+				[ users, depExactMatch ] = dep.getUsers filter, @showOffline
+				if users.length isnt 0
+					if not exactMatch then exactMatch = depExactMatch
+					@_setUsersHtml users, dep.getContainer()
+					if depExactMatch and exactMatch is depExactMatch
+						allDeps.unshift el
+					else
+						allDeps.push el
+			if @showDeps
+				for dep in @departments
+					renderDep dep
 			else
-				forFilter = @panelUsers
+				renderDep @allUserDep
 	
-			for u in @panelUsers
-				if u.isFiltered filter
-					filteredUsers.push u
-					if u.number is filter and not exactMatch
-						exactMatch = u
-			if not exactMatch
+	#		allDeps.find('tr').bind 'mouseenter', (e)=>
+	#			@log 'Mouse enter tr ', e.currentTarget
+	#			$(e.currentTarget).data('user')?.isHovered true
+	#		allDeps.find('tr').bind 'mouseleave', (e)=>
+	#			@log 'Mouse leave tr ', e.currentTarget
+	#			$(e.currentTarget).data('user')?.isHovered true
+	
+			if not exactMatch and filter.match /[0-9\(\)\+\-]/
 				@filterFantomUser = @getUser({name:filter, number: filter}, true)
-				@panelUsersFiltered = [@filterFantomUser].concat(filteredUsers)
+				@exactMatchUserDep.clearUsers()
+				@exactMatchUserDep.addUser @filterFantomUser
+				el = @exactMatchUserDep.getEl()
+				@_setUsersHtml [@filterFantomUser], @exactMatchUserDep.getContainer()
+				@filterFantomUser.showLetter false
+				allDeps.unshift el
 			else
-				@panelUsersFiltered = filteredUsers
-			@afterSetFilter(@panelUsersFiltered)
-			@panelUsersFiltered
+				@filterFantomUser = false
+	
+			@usersListBlockEl.children().detach()
+			@usersListBlockEl.html allDeps
+	
+	
+			@userScrollerToTop()
+	
+			@timer true
+	
+	
+	#		else
+	#
+	#			@usersListBlockEl.html @simpleListEl
+	#
+	#			if filter is ''
+	#				@panelUsersFiltered = [].concat @panelUsers
+	#				@afterSetFilter(@panelUsersFiltered)
+	#				return @panelUsersFiltered
+	#			filteredUsers = []
+	#			exactMatch = false
+	#
+	#			for u in @panelUsers
+	#				if u.isFiltered filter
+	#					filteredUsers.push u
+	#					if u.number is filter and not exactMatch
+	#						exactMatch = u
+	#			if not exactMatch and filter.match /[0-9\(\)\+\-]/
+	#				@filterFantomUser = @getUser({name:filter, number: filter}, true)
+	#				@panelUsersFiltered = [@filterFantomUser].concat(filteredUsers)
+	#			else
+	#				@panelUsersFiltered = filteredUsers
+	#			@afterSetFilter(@panelUsersFiltered)
+	#
+	#			@timer true
+	#
+	#			@panelUsersFiltered
 	
 		afterSetFilter: (filteredUsersArray) ->
 			@setPanelUsersHtml filteredUsersArray
@@ -1008,9 +1448,46 @@ do ($)->
 				user.loadActions() for phone, user of @panelUsersFiltered
 			, 100
 	
+		timer: (stop) ->
+			if stop and @_time
+				@log 'List timer stop: ' + ( Date.now() - @_time )
+			if not stop
+				@_time = Date.now()
+				log 'List timer start'
+	
+		beforeUserAction: (user, action)->
+			if @filterFantomUser and user is @filterFantomUser
+				@clearFilter()
+	
+		config: (data)->
+			if not @_config
+				if localStorage?.oktellPanel and JSON?.parse
+					try
+						@_config = JSON.parse(localStorage.oktellPanel)
+					catch e
+					@_config = {} if not @_config? or typeof @_config isnt 'object'
+				else
+					@_config = {}
+				for own k,v of @defaultConfig
+					if not @_config[k]?
+						@_config[k] = v
+	
+			if data?
+				for own k,v of data
+					@_config[k] = v
+				if localStorage and JSON?.stringify
+					localStorage.setItem 'oktellPanel', JSON.stringify @_config
+	
+			@showDeps = @_config.showDeps
+			@showOffline = @_config.showOffline
+			@buttonShowOffline.toggleClass 'g_active', not @showOffline
+			@buttonShowDeps.toggleClass 'g_active', @showDeps
+			@_config
+	
+	
 	#includecoffee coffee/class/Popup.coffee
-
 	class Popup
+		logGroup: 'Popup'
 		constructor: (popupEl, oktell)->
 			@el = popupEl
 			@absContainer = @el.find('.b_content')
@@ -1083,6 +1560,7 @@ do ($)->
 				el.find('span:first').text(name)
 				el.find('span:last').text(phone)
 				@absContainer.append el
+<<<<<<< HEAD
 	
 		answerButtonVisible: (val) ->
 			if val
@@ -1097,6 +1575,42 @@ do ($)->
 		setCallbacks: (onAnswer, onTerminate) ->
 			@onAnswer = onAnswer
 			@onTerminate = onTerminate
+=======
+	#includecoffee coffee/class/Error.coffee
+
+	class Error
+		logGroup: 'Error'
+		errorTypes:
+			1: 'usingOktellClient'
+			2: 'loginPass'
+			3: 'unavailable'
+		constructor: (errorEl, oktell)->
+			@el = errorEl
+	
+			oktell.on 'disconnect', (reason)=>
+				@log 'disconnect with reason ' + reason.code + ' ' + reason.message
+				if reason.code is 12
+					@show 3, oktell.getMyInfo().login
+	
+			oktell.on 'connectError', (error)=>
+				@log 'connect error ' + error.errorCode + ' ' + error.errorMessage
+				switch error.errorCode
+					when 12 then @show 1, oktell.getMyInfo().login
+					when 13 then @show 2, oktell.getMyInfo().login
+	
+		show: (errorType, username) ->
+			if not @errorTypes[errorType] then return false
+			@log 'show ' + errorType
+			type = @errorTypes[errorType]
+			@el.find('p:eq(0)').text @langs[type].header.replace('%username%', username )
+			@el.find('p:eq(1)').text @langs[type].message?.replace('%username%', username ) or ''
+			@el.find('p:eq(3)').text @langs[type].message2?.replace('%username%', username ) or ''
+			@el.fadeIn 200
+	
+		hide: ->
+			@el.fadeOut 200
+	
+>>>>>>> develop
 	
 	defaultOptions =
 		position: 'right'
@@ -1106,18 +1620,40 @@ do ($)->
 		#buttonCss: 'oktellActionButton'
 		debug: false
 		lang: 'ru'
+<<<<<<< HEAD
 		jsSIPUA: false
+=======
+		noavatar: true
+>>>>>>> develop
 
 	langs = {
 		ru:
-			panel: { inTalk: 'В разговоре', onHold: 'На удержании', queue: 'Очередь ожидания', inputPlaceholder: 'введите имя или номер' },
+			panel: { inTalk: 'В разговоре', onHold: 'На удержании', queue: 'Очередь ожидания', inputPlaceholder: 'введите имя или номер', withoutDepartment: 'без отдела' },
 			actions: { call: 'Позвонить', conference: 'Конференция', transfer: 'Перевести', toggle: 'Переключиться', intercom: 'Интерком', endCall: 'Завершить', ghostListen: 'Прослушка', ghostHelp: 'Помощь' }
+			callPopup: { title: 'Входящий вызов', hide: 'Скрыть', answer: 'Ответить', reject: 'Отклонить', undefinedNumber: 'Номер не определен', goPickup: 'Поднимите трубку' }
+			error:
+				usingOktellClient: { header: 'Пользователь «%username%» использует стандартный Oktell-клиент.', message: 'Одновременная работа двух типов клиентских приложений невозможна.', message2: 'Закройте стандартный Oktell-клиент и повторите попытку.' }
+				loginPass: { header: 'Пароль для пользователя «%username%» не подходит.', message: 'Проверьте правильность имени пользователя и пароля.' }
+				unavailable: { header: 'Сервер телефонии Oktell не доступен.', message: 'Убедитесь что сервер телефонии работает и проверьте настройки соединения.'}
+				#tryAgain: 'Повторить попытку'
 		en:
-			panel: { inTalk: 'In conversation', onHold: 'On hold', queue: 'Wait queue', inputPlaceholder: 'Enter name or number' },
+			panel: { inTalk: 'In conversation', onHold: 'On hold', queue: 'Wait queue', inputPlaceholder: 'Enter name or number', withoutDepartment: 'wihtout department' },
 			actions: { call: 'Dial', conference: 'Conference', transfer: 'Transfer', toggle: 'Switch', intercom: 'Intercom', endCall: 'End', ghostListen: 'Audition', ghostHelp: 'Help' }
+			callPopup: { title: 'Incoming call', hide: 'Hide', answer: 'Answer', reject: 'Decline', undefinedNumber: 'Phone number is not defined', goPickup: 'Pick up the phone' }
+			error:
+				usingOktellClient: { header: 'User «%username%» uses standard Oktell client applications.', message: 'Simultaneous work of two types of client applications is not possible..', message2: 'Close standard Oktell client application and try again.' }
+				loginPass: { header: 'Wrong password for user «%username%».', message: 'Make sure that the username and password are correct.' }
+				unavailable: { header: 'Oktell server is not available.', message: 'Make sure that Oktell server is running and check your connections.'}
+				#tryAgain: 'Try again'
 		cz:
-			panel: { inTalk: 'V rozhovoru', onHold: 'Na hold', queue: 'Fronta čekaní', inputPlaceholder: 'zadejte jméno nebo číslo' },
+			panel: { inTalk: 'V rozhovoru', onHold: 'Na hold', queue: 'Fronta čekaní', inputPlaceholder: 'zadejte jméno nebo číslo', withoutDepartment: '!!!!!!!' },
 			actions: { call: 'Zavolat', conference: 'Konference', transfer: 'Převést', toggle: 'Přepnout', intercom: 'Intercom', endCall: 'Ukončit', ghostListen: 'Odposlech', ghostHelp: 'Nápověda' }
+			callPopup: { title: 'Příchozí hovor', hide: 'Schovat', answer: 'Odpovědět', reject: 'Odmítnout', undefinedNumber: '', goPickup: 'Zvedněte sluchátko' }
+			error:
+				usingOktellClient: { header: 'User «%username%» uses standard Oktell client applications.', message: 'Simultaneous work of two types of client applications is not possible..', message2: 'Close standard Oktell client application and try again.' }
+				loginPass: { header: 'Wrong password for user «%username%».', message: 'Make sure that the username and password are correct.' }
+				unavailable: { header: 'Oktell server is not available.', message: 'Make sure that Oktell server is running and check your connections.'}
+				#tryAgain: 'Try again'
 	}
 
 	options = null
@@ -1127,13 +1663,18 @@ do ($)->
 	afterOktellConnect = null
 	list = null
 	popup = null
+<<<<<<< HEAD
 	jssipUA = null
+=======
+	error = null
+>>>>>>> develop
 
 	getOptions = ->
 		options or defaultOptions
 
 	logStr = ''
 
+<<<<<<< HEAD
 	log = ->
 		if not getOptions().debug then enerated buttonreturn
 		d = new Date()
@@ -1143,6 +1684,18 @@ do ($)->
 		logStr += dd + ' ' + t + ' | '
 		args = ['Oktell-Panel ' + t + ' |']
 		for val in arguments
+=======
+	log = (args...)->
+		if not getOptions().debug then return
+		d = new Date()
+		dd =  d.getFullYear() + '-' + (if d.getMonth()<10 then '0' else '') + d.getMonth() + '-' + (if d.getDate()<10 then '0' else '') + d.getDate();
+		t = (if d.getHours()<10 then '0' else '') + d.getHours() + ':' + (if d.getMinutes()<10 then '0' else '')+d.getMinutes() + ':' +  (if d.getSeconds()<10 then '0' else '')+d.getSeconds() + ':' +	(d.getMilliseconds() + 1000).toString().substr(1)
+		logStr += dd + ' ' + t + ' | '
+		fnName = 'log'
+		if args[0].toString().toLowerCase() is 'error'
+			fnName = 'error'
+		for val, i in args
+>>>>>>> develop
 			if typeof val == 'object'
 				try
 					logStr += JSON.stringify(val)
@@ -1151,6 +1704,7 @@ do ($)->
 			else
 				logStr += val
 			logStr += ' | '
+<<<<<<< HEAD
 			args.push val
 		logStr += "\n\n"
 		try
@@ -1158,6 +1712,15 @@ do ($)->
 		catch e
 
 	templates = {'templates/actionButton.html':'<ul class="oktell_button_action"><li class="g_first"><i></i></li><li class="g_last drop_down"><i></i></li></ul>', 'templates/actionList.html':'<ul class="oktell_actions_group_list"><li class="{{css}}" data-action="{{action}}"><i></i><span>{{actionText}}</span></li></ul>', 'templates/user.html':'<tr class="b_contact"><td class="b_contact_avatar {{css}}"><img src="{{avatarLink32x32}}"><i></i><div class="o_busy"></div></td><td class="b_contact_title"><div class="wrapword"><a><b>{{name}}</b><span class="o_number">{{number}}</span></a></div>{{button}}</td></tr>', 'templates/panel.html':'<div class="oktell_panel"><div class="i_panel_bookmark"><div class="i_panel_bookmark_bg"></div></div><div class="h_panel_bg"><div class="h_padding"><div class="b_marks i_conference j_abonents"><div class="b_marks_noise"><p class="b_marks_header"><span class="b_marks_label">{{inTalk}}</span><span class="b_marks_time"></span></p><table><tbody></tbody></table></div></div><div class="b_marks i_flash j_hold"><div class="b_marks_noise"><p class="b_marks_header"><span class="b_marks_label">{{onHold}}</span></p><table class="j_table_favorite"><tbody></tbody></table></div></div><div class="b_marks i_flash j_queue"><div class="b_marks_noise"><p class="b_marks_header"><span class="b_marks_label">{{queue}}</span></p><table class="j_table_queue"><tbody></tbody></table></div></div><div class="b_inconversation j_phone_block"><table class="j_table_phone"><tbody></tbody></table></div><div class="b_marks i_phone"><div class="h_shadow_bottom"><div class="h_phone_number_input"><div class="i_phone_state_bg"></div><div class="h_input_padding"><div class="i_phone_popup_button j_keypad_expand"><i></i></div><div class="jInputClear_hover"><input class="b_phone_number_input" type="text" placeholder="{{inputPlaceholder}}"><span class="jInputClear_close">&times;</span></div></div><div class="b_phone_keypad j_phone_keypad"><div class="l_column_group"><div class="h_phone_keypad"><ul class="b_phone_panel"><li class="g_top_left g_first"><button data-num="1" class="g_button m_big">1</button></li><li><button data-num="2" class="g_button m_big">2</button></li><li class="g_top_right g_right"><button data-num="3" class="g_button m_big">3</button></li><li class="g_float_celar g_first"><button data-num="4" class="g_button m_big">4</button></li><li><button data-num="5" class="g_button m_big">5</button></li><li class="g_right"><button data-num="6" class="g_button m_big">6</button></li><li class="g_float_celar g_first"><button data-num="7" class="g_button m_big">7</button></li><li><button data-num="8" class="g_button m_big">8</button></li><li class="g_right"><button data-num="9" class="g_button m_big">9</button></li><li class="g_bottom_left g_float_celar g_first"><button data-num="*" class="g_button m_big">&lowast;</button></li><li class="g_bottom_center"><button data-num="0" class="g_button m_big">0</button></li><li class="g_bottom_right g_right"><button data-num="#" class="g_button m_big">#</button></li></ul></div></div></div></div></div></div><div class="h_main_list j_main_list"><table class="b_main_list"><tbody></tbody></table></div></div></div></div>', 'templates/callPopup.html':'<div class="oktell_panel_popup" style="display: none"><div class="m_popup_staff"><div class="m_popup_data"><header><div class="h_header_bg"><i class="o_close"></i><h2>Входящий вызов</h2></div></header><div class="b_content"><div class="b_abonent"><span data-bind="text: name"></span>&nbsp;<span class="g_light" data-bind="textPhone: number"></span></div></div><div class="footer"><div class="b_take_phone j_pickup"><i></i>&nbsp;<span>Поднимите трубку</span></div><button class="oktell_panel_btn m_big m_button_green j_answer" style="margin-right: 20px; float: left"><i style="background: url(\'/img/icons/action/white/call.png\') no-repeat; vertical-align: -2px"></i>ответить</button><button class="oktell_panel_btn m_big j_close_action">Скрыть</button><button class="oktell_panel_btn m_big m_button_red j_abort_action"><i></i>Отклонить</button></div></div></div></div>', }
+=======
+		logStr += "\n\n"
+		args.unshift 'Oktell-Panel.js ' + t + ' |' + ( if typeof @logGroup is 'string' then ' ' + @logGroup + ' |' else '' )
+		try
+			console[fnName].apply( console, args || [])
+		catch e
+
+	templates = {'templates/actionButton.html':'<ul class="oktell_button_action"><li class="g_first"><i></i></li><li class="g_last drop_down"><i></i></li></ul>', 'templates/actionList.html':'<ul class="oktell_actions_group_list"><li class="{{css}}" data-action="{{action}}"><i></i><span>{{actionText}}</span></li></ul>', 'templates/user.html':'<tr class="b_contact"><td class="b_contact_avatar {{css}}"><img src="{{avatarLink32x32}}"><i></i><div class="o_busy"></div></td><td class="b_capital_letter"><span></span></td><td class="b_contact_title"><div class="wrapword"><a><b>{{name}}</b><span class="o_number">{{number}}</span></a></div>{{button}}</td></tr>', 'templates/department.html':'<tr class="b_contact"><td class="b_contact_department" colspan="3">{{department}}</td></tr>', 'templates/dep.html':'<div><div class="b_department_header"><span>{{department}}</span></div><table class="b_main_list"><tbody></tbody></table></div>', 'templates/usersTable.html':'<table class="b_main_list"><tbody></tbody></table>', 'templates/panel.html':'<div class="oktell_panel"><div class="i_panel_bookmark"><div class="i_panel_bookmark_bg"></div></div><div class="h_panel_bg"><div class="b_header"><ul class="b_list_filter"><li class="i_group"></li><li class="i_online"></li></ul></div><div class="h_padding"><div class="b_marks i_conference j_abonents"><div class="b_marks_noise"><p class="b_marks_header"><span class="b_marks_label">{{inTalk}}</span><span class="b_marks_time"></span></p><table><tbody></tbody></table></div></div><div class="b_marks i_flash j_hold"><div class="b_marks_noise"><p class="b_marks_header"><span class="b_marks_label">{{onHold}}</span></p><table class="j_table_favorite"><tbody></tbody></table></div></div><div class="b_marks i_flash j_queue"><div class="b_marks_noise"><p class="b_marks_header"><span class="b_marks_label">{{queue}}</span></p><table class="j_table_queue"><tbody></tbody></table></div></div><div class="b_inconversation j_phone_block"><table class="j_table_phone"><tbody></tbody></table></div><div class="b_marks i_phone"><div class="h_shadow_bottom"><div class="h_phone_number_input"><div class="i_phone_state_bg"></div><div class="h_input_padding"><div class="i_phone_popup_button j_keypad_expand"><i></i></div><div class="jInputClear_hover"><input class="b_phone_number_input" type="text" placeholder="{{inputPlaceholder}}"><span class="jInputClear_close">&times;</span></div></div><div class="b_phone_keypad j_phone_keypad"><div class="l_column_group"><div class="h_phone_keypad"><ul class="b_phone_panel"><li class="g_top_left g_first"><button data-num="1" class="g_button m_big">1</button></li><li><button data-num="2" class="g_button m_big">2</button></li><li class="g_top_right g_right"><button data-num="3" class="g_button m_big">3</button></li><li class="g_float_celar g_first"><button data-num="4" class="g_button m_big">4</button></li><li><button data-num="5" class="g_button m_big">5</button></li><li class="g_right"><button data-num="6" class="g_button m_big">6</button></li><li class="g_float_celar g_first"><button data-num="7" class="g_button m_big">7</button></li><li><button data-num="8" class="g_button m_big">8</button></li><li class="g_right"><button data-num="9" class="g_button m_big">9</button></li><li class="g_bottom_left g_float_celar g_first"><button data-num="*" class="g_button m_big">&lowast;</button></li><li class="g_bottom_center"><button data-num="0" class="g_button m_big">0</button></li><li class="g_bottom_right g_right"><button data-num="#" class="g_button m_big">#</button></li></ul></div></div></div></div></div></div><div class="h_main_list j_main_list"></div></div></div></div>', 'templates/callPopup.html':'<div class="oktell_panel_popup" style="display: none"><div class="m_popup_staff"><div class="m_popup_data"><header><div class="h_header_bg"><i class="o_close"></i><h2>{{title}}</h2></div></header><div class="b_content"><div class="b_abonent"><span data-bind="text: name"></span>&nbsp;<span class="g_light" data-bind="textPhone: number"></span></div></div><div class="footer"><div class="b_take_phone"><i></i>&nbsp;<span>{{goPickup}}</span></div><button class="oktell_panel_btn m_big j_close_action">{{hide}}</button><button class="oktell_panel_btn m_big m_button_red j_abort_action"><i></i>{{reject}}</button></div></div></div></div>', 'templates/error.html':'<div class="b_error" style="display: none"><div class="h_padding"><h4>Ошибка</h4><p class="b_error_alert"></p><p class="g_light"></p><p class="g_light"></p></div></div>', }
+>>>>>>> develop
 
 	loadTemplate = (path) ->
 		path = path.substr(1) if path[0] is '/'
@@ -1174,15 +1737,27 @@ do ($)->
 	actionButtonHtml = loadTemplate '/templates/actionButton.html'
 	actionListHtml = loadTemplate '/templates/actionList.html'
 	userTemplateHtml = loadTemplate '/templates/user.html'
+	departmentTemplateHtml = loadTemplate '/templates/department.html'
+	departmentTemplateHtml = loadTemplate '/templates/dep.html'
+	usersTableHtml = loadTemplate '/templates/usersTable.html'
 	panelHtml = loadTemplate '/templates/panel.html'
 	popupHtml = loadTemplate '/templates/callPopup.html'
+	errorHtml = loadTemplate '/templates/error.html'
 
 	List.prototype.jScroll = jScroll
+	List.prototype.usersTableTemplate = usersTableHtml
 
 	CUser.prototype.buttonTemplate = actionButtonHtml
 	CUser.prototype.log = log
 	List.prototype.log = log
 	Popup.prototype.log = log
+<<<<<<< HEAD
+=======
+	Department.prototype.log = log
+	Error.prototype.log = log
+
+	Department.prototype.template = departmentTemplateHtml
+>>>>>>> develop
 
 	panelWasInitialized = false
 
@@ -1209,6 +1784,7 @@ do ($)->
 
 		options = $.extend defaultOptions, opts or {}
 
+		Department.prototype.withoutDepName = List.prototype.withoutDepName = 'zzzzz_without'
 		langs = langs[options.lang] or langs.ru
 		CUser.prototype.template = userTemplateHtml.replace '{{button}}', actionButtonHtml
 		panelHtml = panelHtml.replace('{{inTalk}}',langs.panel.inTalk)
@@ -1216,10 +1792,19 @@ do ($)->
 			.replace('{{queue}}',langs.panel.queue)
 			.replace('{{inputPlaceholder}}',langs.panel.inputPlaceholder)
 		List.prototype.langs = langs.actions
+		List.prototype.departmentTemplate = departmentTemplateHtml
+		Error.prototype.langs = langs.error
+		CUser.prototype.langs = langs
+		Department.prototype.langs = langs
 		panelEl = $(panelHtml)
 
-		popupEl = $(popupHtml)
-		$('body').append(popupEl)
+		if getOptions().noavatar
+			panelEl.addClass('noavatar')
+
+		popupHtml = popupHtml.replace('{{title}}', langs.callPopup.title)
+			.replace('{{goPickup}}', langs.callPopup.goPickup)
+			.replace('{{hide}}', langs.callPopup.hide)
+			.replace('{{reject}}', langs.callPopup.reject)
 
 		$user = $(userTemplateHtml)
 		$userActionButton = $(actionButtonHtml)
@@ -1231,8 +1816,18 @@ do ($)->
 		$('body').append actionListEl
 
 		oktell = getOptions().oktell
+		CUser.prototype.formatPhone = oktell.formatPhone
 
-		popup = new Popup popupEl, oktell
+		if not getOptions().withoutCallPopup
+			popupEl = $(popupHtml)
+			$('body').append(popupEl)
+			popup = new Popup popupEl, oktell
+
+		if not getOptions().withoutError
+			errorEl = $(errorHtml)
+			panelEl.find('.h_panel_bg:first').append errorEl
+			#errorEl.hide()
+			error = new Error errorEl, oktell
 
 		panelPos = getOptions().position
 		animOptShow = {}
@@ -1247,6 +1842,7 @@ do ($)->
 		if getOptions().debug
 			window.wList = list
 			window.wPopup = popup
+			window.wError = error
 
 		if panelPos is "right"
 			panelEl.addClass("right");
@@ -1379,7 +1975,7 @@ do ($)->
 		phone = el.attr('data-phone')
 		if phone
 			button = list.getUserButtonForPlugin phone
-			log 'generated button for ' + phone, button
+			#log 'generated button for ' + phone, button
 			el.html button
 
 	addActionButtonToEl = (el) ->

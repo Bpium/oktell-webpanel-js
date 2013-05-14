@@ -291,7 +291,8 @@ class JsSIPAccount extends Account
 	constructor: ->
 		super
 
-OktellVoice = {}
+OktellVoice =
+	isOktellVoice: true
 extend OktellVoice, events
 
 manager =

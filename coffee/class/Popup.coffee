@@ -1,4 +1,5 @@
 class Popup
+	logGroup: 'Popup'
 	constructor: (popupEl, oktell)->
 		@el = popupEl
 		@absContainer = @el.find('.b_content')
