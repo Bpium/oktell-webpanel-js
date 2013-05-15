@@ -1543,6 +1543,9 @@ do ($)->
 		constructor: (errorEl, oktell)->
 			@el = errorEl
 	
+			oktell.on 'connecting', =>
+				@hide()
+	
 			oktell.on 'disconnect', (reason)=>
 				@log 'disconnect with reason ' + reason.code + ' ' + reason.message
 				if reason.code is 12
