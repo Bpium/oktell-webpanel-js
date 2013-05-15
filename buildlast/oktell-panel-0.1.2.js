@@ -1796,6 +1796,9 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
       var _this = this;
 
       this.el = errorEl;
+      oktell.on('connecting', function() {
+        return _this.hide();
+      });
       oktell.on('disconnect', function(reason) {
         _this.log('disconnect with reason ' + reason.code + ' ' + reason.message);
         if (reason.code === 12) {
