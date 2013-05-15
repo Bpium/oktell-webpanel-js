@@ -57,6 +57,7 @@
     background-image: -moz-linear-gradient(90deg, #c7cfd6 0%, #e0e4e7);
     border-left: 1px solid #B4BDBE;
     z-index: 202;
+    line-height: normal;
 }
 .oktell_panel.right {
     right: -281px;
@@ -131,6 +132,7 @@
     border: 1px solid #B4BDBE;
     overflow: hidden;
     z-index: -1;
+    top: 18px;
 }
 .oktell_panel.right .i_panel_bookmark {
     left: -40px;
