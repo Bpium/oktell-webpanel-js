@@ -57,6 +57,7 @@
     background-image: -moz-linear-gradient(90deg, #c7cfd6 0%, #e0e4e7);
     border-left: 1px solid #B4BDBE;
     z-index: 202;
+    line-height: normal;
 }
 .oktell_panel.right {
     right: -281px;
@@ -131,6 +132,7 @@
     border: 1px solid #B4BDBE;
     overflow: hidden;
     z-index: -1;
+    top: 18px;
 }
 .oktell_panel.right .i_panel_bookmark {
     left: -40px;
@@ -343,14 +345,12 @@
             right: -2px;
         }
         .oktell_panel .i_phone_popup_button {
-            right: -1px;
-            top: -1px;
+            right: 0;
+            top: 0;
+            bottom: 0;
             height: 22px;
             position: absolute;
             padding: 0 6px;
-            border-top: 1px solid #949393;
-            border-right: 1px solid #949393;
-            border-bottom: 1px solid #949393;
             -webkit-border-top-right-radius: 3px;
             -webkit-border-bottom-right-radius: 3px;
             -moz-border-radius-topright: 3px;
