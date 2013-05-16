@@ -8,14 +8,14 @@ class List
 			showOffline: false
 
 		@allActions =
-			call: { icon: '/img/icons/action/call.png', iconWhite: '/img/icons/action/white/call.png', text: @langs.call }
-			conference : { icon: '/img/icons/action/confinvite.png', iconWhite: '/img/icons/action/white/confinvite.png', text: @langs.conference }
-			transfer : { icon: '/img/icons/action/transfer.png', text: @langs.transfer }
-			toggle : { icon: '/img/icons/action/toggle.png', text: @langs.toggle }
-			intercom : { icon: '/img/icons/action/intercom.png', text: @langs.intercom }
-			endCall : { icon: '/img/icons/action/endcall.png', iconWhite: '/img/icons/action/white/endcall.png', text: @langs.endCall }
-			ghostListen : { icon: '/img/icons/action/ghost_monitor.png', text: @langs.ghostListen }
-			ghostHelp : { icon: '/img/icons/action/ghost_help.png', text: @langs.ghostHelp }
+			call: { icon: '/img/icons/action/call.png', iconWhite: '/img/icons/action/white/call.png', text: @langs.actions.call }
+			conference : { icon: '/img/icons/action/confinvite.png', iconWhite: '/img/icons/action/white/confinvite.png', text: @langs.actions.conference }
+			transfer : { icon: '/img/icons/action/transfer.png', text: @langs.actions.transfer }
+			toggle : { icon: '/img/icons/action/toggle.png', text: @langs.actions.toggle }
+			intercom : { icon: '/img/icons/action/intercom.png', text: @langs.actions.intercom }
+			endCall : { icon: '/img/icons/action/endcall.png', iconWhite: '/img/icons/action/white/endcall.png', text: @langs.actions.endCall }
+			ghostListen : { icon: '/img/icons/action/ghost_monitor.png', text: @langs.actions.ghostListen }
+			ghostHelp : { icon: '/img/icons/action/ghost_help.png', text: @langs.actions.ghostHelp }
 
 		@actionCssPrefix = 'i_'
 		@lastDropdownUser = false
@@ -586,6 +586,8 @@ class List
 		if @showDeps
 			for dep in @departments
 				renderDep dep
+#			if allDeps.length > 0
+#				allDeps[allDeps.length-1].
 		else
 			renderDep @allUserDep
 
@@ -720,6 +722,8 @@ class List
 		@showDeps = @_config.showDeps
 		@showOffline = @_config.showOffline
 		@buttonShowOffline.toggleClass 'g_active', not @showOffline
+		@buttonShowOffline.attr 'title', if @showOffline then @langs.panel.showOnlineOnly else @langs.panel.showOnlineOnlyCLicked
 		@buttonShowDeps.toggleClass 'g_active', @showDeps
+		@buttonShowDeps.attr 'title', if @showDeps then @langs.panel.showDepartmentsClicked else @langs.panel.showDepartments
 		@_config
 
