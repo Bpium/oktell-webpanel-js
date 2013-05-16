@@ -620,6 +620,9 @@
   color: #24211d;
   text-decoration: none;
 }
+.oktell_panel .b_contact td.b_contact_title b {
+  font-weight: 700;
+}
 .oktell_panel .b_contact td.b_contact_title span.o_number {
   color: #999;
   padding-left: 6px;
@@ -644,6 +647,7 @@
 }
 .oktell_panel .b_main_list {
   margin-top: 3px;
+  margin-bottom: 3px;
 }
 .oktell_panel .b_main_list .b_contact.m_busy .b_contact_avatar img {
   opacity: 0.5;
