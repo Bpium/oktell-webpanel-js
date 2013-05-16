@@ -544,7 +544,8 @@
 .oktell_panel table {
   width: 100%;
 }
-.oktell_panel table .b_contact.g_last {
+.oktell_panel .h_main_list .b_main_list.m_without_department .b_contact:last-child,
+.oktell_panel .h_main_list .b_department:last-child .b_contact:last-child {
   margin-bottom: 20px;
 }
 .oktell_panel .b_contact {
