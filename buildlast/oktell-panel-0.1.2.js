@@ -1533,6 +1533,9 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
       }
       this.usersListBlockEl.children().detach();
       this.usersListBlockEl.html(allDeps);
+      if (allDeps.length > 0) {
+        allDeps[allDeps.length - 1].find('tr:last').addClass('g_last');
+      }
       this.userScrollerToTop();
       return this.timer(true);
     };

@@ -1350,7 +1350,8 @@ do ($)->
 	
 			@usersListBlockEl.children().detach()
 			@usersListBlockEl.html allDeps
-	
+			if allDeps.length > 0
+				allDeps[allDeps.length-1].find('tr:last').addClass 'g_last'
 	
 			@userScrollerToTop()
 	
