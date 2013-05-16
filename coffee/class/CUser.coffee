@@ -38,6 +38,8 @@ class CUser
 		ns = @nameHtml.split(/\s+/)
 		if ns.length > 1
 			@nameHtml = '<b>' + ns[0] + '</b> ' + ns.splice(1)
+		else
+			@nameHtml = '<b>' + @nameHtml + '</b>'
 
 		lastHtml = @elNumberHtml
 		@elNumberHtml = if @numberHtml isnt @nameHtml then @numberHtml else ''

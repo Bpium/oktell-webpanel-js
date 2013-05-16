@@ -33,6 +33,8 @@ CUser = (function() {
     ns = this.nameHtml.split(/\s+/);
     if (ns.length > 1) {
       this.nameHtml = '<b>' + ns[0] + '</b> ' + ns.splice(1);
+    } else {
+      this.nameHtml = '<b>' + this.nameHtml + '</b>';
     }
     lastHtml = this.elNumberHtml;
     this.elNumberHtml = this.numberHtml !== this.nameHtml ? this.numberHtml : '';
