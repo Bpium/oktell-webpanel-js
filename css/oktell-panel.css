@@ -544,6 +544,9 @@
 .oktell_panel table {
   width: 100%;
 }
+.oktell_panel table .b_contact.g_last {
+  margin-bottom: 20px;
+}
 .oktell_panel .b_contact {
   height: 35px;
   display: inline-block !important;
@@ -551,9 +554,6 @@
   margin-top: -3px;
   margin-bottom: -3px;
   clear: left;
-}
-.oktell_panel .b_contact:last-child {
-  margin-bottom: 20px;
 }
 .oktell_panel .b_contact td.b_contact_avatar,
 .oktell_panel .b_contact td.b_capital_letter {
