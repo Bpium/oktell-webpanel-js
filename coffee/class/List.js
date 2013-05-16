@@ -742,6 +742,9 @@ List = (function() {
     }
     this.usersListBlockEl.children().detach();
     this.usersListBlockEl.html(allDeps);
+    if (allDeps.length > 0) {
+      allDeps[allDeps.length - 1].find('tr:last').addClass('g_last');
+    }
     this.userScrollerToTop();
     return this.timer(true);
   };

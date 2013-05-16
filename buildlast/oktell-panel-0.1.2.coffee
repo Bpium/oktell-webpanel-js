@@ -561,6 +561,10 @@ do ($)->
 			@nameLower = @name.toLowerCase()
 			@letter = @name[0]?.toUpperCase() or @number?[0].toString().toLowerCase()
 			@nameHtml = if data.name and data.name.toString() isnt @number then escapeHtml(data.name) else @numberHtml
+			ns = @nameHtml.split(/\s+/)
+			if ns.length > 1
+				@nameHtml = '<b>' + ns[0] + '</b> ' + ns.splice(1)
+	
 			lastHtml = @elNumberHtml
 			@elNumberHtml = if @numberHtml isnt @nameHtml then @numberHtml else ''
 			if @elNumberHtml isnt lastHtml and @el?
@@ -1346,7 +1350,8 @@ do ($)->
 	
 			@usersListBlockEl.children().detach()
 			@usersListBlockEl.html allDeps
-	
+			if allDeps.length > 0
+				allDeps[allDeps.length-1].find('tr:last').addClass 'g_last'
 	
 			@userScrollerToTop()
 	
