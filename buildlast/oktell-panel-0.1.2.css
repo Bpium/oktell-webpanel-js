@@ -179,7 +179,6 @@
 ---------------------------------------------------------------*/
 .oktell_panel .b_marks {
     width: 100%;
-    padding: 10px 0;
 }
 .oktell_panel .b_marks p.b_marks_header {
     padding: 0 10px;
@@ -238,6 +237,10 @@
     background-image: -ms-linear-gradient(top, #bbbcc0 0px, #c5c7cb 6px);
     background-image: linear-gradient(top, #bbbcc0 0px, #c5c7cb 6px);
     box-sizing: border-box;
+}
+.oktell_panel .b_marks.i_conference,
+.oktell_panel .b_marks.i_flash  {
+    padding: 10px 0;
 }
 .oktell_panel .b_department_header {
     padding: 3px 10px;

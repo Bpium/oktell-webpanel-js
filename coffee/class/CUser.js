@@ -16,7 +16,7 @@ CUser = (function() {
   }
 
   CUser.prototype.init = function(data) {
-    var lastHtml, _ref, _ref1, _ref2, _ref3, _ref4, _ref5, _ref6, _ref7, _ref8, _ref9;
+    var lastHtml, ns, _ref, _ref1, _ref2, _ref3, _ref4, _ref5, _ref6, _ref7, _ref8, _ref9;
 
     this.id = (_ref = data.id) != null ? _ref.toString().toLowerCase() : void 0;
     this.isFantom = data.isFantom || false;
@@ -30,6 +30,10 @@ CUser = (function() {
     this.nameLower = this.name.toLowerCase();
     this.letter = ((_ref4 = this.name[0]) != null ? _ref4.toUpperCase() : void 0) || ((_ref5 = this.number) != null ? _ref5[0].toString().toLowerCase() : void 0);
     this.nameHtml = data.name && data.name.toString() !== this.number ? escapeHtml(data.name) : this.numberHtml;
+    ns = this.nameHtml.split(/\s+/);
+    if (ns.length > 1) {
+      this.nameHtml = '<b>' + ns[0] + '</b> ' + ns.splice(1);
+    }
     lastHtml = this.elNumberHtml;
     this.elNumberHtml = this.numberHtml !== this.nameHtml ? this.numberHtml : '';
     if (this.elNumberHtml !== lastHtml && (this.el != null)) {
