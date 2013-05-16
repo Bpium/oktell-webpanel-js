@@ -22,7 +22,11 @@ var __slice = [].slice;
         onHold: 'На удержании',
         queue: 'Очередь ожидания',
         inputPlaceholder: 'введите имя или номер',
-        withoutDepartment: 'без отдела'
+        withoutDepartment: 'без отдела',
+        showDepartments: 'Группировать по отделам',
+        showDepartmentsClicked: 'Показать общим списком',
+        showOnlineOnly: 'Показать только online',
+        showOnlineOnlyCLicked: 'Показать всех'
       },
       actions: {
         call: 'Позвонить',
@@ -64,7 +68,11 @@ var __slice = [].slice;
         onHold: 'On hold',
         queue: 'Wait queue',
         inputPlaceholder: 'Enter name or number',
-        withoutDepartment: 'wihtout department'
+        withoutDepartment: 'wihtout department',
+        showDepartments: 'Show departments',
+        showDepartmentsClicked: 'Hide departments',
+        showOnlineOnly: 'Show online only',
+        showOnlineOnlyCLicked: 'Show all'
       },
       actions: {
         call: 'Dial',
@@ -106,7 +114,11 @@ var __slice = [].slice;
         onHold: 'Na hold',
         queue: 'Fronta čekaní',
         inputPlaceholder: 'zadejte jméno nebo číslo',
-        withoutDepartment: '!!!!!!!'
+        withoutDepartment: '!!!!!!!',
+        showDepartments: 'Show departments',
+        showDepartmentsClicked: 'Hide departments',
+        showOnlineOnly: 'Show online only',
+        showOnlineOnlyCLicked: 'Show all'
       },
       actions: {
         call: 'Zavolat',
@@ -243,7 +255,7 @@ var __slice = [].slice;
     langs = langs[options.lang] || langs.ru;
     CUser.prototype.template = userTemplateHtml.replace('{{button}}', actionButtonHtml);
     panelHtml = panelHtml.replace('{{inTalk}}', langs.panel.inTalk).replace('{{onHold}}', langs.panel.onHold).replace('{{queue}}', langs.panel.queue).replace('{{inputPlaceholder}}', langs.panel.inputPlaceholder);
-    List.prototype.langs = langs.actions;
+    List.prototype.langs = langs;
     List.prototype.departmentTemplate = departmentTemplateHtml;
     Error.prototype.langs = langs.error;
     CUser.prototype.langs = langs;

@@ -19,37 +19,37 @@ List = (function() {
       call: {
         icon: '/img/icons/action/call.png',
         iconWhite: '/img/icons/action/white/call.png',
-        text: this.langs.call
+        text: this.langs.actions.call
       },
       conference: {
         icon: '/img/icons/action/confinvite.png',
         iconWhite: '/img/icons/action/white/confinvite.png',
-        text: this.langs.conference
+        text: this.langs.actions.conference
       },
       transfer: {
         icon: '/img/icons/action/transfer.png',
-        text: this.langs.transfer
+        text: this.langs.actions.transfer
       },
       toggle: {
         icon: '/img/icons/action/toggle.png',
-        text: this.langs.toggle
+        text: this.langs.actions.toggle
       },
       intercom: {
         icon: '/img/icons/action/intercom.png',
-        text: this.langs.intercom
+        text: this.langs.actions.intercom
       },
       endCall: {
         icon: '/img/icons/action/endcall.png',
         iconWhite: '/img/icons/action/white/endcall.png',
-        text: this.langs.endCall
+        text: this.langs.actions.endCall
       },
       ghostListen: {
         icon: '/img/icons/action/ghost_monitor.png',
-        text: this.langs.ghostListen
+        text: this.langs.actions.ghostListen
       },
       ghostHelp: {
         icon: '/img/icons/action/ghost_help.png',
-        text: this.langs.ghostHelp
+        text: this.langs.actions.ghostHelp
       }
     };
     this.actionCssPrefix = 'i_';
@@ -742,6 +742,9 @@ List = (function() {
     }
     this.usersListBlockEl.children().detach();
     this.usersListBlockEl.html(allDeps);
+    if (allDeps.length > 0) {
+      allDeps[allDeps.length - 1].find('tr:last').addClass('g_last');
+    }
     this.userScrollerToTop();
     return this.timer(true);
   };
@@ -875,7 +878,9 @@ List = (function() {
     this.showDeps = this._config.showDeps;
     this.showOffline = this._config.showOffline;
     this.buttonShowOffline.toggleClass('g_active', !this.showOffline);
+    this.buttonShowOffline.attr('title', this.showOffline ? this.langs.panel.showOnlineOnly : this.langs.panel.showOnlineOnlyCLicked);
     this.buttonShowDeps.toggleClass('g_active', this.showDeps);
+    this.buttonShowDeps.attr('title', this.showDeps ? this.langs.panel.showDepartmentsClicked : this.langs.panel.showDepartments);
     return this._config;
   };
 
