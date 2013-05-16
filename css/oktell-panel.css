@@ -166,6 +166,12 @@
   color: #a0a0a0;
   font-size: 0.785em;
 }
+.oktell_panel.noavatar .b_marks .b_capital_letter {
+  display: none !important;
+}
+.oktell_panel.noavatar .b_marks .b_contact_title {
+  padding-left: 11px;
+}
 .oktell_panel.noavatar table .b_contact .b_contact_avatar {
   display: none;
 }
