@@ -546,6 +546,9 @@
   margin-bottom: -3px;
   clear: left;
 }
+.oktell_panel .b_contact.g_last {
+  margin-bottom: 20px;
+}
 .oktell_panel .b_contact td.b_contact_avatar,
 .oktell_panel .b_contact td.b_capital_letter {
   width: 24px;
