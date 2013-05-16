@@ -546,7 +546,7 @@
   margin-bottom: -3px;
   clear: left;
 }
-.oktell_panel .b_contact.g_last {
+.oktell_panel .b_contact:last-child {
   margin-bottom: 20px;
 }
 .oktell_panel .b_contact td.b_contact_avatar,
