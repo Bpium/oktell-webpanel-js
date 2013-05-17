@@ -68,7 +68,7 @@ var __slice = [].slice;
         onHold: 'On hold',
         queue: 'Wait queue',
         inputPlaceholder: 'Enter name or number',
-        withoutDepartment: 'wihtout department',
+        withoutDepartment: 'Without department',
         showDepartments: 'Show departments',
         showDepartmentsClicked: 'Hide departments',
         showOnlineOnly: 'Show online only',
@@ -114,11 +114,11 @@ var __slice = [].slice;
         onHold: 'Na hold',
         queue: 'Fronta čekaní',
         inputPlaceholder: 'zadejte jméno nebo číslo',
-        withoutDepartment: '!!!!!!!',
-        showDepartments: 'Show departments',
-        showDepartmentsClicked: 'Hide departments',
-        showOnlineOnly: 'Show online only',
-        showOnlineOnlyCLicked: 'Show all'
+        withoutDepartment: 'Bez oddělení',
+        showDepartments: 'Zobrazit oddělení',
+        showDepartmentsClicked: 'Skrýt oddělení',
+        showOnlineOnly: 'Zobrazit pouze online',
+        showOnlineOnlyCLicked: 'Zobrazit všechny'
       },
       actions: {
         call: 'Zavolat',

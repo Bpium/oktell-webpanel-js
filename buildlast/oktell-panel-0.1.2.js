@@ -584,6 +584,8 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
       ns = this.nameHtml.split(/\s+/);
       if (ns.length > 1) {
         this.nameHtml = '<b>' + ns[0] + '</b> ' + ns.splice(1);
+      } else {
+        this.nameHtml = '<b>' + this.nameHtml + '</b>';
       }
       lastHtml = this.elNumberHtml;
       this.elNumberHtml = this.numberHtml !== this.nameHtml ? this.numberHtml : '';
@@ -1907,7 +1909,7 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
         onHold: 'On hold',
         queue: 'Wait queue',
         inputPlaceholder: 'Enter name or number',
-        withoutDepartment: 'wihtout department',
+        withoutDepartment: 'Without department',
         showDepartments: 'Show departments',
         showDepartmentsClicked: 'Hide departments',
         showOnlineOnly: 'Show online only',
@@ -1953,11 +1955,11 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
         onHold: 'Na hold',
         queue: 'Fronta čekaní',
         inputPlaceholder: 'zadejte jméno nebo číslo',
-        withoutDepartment: '!!!!!!!',
-        showDepartments: 'Show departments',
-        showDepartmentsClicked: 'Hide departments',
-        showOnlineOnly: 'Show online only',
-        showOnlineOnlyCLicked: 'Show all'
+        withoutDepartment: 'Bez oddělení',
+        showDepartments: 'Zobrazit oddělení',
+        showDepartmentsClicked: 'Skrýt oddělení',
+        showOnlineOnly: 'Zobrazit pouze online',
+        showOnlineOnlyCLicked: 'Zobrazit všechny'
       },
       actions: {
         call: 'Zavolat',
@@ -2047,7 +2049,7 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
   templates = {
     'templates/actionButton.html': '<ul class="oktell_button_action"><li class="g_first"><i></i></li><li class="g_last drop_down"><i></i></li></ul>',
     'templates/actionList.html': '<ul class="oktell_actions_group_list"><li class="{{css}}" data-action="{{action}}"><i></i><span>{{actionText}}</span></li></ul>',
-    'templates/user.html': '<tr class="b_contact"><td class="b_contact_avatar {{css}}"><img src="{{avatarLink32x32}}"><i></i><div class="o_busy"></div></td><td class="b_capital_letter"><span></span></td><td class="b_contact_title"><div class="wrapword"><a><b>{{name}}</b><span class="o_number">{{number}}</span></a></div>{{button}}</td></tr>',
+    'templates/user.html': '<tr class="b_contact"><td class="b_contact_avatar {{css}}"><img src="{{avatarLink32x32}}"><i></i><div class="o_busy"></div></td><td class="b_capital_letter"><span></span></td><td class="b_contact_title"><div class="wrapword"><a>{{name}}<span class="o_number">{{number}}</span></a></div>{{button}}</td></tr>',
     'templates/department.html': '<tr class="b_contact"><td class="b_contact_department" colspan="3">{{department}}</td></tr>',
     'templates/dep.html': '<div class="b_department"><div class="b_department_header"><span>{{department}}</span></div><table class="b_main_list"><tbody></tbody></table></div>',
     'templates/usersTable.html': '<table class="b_main_list m_without_department"><tbody></tbody></table>',
