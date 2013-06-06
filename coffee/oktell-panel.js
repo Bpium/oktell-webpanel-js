@@ -2,7 +2,7 @@
 var __slice = [].slice;
 
 (function($) {
-  var actionButtonHtml, actionListEl, actionListHtml, addActionButtonToEl, afterOktellConnect, defaultOptions, departmentTemplateHtml, error, errorHtml, getOptions, initActionButtons, initButtonOnElement, initPanel, langs, list, loadTemplate, log, logStr, oktell, oktellConnected, options, panelHtml, panelWasInitialized, popup, popupHtml, templates, userTemplateHtml, usersTableHtml;
+  var actionButtonContainerClass, actionButtonHtml, actionListEl, actionListHtml, addActionButtonToEl, afterOktellConnect, defaultOptions, departmentTemplateHtml, error, errorHtml, getOptions, initActionButtons, initButtonOnElement, initPanel, langs, list, loadTemplate, log, logStr, oktell, oktellConnected, options, panelHtml, panelWasInitialized, popup, popupHtml, templates, userTemplateHtml, usersTableHtml;
 
   if (!$) {
     throw new Error('Error init oktell panel, jQuery ( $ ) is not defined');
@@ -163,6 +163,7 @@ var __slice = [].slice;
   list = null;
   popup = null;
   error = null;
+  actionButtonContainerClass = 'oktellPanelActionButton';
   getOptions = function() {
     return options || defaultOptions;
   };

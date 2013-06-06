@@ -5,7 +5,7 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
   __hasProp = {}.hasOwnProperty;
 
 (function($) {
-  var CUser, Department, Error, List, Popup, actionButtonHtml, actionListEl, actionListHtml, addActionButtonToEl, afterOktellConnect, cookie, debounce, defaultOptions, departmentTemplateHtml, error, errorHtml, escapeHtml, getOptions, initActionButtons, initButtonOnElement, initPanel, jScroll, langs, list, loadTemplate, log, logStr, oktell, oktellConnected, options, panelHtml, panelWasInitialized, popup, popupHtml, templates, userTemplateHtml, usersTableHtml;
+  var CUser, Department, Error, List, Popup, actionButtonContainerClass, actionButtonHtml, actionListEl, actionListHtml, addActionButtonToEl, afterOktellConnect, cookie, debounce, defaultOptions, departmentTemplateHtml, error, errorHtml, escapeHtml, getOptions, initActionButtons, initButtonOnElement, initPanel, jScroll, langs, list, loadTemplate, log, logStr, oktell, oktellConnected, options, panelHtml, panelWasInitialized, popup, popupHtml, templates, userTemplateHtml, usersTableHtml;
 
   if (!$) {
     throw new Error('Error init oktell panel, jQuery ( $ ) is not defined');
@@ -1953,6 +1953,7 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
   list = null;
   popup = null;
   error = null;
+  actionButtonContainerClass = 'oktellPanelActionButton';
   getOptions = function() {
     return options || defaultOptions;
   };

@@ -1629,6 +1629,7 @@ do ($)->
 	list = null
 	popup = null
 	error = null
+	actionButtonContainerClass = 'oktellPanelActionButton'
 
 	getOptions = ->
 		options or defaultOptions
