@@ -276,7 +276,7 @@ List = (function() {
       return _results;
     });
     oktell.on('connect', function() {
-      var createdDeps, dep, oId, oInfo, oUser, oUsers, otherDep, strNumber, user, _i, _len, _ref, _ref1, _ref2;
+      var createdDeps, dep, id, numObj, number, oId, oInfo, oNumbers, oUser, oUsers, otherDep, strNumber, user, _i, _len, _ref, _ref1, _ref2;
 
       _this.oktellConnected = true;
       oInfo = oktell.getMyInfo();
@@ -290,6 +290,23 @@ List = (function() {
       createdDeps = {};
       otherDep = new Department();
       oUsers = oktell.getUsers();
+      oNumbers = oktell.getNumbers();
+      for (id in oUsers) {
+        if (!__hasProp.call(oUsers, id)) continue;
+        user = oUsers[id];
+        delete oNumbers[user.number];
+      }
+      for (number in oNumbers) {
+        if (!__hasProp.call(oNumbers, number)) continue;
+        numObj = oNumbers[number];
+        id = newGuid();
+        oUsers[id] = {
+          id: id,
+          number: number,
+          name: numObj.caption,
+          numberObj: numObj
+        };
+      }
       for (oId in oUsers) {
         if (!__hasProp.call(oUsers, oId)) continue;
         oUser = oUsers[oId];

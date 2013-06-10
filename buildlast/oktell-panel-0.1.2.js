@@ -5,7 +5,7 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
   __hasProp = {}.hasOwnProperty;
 
 (function($) {
-  var CUser, Department, Error, List, PermissionsPopup, Popup, actionButtonHtml, actionListEl, actionListHtml, addActionButtonToEl, afterOktellConnect, cookie, debounce, defaultOptions, departmentTemplateHtml, error, errorHtml, escapeHtml, getOptions, initActionButtons, initButtonOnElement, initPanel, jScroll, langs, list, loadTemplate, log, logStr, oktell, oktellConnected, options, panelHtml, panelWasInitialized, permissionsPopup, permissionsPopupHtml, popup, popupHtml, templates, userTemplateHtml, usersTableHtml;
+  var CUser, Department, Error, List, PermissionsPopup, Popup, actionButtonContainerClass, actionButtonHtml, actionListEl, actionListHtml, addActionButtonToEl, afterOktellConnect, cookie, debounce, defaultOptions, departmentTemplateHtml, error, errorHtml, escapeHtml, getOptions, initActionButtons, initButtonOnElement, initPanel, jScroll, langs, list, loadTemplate, log, logStr, newGuid, oktell, oktellConnected, options, panelHtml, panelWasInitialized, permissionsPopup, permissionsPopupHtml, popup, popupHtml, templates, userTemplateHtml, usersTableHtml;
 
   if (!$) {
     throw new Error('Error init oktell panel, jQuery ( $ ) is not defined');
@@ -78,6 +78,15 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
     } else {
       return null;
     }
+  };
+  newGuid = function() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+      var r, v;
+
+      r = Math.random() * 16 | 0;
+      v = c === 'x' ? r : r & 0x3 | 0x8;
+      return v.toString(16);
+    });
   };
   jScroll = function($el) {
     var END_EVENT, MOVE_EVENT, START_EVENT, WHEEL_EV, get_koef, get_pageY, get_position, init, isTouch, jscroll_timer, move_by_bar, pageY_end, pageY_start, params, pos, pos_start, scrollClick, scrollTo, scrollWheelPos, scroll_hide, scroll_show, scrollbar_cont, scrollbar_inner, scroller, scroller_left_while_scrolling, scrolling, set_bar_bounds, set_position, vendor, wrapper,
@@ -1069,7 +1078,7 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
         return _results;
       });
       oktell.on('connect', function() {
-        var createdDeps, dep, oId, oInfo, oUser, oUsers, otherDep, strNumber, user, _i, _len, _ref, _ref1, _ref2;
+        var createdDeps, dep, id, numObj, number, oId, oInfo, oNumbers, oUser, oUsers, otherDep, strNumber, user, _i, _len, _ref, _ref1, _ref2;
 
         _this.oktellConnected = true;
         oInfo = oktell.getMyInfo();
@@ -1083,6 +1092,23 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
         createdDeps = {};
         otherDep = new Department();
         oUsers = oktell.getUsers();
+        oNumbers = oktell.getNumbers();
+        for (id in oUsers) {
+          if (!__hasProp.call(oUsers, id)) continue;
+          user = oUsers[id];
+          delete oNumbers[user.number];
+        }
+        for (number in oNumbers) {
+          if (!__hasProp.call(oNumbers, number)) continue;
+          numObj = oNumbers[number];
+          id = newGuid();
+          oUsers[id] = {
+            id: id,
+            number: number,
+            name: numObj.caption,
+            numberObj: numObj
+          };
+        }
         for (oId in oUsers) {
           if (!__hasProp.call(oUsers, oId)) continue;
           oUser = oUsers[oId];
@@ -2005,6 +2031,7 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
   popup = null;
   permissionsPopup = null;
   error = null;
+  actionButtonContainerClass = 'oktellPanelActionButton';
   getOptions = function() {
     return options || defaultOptions;
   };

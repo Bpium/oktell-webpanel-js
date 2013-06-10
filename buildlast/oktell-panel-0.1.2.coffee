@@ -68,6 +68,12 @@ do ($)->
 			decode(result[1])
 		else
 			null
+	
+	newGuid = ()->
+		'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace /[xy]/g, (c)->
+			r = Math.random()*16|0
+			v = if c is 'x' then r else (r&0x3|0x8)
+			v.toString(16)
 	#includecoffee coffee/jScroll.coffee
 	jScroll = ( $el )->
 		wrapper = ''
@@ -979,6 +985,18 @@ do ($)->
 	
 	
 				oUsers = oktell.getUsers()
+				oNumbers = oktell.getNumbers()
+				for own id, user of oUsers
+					delete oNumbers[user.number]
+				for own number, numObj of oNumbers
+					id = newGuid()
+					oUsers[id] =
+						id: id
+						number: number
+						name: numObj.caption
+						numberObj: numObj
+	
+	
 				for own oId, oUser of oUsers
 					strNumber = oUser.number?.toString() or ''
 					if not strNumber
@@ -1637,6 +1655,7 @@ do ($)->
 	popup = null
 	permissionsPopup = null
 	error = null
+	actionButtonContainerClass = 'oktellPanelActionButton'
 
 	getOptions = ->
 		options or defaultOptions

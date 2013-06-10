@@ -245,6 +245,18 @@ class List
 
 
 			oUsers = oktell.getUsers()
+			oNumbers = oktell.getNumbers()
+			for own id, user of oUsers
+				delete oNumbers[user.number]
+			for own number, numObj of oNumbers
+				id = newGuid()
+				oUsers[id] =
+					id: id
+					number: number
+					name: numObj.caption
+					numberObj: numObj
+
+
 			for own oId, oUser of oUsers
 				strNumber = oUser.number?.toString() or ''
 				if not strNumber
