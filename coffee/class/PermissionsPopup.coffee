@@ -1,13 +1,13 @@
 class PermissionsPopup
-	constructor: (popupEl, oktell)->
+	constructor: (popupEl, oktellVoice)->
 		@el = popupEl
-		oktell.on 'mediaPermissionsRequest', (abonents) =>
+		oktellVoice.on 'mediaPermissionsRequest', =>
 			@show()
 
-		oktell.on 'mediaPermissionsAccept', =>
+		oktellVoice.on 'mediaPermissionsAccept', =>
 			@hide()
 
-		oktell.on 'mediaPermissionsRefuse', =>
+		oktellVoice.on 'mediaPermissionsRefuse', =>
 			oktell.endCall();
 			@hide()
 
@@ -15,7 +15,8 @@ class PermissionsPopup
 
 	show: ->
 		@log 'Permissions Popup show!'
-		@el.fadeIn 200
+		#@el.fadeIn 200
+		@el.show()
 
 	hide: ->
 		@el.fadeOut 200

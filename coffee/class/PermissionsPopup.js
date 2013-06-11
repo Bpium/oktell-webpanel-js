@@ -2,17 +2,17 @@
 var PermissionsPopup;
 
 PermissionsPopup = (function() {
-  function PermissionsPopup(popupEl, oktell) {
+  function PermissionsPopup(popupEl, oktellVoice) {
     var _this = this;
 
     this.el = popupEl;
-    oktell.on('mediaPermissionsRequest', function(abonents) {
+    oktellVoice.on('mediaPermissionsRequest', function() {
       return _this.show();
     });
-    oktell.on('mediaPermissionsAccept', function() {
+    oktellVoice.on('mediaPermissionsAccept', function() {
       return _this.hide();
     });
-    oktell.on('mediaPermissionsRefuse', function() {
+    oktellVoice.on('mediaPermissionsRefuse', function() {
       oktell.endCall();
       return _this.hide();
     });
@@ -20,7 +20,7 @@ PermissionsPopup = (function() {
 
   PermissionsPopup.prototype.show = function() {
     this.log('Permissions Popup show!');
-    return this.el.fadeIn(200);
+    return this.el.show();
   };
 
   PermissionsPopup.prototype.hide = function() {

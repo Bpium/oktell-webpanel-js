@@ -11,6 +11,7 @@ var __slice = [].slice;
     position: 'right',
     dynamic: false,
     oktell: window.oktell,
+    oktellVoice: window.oktellVoice,
     debug: false,
     lang: 'ru',
     noavatar: true
@@ -283,7 +284,7 @@ var __slice = [].slice;
     if (!getOptions().withoutPermissionsPopup) {
       permissionsPopupEl = $(permissionsPopupHtml);
       $('body').append(permissionsPopupEl);
-      permissionsPopup = new PermissionsPopup(permissionsPopupEl, oktell);
+      permissionsPopup = new PermissionsPopup(permissionsPopupEl, getOptions().oktellVoice);
     }
     if (!getOptions().withoutError) {
       errorEl = $(errorHtml);

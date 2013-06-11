@@ -1547,15 +1547,15 @@ do ($)->
 	
 	#includecoffee coffee/class/PermissionsPopup.coffee
 	class PermissionsPopup
-		constructor: (popupEl, oktell)->
+		constructor: (popupEl, oktellVoice)->
 			@el = popupEl
-			oktell.on 'mediaPermissionsRequest', (abonents) =>
+			oktellVoice.on 'mediaPermissionsRequest', =>
 				@show()
 	
-			oktell.on 'mediaPermissionsAccept', =>
+			oktellVoice.on 'mediaPermissionsAccept', =>
 				@hide()
 	
-			oktell.on 'mediaPermissionsRefuse', =>
+			oktellVoice.on 'mediaPermissionsRefuse', =>
 				oktell.endCall();
 				@hide()
 	
@@ -1563,7 +1563,8 @@ do ($)->
 	
 		show: ->
 			@log 'Permissions Popup show!'
-			@el.fadeIn 200
+			#@el.fadeIn 200
+			@el.show()
 	
 		hide: ->
 			@el.fadeOut 200
@@ -1611,6 +1612,7 @@ do ($)->
 		dynamic: false
 		#animateTimout: 200
 		oktell: window.oktell
+		oktellVoice: window.oktellVoice
 		#buttonCss: 'oktellActionButton'
 		debug: false
 		lang: 'ru'
@@ -1774,7 +1776,7 @@ do ($)->
 		if not getOptions().withoutPermissionsPopup
 			permissionsPopupEl = $(permissionsPopupHtml)
 			$('body').append(permissionsPopupEl)
-			permissionsPopup = new PermissionsPopup permissionsPopupEl, oktell
+			permissionsPopup = new PermissionsPopup permissionsPopupEl, getOptions().oktellVoice
 
 		if not getOptions().withoutError
 			errorEl = $(errorHtml)

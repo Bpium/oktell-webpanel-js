@@ -16,6 +16,7 @@ do ($)->
 		dynamic: false
 		#animateTimout: 200
 		oktell: window.oktell
+		oktellVoice: window.oktellVoice
 		#buttonCss: 'oktellActionButton'
 		debug: false
 		lang: 'ru'
@@ -179,7 +180,7 @@ do ($)->
 		if not getOptions().withoutPermissionsPopup
 			permissionsPopupEl = $(permissionsPopupHtml)
 			$('body').append(permissionsPopupEl)
-			permissionsPopup = new PermissionsPopup permissionsPopupEl, oktell
+			permissionsPopup = new PermissionsPopup permissionsPopupEl, getOptions().oktellVoice
 
 		if not getOptions().withoutError
 			errorEl = $(errorHtml)

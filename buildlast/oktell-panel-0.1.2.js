@@ -1792,17 +1792,17 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
 
   })();
   PermissionsPopup = (function() {
-    function PermissionsPopup(popupEl, oktell) {
+    function PermissionsPopup(popupEl, oktellVoice) {
       var _this = this;
 
       this.el = popupEl;
-      oktell.on('mediaPermissionsRequest', function(abonents) {
+      oktellVoice.on('mediaPermissionsRequest', function() {
         return _this.show();
       });
-      oktell.on('mediaPermissionsAccept', function() {
+      oktellVoice.on('mediaPermissionsAccept', function() {
         return _this.hide();
       });
-      oktell.on('mediaPermissionsRefuse', function() {
+      oktellVoice.on('mediaPermissionsRefuse', function() {
         oktell.endCall();
         return _this.hide();
       });
@@ -1810,7 +1810,7 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
 
     PermissionsPopup.prototype.show = function() {
       this.log('Permissions Popup show!');
-      return this.el.fadeIn(200);
+      return this.el.show();
     };
 
     PermissionsPopup.prototype.hide = function() {
@@ -1878,6 +1878,7 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
     position: 'right',
     dynamic: false,
     oktell: window.oktell,
+    oktellVoice: window.oktellVoice,
     debug: false,
     lang: 'ru',
     noavatar: true
@@ -2161,7 +2162,7 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
     if (!getOptions().withoutPermissionsPopup) {
       permissionsPopupEl = $(permissionsPopupHtml);
       $('body').append(permissionsPopupEl);
-      permissionsPopup = new PermissionsPopup(permissionsPopupEl, oktell);
+      permissionsPopup = new PermissionsPopup(permissionsPopupEl, getOptions().oktellVoice);
     }
     if (!getOptions().withoutError) {
       errorEl = $(errorHtml);
