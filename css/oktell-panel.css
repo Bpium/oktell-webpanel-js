@@ -180,10 +180,6 @@
 .oktell_panel .b_marks {
   width: 100%;
 }
-.oktell_panel .b_marks.i_conference,
-.oktell_panel .b_marks.i_flash {
-  padding: 10px 0;
-}
 .oktell_panel .b_marks p.b_marks_header {
   padding: 0 10px;
 }
@@ -196,6 +192,11 @@
 }
 .oktell_panel .b_marks .b_marks_label {
   line-height: 160%;
+}
+.oktell_panel .b_marks.h_shadow_top .h_shadow_top,
+.oktell_panel .b_marks.i_conference  .h_shadow_top,
+.oktell_panel .b_marks.i_flash .h_shadow_top {
+  padding: 10px 0;
 }
 .oktell_panel .b_marks.i_conference {
   background-color: #bcd2a4;
@@ -224,29 +225,32 @@
   background-image: linear-gradient(top, #bbbcc0 0px, #c5c7cb 6px);
   box-sizing: border-box;
 }
+.oktell_panel .h_shadow_top {
+  background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAFCAYAAACEhIafAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMy1jMDExIDY2LjE0NTY2MSwgMjAxMi8wMi8wNi0xNDo1NjoyNyAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNiAoV2luZG93cykiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6NEYzRDc1NDNENDI3MTFFMjlEQ0VFOTQ4Q0M3NDhFMDMiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6NEYzRDc1NDRENDI3MTFFMjlEQ0VFOTQ4Q0M3NDhFMDMiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDo0RjNENzU0MUQ0MjcxMUUyOURDRUU5NDhDQzc0OEUwMyIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDo0RjNENzU0MkQ0MjcxMUUyOURDRUU5NDhDQzc0OEUwMyIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/Pl2P6EoAAAAbSURBVHjaYmBgYOABYgYuEMEKIphBBCNAgAEAAf8AIGNdTvcAAAAASUVORK5CYII=");
+  background-position: top left;
+  background-repeat: repeat-x;
+  height: 100%;
+  overflow: hidden;
+}
 .oktell_panel .b_inconversation table {
   width: 100%;
 }
 .oktell_panel .b_department_header {
-  padding: 3px 10px;
   border-top: 1px solid #bebebe;
   border-bottom: 1px solid #bebebe;
-  background: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2Q0ZDNjYyIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjIwJSIgc3RvcC1jb2xvcj0iI2RlZGNkNSIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjgwJSIgc3RvcC1jb2xvcj0iI2RlZGNkNSIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNkNGQzY2MiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+");
-  background: -moz-linear-gradient(top, #d4d3cc 0%, #dedcd5 20%, #dedcd5 80%, #d4d3cc 100%);
-  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #d4d3cc), color-stop(20%, #dedcd5), color-stop(80%, #dedcd5), color-stop(100%, #d4d3cc));
-  background: -webkit-linear-gradient(top, #d4d3cc 0%, #dedcd5 20%, #dedcd5 80%, #d4d3cc 100%);
-  background: -o-linear-gradient(top, #d4d3cc 0%, #dedcd5 20%, #dedcd5 80%, #d4d3cc 100%);
-  background: -ms-linear-gradient(top, #d4d3cc 0%, #dedcd5 20%, #dedcd5 80%, #d4d3cc 100%);
-  background: linear-gradient(to bottom, #d4d3cc 0%, #dedcd5 20%, #dedcd5 80%, #d4d3cc 100%);
+  background-color: #d4d3cc;
   overflow: hidden;
   cursor: pointer;
 }
-.oktell_panel .b_department_header.g_first {
-  border-top: none;
+.oktell_panel .b_department_header .h_shadow_top {
+  padding: 3px 10px;
 }
-.oktell_panel .b_department_header span {
+.oktell_panel .b_department_header .h_shadow_top span {
   color: #8f8f8d;
   font-size: 0.875em;
+}
+.oktell_panel .b_department_header.g_first {
+  border-top: none;
 }
 /* Phone number input fields
 ---------------------------------------------------------------*/
@@ -339,10 +343,10 @@
   position: absolute;
   padding: 0 6px;
   -webkit-border-top-right-radius: 3px;
-  -webkit-border-bottom-right-radius: 3px;
   -moz-border-radius-topright: 3px;
-  -moz-border-radius-bottomright: 3px;
   border-top-right-radius: 3px;
+  -webkit-border-bottom-right-radius: 3px;
+  -moz-border-radius-bottomright: 3px;
   border-bottom-right-radius: 3px;
   background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAcCAIAAAAvP0KbAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyBpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNSBXaW5kb3dzIiB4bXBNTTpJbnN0YW5jZUlEPSJ4bXAuaWlkOjk1QkVFNzcwRjU5OTExRTA5MkNEODBCRjYyQjE2MTgxIiB4bXBNTTpEb2N1bWVudElEPSJ4bXAuZGlkOjk1QkVFNzcxRjU5OTExRTA5MkNEODBCRjYyQjE2MTgxIj4gPHhtcE1NOkRlcml2ZWRGcm9tIHN0UmVmOmluc3RhbmNlSUQ9InhtcC5paWQ6OTVCRUU3NkVGNTk5MTFFMDkyQ0Q4MEJGNjJCMTYxODEiIHN0UmVmOmRvY3VtZW50SUQ9InhtcC5kaWQ6OTVCRUU3NkZGNTk5MTFFMDkyQ0Q4MEJGNjJCMTYxODEiLz4gPC9yZGY6RGVzY3JpcHRpb24+IDwvcmRmOlJERj4gPC94OnhtcG1ldGE+IDw/eHBhY2tldCBlbmQ9InIiPz6/VrULAAAAQElEQVR42lyISQ7AMAwCMc7/vxv7AnXUXlLQiAW7mrDpg0QZNExN9/dLb1Y3azeTMSYj4geufZSZXGuYnP4IMADqgCQd2AfP+QAAAABJRU5ErkJggg==");
   background-color: #dddee1;
@@ -477,6 +481,8 @@
   border-left: none;
 }
 .oktell_panel .b_phone_keypad .b_phone_panel li button {
+  -webkit-border-radius: 0 !important;
+  -moz-border-radius: 0 !important;
   border-radius: 0 !important;
   border: none;
   text-align: center;
@@ -669,11 +675,12 @@
 ---------------------------------------------------------------*/
 .oktell_button_action {
   border: 1px solid #d8dce0;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
   border-radius: 3px;
   height: 26px;
   width: 60px;
   overflow: hidden;
-  zoom: 1;
   cursor: pointer;
   display: inline-block;
   visibility: hidden;
@@ -705,20 +712,20 @@
 }
 .oktell_button_action li.g_first {
   -webkit-border-top-left-radius: 3px;
-  -webkit-border-bottom-left-radius: 3px;
   -moz-border-radius-topleft: 3px;
-  -moz-border-radius-bottomleft: 3px;
   border-top-left-radius: 3px;
+  -webkit-border-bottom-left-radius: 3px;
+  -moz-border-radius-bottomleft: 3px;
   border-bottom-left-radius: 3px;
 }
 .oktell_button_action li.g_last {
   padding: 0 4px;
   border-right: 1px solid #fff;
   -webkit-border-top-right-radius: 3px;
-  -webkit-border-bottom-right-radius: 3px;
   -moz-border-radius-topright: 3px;
-  -moz-border-radius-bottomright: 3px;
   border-top-right-radius: 3px;
+  -webkit-border-bottom-right-radius: 3px;
+  -moz-border-radius-bottomright: 3px;
   border-bottom-right-radius: 3px;
 }
 .oktell_button_action li.g_first.g_last {
@@ -746,6 +753,8 @@
 }
 .oktell_actions_group_list {
   border: 1px solid #d8dce0;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
   border-radius: 3px;
   position: absolute;
   margin: 0 auto;
@@ -761,26 +770,25 @@
   border: 1px solid #fff;
   border-bottom-color: #d8dce0;
   overflow: hidden;
-  zoom: 1;
   cursor: pointer;
 }
 .oktell_actions_group_list li.g_first {
   border-top: 1px solid #fff !important;
   -webkit-border-top-left-radius: 3px;
-  -webkit-border-top-right-radius: 3px;
   -moz-border-radius-topleft: 3px;
-  -moz-border-radius-topright: 3px;
   border-top-left-radius: 3px;
+  -webkit-border-top-right-radius: 3px;
+  -moz-border-radius-topright: 3px;
   border-top-right-radius: 3px;
 }
 .oktell_actions_group_list li.g_last {
   border-bottom: 1px solid #fff !important;
-  -webkit-border-bottom-right-radius: 3px;
   -webkit-border-bottom-left-radius: 3px;
-  -moz-border-radius-bottomright: 3px;
   -moz-border-radius-bottomleft: 3px;
-  border-bottom-right-radius: 3px;
   border-bottom-left-radius: 3px;
+  -webkit-border-bottom-right-radius: 3px;
+  -moz-border-radius-bottomright: 3px;
+  border-bottom-right-radius: 3px;
 }
 .oktell_actions_group_list li:hover {
   background: #edeeee;
@@ -1082,7 +1090,6 @@
 }
 .oktell_panel_popup .footer {
   overflow: hidden;
-  zoom: 1;
   padding: 19px 12px;
 }
 .oktell_panel_popup .footer .b_take_phone {
@@ -1251,7 +1258,7 @@
   -moz-border-radius: 5px;
   border-radius: 5px;
 }
-/* Forms & error blocks
+/* Forms error blocks
 ---------------------------------------------------------------*/
 .oktell_panel .m_form {
   position: absolute;
