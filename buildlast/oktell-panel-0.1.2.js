@@ -596,7 +596,7 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
       ns = this.nameHtml.split(/\s+/);
       if (ns.length > 1 && data.name.toString() !== this.number) {
         this.nameHtml1 = ns[0];
-        this.nameHtml2 = ns.splice(1).join('');
+        this.nameHtml2 = ' ' + ns.splice(1).join('');
       } else {
         this.nameHtml1 = this.nameHtml;
         this.nameHtml2 = '';

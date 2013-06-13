@@ -563,7 +563,7 @@ do ($)->
 			ns = @nameHtml.split(/\s+/)
 			if ns.length > 1 and data.name.toString() isnt @number
 				@nameHtml1 = ns[0]
-				@nameHtml2 = ns.splice(1).join('')
+				@nameHtml2 = ' ' + ns.splice(1).join('')
 			else
 				@nameHtml1 = @nameHtml
 				@nameHtml2 = ''
