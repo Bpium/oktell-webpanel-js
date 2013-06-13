@@ -371,8 +371,10 @@ class List
 					@talkTimeEl.text formattedTime
 
 
-			@setAbonents oktell.getAbonents()
-			@setHold oktell.getHoldInfo()
+			setTimeout =>
+				@setAbonents oktell.getAbonents()
+				@setHold oktell.getHoldInfo()
+			, 1000
 
 #			depsEls = $()
 #			for d in @departments

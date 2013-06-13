@@ -1255,8 +1255,10 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
             return _this.talkTimeEl.text(formattedTime);
           }
         });
-        _this.setAbonents(oktell.getAbonents());
-        _this.setHold(oktell.getHoldInfo());
+        setTimeout(function() {
+          _this.setAbonents(oktell.getAbonents());
+          return _this.setHold(oktell.getHoldInfo());
+        }, 1000);
         _this.setFilter('', true);
         oktell.on('queueChange', function(queue) {
           return _this.setQueue(queue);
@@ -2227,7 +2229,7 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
       if (parseInt(panelEl.css(panelPos)) < 0 && (panelStatus === 'closed' || panelStatus === 'closing')) {
         panelStatus = 'opening';
         panelBookmarkEl.stop(true, true);
-        panelBookmarkEl.animate(bookmarkAnimOptShow, 50, 'swing');
+        panelBookmarkEl.css(bookmarkAnimOptShow);
         panelEl.stop(true, true);
         panelEl.animate(animOptShow, 100, "swing", function() {
           panelEl.addClass("g_hover");
@@ -2240,16 +2242,15 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
       if (panelEl.hasClass("g_hover")) {
         panelStatus = 'closing';
         panelEl.stop(true, true);
-        panelEl.animate(animOptHide, 300, "swing", function() {
+        return panelEl.animate(animOptHide, 300, "swing", function() {
           panelEl.css({
             panelPos: 0
           });
           panelEl.removeClass("g_hover");
-          return panelStatus = 'closed';
+          panelStatus = 'closed';
+          panelBookmarkEl.stop(true, true);
+          return panelBookmarkEl.css(bookmarkAnimOptHide);
         });
-        return setTimeout(function() {
-          return panelBookmarkEl.animate(bookmarkAnimOptHide, 50, 'swing');
-        }, 150);
       }
     };
     panelEl.on("mouseleave", function() {

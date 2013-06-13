@@ -447,8 +447,10 @@ List = (function() {
           return _this.talkTimeEl.text(formattedTime);
         }
       });
-      _this.setAbonents(oktell.getAbonents());
-      _this.setHold(oktell.getHoldInfo());
+      setTimeout(function() {
+        _this.setAbonents(oktell.getAbonents());
+        return _this.setHold(oktell.getHoldInfo());
+      }, 1000);
       _this.setFilter('', true);
       oktell.on('queueChange', function(queue) {
         return _this.setQueue(queue);

@@ -237,7 +237,8 @@ do ($)->
 			if parseInt(panelEl.css(panelPos)) < 0 and ( panelStatus is 'closed' or panelStatus is 'closing' )
 				panelStatus = 'opening'
 				panelBookmarkEl.stop(true,true)
-				panelBookmarkEl.animate bookmarkAnimOptShow, 50, 'swing'
+				#panelBookmarkEl.animate bookmarkAnimOptShow, 1, 'swing'
+				panelBookmarkEl.css bookmarkAnimOptShow
 				panelEl.stop true, true
 				panelEl.animate animOptShow, 100, "swing", ->
 					panelEl.addClass("g_hover")
@@ -252,9 +253,11 @@ do ($)->
 					panelEl.css({panelPos: 0});
 					panelEl.removeClass("g_hover");
 					panelStatus = 'closed'
-				setTimeout ->
-				   panelBookmarkEl.animate bookmarkAnimOptHide, 50, 'swing'
-				, 150
+				#setTimeout ->
+					panelBookmarkEl.stop(true,true)
+					#panelBookmarkEl.animate bookmarkAnimOptHide, 50, 'swing'
+					panelBookmarkEl.css bookmarkAnimOptHide
+				#, 49
 
 
 		panelEl.on "mouseleave", ->

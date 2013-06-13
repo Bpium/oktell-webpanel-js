@@ -343,7 +343,7 @@ var __slice = [].slice;
       if (parseInt(panelEl.css(panelPos)) < 0 && (panelStatus === 'closed' || panelStatus === 'closing')) {
         panelStatus = 'opening';
         panelBookmarkEl.stop(true, true);
-        panelBookmarkEl.animate(bookmarkAnimOptShow, 50, 'swing');
+        panelBookmarkEl.css(bookmarkAnimOptShow);
         panelEl.stop(true, true);
         panelEl.animate(animOptShow, 100, "swing", function() {
           panelEl.addClass("g_hover");
@@ -356,16 +356,15 @@ var __slice = [].slice;
       if (panelEl.hasClass("g_hover")) {
         panelStatus = 'closing';
         panelEl.stop(true, true);
-        panelEl.animate(animOptHide, 300, "swing", function() {
+        return panelEl.animate(animOptHide, 300, "swing", function() {
           panelEl.css({
             panelPos: 0
           });
           panelEl.removeClass("g_hover");
-          return panelStatus = 'closed';
+          panelStatus = 'closed';
+          panelBookmarkEl.stop(true, true);
+          return panelBookmarkEl.css(bookmarkAnimOptHide);
         });
-        return setTimeout(function() {
-          return panelBookmarkEl.animate(bookmarkAnimOptHide, 50, 'swing');
-        }, 150);
       }
     };
     panelEl.on("mouseleave", function() {
