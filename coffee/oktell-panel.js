@@ -47,6 +47,10 @@ var __slice = [].slice;
         undefinedNumber: 'Номер не определен',
         goPickup: 'Поднимите трубку'
       },
+      permissionsPopup: {
+        header: 'Запрос на доступ к микрофону',
+        text: 'Для использования веб-телефона необходимо разрешить браузеру доступ к микрофону.'
+      },
       error: {
         usingOktellClient: {
           header: 'Пользователь «%username%» использует стандартный Oktell-клиент.',
@@ -93,6 +97,10 @@ var __slice = [].slice;
         undefinedNumber: 'Phone number is not defined',
         goPickup: 'Pick up the phone'
       },
+      permissionsPopup: {
+        header: 'Request for access to the microphone',
+        text: 'To use the phone you need to allow browser access to the microphone.'
+      },
       error: {
         usingOktellClient: {
           header: 'User «%username%» uses standard Oktell client applications.',
@@ -138,6 +146,10 @@ var __slice = [].slice;
         reject: 'Odmítnout',
         undefinedNumber: '',
         goPickup: 'Zvedněte sluchátko'
+      },
+      permissionsPopup: {
+        header: 'Žádost o přístup k mikrofonu',
+        text: 'Abyste mohli používat telefon, musíte povolit prohlížeče přístup k mikrofonu.'
       },
       error: {
         usingOktellClient: {
@@ -282,6 +294,7 @@ var __slice = [].slice;
       popup = new Popup(popupEl, oktell);
     }
     if (!getOptions().withoutPermissionsPopup) {
+      permissionsPopupHtml = permissionsPopupHtml.replace('{{header}}', langs.permissionsPopup.header).replace('{{text}}', langs.permissionsPopup.text);
       permissionsPopupEl = $(permissionsPopupHtml);
       $('body').append(permissionsPopupEl);
       permissionsPopup = new PermissionsPopup(permissionsPopupEl, getOptions().oktellVoice);

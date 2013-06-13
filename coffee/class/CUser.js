@@ -30,8 +30,11 @@ CUser = (function() {
     this.nameLower = this.name.toLowerCase();
     this.letter = ((_ref4 = this.name[0]) != null ? _ref4.toUpperCase() : void 0) || ((_ref5 = this.number) != null ? _ref5[0].toString().toLowerCase() : void 0);
     this.nameHtml = data.name && data.name.toString() !== this.number ? escapeHtml(data.name) : this.numberHtml;
+    if (this.numberHtml === this.nameHtml) {
+      this.numberHtml = '';
+    }
     ns = this.nameHtml.split(/\s+/);
-    if (ns.length > 1) {
+    if (ns.length > 1 && data.name.toString() !== this.number) {
       this.nameHtml = '<b>' + ns[0] + '</b> ' + ns.splice(1);
     } else {
       this.nameHtml = '<b>' + this.nameHtml + '</b>';
@@ -119,7 +122,7 @@ CUser = (function() {
     var $el, str;
 
     if (!this.el || createIndependent) {
-      str = this.template.replace(this.regexps.name, this.nameHtml).replace(this.regexps.number, this.numberHtml !== this.nameHtml ? this.numberHtml : '').replace(this.regexps.avatarLink32x32, this.avatarLink32x32).replace(this.regexps.css, this.defaultAvatarCss);
+      str = this.template.replace(this.regexps.name, this.nameHtml).replace(this.regexps.number, this.numberHtml).replace(this.regexps.avatarLink32x32, this.avatarLink32x32).replace(this.regexps.css, this.defaultAvatarCss);
       $el = $(str);
       $el.data('user', this);
       this.initButtonEl($el.find('.oktell_button_action'));

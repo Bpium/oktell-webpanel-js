@@ -25,8 +25,11 @@ class CUser
 		@nameLower = @name.toLowerCase()
 		@letter = @name[0]?.toUpperCase() or @number?[0].toString().toLowerCase()
 		@nameHtml = if data.name and data.name.toString() isnt @number then escapeHtml(data.name) else @numberHtml
+		if @numberHtml is @nameHtml
+			@numberHtml = ''
+
 		ns = @nameHtml.split(/\s+/)
-		if ns.length > 1
+		if ns.length > 1 and data.name.toString() isnt @number
 			@nameHtml = '<b>' + ns[0] + '</b> ' + ns.splice(1)
 		else
 			@nameHtml = '<b>' + @nameHtml + '</b>'
@@ -99,7 +102,7 @@ class CUser
 	getEl: ( createIndependent) ->
 		if not @el or createIndependent
 			str = @template.replace( @regexps.name, @nameHtml)
-				.replace( @regexps.number, if @numberHtml isnt @nameHtml then @numberHtml else '' )
+				.replace( @regexps.number, @numberHtml )
 				.replace( @regexps.avatarLink32x32, @avatarLink32x32)
 				.replace( @regexps.css, @defaultAvatarCss )
 			$el = $(str)
