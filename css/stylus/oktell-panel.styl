@@ -1,3 +1,6 @@
+@import "if-ie.styl"
+@import "functions.styl"
+
 /* Normalize panel
 ---------------------------------------------------------------*/
 .oktell_panel
@@ -160,7 +163,7 @@
         color: #c4c4c4
         width: 12px !important
 
-        & span
+        span
             color: #a0a0a0
             font-size: 0.785em
 
@@ -176,25 +179,26 @@
 /* Marks
 ---------------------------------------------------------------*/
 .oktell_panel
-    & .b_marks
+    .b_marks
         width: 100%
 
-        &.i_conference,
-        &.i_flash
-            padding: 10px 0
-
-        & p.b_marks_header
+        p.b_marks_header
             padding: 0 10px
 
-        & table
+        table
             margin-top: 6px
 
-        & .b_marks_time
+        .b_marks_time
             float: right
             font-size: 1.125em
 
-        & .b_marks_label
+        .b_marks_label
             line-height: 160%
+
+        &.h_shadow_top .h_shadow_top,
+        &.i_conference .h_shadow_top,
+        &.i_flash .h_shadow_top
+            padding: 10px 0
 
         &.i_conference
             background-color: #BCD2A4
@@ -223,39 +227,42 @@
             background-image: linear-gradient(top, #bbbcc0 0px, #c5c7cb 6px)
             box-sizing: border-box
 
-    & .b_inconversation table
+    .h_shadow_top
+        background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAFCAYAAACEhIafAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMy1jMDExIDY2LjE0NTY2MSwgMjAxMi8wMi8wNi0xNDo1NjoyNyAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNiAoV2luZG93cykiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6NEYzRDc1NDNENDI3MTFFMjlEQ0VFOTQ4Q0M3NDhFMDMiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6NEYzRDc1NDRENDI3MTFFMjlEQ0VFOTQ4Q0M3NDhFMDMiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDo0RjNENzU0MUQ0MjcxMUUyOURDRUU5NDhDQzc0OEUwMyIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDo0RjNENzU0MkQ0MjcxMUUyOURDRUU5NDhDQzc0OEUwMyIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/Pl2P6EoAAAAbSURBVHjaYmBgYOABYgYuEMEKIphBBCNAgAEAAf8AIGNdTvcAAAAASUVORK5CYII=');
+        background-position: top left
+        background-repeat: repeat-x
+        height: 100%
+        overflow: hidden
+
+    .b_inconversation table
         width: 100%
 
-    & .b_department_header
-        padding: 3px 10px
+    .b_department_header
         border-top: 1px solid #bebebe
         border-bottom: 1px solid #bebebe
-        background: url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2Q0ZDNjYyIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjIwJSIgc3RvcC1jb2xvcj0iI2RlZGNkNSIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjgwJSIgc3RvcC1jb2xvcj0iI2RlZGNkNSIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNkNGQzY2MiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+')
-        background: -moz-linear-gradient(top,  rgb(212,211,204) 0%, rgb(222,220,213) 20%, rgb(222,220,213) 80%, rgb(212,211,204) 100%)
-        background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgb(212,211,204)), color-stop(20%,rgb(222,220,213)), color-stop(80%,rgb(222,220,213)), color-stop(100%,rgb(212,211,204)))
-        background: -webkit-linear-gradient(top,  rgb(212,211,204) 0%,rgb(222,220,213) 20%,rgb(222,220,213) 80%,rgb(212,211,204) 100%)
-        background: -o-linear-gradient(top,  rgb(212,211,204) 0%,rgb(222,220,213) 20%,rgb(222,220,213) 80%,rgb(212,211,204) 100%)
-        background: -ms-linear-gradient(top,  rgb(212,211,204) 0%,rgb(222,220,213) 20%,rgb(222,220,213) 80%,rgb(212,211,204) 100%)
-        background: linear-gradient(to bottom,  rgb(212,211,204) 0%,rgb(222,220,213) 20%,rgb(222,220,213) 80%,rgb(212,211,204) 100%)
+        background-color: #d4d3cc
         overflow: hidden
         cursor: pointer
+
+        .h_shadow_top
+            padding: 3px 10px
+
+            span
+                color: #8f8f8d
+                font-size: 0.875em
 
         &.g_first
             border-top: none
 
-        & span
-            color: #8f8f8d
-            font-size: 0.875em
+
 
 
 /* Phone number input fields
 ---------------------------------------------------------------*/
 .oktell_panel
-    & .h_input_padding
+    .h_input_padding
         background: white
-        -webkit-border-radius: 3px
-        -moz-border-radius: 3px
-        border-radius: 3px
+        border-radius(3px)
         border: 1px solid #949393
         resize: none
         overflow: hidden
@@ -269,7 +276,7 @@
         display: inline-block
         margin: 4px 0
 
-    & .h_input_padding input
+    .h_input_padding input
         width: 100%
         height: 100%
         border: none
@@ -280,10 +287,10 @@
         display: block
         outline: none !important
 
-    & .h_input_padding input:focus
+    .h_input_padding input:focus
         outline: none
 
-    & .h_phone_number_input
+    .h_phone_number_input
         padding-left: 36px
         padding-right: 36px
         margin-top: 13px
@@ -294,7 +301,7 @@
         background-repeat: no-repeat
         overflow: hidden
 
-    & .i_phone_state_bg
+    .i_phone_state_bg
         width: 36px
         position: absolute
         left: 0
@@ -303,16 +310,14 @@
         background-repeat: no-repeat
         height: 26px
 
-    & .b_phone_number_input
+    .b_phone_number_input
         border: 1px solid #949393
         width: 100%
-        -webkit-border-radius: 3px
-        -moz-border-radius: 3px
-        border-radius: 3px
+        border-radius(3px)
         line-height: 22px
         height: 22px !important
 
-    & .h_phone_number_input  .h_input_padding
+    .h_phone_number_input  .h_input_padding
         padding-top: 0
         padding-bottom: 0
         padding-right: 44px
@@ -321,35 +326,31 @@
         overflow: hidden
         display: block
 
-    & .h_phone_number_input .h_input_padding .jInputClear_close
+    .h_phone_number_input .h_input_padding .jInputClear_close
         margin-right: -20px
 
-    & .h_phone_number_bg
+    .h_phone_number_bg
         padding: 4px 4px 4px 6px
         z-index: 12
         position: relative
 
-    & .i_phone_number_bg_active .i_phone_popup_button
+    .i_phone_number_bg_active .i_phone_popup_button
         right: -2px
 
-    & .i_phone_popup_button
+    .i_phone_popup_button
         right: 0
         top: 0
         bottom: 0
         height: 22px
         position: absolute
         padding: 0 6px
-        -webkit-border-top-right-radius: 3px
-        -webkit-border-bottom-right-radius: 3px
-        -moz-border-radius-topright: 3px
-        -moz-border-radius-bottomright: 3px
-        border-top-right-radius: 3px
-        border-bottom-right-radius: 3px
+        border-radius(3px, topright)
+        border-radius(3px, bottomright)
         background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAcCAIAAAAvP0KbAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyBpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNSBXaW5kb3dzIiB4bXBNTTpJbnN0YW5jZUlEPSJ4bXAuaWlkOjk1QkVFNzcwRjU5OTExRTA5MkNEODBCRjYyQjE2MTgxIiB4bXBNTTpEb2N1bWVudElEPSJ4bXAuZGlkOjk1QkVFNzcxRjU5OTExRTA5MkNEODBCRjYyQjE2MTgxIj4gPHhtcE1NOkRlcml2ZWRGcm9tIHN0UmVmOmluc3RhbmNlSUQ9InhtcC5paWQ6OTVCRUU3NkVGNTk5MTFFMDkyQ0Q4MEJGNjJCMTYxODEiIHN0UmVmOmRvY3VtZW50SUQ9InhtcC5kaWQ6OTVCRUU3NkZGNTk5MTFFMDkyQ0Q4MEJGNjJCMTYxODEiLz4gPC9yZGY6RGVzY3JpcHRpb24+IDwvcmRmOlJERj4gPC94OnhtcG1ldGE+IDw/eHBhY2tldCBlbmQ9InIiPz6/VrULAAAAQElEQVR42lyISQ7AMAwCMc7/vxv7AnXUXlLQiAW7mrDpg0QZNExN9/dLb1Y3azeTMSYj4geufZSZXGuYnP4IMADqgCQd2AfP+QAAAABJRU5ErkJggg==')
         background-color: #dddee1
         background-repeat: repeat-x
 
-    & .i_phone_popup_button i
+    .i_phone_popup_button i
         margin-top: 3px
         background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyBpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNSBXaW5kb3dzIiB4bXBNTTpJbnN0YW5jZUlEPSJ4bXAuaWlkOjI4M0RFMjk3MkM2RDExRTFBRjQyQjAzMEYzREE5QTUwIiB4bXBNTTpEb2N1bWVudElEPSJ4bXAuZGlkOjI4M0RFMjk4MkM2RDExRTFBRjQyQjAzMEYzREE5QTUwIj4gPHhtcE1NOkRlcml2ZWRGcm9tIHN0UmVmOmluc3RhbmNlSUQ9InhtcC5paWQ6MjgzREUyOTUyQzZEMTFFMUFGNDJCMDMwRjNEQTlBNTAiIHN0UmVmOmRvY3VtZW50SUQ9InhtcC5kaWQ6MjgzREUyOTYyQzZEMTFFMUFGNDJCMDMwRjNEQTlBNTAiLz4gPC9yZGY6RGVzY3JpcHRpb24+IDwvcmRmOlJERj4gPC94OnhtcG1ldGE+IDw/eHBhY2tldCBlbmQ9InIiPz6UpMyYAAABLElEQVR42qSTQUtCURCF5121pAyiIBDbuBBa1KKgfkMkgfi73m9xI0pQm2hXUItcBC1aRkURZKFp6hk60TTcQujA9xZn7rvce2ZukqZpR0TK8qkx2AcdUqDfBeukCRL6N1l8KmBGvrUE8mDFeHP0tDZv/ErAZyQ/NZbf5Wsj3SA484PIFH7QK+yCRWOegBdQBbP0+uCBtbpZ+6wbXPJ+X0fUn4fgHGTpD4nWTk2IPV1wBZbNrnvgAty64xbBJmgb7zGYVtnEc5EMcqxZFYL8U4FDYvUGBpG1A9asuprBmgvxnoEVXYh34Ais+hA3XBuPmfaWa+MhWAA7vo0HbpRr4Ay03HFLYBs0jPceG+UMkSn86Cgnf4SexEb52j3nJw2HYdrn3GPt1T7niQADAOELR8beSxlpAAAAAElFTkSuQmCC')
         width: 16px
@@ -360,7 +361,7 @@
 /* Buttons
 ---------------------------------------------------------------*/
 .oktell_panel
-    & .g_button
+    .g_button
         display: inline-block
         padding: 4px 10px 4px
         line-height: 18px
@@ -372,9 +373,7 @@
         background-repeat: no-repeat
         border: 1px solid #ccc
         border-bottom-color: #bbb
-        -webkit-border-radius: 4px
-        -moz-border-radius: 4px
-        border-radius: 4px
+        border-radius(4px)
         -webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05)
         -moz-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05)
         box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05)
@@ -382,10 +381,10 @@
         *margin-left: .3em
         text-decoration: none
 
-    & .g_button:first-child
+    .g_button:first-child
         *margin-left: 0
 
-    & .g_button:hover
+    .g_button:hover
         color: #333333
         text-decoration: none
         background-color: #e6e6e6
@@ -396,17 +395,17 @@
         -o-transition: background-position 0.1s linear
         transition: background-position 0.1s linear
 
-    & .g_button:focus
+    .g_button:focus
         outline: 5px auto -webkit-focus-ring-color
         outline-offset: -2px
 
-    & .g_button i
+    .g_button i
         display: inline-block
         width: 16px
         height: 16px
         vertical-align: text-top
 
-    & .g_button.g_active, & .g_button:active
+    .g_button.g_active, & .g_button:active
         background-image: none
         -webkit-box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(0, 0, 0, 0.05)
         -moz-box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(0, 0, 0, 0.05)
@@ -415,7 +414,7 @@
         color: rgba(0, 0, 0, 0.5)
         outline: 0
 
-    & .g_button.disabled, & .g_button[disabled]
+    .g_button.disabled, & .g_button[disabled]
         cursor: default
         background-image: none
         background-color: #e6e6e6
@@ -424,42 +423,36 @@
         -moz-box-shadow: none
         box-shadow: none
 
-    & .g_button.m_big
+    .g_button.m_big
         padding: 7px 12px
         font-size: 17px
         line-height: normal
-        -webkit-border-radius: 5px
-        -moz-border-radius: 5px
-        border-radius: 5px
+        border-radius(5px)
 
-    & .g_button.m_big .icon
+    .g_button.m_big .icon
         margin-top: 1px
 
 
 /* Popup phone input panel
 ---------------------------------------------------------------*/
 .oktell_panel
-    & .b_phone_keypad
+    .b_phone_keypad
         margin: 24px 0 10px
         box-sizing: border-box
         -moz-box-sizing: border-box
         -webkit-box-sizing: border-box
         display: none
 
-    & .b_phone_keypad .h_phone_keypad
-        -webkit-border-radius: 3px
-        -moz-border-radius: 3px
-        border-radius: 3px
+    .b_phone_keypad .h_phone_keypad
+        border-radius(3px)
         display: inline-block
         border: 1px solid white
 
-    & .b_phone_keypad .b_phone_panel
+    .b_phone_keypad .b_phone_panel
         border: 1px solid #c1c0bf
-        -webkit-border-radius: 3px
-        -moz-border-radius: 3px
-        border-radius: 3px
+        border-radius(3px)
 
-    & .b_phone_keypad .b_phone_panel li
+    .b_phone_keypad .b_phone_panel li
         border-bottom: 1px solid #c1c0bf
         float: left
         display: inline-block
@@ -470,17 +463,17 @@
         -webkit-box-sizing: border-box
         width: 64px
 
-    & .b_phone_keypad .b_phone_panel li.g_right
+    .b_phone_keypad .b_phone_panel li.g_right
         border-right: none
 
-    & .b_phone_keypad .b_phone_panel li.g_float_celar
+    .b_phone_keypad .b_phone_panel li.g_float_celar
         clear: both
 
-    & .b_phone_keypad .b_phone_panel li.g_first
+    .b_phone_keypad .b_phone_panel li.g_first
         border-left: none
 
-    & .b_phone_keypad .b_phone_panel li button
-        border-radius: 0 !important
+    .b_phone_keypad .b_phone_panel li button
+        border-radius(0 !important)
         border: none
         text-align: center
         line-height: 140%
@@ -489,28 +482,20 @@
         width: 100%
         height: 100%
 
-    & .b_phone_keypad .b_phone_panel li.g_top_left button
-        -webkit-border-top-left-radius: 3px
-        -moz-border-radius-topleft: 3px
-        border-top-left-radius: 3px
+    .b_phone_keypad .b_phone_panel li.g_top_left button
+        border-radius(3px, topleft)
 
-    & .b_phone_keypad .b_phone_panel li.g_top_right button
-        -webkit-border-top-right-radius: 3px
-        -moz-border-radius-topright: 3px
-        border-top-right-radius: 3px
+    .b_phone_keypad .b_phone_panel li.g_top_right button
+        border-radius(3px, topright)
 
-    & .b_phone_keypad .b_phone_panel li.g_bottom_left button
-        -webkit-border-bottom-left-radius: 3px
-        -moz-border-radius-bottomleft: 3px
-        border-bottom-left-radius: 3px
+    .b_phone_keypad .b_phone_panel li.g_bottom_left button
+        border-radius(3px, bottomleft)
 
-    & .b_phone_keypad .b_phone_panel li.g_bottom_right button
-        -webkit-border-bottom-right-radius: 3px
-        -moz-border-radius-bottomright: 3px
-        border-bottom-right-radius: 3px
+    .b_phone_keypad .b_phone_panel li.g_bottom_right button
+        border-radius(3px, bottomright)
 
-    & .b_phone_keypad .b_phone_panel li button.m_big:hover,
-    & .b_phone_keypad .b_phone_panel li button.m_big:active
+    .b_phone_keypad .b_phone_panel li button.m_big:hover,
+    .b_phone_keypad .b_phone_panel li button.m_big:active
         border: none
 
 
@@ -532,13 +517,13 @@
 /* Clear input plugin. It blocks create in javascript.
 ---------------------------------------------------------------*/
 .oktell_panel
-    & .jInputClear_hover
+    .jInputClear_hover
         width: 100% !important
         height: 22px
         position: relative !important
         background: none !important
 
-    & .jInputClear_hover .jInputClear_close
+    .jInputClear_hover .jInputClear_close
         position: absolute
         right: 8px
         top: 1px
@@ -550,14 +535,14 @@
 /* Contact lists
 ---------------------------------------------------------------*/
 .oktell_panel
-    & table
+    table
         width: 100%
 
-    & .h_main_list .b_main_list.m_without_department .b_contact:last-child,
-    & .h_main_list .b_department:last-child .b_contact:last-child
+    .h_main_list .b_main_list.m_without_department .b_contact:last-child,
+    .h_main_list .b_department:last-child .b_contact:last-child
         margin-bottom: 20px
 
-    & .b_contact
+    .b_contact
         height: 35px
         display: inline-block !important
         width: 100%
@@ -566,21 +551,21 @@
         clear: left
 
 
-    & .b_contact td.b_contact_avatar,
-    & .b_contact td.b_capital_letter
+    .b_contact td.b_contact_avatar,
+    .b_contact td.b_capital_letter
         width: 24px
         padding: 5px 0 5px 12px
         position: relative
         float: left
 
-    & .b_contact td.b_contact_action
+    .b_contact td.b_contact_action
         width: 60px
         text-align: center
         vertical-align: middle
         color: #828180
         display: none
 
-    & .b_contact td.b_contact_title
+    .b_contact td.b_contact_title
         font-size: 1.1em
         position: relative
         padding: 9px 26px 5px 7px
@@ -588,17 +573,17 @@
         overflow: hidden
         display: block
 
-    & .b_contact td.b_contact_avatar img
+    .b_contact td.b_contact_avatar img
         width: 24px
         height: 24px
         float: left
         cursor: pointer
         vertical-align: middle
 
-    & .b_contact td.b_contact_avatar.m_default img
+    .b_contact td.b_contact_avatar.m_default img
         display: none
 
-    & .b_contact td.b_contact_avatar.m_default i
+    .b_contact td.b_contact_avatar.m_default i
         width: 24px
         height: 24px
         float: left
@@ -607,13 +592,13 @@
         background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAIAAABvFaqvAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyBpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNSBXaW5kb3dzIiB4bXBNTTpJbnN0YW5jZUlEPSJ4bXAuaWlkOjQ5QjUzRTM4RkYwODExRTBCRDUzQ0NCRDcwOTI2MzUxIiB4bXBNTTpEb2N1bWVudElEPSJ4bXAuZGlkOjQ5QjUzRTM5RkYwODExRTBCRDUzQ0NCRDcwOTI2MzUxIj4gPHhtcE1NOkRlcml2ZWRGcm9tIHN0UmVmOmluc3RhbmNlSUQ9InhtcC5paWQ6NDlCNTNFMzZGRjA4MTFFMEJENTNDQ0JENzA5MjYzNTEiIHN0UmVmOmRvY3VtZW50SUQ9InhtcC5kaWQ6NDlCNTNFMzdGRjA4MTFFMEJENTNDQ0JENzA5MjYzNTEiLz4gPC9yZGY6RGVzY3JpcHRpb24+IDwvcmRmOlJERj4gPC94OnhtcG1ldGE+IDw/eHBhY2tldCBlbmQ9InIiPz7zKRZeAAABxklEQVR42qxVXW+jMBD02iYgIpLmdOr//2H3cFJfWtQmwBUUhPHe2AFKSIxaKSvk2LMfzKxtQq/5u3iAkRSPMdbMY80LMJuI67lYRTSP4OSbB/HtqwOIXqFrrf1XVU3TYJ6mabbbSRlsxSRtkvKlqapKVNE6wryuGzj2+/1MzVWi9LNbWQ50VZQW7Exp1TT13LtIBCO+S7VtW2N65QtdSGB5Pp/jOL4bLzlgeZ5rpaztL0v0SykFMBSvA4TEJtr0tpdMl745GZYBhuIlXyuent/Pz9bl0NgJsh4MxQd7BMuyrCrLKIpAqOsMtmwleK1QvNl0pnOFmI3psFwrJAK+pq7LssT2o9GI0VLlb28glW63AUb3Nh4l2vacJIlrs79+SmuM78ePuK5RLkniBQH68/dlfhXrz8+yKASRjjRAIj9IwvZj17AynbHMh1+HNN3OE+X8qMJORSGVwp1C2gSy5fH2MSn41fF4WiQOzXaF3ctFj+56Fe5oOEIYnDoavi/DjzFmkTj0yI3eke32RXHyakDLDeNlGs639b1/ejosEvXiA4MIPN/7KH77HP3ItKtMdOc03YKriBSjyBvm/CPkQf8iRP8FGAB651zBEiykwAAAAABJRU5ErkJggg==')
         background-repeat: no-repeat
 
-    & .b_contact td.b_contact_title .wrapword
+    .b_contact td.b_contact_title .wrapword
         overflow: hidden
         float: left
         height: 20px
         position: relative
 
-    & .b_contact td.b_contact_title .wrapword *
+    .b_contact td.b_contact_title .wrapword *
         white-space: -moz-pre-wrap !important
         white-space: -pre-wrap
         white-space: -o-pre-wrap
@@ -622,47 +607,47 @@
         word-break: break-all
         white-space: normal
 
-    & .b_contact td.b_contact_title .wrapword a
+    .b_contact td.b_contact_title .wrapword a
         width: 300%
         display: inline-block
 
-    & .b_contact td.b_contact_title a
+    .b_contact td.b_contact_title a
         color: #24211d
         text-decoration: none
 
-    & .b_contact td.b_contact_title b
+    .b_contact td.b_contact_title b
         font-weight: 700
 
-    & .b_contact td.b_contact_title span.o_number
+    .b_contact td.b_contact_title span.o_number
         color: #999
         padding-left: 6px
 
-    & .b_contact:hover,
-    & .b_contact:hover:active
+    .b_contact:hover,
+    .b_contact:hover:active
         background: rgba( 255, 255, 255, 0.3 )
 
-    & .b_contact.m_offline .b_contact_title .wrapword
+    .b_contact.m_offline .b_contact_title .wrapword
         opacity: 0.3
 
-    & .b_contact.m_offline .b_contact_avatar img
+    .b_contact.m_offline .b_contact_avatar img
         opacity: 0.5
 
-    & .h_main_list
+    .h_main_list
         height: 100%
         overflow: hidden
         margin-top: -1px
 
-    & .h_main_list .invisibleDep
+    .h_main_list .invisibleDep
         margin-bottom: -1px
 
-    & .b_main_list
+    .b_main_list
         margin-top: 3px
         margin-bottom: 3px
 
-    & .b_main_list .b_contact.m_busy .b_contact_avatar img
+    .b_main_list .b_contact.m_busy .b_contact_avatar img
         opacity: 0.5
 
-    & .b_main_list .b_contact.m_busy .b_contact_avatar .o_busy
+    .b_main_list .b_contact.m_busy .b_contact_avatar .o_busy
         top: 12px
         left: 18px
         position: absolute
@@ -671,7 +656,7 @@
         background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyBpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNSBXaW5kb3dzIiB4bXBNTTpJbnN0YW5jZUlEPSJ4bXAuaWlkOjYyNkI1MTYxQUYxMDExRTE4N0IyRDlDQUI3RDIxQUVDIiB4bXBNTTpEb2N1bWVudElEPSJ4bXAuZGlkOjYyNkI1MTYyQUYxMDExRTE4N0IyRDlDQUI3RDIxQUVDIj4gPHhtcE1NOkRlcml2ZWRGcm9tIHN0UmVmOmluc3RhbmNlSUQ9InhtcC5paWQ6NjI2QjUxNUZBRjEwMTFFMTg3QjJEOUNBQjdEMjFBRUMiIHN0UmVmOmRvY3VtZW50SUQ9InhtcC5kaWQ6NjI2QjUxNjBBRjEwMTFFMTg3QjJEOUNBQjdEMjFBRUMiLz4gPC9yZGY6RGVzY3JpcHRpb24+IDwvcmRmOlJERj4gPC94OnhtcG1ldGE+IDw/eHBhY2tldCBlbmQ9InIiPz7QM2G7AAAAx0lEQVR42mJcJCnJAASMQKwHxBcZCAAmIBYB4plAvBqI64nRMB2Io4FYFYjzgViWkAYxIP4P5QsCsRshDXeA+BeU/wmIbxLSMAuIP0D5+4H4CCENJ4F4B5TvBMQhhDSAQC8QvwFiXmiIuSKpYYb6kwPMCeQFqWF4D8SXgNgTiIWhtrAC8VcgbgDiHiC2A2IWRmjEwYAHEM8HYgko/y3UABh4w4TmxB1QkxZAbRVGk3/JgsVft4E4EYjVgDgYSoNSw08gngMQYADSQiIGLN6PKQAAAABJRU5ErkJggg==')
         background-repeat: no-repeat
 
-    & .b_main_list .b_contact.m_busy .b_contact_title .wrapword a b
+    .b_main_list .b_contact.m_busy .b_contact_title .wrapword a b
         color: #BD3B1B
 
 
@@ -680,7 +665,7 @@
 ---------------------------------------------------------------*/
 .oktell_button_action
     border: 1px solid #d8dce0
-    border-radius: 3px
+    border-radius(3px)
     height: 26px
     width: 60px
     overflow: hidden
@@ -702,7 +687,7 @@
     &[class*="m_button_action_"]
         visibility: visible
 
-    & li
+    li
         height: 24px
         padding: 0 10px
         float: left
@@ -711,46 +696,38 @@
         text-align: center
         margin: 0 auto
 
-    & li.invisible
+    li.invisible
         display: none
 
-    & li.g_first
-        -webkit-border-top-left-radius: 3px
-        -webkit-border-bottom-left-radius: 3px
-        -moz-border-radius-topleft: 3px
-        -moz-border-radius-bottomleft: 3px
-        border-top-left-radius: 3px
-        border-bottom-left-radius: 3px
+    li.g_first
+        border-radius(3px, topleft)
+        border-radius(3px, bottomleft)
 
-    & li.g_last
+    li.g_last
         padding: 0 4px
         border-right: 1px solid white
-        -webkit-border-top-right-radius: 3px
-        -webkit-border-bottom-right-radius: 3px
-        -moz-border-radius-topright: 3px
-        -moz-border-radius-bottomright: 3px
-        border-top-right-radius: 3px
-        border-bottom-right-radius: 3px
+        border-radius(3px, topright)
+        border-radius(3px, bottomright)
 
-    & li.g_first.g_last
+    li.g_first.g_last
         border-right: none
         padding: 0 12px
 
-    & li img
+    li img
         padding-top: 3px
 
 .oktell_panel
-    & .oktell_button_action
+    .oktell_button_action
         right: 14px
         top: 5px
         visibility: hidden
         position: absolute
         float: right
 
-    & .b_contact .oktell_button_action[class*="m_button_action_"]
+    .b_contact .oktell_button_action[class*="m_button_action_"]
         visibility: hidden
 
-    & .b_contact:hover .oktell_button_action[class*="m_button_action_"]
+    .b_contact:hover .oktell_button_action[class*="m_button_action_"]
         visibility: visible
 
 .oktell_button_action.m_static
@@ -758,7 +735,7 @@
 
 .oktell_actions_group_list
     border: 1px solid #d8dce0
-    border-radius: 3px
+    border-radius(3px)
     position: absolute
     margin: 0 auto
     display: none
@@ -767,7 +744,7 @@
     font-size: 13px
     font-family: Tahoma
 
-    & li
+    li
         background: #f7f8f9
         padding: 6px 12px 5px 10px
         border: 1px solid white
@@ -776,31 +753,21 @@
         zoom: 1
         cursor: pointer
 
-    & li.g_first
+    li.g_first
         border-top: 1px solid white !important
-        -webkit-border-top-left-radius: 3px
-        -webkit-border-top-right-radius: 3px
-        -moz-border-radius-topleft: 3px
-        -moz-border-radius-topright: 3px
-        border-top-left-radius: 3px
-        border-top-right-radius: 3px
+        border-radius(3px, top)
 
-    & li.g_last
+    li.g_last
         border-bottom: 1px solid white !important
-        -webkit-border-bottom-right-radius: 3px
-        -webkit-border-bottom-left-radius: 3px
-        -moz-border-radius-bottomright: 3px
-        -moz-border-radius-bottomleft: 3px
-        border-bottom-right-radius: 3px
-        border-bottom-left-radius: 3px
+        border-radius(3px, bottom)
 
-    & li:hover
+    li:hover
         background: #edeeee
 
-    & li span
+    li span
         line-height: 16px
 
-    & li i
+    li i
         float: left
         margin-right: 6px
         margin-top: 1px
@@ -808,35 +775,35 @@
         height: 16px
         display: inline-block
 
-    & li.i_call i
+    li.i_call i
         background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAAK/INwWK6QAAABl0RVh0U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAADKSURBVHjaYoxdJMkABPxA3ADEBkB8AIgbGYgELFD6AFQzCDhA+QeJMYAJiO2RNDMgGcJArAHYAMUGMJBiALpfPwBxAakuuIAktgCIL5JqwAIksQRotJJswAcoWwCIJ5BqwEc0TSBXxJMaCyADHqCFRT0SXx6I86E0VgNArghA8goDNHmvh2p8gGTJfiD2BylghOYFZKAPTcoCRPhAAVtCughNiQ/INQBmiAHUCx9wqAGlnYMseEz/CM3WE6BhA3KVAlTuASy1AgQYAMumJ3E5CTqrAAAAAElFTkSuQmCC')
         background-repeat: no-repeat
 
-    & li.i_conference i
+    li.i_conference i
         background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAAK/INwWK6QAAABl0RVh0U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAADsSURBVHjanFLBDYJAEATDH76+pAPpADrQBkjsQEvADiwBaUA7kOtAOsCPb64C3E2GZN2c5mCTycHd7tzs3IZlsw4oYkJFyAgt4Rx4xgorF50IBYhy3mzKt84fgS+CHDfLKOYqCJYSRB454789VmDU4QA/Zil4Ch9qQvejnVbvRaLogu8DXsLi3zguNtrEGtI5EkHm3YJFUSVUsNyrmoVQE4SYxGka2YtUnFdiKjeEPeFOeLnmwCJhUAQ3wpHQQyWvD8JOK5hiC/mJhwWpaxI7PFO/lGAiydDC8COH/TKuFnTE8KYQBveYVvsRYAD4+zcQfhD55QAAAABJRU5ErkJggg==')
         background-repeat: no-repeat
 
-    & li.i_intercom i
+    li.i_intercom i
         background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAAK/INwWK6QAAABl0RVh0U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAAEYSURBVHjajFPbDcIwDEyzAP3li24AG9ANgAEQZQM2oExAmYDHArQTABO0bFAmoEwADjojy4QKS6dYanK+u6TB9NA1LTUknNG7dUfYyw0W64iwxAFZFSEmjAk1CEpCXxKsCTkhxZSeIHgQLoSCMCdEQk2fCRZqaqwsPAl3KGzwndV8LMgaeCxkGMR5jLFv5iOIPBZWIIpAdIOCxEIOV40stAUn/yqUGOQWWyHLgPWqLKSC1O0N0TecQS4OOPaOspCJYCvdW1wR2wg5XU8O3t6KyUYkvDV/FhMUanICkg4ezIlwdNemCQL1L5TqHdTqWjm8Aa7y6yHFKtTIozqEQuMjcMFMkEnTYr36RcC1Ea+uUvITZPaulwADAC28Sx5Y29B4AAAAAElFTkSuQmCC')
         background-repeat: no-repeat
 
-    & li.i_endcall i
+    li.i_endcall i
         background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAAK/INwWK6QAAABl0RVh0U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAADDSURBVHjaYlwkKclAArBHYh8EESwENPADcQIUG6DJXQBiBxY8GgugWACHGpCBDdgM0AfiDUCsQISXDJiwaD6ApvkDEE+A0ujgAAsWzchOXgD1xkcoewJMIxQfZEHy8wY0zaCAW4jEvwjEjuhOgHmhAM3ZDWiacQImpBCHAZBLGolNGCADAtCcfoCUlAUywAFNDBRQ8qQYgC2+A0gxABvYQIoBD9ATBxA/JMWAAmjGQA4DogELNJUZQrPqA1JsBwGAAAMAafMigplZzoMAAAAASUVORK5CYII=')
         background-repeat: no-repeat
 
-    & li.i_transfer i
+    li.i_transfer i
         background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAAK/INwWK6QAAABl0RVh0U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAACwSURBVHjaYvz//z8DJYCJgULAIhW3mJCa+UCcAGUvAOJEfC7gR+PbI2lmgLLt8RlwAIj1kfgCWFwkgM8AA6gh/kh8BixqUAz4j4RhNmwA4n4ojQ42EBsLIIMuQl2E7MWLKLEAxA5oCj4AcQEQL4SKPUCSf4AtHRxEwhegBh6AeuE9llh4D5WTBwkwSsYuQo9GBxx+xwYC0MPgI46QxwUMmAjFMwEgQHFeYBzw3AgQYAB4fSaXUNIvYAAAAABJRU5ErkJggg==')
         background-repeat: no-repeat
 
-    & li.i_toggle i
+    li.i_toggle i
         background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAAK/INwWK6QAAABl0RVh0U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAADKSURBVHjaYoxdJMkABPxA3ADEBkB8AIgbGYgELFD6AFQzCDhA+QeJMYAJiO2RNDMgGcJArAHYAMUGMJBiALpfPwBxAakuuIAktgCIL5JqwAIksQRotJJswAcoWwCIJ5BqwEc0TSBXxJMaCyADHqCFRT0SXx6I86E0VgNArghA8goDNHmvh2p8gGTJfiD2BylghOYFZKAPTcoCRPhAAVtCughNiQ/INQBmiAHUCx9wqAGlnYMseEz/CM3WE6BhA3KVAlTuASy1AgQYAMumJ3E5CTqrAAAAAElFTkSuQmCC')
         background-repeat: no-repeat
 
-    & li.i_ghosthelp i
+    li.i_ghosthelp i
         background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAAK/INwWK6QAAABl0RVh0U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAAEcSURBVHjapFOxDcJADPwECqh4JoBMAGyQDaBCdGEDGIERKCmhpskGZIPAApBMAEwANjpLpxdp4KTTW47tPzv+6HrsuwCZcClMA38h3AsP7IzJHghLBClmKJLCdvhWIvaDCArUcRZ6+CthEii4CYewH8KxsDYFOSU7BN6FL/BOyQ6xubWQoRpDb9hSC1v4GJqTaQsnunWIQE26BAkjDNKjxcoU2A0J3RwmO/hMSWIKY5LcQ/XCNaOgWT3C3/gTYprqk/pvQkrD9LYHfw2xtZp39VxTbx3hAqcV1tXeUYyHf2ObWDbsgv9iG3RzJzHtPS+KytPKEdg3yVTw8z7acNRQkOPU4GkwsAqyz0iuuYAVmdBzzr/swDJ8zm8BBgBjVk7wriK8QAAAAABJRU5ErkJggg==')
         background-repeat: no-repeat
 
-    & li.i_ghostlisten i
+    li.i_ghostlisten i
         background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAAK/INwWK6QAAABl0RVh0U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAADsSURBVHja1JPNDYJAEIVh412wAbQCsQM6kA60BKwArUA6EM96oATsgAoEKxAqwLfJm2TckwknJ/nC/sy8nZld/HEcvSlmvIk2WWDW3hd6PgcpSUDA9YaU4PEloMZbOkhQx3kP9oqa35cu4QIqFWzHMTiAE1iBI/cSZrMWgZyKYnLiErTgDXYUqukTcBwZKmqz6gMoKBKwFMnMUyKlUao6g18tMUyt0Yu8jYyN7FWJqSNQG6cxklrFYNu8EFzB2SnX+qciMHCzUIIdg3I2M1PB9kY2Ns5/3kK3rojOsXNizcwqeQPW/P//mT4CDABJ3zvzAVqoLwAAAABJRU5ErkJggg==')
         background-repeat: no-repeat
 
@@ -844,7 +811,7 @@
 /* Buttons gradient style
 ---------------------------------------------------------------*/
 .oktell_button_action
-    & li
+    li
         background-repeat: repeat-x
 
     &.m_button_action_call li.g_first
@@ -919,7 +886,7 @@
         background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAcCAIAAAAvP0KbAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyBpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNSBXaW5kb3dzIiB4bXBNTTpJbnN0YW5jZUlEPSJ4bXAuaWlkOjdDNTlDRjU4Rjk2RTExRTA5NDE2QjkwOTUzNkQ4MzQzIiB4bXBNTTpEb2N1bWVudElEPSJ4bXAuZGlkOjdDNTlDRjU5Rjk2RTExRTA5NDE2QjkwOTUzNkQ4MzQzIj4gPHhtcE1NOkRlcml2ZWRGcm9tIHN0UmVmOmluc3RhbmNlSUQ9InhtcC5paWQ6N0M1OUNGNTZGOTZFMTFFMDk0MTZCOTA5NTM2RDgzNDMiIHN0UmVmOmRvY3VtZW50SUQ9InhtcC5kaWQ6N0M1OUNGNTdGOTZFMTFFMDk0MTZCOTA5NTM2RDgzNDMiLz4gPC9yZGY6RGVzY3JpcHRpb24+IDwvcmRmOlJERj4gPC94OnhtcG1ldGE+IDw/eHBhY2tldCBlbmQ9InIiPz4316IqAAAATUlEQVR42iyK2w2AMBDD0lyPh1iNuZiGEWlDWviwLCvBdZ9setgBSqIgdsGt2Z/BZmckj7r7X/wrxDR/RmN6dPdWSWaaCFbHumyvAAMAMzEj9Gyw5l8AAAAASUVORK5CYII=')
         background-color: #92be6d
 
-    & .drop_down
+    .drop_down
         background-color: #fafafa
         background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#ffffff), color-stop(25%, #ffffff), to(#e6e6e6))
         background-image: -webkit-linear-gradient(#ffffff, #ffffff 25%, #e6e6e6)
@@ -929,7 +896,7 @@
         background-image: linear-gradient(#ffffff, #ffffff 25%, #e6e6e6)
         background-repeat: no-repeat
 
-    & .drop_down:active
+    .drop_down:active
             -webkit-box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(0, 0, 0, 0.05)
             -moz-box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(0, 0, 0, 0.05)
             box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(0, 0, 0, 0.05)
@@ -939,7 +906,7 @@
 /* Buttons icons style
 ---------------------------------------------------------------*/
 .oktell_button_action
-    & li.g_first i
+    li.g_first i
         background-position: 0 3px
         background-repeat: no-repeat
         width: 16px
@@ -1004,7 +971,7 @@
         background-color: #e6e6e6
         background-color: #d9d9d9 \9
 
-    & .drop_down i
+    .drop_down i
         display: inline-block
         width: 12px
         height: 8px
@@ -1043,11 +1010,11 @@
     font-family: Tahoma, Verdana, Arial, sans-serif
     display: table
 
-    & .m_popup_staff
+    .m_popup_staff
         display: table-cell
         vertical-align: middle
 
-    & .m_popup_data
+    .m_popup_data
         max-width: 500px
         background: #F7F8F8
         border: 1px solid #616C72
@@ -1055,7 +1022,7 @@
         margin: 0 auto
         overflow: hidden
 
-    & .m_popup_staff .o_close
+    .m_popup_staff .o_close
         position: absolute
         width: 10px
         height: 10px
@@ -1068,14 +1035,14 @@
         background-position: 6px 6px
         opacity: 0.5
 
-    & .m_popup_staff .o_close:hover
+    .m_popup_staff .o_close:hover
         opacity: 1
 
-    & .m_popup_staff header
+    .m_popup_staff header
         background: #f0f1f3
         position: relative
 
-    & .m_popup_staff .h_header_bg
+    .m_popup_staff .h_header_bg
         padding: 12px 15px 0 12px
         background-image: -webkit-gradient( linear, left top, left bottom, from(#dfe3e7), to(#c6ccd1))
         background-image: -moz-linear-gradient( #dfe3e7 0%, #c6ccd1 95% )
@@ -1084,34 +1051,34 @@
         text-align: left
         height: 40px
 
-    & .m_popup_staff header h2
+    .m_popup_staff header h2
         margin-top: 0
         font-size: 1.3em
         color: #828180
         font-weight: normal
 
-    & .b_content
+    .b_content
         padding: 35px 12px 20px 12px
         overflow: hidden
         border-bottom: 1px solid #e3e3e3
 
-    & .b_content .b_abonent
+    .b_content .b_abonent
         margin-bottom: 15px
 
-    & .b_content .g_light
+    .b_content .g_light
         color: #828180
 
-    & .footer
+    .footer
         overflow: hidden
         zoom: 1
         padding: 19px 12px
 
-    & .footer .b_take_phone
+    .footer .b_take_phone
         display: inline-block
         float: left
         padding-top: 11px
 
-    & .footer .b_take_phone i
+    .footer .b_take_phone i
         width: 16px
         height: 16px
         display: inline-block
@@ -1119,11 +1086,11 @@
         background-repeat: no-repeat
         vertical-align: -2px
 
-    & .footer button
+    .footer button
         margin: 2px
         float: right
 
-    & .m_popup_staff .oktell_panel_btn i
+    .m_popup_staff .oktell_panel_btn i
         margin-top: 1px
         margin-right: 4px
 
@@ -1148,9 +1115,7 @@
     background-repeat: no-repeat
     border: 1px solid #ccc
     border-bottom-color: #bbb
-    -webkit-border-radius: 4px
-    -moz-border-radius: 4px
-    border-radius: 4px
+    border-radius(4px)
     -webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05)
     -moz-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05)
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05)
@@ -1176,7 +1141,7 @@
         outline: 5px auto -webkit-focus-ring-color
         outline-offset: -2px
 
-    & i
+    i
         display: inline-block
         width: 16px
         height: 16px
@@ -1269,15 +1234,13 @@
         padding: 7px 12px
         font-size: 17px
         line-height: normal
-        -webkit-border-radius: 5px
-        -moz-border-radius: 5px
-        border-radius: 5px
+        border-radius(5px)
 
 
-/* Forms & error blocks
+/* Forms error blocks
 ---------------------------------------------------------------*/
 .oktell_panel
-    & .m_form
+    .m_form
         position: absolute
         top: 0
         left: 0
@@ -1287,21 +1250,21 @@
         background-image: -webkit-gradient(linear, left top, left bottom, from(#e0e4e7), color-stop(100%, #c7cfd6))
         background-image: -moz-linear-gradient(90deg, #c7cfd6 0%, #e0e4e7)
 
-    & .m_form .h_padding
+    .m_form .h_padding
         padding: 20px !important
 
-    & .m_form.b_error h4
+    .m_form.b_error h4
         color: rgba(190, 27, 26, 1)
         margin-bottom: 2px
         font-weight: 800
         font-size: 1.125em
 
-    & .m_form p
+    .m_form p
         margin-bottom: 16px
 
-    & .m_form p.g_light
+    .m_form p.g_light
         color: #828180
 
-    & .m_form.b_error p.b_error_alert
+    .m_form.b_error p.b_error_alert
         font-weight: bold
         font-size: 1.125em

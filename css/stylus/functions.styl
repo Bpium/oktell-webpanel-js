@@ -1,0 +1,42 @@
+border-radius(val, position = false)
+    topleft(a)
+        -webkit-border-top-left-radius a
+        -moz-border-radius-topleft: a
+        border-top-left-radius: a
+    topright(a)
+        -webkit-border-top-right-radius: a
+        -moz-border-radius-topright: a
+        border-top-right-radius: a
+    bottomleft(a)
+        -webkit-border-bottom-left-radius a
+        -moz-border-radius-bottomleft: a
+        border-bottom-left-radius: a
+    bottomright(a)
+        -webkit-border-bottom-right-radius a
+        -moz-border-radius-bottomright: a
+        border-bottom-right-radius: a
+
+    if position == false
+        -webkit-border-radius val
+        -moz-border-radius val
+        border-radius val
+
+    else if position == topleft
+        topleft(val)
+
+    else if position == topright
+        topright(val)
+
+    else if position == top
+        topleft(val)
+        topright(val)
+
+    else if position == bottomleft
+        bottomleft(val)
+
+    else if position == bottomright
+        bottomright(val)
+
+    else
+        bottomleft(val)
+        bottomright(val)
