@@ -30,15 +30,17 @@ class CUser
 
 		ns = @nameHtml.split(/\s+/)
 		if ns.length > 1 and data.name.toString() isnt @number
-			@nameHtml = '<b>' + ns[0] + '</b> ' + ns.splice(1)
+			@nameHtml1 = ns[0]
+			@nameHtml2 = ns.splice(1).join('')
 		else
-			@nameHtml = '<b>' + @nameHtml + '</b>'
+			@nameHtml1 = @nameHtml
+			@nameHtml2 = ''
 
 		lastHtml = @elNumberHtml
 		@elNumberHtml = if @numberHtml isnt @nameHtml then @numberHtml else ''
 		if @elNumberHtml isnt lastHtml and @el?
 			@el.find('.o_number').text @elNumberHtml
-		@el?.find('.b_contact_title b').text @nameHtml
+		@el?.find('.b_contact_title wrapword a').text @nameHtml
 
 		@avatarLink32x32 = data.avatarLink32x32 or @defaultAvatar32 or ''
 		@defaultAvatarCss = if @avatarLink32x32 then '' else 'm_default'
@@ -56,7 +58,8 @@ class CUser
 		@loadActions()
 
 	regexps:
-		name: /\{\{name\}\}/
+		name1: /\{\{name1\}\}/
+		name2: /\{\{name2\}\}/
 		number: /\{\{number\}\}/
 		avatarLink32x32: /\{\{avatarLink32x32\}\}/
 		css: /\{\{css\}\}/
@@ -101,7 +104,8 @@ class CUser
 
 	getEl: ( createIndependent) ->
 		if not @el or createIndependent
-			str = @template.replace( @regexps.name, @nameHtml)
+			str = @template.replace( @regexps.name1, @nameHtml1)
+				.replace( @regexps.name2, @nameHtml2 )
 				.replace( @regexps.number, @numberHtml )
 				.replace( @regexps.avatarLink32x32, @avatarLink32x32)
 				.replace( @regexps.css, @defaultAvatarCss )

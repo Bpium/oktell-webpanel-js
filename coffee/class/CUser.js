@@ -35,9 +35,11 @@ CUser = (function() {
     }
     ns = this.nameHtml.split(/\s+/);
     if (ns.length > 1 && data.name.toString() !== this.number) {
-      this.nameHtml = '<b>' + ns[0] + '</b> ' + ns.splice(1);
+      this.nameHtml1 = ns[0];
+      this.nameHtml2 = ns.splice(1).join('');
     } else {
-      this.nameHtml = '<b>' + this.nameHtml + '</b>';
+      this.nameHtml1 = this.nameHtml;
+      this.nameHtml2 = '';
     }
     lastHtml = this.elNumberHtml;
     this.elNumberHtml = this.numberHtml !== this.nameHtml ? this.numberHtml : '';
@@ -45,7 +47,7 @@ CUser = (function() {
       this.el.find('.o_number').text(this.elNumberHtml);
     }
     if ((_ref6 = this.el) != null) {
-      _ref6.find('.b_contact_title b').text(this.nameHtml);
+      _ref6.find('.b_contact_title wrapword a').text(this.nameHtml);
     }
     this.avatarLink32x32 = data.avatarLink32x32 || this.defaultAvatar32 || '';
     this.defaultAvatarCss = this.avatarLink32x32 ? '' : 'm_default';
@@ -62,7 +64,8 @@ CUser = (function() {
   };
 
   CUser.prototype.regexps = {
-    name: /\{\{name\}\}/,
+    name1: /\{\{name1\}\}/,
+    name2: /\{\{name2\}\}/,
     number: /\{\{number\}\}/,
     avatarLink32x32: /\{\{avatarLink32x32\}\}/,
     css: /\{\{css\}\}/,
@@ -122,7 +125,7 @@ CUser = (function() {
     var $el, str;
 
     if (!this.el || createIndependent) {
-      str = this.template.replace(this.regexps.name, this.nameHtml).replace(this.regexps.number, this.numberHtml).replace(this.regexps.avatarLink32x32, this.avatarLink32x32).replace(this.regexps.css, this.defaultAvatarCss);
+      str = this.template.replace(this.regexps.name1, this.nameHtml1).replace(this.regexps.name2, this.nameHtml2).replace(this.regexps.number, this.numberHtml).replace(this.regexps.avatarLink32x32, this.avatarLink32x32).replace(this.regexps.css, this.defaultAvatarCss);
       $el = $(str);
       $el.data('user', this);
       this.initButtonEl($el.find('.oktell_button_action'));

@@ -595,9 +595,11 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
       }
       ns = this.nameHtml.split(/\s+/);
       if (ns.length > 1 && data.name.toString() !== this.number) {
-        this.nameHtml = '<b>' + ns[0] + '</b> ' + ns.splice(1);
+        this.nameHtml1 = ns[0];
+        this.nameHtml2 = ns.splice(1).join('');
       } else {
-        this.nameHtml = '<b>' + this.nameHtml + '</b>';
+        this.nameHtml1 = this.nameHtml;
+        this.nameHtml2 = '';
       }
       lastHtml = this.elNumberHtml;
       this.elNumberHtml = this.numberHtml !== this.nameHtml ? this.numberHtml : '';
@@ -605,7 +607,7 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
         this.el.find('.o_number').text(this.elNumberHtml);
       }
       if ((_ref6 = this.el) != null) {
-        _ref6.find('.b_contact_title b').text(this.nameHtml);
+        _ref6.find('.b_contact_title wrapword a').text(this.nameHtml);
       }
       this.avatarLink32x32 = data.avatarLink32x32 || this.defaultAvatar32 || '';
       this.defaultAvatarCss = this.avatarLink32x32 ? '' : 'm_default';
@@ -622,7 +624,8 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
     };
 
     CUser.prototype.regexps = {
-      name: /\{\{name\}\}/,
+      name1: /\{\{name1\}\}/,
+      name2: /\{\{name2\}\}/,
       number: /\{\{number\}\}/,
       avatarLink32x32: /\{\{avatarLink32x32\}\}/,
       css: /\{\{css\}\}/,
@@ -682,7 +685,7 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
       var $el, str;
 
       if (!this.el || createIndependent) {
-        str = this.template.replace(this.regexps.name, this.nameHtml).replace(this.regexps.number, this.numberHtml).replace(this.regexps.avatarLink32x32, this.avatarLink32x32).replace(this.regexps.css, this.defaultAvatarCss);
+        str = this.template.replace(this.regexps.name1, this.nameHtml1).replace(this.regexps.name2, this.nameHtml2).replace(this.regexps.number, this.numberHtml).replace(this.regexps.avatarLink32x32, this.avatarLink32x32).replace(this.regexps.css, this.defaultAvatarCss);
         $el = $(str);
         $el.data('user', this);
         this.initButtonEl($el.find('.oktell_button_action'));
@@ -2092,7 +2095,7 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
   templates = {
     'templates/actionButton.html': '<ul class="oktell_button_action"><li class="g_first"><i></i></li><li class="g_last drop_down"><i></i></li></ul>',
     'templates/actionList.html': '<ul class="oktell_actions_group_list"><li class="{{css}}" data-action="{{action}}"><i></i><span>{{actionText}}</span></li></ul>',
-    'templates/user.html': '<tr class="b_contact"><td class="b_contact_avatar {{css}}"><img src="{{avatarLink32x32}}"><i></i><div class="o_busy"></div></td><td class="b_capital_letter"><span></span></td><td class="b_contact_title"><div class="wrapword"><a>{{name}}<span class="o_number">{{number}}</span></a></div>{{button}}</td></tr>',
+    'templates/user.html': '<tr class="b_contact"><td class="b_contact_avatar {{css}}"><img src="{{avatarLink32x32}}"><i></i><div class="o_busy"></div></td><td class="b_capital_letter"><span></span></td><td class="b_contact_title"><div class="wrapword"><a><span class="b_contact_name"><b>{{name1}}</b>{{name2}}</span><span class="o_number">{{number}}</span></a></div>{{button}}</td></tr>',
     'templates/department.html': '<tr class="b_contact"><td class="b_contact_department" colspan="3">{{department}}</td></tr>',
     'templates/dep.html': '<div class="b_department"><div class="b_department_header"><span>{{department}}</span></div><table class="b_main_list"><tbody></tbody></table></div>',
     'templates/usersTable.html': '<table class="b_main_list m_without_department"><tbody></tbody></table>',
