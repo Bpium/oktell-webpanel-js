@@ -52,6 +52,7 @@
     border-left: 1px solid #B4BDBE
     z-index: 202
     line-height: normal
+    font-size: 13px
 
     & *
         font-family: Tahoma, Verdana, Arial, sans-serif
@@ -113,7 +114,7 @@
         background-position: -18px center
 
     & .h_panel_bg .b_header .b_list_filter li.i_group.g_active
-        background-color: #e1dbc2
+        background-color: #eeebd0
         background-position: -18px center
 
     & .h_panel_bg > .h_padding
@@ -184,25 +185,25 @@
 
         p.b_marks_header
             padding: 0 10px
+            margin-bottom: -2px
 
         table
             margin-top: 6px
 
         .b_marks_time
             float: right
-            font-size: 1.125em
+            font-size: 1em
 
         .b_marks_label
-            line-height: 160%
+            font-size: 0.85em
 
         &.h_shadow_top .h_shadow_top,
         &.i_conference .h_shadow_top,
         &.i_flash .h_shadow_top
-            padding: 10px 0
+            padding: 6px 0 0 0
 
         &.i_conference
-            background-color: #BCD2A4
-            background-image: linear-gradient(top, #9bb48a 0px, #BCD2A4 6px)
+            background-color: #BAD29B
             overflow: hidden
             display: none
             border-top: 1px solid #869b78
@@ -211,8 +212,7 @@
             color: #4b793e
 
         &.i_flash
-            background-color: #d4ccb1
-            background-image: linear-gradient(top, #c2baa3 0px, #d4ccb1 6px)
+            background-color: #DAC59A
             border-top: 1px solid #a79f89
             overflow: hidden
             display: none
@@ -239,17 +239,21 @@
 
     .b_department_header
         border-top: 1px solid #bebebe
-        border-bottom: 1px solid #bebebe
-        background-color: #d4d3cc
-        overflow: hidden
+        border-bottom: 1px solid #F1F1F1
+        background-color: #EEEBD0
         cursor: pointer
+        overflow: hidden
+        white-space: nowrap
 
         .h_shadow_top
             padding: 3px 10px
+            text-overflow: ellipsis
+            -o-text-overflow: ellipsis
 
             span
                 color: #8f8f8d
                 font-size: 0.875em
+                vertical-align: 1px
 
         &.g_first
             border-top: none
@@ -320,14 +324,13 @@
     .h_phone_number_input  .h_input_padding
         padding-top: 0
         padding-bottom: 0
-        padding-right: 44px
         height: 22px
         position: relative
         overflow: hidden
         display: block
 
     .h_phone_number_input .h_input_padding .jInputClear_close
-        margin-right: -20px
+        //margin-right: -20px
 
     .h_phone_number_bg
         padding: 4px 4px 4px 6px
@@ -642,7 +645,7 @@
 
     .b_main_list
         margin-top: 3px
-        margin-bottom: 3px
+        margin-bottom: 10px
 
     .b_main_list .b_contact.m_busy .b_contact_avatar img
         opacity: 0.5
