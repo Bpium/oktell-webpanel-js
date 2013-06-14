@@ -112,7 +112,7 @@
   background-position: -18px center;
 }
 .oktell_panel .h_panel_bg .b_header .b_list_filter li.i_group.g_active {
-  background-color: #e1dbc2;
+  background-color: #eeebd0;
   background-position: -18px center;
 }
 .oktell_panel .h_panel_bg > .h_padding {
@@ -194,13 +194,12 @@
   line-height: 160%;
 }
 .oktell_panel .b_marks.h_shadow_top .h_shadow_top,
-.oktell_panel .b_marks.i_conference  .h_shadow_top,
+.oktell_panel .b_marks.i_conference .h_shadow_top,
 .oktell_panel .b_marks.i_flash .h_shadow_top {
   padding: 10px 0;
 }
 .oktell_panel .b_marks.i_conference {
-  background-color: #bcd2a4;
-  background-image: linear-gradient(top, #9bb48a 0px, #bcd2a4 6px);
+  background-color: #bad29b;
   overflow: hidden;
   display: none;
   border-top: 1px solid #869b78;
@@ -209,8 +208,7 @@
   color: #4b793e;
 }
 .oktell_panel .b_marks.i_flash {
-  background-color: #d4ccb1;
-  background-image: linear-gradient(top, #c2baa3 0px, #d4ccb1 6px);
+  background-color: #dac59a;
   border-top: 1px solid #a79f89;
   overflow: hidden;
   display: none;
@@ -237,17 +235,21 @@
 }
 .oktell_panel .b_department_header {
   border-top: 1px solid #bebebe;
-  border-bottom: 1px solid #bebebe;
-  background-color: #d4d3cc;
-  overflow: hidden;
+  border-bottom: 1px solid #f1f1f1;
+  background-color: #eeebd0;
   cursor: pointer;
+  overflow: hidden;
+  white-space: nowrap;
 }
 .oktell_panel .b_department_header .h_shadow_top {
   padding: 3px 10px;
+  text-overflow: ellipsis;
+  -o-text-overflow: ellipsis;
 }
 .oktell_panel .b_department_header .h_shadow_top span {
   color: #8f8f8d;
   font-size: 0.875em;
+  vertical-align: 1px;
 }
 .oktell_panel .b_department_header.g_first {
   border-top: none;
@@ -318,14 +320,10 @@
 .oktell_panel .h_phone_number_input  .h_input_padding {
   padding-top: 0;
   padding-bottom: 0;
-  padding-right: 44px;
   height: 22px;
   position: relative;
   overflow: hidden;
   display: block;
-}
-.oktell_panel .h_phone_number_input .h_input_padding .jInputClear_close {
-  margin-right: -20px;
 }
 .oktell_panel .h_phone_number_bg {
   padding: 4px 4px 4px 6px;
@@ -653,7 +651,7 @@
 }
 .oktell_panel .b_main_list {
   margin-top: 3px;
-  margin-bottom: 3px;
+  margin-bottom: 10px;
 }
 .oktell_panel .b_main_list .b_contact.m_busy .b_contact_avatar img {
   opacity: 0.5;
@@ -667,8 +665,7 @@
   background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyBpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNSBXaW5kb3dzIiB4bXBNTTpJbnN0YW5jZUlEPSJ4bXAuaWlkOjYyNkI1MTYxQUYxMDExRTE4N0IyRDlDQUI3RDIxQUVDIiB4bXBNTTpEb2N1bWVudElEPSJ4bXAuZGlkOjYyNkI1MTYyQUYxMDExRTE4N0IyRDlDQUI3RDIxQUVDIj4gPHhtcE1NOkRlcml2ZWRGcm9tIHN0UmVmOmluc3RhbmNlSUQ9InhtcC5paWQ6NjI2QjUxNUZBRjEwMTFFMTg3QjJEOUNBQjdEMjFBRUMiIHN0UmVmOmRvY3VtZW50SUQ9InhtcC5kaWQ6NjI2QjUxNjBBRjEwMTFFMTg3QjJEOUNBQjdEMjFBRUMiLz4gPC9yZGY6RGVzY3JpcHRpb24+IDwvcmRmOlJERj4gPC94OnhtcG1ldGE+IDw/eHBhY2tldCBlbmQ9InIiPz7QM2G7AAAAx0lEQVR42mJcJCnJAASMQKwHxBcZCAAmIBYB4plAvBqI64nRMB2Io4FYFYjzgViWkAYxIP4P5QsCsRshDXeA+BeU/wmIbxLSMAuIP0D5+4H4CCENJ4F4B5TvBMQhhDSAQC8QvwFiXmiIuSKpYYb6kwPMCeQFqWF4D8SXgNgTiIWhtrAC8VcgbgDiHiC2A2IWRmjEwYAHEM8HYgko/y3UABh4w4TmxB1QkxZAbRVGk3/JgsVft4E4EYjVgDgYSoNSw08gngMQYADSQiIGLN6PKQAAAABJRU5ErkJggg==");
   background-repeat: no-repeat;
 }
-.oktell_panel .b_main_list .b_contact.m_busy .b_contact_title .wrapword a .b_contact_name,
-.oktell_panel .b_main_list .b_contact.m_busy .b_contact_title .wrapword a .b_contact_name b {
+.oktell_panel .b_main_list .b_contact.m_busy .b_contact_title .wrapword a b {
   color: #bd3b1b;
 }
 /* Action bar
