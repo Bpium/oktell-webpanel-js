@@ -6,16 +6,18 @@ PermissionsPopup = (function() {
     var _this = this;
 
     this.el = popupEl;
-    oktellVoice.on('mediaPermissionsRequest', function() {
-      return _this.show();
-    });
-    oktellVoice.on('mediaPermissionsAccept', function() {
-      return _this.hide();
-    });
-    oktellVoice.on('mediaPermissionsRefuse', function() {
-      oktell.endCall();
-      return _this.hide();
-    });
+    if (oktellVoice) {
+      oktellVoice.on('mediaPermissionsRequest', function() {
+        return _this.show();
+      });
+      oktellVoice.on('mediaPermissionsAccept', function() {
+        return _this.hide();
+      });
+      oktellVoice.on('mediaPermissionsRefuse', function() {
+        oktell.endCall();
+        return _this.hide();
+      });
+    }
   }
 
   PermissionsPopup.prototype.show = function() {

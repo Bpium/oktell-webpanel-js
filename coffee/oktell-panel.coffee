@@ -37,11 +37,11 @@ do ($)->
 			panel: { inTalk: 'In conversation', onHold: 'On hold', queue: 'Wait queue', inputPlaceholder: 'Enter name or number', withoutDepartment: 'Without department', showDepartments: 'Show departments', showDepartmentsClicked: 'Hide departments', showOnlineOnly: 'Show online only', showOnlineOnlyCLicked: 'Show all' },
 			actions: { call: 'Dial', conference: 'Conference', transfer: 'Transfer', toggle: 'Switch', intercom: 'Intercom', endCall: 'End', ghostListen: 'Audition', ghostHelp: 'Help' }
 			callPopup: { title: 'Incoming call', hide: 'Hide', answer: 'Answer', reject: 'Decline', undefinedNumber: 'Phone number is not defined', goPickup: 'Pick up the phone' }
-			permissionsPopup: { header: 'Request for access to the microphone', text: 'To use the phone you need to allow browser access to the microphone.' }
+			permissionsPopup: { header: 'Request for access to the microphone', text: 'To use the web-phone you need to allow browser access to the microphone.' }
 			error:
-				usingOktellClient: { header: 'User «%username%» uses standard Oktell client applications.', message: 'Simultaneous work of two types of client applications is not possible..', message2: 'Close standard Oktell client application and try again.' }
+				usingOktellClient: { header: 'User «%username%» uses standard Oktell client application.', message: 'Simultaneous work of two types of client applications is not possible.', message2: 'Close standard Oktell client application and try again.' }
 				loginPass: { header: 'Wrong password for user «%username%».', message: 'Make sure that the username and password are correct.' }
-				unavailable: { header: 'Oktell server is not available.', message: 'Make sure that Oktell server is running and check your connections.'}
+				unavailable: { header: 'Oktell server is not available.', message: 'Make sure that Oktell server is running and check your connection.'}
 				#tryAgain: 'Try again'
 		cz:
 			panel: { inTalk: 'V rozhovoru', onHold: 'Na hold', queue: 'Fronta čekaní', inputPlaceholder: 'zadejte jméno nebo číslo', withoutDepartment: 'Bez oddělení', showDepartments: 'Zobrazit oddělení', showDepartmentsClicked: 'Skrýt oddělení', showOnlineOnly: 'Zobrazit pouze online', showOnlineOnlyCLicked: 'Zobrazit všechny' },
@@ -49,9 +49,9 @@ do ($)->
 			callPopup: { title: 'Příchozí hovor', hide: 'Schovat', answer: 'Odpovědět', reject: 'Odmítnout', undefinedNumber: '', goPickup: 'Zvedněte sluchátko' }
 			permissionsPopup: { header: 'Žádost o přístup k mikrofonu', text: 'Abyste mohli používat telefon, musíte povolit prohlížeče přístup k mikrofonu.' }
 			error:
-				usingOktellClient: { header: 'User «%username%» uses standard Oktell client applications.', message: 'Simultaneous work of two types of client applications is not possible..', message2: 'Close standard Oktell client application and try again.' }
-				loginPass: { header: 'Wrong password for user «%username%».', message: 'Make sure that the username and password are correct.' }
-				unavailable: { header: 'Oktell server is not available.', message: 'Make sure that Oktell server is running and check your connections.'}
+				usingOktellClient: { header: 'Uživatel «%username%» používá standardní Oktell klientské aplikace.', message: 'Současnou práci dvou typů klientských aplikací není možné.', message2: 'Zavřít Oktell standardní klientskou aplikaci a zkuste to znovu.' }
+				loginPass: { header: 'Chybné heslo uživatele «%username%».', message: 'Ujistěte se, že uživatelské jméno a heslo jsou správné.' }
+				unavailable: { header: 'Oktell server není k dispozici.', message: 'Ujistěte se, že Oktell server běží a zkontrolujte připojení.'}
 				#tryAgain: 'Try again'
 	}
 

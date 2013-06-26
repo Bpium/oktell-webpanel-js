@@ -99,12 +99,12 @@ var __slice = [].slice;
       },
       permissionsPopup: {
         header: 'Request for access to the microphone',
-        text: 'To use the phone you need to allow browser access to the microphone.'
+        text: 'To use the web-phone you need to allow browser access to the microphone.'
       },
       error: {
         usingOktellClient: {
-          header: 'User «%username%» uses standard Oktell client applications.',
-          message: 'Simultaneous work of two types of client applications is not possible..',
+          header: 'User «%username%» uses standard Oktell client application.',
+          message: 'Simultaneous work of two types of client applications is not possible.',
           message2: 'Close standard Oktell client application and try again.'
         },
         loginPass: {
@@ -113,7 +113,7 @@ var __slice = [].slice;
         },
         unavailable: {
           header: 'Oktell server is not available.',
-          message: 'Make sure that Oktell server is running and check your connections.'
+          message: 'Make sure that Oktell server is running and check your connection.'
         }
       }
     },
@@ -153,17 +153,17 @@ var __slice = [].slice;
       },
       error: {
         usingOktellClient: {
-          header: 'User «%username%» uses standard Oktell client applications.',
-          message: 'Simultaneous work of two types of client applications is not possible..',
-          message2: 'Close standard Oktell client application and try again.'
+          header: 'Uživatel «%username%» používá standardní Oktell klientské aplikace.',
+          message: 'Současnou práci dvou typů klientských aplikací není možné.',
+          message2: 'Zavřít Oktell standardní klientskou aplikaci a zkuste to znovu.'
         },
         loginPass: {
-          header: 'Wrong password for user «%username%».',
-          message: 'Make sure that the username and password are correct.'
+          header: 'Chybné heslo uživatele «%username%».',
+          message: 'Ujistěte se, že uživatelské jméno a heslo jsou správné.'
         },
         unavailable: {
-          header: 'Oktell server is not available.',
-          message: 'Make sure that Oktell server is running and check your connections.'
+          header: 'Oktell server není k dispozici.',
+          message: 'Ujistěte se, že Oktell server běží a zkontrolujte připojení.'
         }
       }
     }

@@ -1804,16 +1804,18 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
       var _this = this;
 
       this.el = popupEl;
-      oktellVoice.on('mediaPermissionsRequest', function() {
-        return _this.show();
-      });
-      oktellVoice.on('mediaPermissionsAccept', function() {
-        return _this.hide();
-      });
-      oktellVoice.on('mediaPermissionsRefuse', function() {
-        oktell.endCall();
-        return _this.hide();
-      });
+      if (oktellVoice) {
+        oktellVoice.on('mediaPermissionsRequest', function() {
+          return _this.show();
+        });
+        oktellVoice.on('mediaPermissionsAccept', function() {
+          return _this.hide();
+        });
+        oktellVoice.on('mediaPermissionsRefuse', function() {
+          oktell.endCall();
+          return _this.hide();
+        });
+      }
     }
 
     PermissionsPopup.prototype.show = function() {
@@ -1974,12 +1976,12 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
       },
       permissionsPopup: {
         header: 'Request for access to the microphone',
-        text: 'To use the phone you need to allow browser access to the microphone.'
+        text: 'To use the web-phone you need to allow browser access to the microphone.'
       },
       error: {
         usingOktellClient: {
-          header: 'User «%username%» uses standard Oktell client applications.',
-          message: 'Simultaneous work of two types of client applications is not possible..',
+          header: 'User «%username%» uses standard Oktell client application.',
+          message: 'Simultaneous work of two types of client applications is not possible.',
           message2: 'Close standard Oktell client application and try again.'
         },
         loginPass: {
@@ -1988,7 +1990,7 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
         },
         unavailable: {
           header: 'Oktell server is not available.',
-          message: 'Make sure that Oktell server is running and check your connections.'
+          message: 'Make sure that Oktell server is running and check your connection.'
         }
       }
     },
@@ -2028,17 +2030,17 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
       },
       error: {
         usingOktellClient: {
-          header: 'User «%username%» uses standard Oktell client applications.',
-          message: 'Simultaneous work of two types of client applications is not possible..',
-          message2: 'Close standard Oktell client application and try again.'
+          header: 'Uživatel «%username%» používá standardní Oktell klientské aplikace.',
+          message: 'Současnou práci dvou typů klientských aplikací není možné.',
+          message2: 'Zavřít Oktell standardní klientskou aplikaci a zkuste to znovu.'
         },
         loginPass: {
-          header: 'Wrong password for user «%username%».',
-          message: 'Make sure that the username and password are correct.'
+          header: 'Chybné heslo uživatele «%username%».',
+          message: 'Ujistěte se, že uživatelské jméno a heslo jsou správné.'
         },
         unavailable: {
-          header: 'Oktell server is not available.',
-          message: 'Make sure that Oktell server is running and check your connections.'
+          header: 'Oktell server není k dispozici.',
+          message: 'Ujistěte se, že Oktell server běží a zkontrolujte připojení.'
         }
       }
     }
@@ -2101,7 +2103,7 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
     'templates/department.html': '<tr class="b_contact"><td class="b_contact_department" colspan="3">{{department}}</td></tr>',
     'templates/dep.html': '<div class="b_department"><div class="b_department_header"><div class="h_shadow_top"><span>{{department}}</span></div></div><table class="b_main_list"><tbody></tbody></table></div>',
     'templates/usersTable.html': '<table class="b_main_list m_without_department"><tbody></tbody></table>',
-    'templates/panel.html': '<div class="oktell_panel"><div class="i_panel_bookmark"><div class="i_panel_bookmark_bg"></div></div><div class="h_panel_bg"><div class="b_header"><ul class="b_list_filter"><li class="i_group"></li><li class="i_online"></li></ul></div><div class="h_padding"><div class="b_marks i_conference j_abonents"><div class="h_shadow_top"><div class="b_marks_noise"><p class="b_marks_header"><span class="b_marks_label">{{inTalk}}</span><span class="b_marks_time"></span></p><table><tbody></tbody></table></div></div></div><div class="b_marks i_flash j_hold"><div class="h_shadow_top"><div class="b_marks_noise"><p class="b_marks_header"><span class="b_marks_label">{{onHold}}</span></p><table class="j_table_favorite"><tbody></tbody></table></div></div></div><div class="b_marks i_flash j_queue"><div class="h_shadow_top"><div class="b_marks_noise"><p class="b_marks_header"><span class="b_marks_label">{{queue}}</span></p><table class="j_table_queue"><tbody></tbody></table></div></div></div><div class="b_inconversation j_phone_block"><table class="j_table_phone"><tbody></tbody></table></div><div class="b_marks i_phone"><div class="h_shadow_top"><div class="h_phone_number_input"><div class="i_phone_state_bg"></div><div class="h_input_padding"><div class="i_phone_popup_button j_keypad_expand"><i></i></div><div class="jInputClear_hover"><input class="b_phone_number_input" type="text" placeholder="{{inputPlaceholder}}"><span class="jInputClear_close">&times;</span></div></div><div class="b_phone_keypad j_phone_keypad"><div class="l_column_group"><div class="h_phone_keypad"><ul class="b_phone_panel"><li class="g_top_left g_first"><button data-num="1" class="g_button m_big">1</button></li><li><button data-num="2" class="g_button m_big">2</button></li><li class="g_top_right g_right"><button data-num="3" class="g_button m_big">3</button></li><li class="g_float_celar g_first"><button data-num="4" class="g_button m_big">4</button></li><li><button data-num="5" class="g_button m_big">5</button></li><li class="g_right"><button data-num="6" class="g_button m_big">6</button></li><li class="g_float_celar g_first"><button data-num="7" class="g_button m_big">7</button></li><li><button data-num="8" class="g_button m_big">8</button></li><li class="g_right"><button data-num="9" class="g_button m_big">9</button></li><li class="g_bottom_left g_float_celar g_first"><button data-num="*" class="g_button m_big">&lowast;</button></li><li class="g_bottom_center"><button data-num="0" class="g_button m_big">0</button></li><li class="g_bottom_right g_right"><button data-num="#" class="g_button m_big">#</button></li></ul></div></div></div></div></div></div><div class="h_main_list j_main_list"></div></div></div></div>',
+    'templates/panel.html': '<div class="oktell_panel"><div class="i_panel_bookmark"><div class="i_panel_bookmark_bg"></div></div><div class="h_panel_bg"><div class="b_header"><ul class="b_list_filter"><li class="i_group"></li><li class="i_online"></li></ul></div><div class="h_padding"><div class="b_marks i_conference j_abonents"><div class="h_shadow_top"><div class="b_marks_noise"><p class="b_marks_header"><span class="b_marks_label">{{inTalk}}</span><span class="b_marks_time"></span></p><table><tbody></tbody></table></div></div></div><div class="b_marks i_flash j_hold"><div class="h_shadow_top"><div class="b_marks_noise"><p class="b_marks_header"><span class="b_marks_label">{{onHold}}</span></p><table class="j_table_favorite"><tbody></tbody></table></div></div></div><div class="b_marks i_flash j_queue"><div class="h_shadow_top"><div class="b_marks_noise"><p class="b_marks_header"><span class="b_marks_label">{{queue}}</span></p><table class="j_table_queue"><tbody></tbody></table></div></div></div><div class="b_inconversation j_phone_block"><table class="j_table_phone"><tbody></tbody></table></div><div class="b_marks i_phone"><div class="h_shadow_top"><div class="h_phone_number_input"><div class="i_phone_state_bg"></div><div class="h_input_padding"><div class="jInputClear_hover"><input class="b_phone_number_input" type="text" placeholder="{{inputPlaceholder}}"><span class="jInputClear_close">&times;</span></div></div></div></div></div><div class="h_main_list j_main_list"></div></div></div></div>',
     'templates/callPopup.html': '<div class="oktell_panel_popup" style="display: none"><div class="m_popup_staff"><div class="m_popup_data"><header><div class="h_header_bg"><i class="o_close"></i><h2>{{title}}</h2></div></header><div class="b_content"><div class="b_abonent"><span data-bind="text: name"></span>&nbsp;<span class="g_light" data-bind="textPhone: number"></span></div></div><div class="footer"><div class="b_take_phone j_pickup"><i></i>&nbsp;<span>{{goPickup}}</span></div><button class="oktell_panel_btn m_big m_button_green j_answer" style="margin-right: 20px; float: left"><i style="background: url(\'/img/icons/action/white/call.png\') no-repeat; vertical-align: -2px"></i>Ответить</button><button class="oktell_panel_btn m_big j_close_action">{{hide}}</button><button class="oktell_panel_btn m_big m_button_red j_abort_action"><i></i>{{reject}}</button></div></div></div></div>',
     'templates/permissionsPopup.html': '<div class="oktell_panel_popup" style="display: none"><div class="m_popup_staff"><div class="m_popup_data"><header><div class="h_header_bg"><h2>{{header}}</h2></div></header><div class="b_content"><p>{{text}}</p></div></div></div></div>',
     'templates/error.html': '<div class="b_error m_form" style="display: none"><div class="h_padding"><h4>Ошибка</h4><p class="b_error_alert"></p><p class="g_light"></p><p class="g_light"></p></div></div>'
