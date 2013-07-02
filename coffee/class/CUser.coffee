@@ -153,6 +153,7 @@ class CUser
 		@buttonEls = @buttonEls.add $el
 		$el.data 'user', @
 		$el.children(':first').bind 'click', =>
+			#@log 'log do action'
 			@doAction @buttonLastAction
 		if @buttonLastAction then $el.addClass @firstLiCssPrefix + @buttonLastAction.toLowerCase()
 
@@ -203,6 +204,8 @@ class CUser
 		if not action
 			return
 
+		@log 'do action ' + action
+		return
 		target = @number
 
 		@beforeAction?(action)
@@ -234,6 +237,7 @@ class CUser
 
 	doLastFirstAction: ->
 		if @buttonLastAction
+			#@log 'second do action'
 			@doAction @buttonLastAction
 			true
 		else false

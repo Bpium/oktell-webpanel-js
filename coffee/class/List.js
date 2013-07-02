@@ -194,10 +194,6 @@ List = (function() {
         return true;
       }
       if ((actionButton != null) && actionButton.size()) {
-        user = actionButton.data('user');
-        if (user != null) {
-          user.doLastFirstAction();
-        }
         return true;
       }
       if ((buttonEl != null) && buttonEl.size()) {

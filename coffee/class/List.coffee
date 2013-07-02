@@ -159,8 +159,8 @@ class List
 				return true
 
 			if actionButton? and actionButton.size()
-				user = actionButton.data('user')
-				user?.doLastFirstAction()
+#				user = actionButton.data('user')
+#				user?.doLastFirstAction()
 				return true
 
 			if buttonEl? and buttonEl.size()
