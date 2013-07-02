@@ -688,6 +688,7 @@ do ($)->
 			@buttonEls = @buttonEls.add $el
 			$el.data 'user', @
 			$el.children(':first').bind 'click', =>
+				#@log 'log do action'
 				@doAction @buttonLastAction
 			if @buttonLastAction then $el.addClass @firstLiCssPrefix + @buttonLastAction.toLowerCase()
 	
@@ -738,6 +739,8 @@ do ($)->
 			if not action
 				return
 	
+			@log 'do action ' + action
+			return
 			target = @number
 	
 			@beforeAction?(action)
@@ -769,6 +772,7 @@ do ($)->
 	
 		doLastFirstAction: ->
 			if @buttonLastAction
+				#@log 'second do action'
 				@doAction @buttonLastAction
 				true
 			else false
@@ -955,8 +959,8 @@ do ($)->
 					return true
 	
 				if actionButton? and actionButton.size()
-					user = actionButton.data('user')
-					user?.doLastFirstAction()
+	#				user = actionButton.data('user')
+	#				user?.doLastFirstAction()
 					return true
 	
 				if buttonEl? and buttonEl.size()
