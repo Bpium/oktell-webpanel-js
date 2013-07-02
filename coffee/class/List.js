@@ -366,26 +366,18 @@ List = (function() {
           numStr = n.num.toString();
           user = _this.usersByNumber[numStr];
           if (user) {
-            _this.log('');
-            _this.log('start user state change from ' + user.state + ' to ' + n.numstateid + ' for ' + user.getInfo());
             if (_this.showDeps) {
               dep = _this.departmentsById[user.departmentId];
             } else {
               dep = _this.allUserDep;
             }
-            _this.log('current visibility settings are ShowDeps=' + _this.showDeps + ' and ShowOffline=' + _this.showOffline);
             wasFiltered = user.isFiltered(_this.filter, _this.showOffline);
-            _this.log('user was filtered earlier = ' + wasFiltered);
             user.setState(n.numstateid);
             userNowIsFiltered = user.isFiltered(_this.filter, _this.showOffline);
-            _this.log('after user.setState, now user filtered = ' + userNowIsFiltered);
             if (!userNowIsFiltered) {
-              _this.log('now user isnt filtered');
               if (dep.getContainer().children().length === 1) {
-                _this.log('container contains only users el, so refilter all list');
                 _this.setFilter(_this.filter, true);
               } else {
-                _this.log('remove his html element');
                 if ((_ref3 = user.el) != null) {
                   if (typeof _ref3.remove === "function") {
                     _ref3.remove();
@@ -393,21 +385,15 @@ List = (function() {
                 }
               }
             } else if (!wasFiltered) {
-              _this.log('user now filtered and was not filtered before state change');
               dep.getUsers(_this.filter, _this.showOffline);
-              _this.log('refilter all user of department ' + dep.getInfo());
               index = dep.lastFilteredUsers.indexOf(user);
-              _this.log('index of user in refiltered users list is ' + index);
               if (index !== -1) {
                 if (!dep.getContainer().is(':visible')) {
-                  _this.log('dep container is hidden, so, refilter all users list');
                   _this.setFilter(_this.filter, true);
                 } else {
                   if (index === 0) {
-                    _this.log('add user html to start of department container');
                     dep.getContainer().prepend(user.getEl());
                   } else {
-                    _this.log('add user html after prev user html element');
                     if ((_ref4 = dep.lastFilteredUsers[index - 1]) != null) {
                       if ((_ref5 = _ref4.el) != null) {
                         _ref5.after(user.getEl());
@@ -415,10 +401,8 @@ List = (function() {
                     }
                   }
                   if (((_ref6 = dep.lastFilteredUsers[index - 1]) != null ? _ref6.letter : void 0) === user.letter) {
-                    _this.log('hide user letter because it is like prev user letter ' + user.letter);
                     user.letterVisibility(false);
                   } else if (((_ref7 = dep.lastFilteredUsers[index + 1]) != null ? _ref7.letter : void 0) === user.letter) {
-                    _this.log('hide prev user letter because it is like user letter ' + user.letter);
                     dep.lastFilteredUsers[index + 1].letterVisibility(false);
                   }
                 }
