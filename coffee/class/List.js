@@ -50,6 +50,14 @@ List = (function() {
       ghostHelp: {
         icon: '/img/icons/action/ghost_help.png',
         text: this.langs.actions.ghostHelp
+      },
+      hold: {
+        icon: '/img/icons/action/ghost_help.png',
+        text: this.langs.actions.hold
+      },
+      resume: {
+        icon: '/img/icons/action/ghost_help.png',
+        text: this.langs.actions.resume
       }
     };
     this.actionCssPrefix = 'i_';
@@ -371,25 +379,21 @@ List = (function() {
             } else {
               dep = _this.allUserDep;
             }
-            wasFiltered = user.isFiltered(_this.filter, _this.showOffline);
+            wasFiltered = user.isFiltered(_this.filter, _this.showOffline, _this.filterLang);
             user.setState(n.numstateid);
-            userNowIsFiltered = user.isFiltered(_this.filter, _this.showOffline);
+            userNowIsFiltered = user.isFiltered(_this.filter, _this.showOffline, _this.filterLang);
             if (!userNowIsFiltered) {
               if (dep.getContainer().children().length === 1) {
-                _this.setFilter(_this.filter, true);
+                _results.push(_this.setFilter(_this.filter, true));
               } else {
-                if ((_ref3 = user.el) != null) {
-                  if (typeof _ref3.remove === "function") {
-                    _ref3.remove();
-                  }
-                }
+                _results.push((_ref3 = user.el) != null ? typeof _ref3.remove === "function" ? _ref3.remove() : void 0 : void 0);
               }
             } else if (!wasFiltered) {
-              dep.getUsers(_this.filter, _this.showOffline);
+              dep.getUsers(_this.filter, _this.showOffline, _this.filterLang);
               index = dep.lastFilteredUsers.indexOf(user);
               if (index !== -1) {
                 if (!dep.getContainer().is(':visible')) {
-                  _this.setFilter(_this.filter, true);
+                  _results.push(_this.setFilter(_this.filter, true));
                 } else {
                   if (index === 0) {
                     dep.getContainer().prepend(user.getEl());
@@ -401,15 +405,19 @@ List = (function() {
                     }
                   }
                   if (((_ref6 = dep.lastFilteredUsers[index - 1]) != null ? _ref6.letter : void 0) === user.letter) {
-                    user.letterVisibility(false);
+                    _results.push(user.letterVisibility(false));
                   } else if (((_ref7 = dep.lastFilteredUsers[index + 1]) != null ? _ref7.letter : void 0) === user.letter) {
-                    dep.lastFilteredUsers[index + 1].letterVisibility(false);
+                    _results.push(dep.lastFilteredUsers[index + 1].letterVisibility(false));
+                  } else {
+                    _results.push(void 0);
                   }
                 }
+              } else {
+                _results.push(void 0);
               }
+            } else {
+              _results.push(void 0);
             }
-            _this.log('end user state change');
-            _results.push(_this.log(''));
           } else {
             _results.push(void 0);
           }
@@ -697,6 +705,7 @@ List = (function() {
     }
     oldFilter = this.filter;
     this.filter = filter;
+    this.filterLang = filter.match(/^[^А-яёЁ]+$/) ? 'en' : filter.match(/^[^A-z]+$/) ? 'ru' : '';
     exactMatch = false;
     this.timer();
     this.panelUsersFiltered = [];
@@ -706,7 +715,7 @@ List = (function() {
 
       el = dep.getEl(filter !== '');
       depExactMatch = false;
-      _ref = dep.getUsers(filter, _this.showOffline), users = _ref[0], depExactMatch = _ref[1];
+      _ref = dep.getUsers(filter, _this.showOffline, _this.filterLang), users = _ref[0], depExactMatch = _ref[1];
       _this.panelUsersFiltered = _this.panelUsersFiltered.concat(users);
       if (users.length !== 0) {
         if (!exactMatch) {
@@ -829,11 +838,10 @@ List = (function() {
 
   List.prototype.timer = function(stop) {
     if (stop && this._time) {
-      this.log('List timer stop: ' + (Date.now() - this._time));
+      1;
     }
     if (!stop) {
-      this._time = Date.now();
-      return log('List timer start');
+      return this._time = Date.now();
     }
   };
 

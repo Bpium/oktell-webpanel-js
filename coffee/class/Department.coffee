@@ -11,7 +11,7 @@ class Department
 		@isOpen = if @config().departmentVisibility[@id]? then @config().departmentVisibility[@id] else true
 
 	getEl: (usersVisible)->
-		@log 'get el, usersVisible - ' + usersVisible + ' , for department ' + @getInfo()
+#		@log 'get el, usersVisible - ' + usersVisible + ' , for department ' + @getInfo()
 		if not @el
 			@el = $(@template.replace /\{\{department}\}/g, escapeHtml(@name))
 			@el.find('.b_department_header').bind 'click', =>
@@ -30,7 +30,7 @@ class Department
 			val = ! @isOpen
 		if not @hideEl
 			@hideEl = @el.find 'table'
-		@log 'department users visibility set ' + val + ' , without save - ' + notSave + '. For ' + @getInfo()
+#		@log 'department users visibility set ' + val + ' , without save - ' + notSave + '. For ' + @getInfo()
 
 		@hideEl.stop true, true
 		if not notSave
@@ -70,7 +70,7 @@ class Department
 			@el.hide()
 		@visible = false
 
-	getUsers: (filter, showOffline) ->
+	getUsers: (filter, showOffline, filterLang) ->
 		if not @isSorted
 			@sortUsers()
 
@@ -78,14 +78,17 @@ class Department
 		exactMatch = false
 		if filter is ''
 			if showOffline
-				users = [].concat @users
+				for u in @users
+					u.setSelection()
+					users.push u
 			else
 				for u in @users
 					if u.state isnt 0
+						u.setSelection()
 						users.push u
 		else
 			for u in @users
-				if u.isFiltered filter, showOffline
+				if u.isFiltered filter, showOffline, filterLang
 					users.push u
 					if u.number is filter and not exactMatch
 						exactMatch = u

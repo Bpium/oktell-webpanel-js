@@ -16,6 +16,8 @@ class List
 			endCall : { icon: '/img/icons/action/endcall.png', iconWhite: '/img/icons/action/white/endcall.png', text: @langs.actions.endCall }
 			ghostListen : { icon: '/img/icons/action/ghost_monitor.png', text: @langs.actions.ghostListen }
 			ghostHelp : { icon: '/img/icons/action/ghost_help.png', text: @langs.actions.ghostHelp }
+			hold : { icon: '/img/icons/action/ghost_help.png', text: @langs.actions.hold }
+			resume : { icon: '/img/icons/action/ghost_help.png', text: @langs.actions.resume }
 
 		@actionCssPrefix = 'i_'
 		@lastDropdownUser = false
@@ -313,10 +315,10 @@ class List
 						else
 							dep = @allUserDep
 #						@log 'current visibility settings are ShowDeps='+@showDeps+' and ShowOffline=' + @showOffline
-						wasFiltered = user.isFiltered @filter, @showOffline
+						wasFiltered = user.isFiltered @filter, @showOffline, @filterLang
 #						@log 'user was filtered earlier = ' + wasFiltered
 						user.setState n.numstateid
-						userNowIsFiltered = user.isFiltered @filter, @showOffline
+						userNowIsFiltered = user.isFiltered @filter, @showOffline, @filterLang
 #						@log 'after user.setState, now user filtered = ' + userNowIsFiltered
 						if not userNowIsFiltered
 #							@log 'now user isnt filtered'
@@ -328,7 +330,7 @@ class List
 								user.el?.remove?()
 						else if not wasFiltered
 #							@log 'user now filtered and was not filtered before state change'
-							dep.getUsers @filter, @showOffline
+							dep.getUsers @filter, @showOffline, @filterLang
 #							@log 'refilter all user of department ' + dep.getInfo()
 							index = dep.lastFilteredUsers.indexOf user
 #							@log 'index of user in refiltered users list is ' + index
@@ -351,8 +353,8 @@ class List
 #										@log 'hide prev user letter because it is like user letter ' + user.letter
 										dep.lastFilteredUsers[index+1].letterVisibility false
 
-						@log 'end user state change'
-						@log ''
+#						@log 'end user state change'
+#						@log ''
 
 
 			oktell.on 'abonentsChange', ( abonents ) =>
@@ -576,6 +578,11 @@ class List
 		if @filter is filter and not reloadAnyway then return false
 		oldFilter = @filter
 		@filter = filter
+
+		@filterLang = if filter.match(/^[^А-яёЁ]+$/) then 'en' else if filter.match(/^[^A-z]+$/) then 'ru' else ''
+
+		#@log 'filterLang ' + @filterLang
+
 		exactMatch = false
 		@timer()
 		@panelUsersFiltered = []
@@ -584,7 +591,7 @@ class List
 		renderDep = (dep) =>
 			el = dep.getEl filter isnt ''
 			depExactMatch = false
-			[ users, depExactMatch ] = dep.getUsers filter, @showOffline
+			[ users, depExactMatch ] = dep.getUsers filter, @showOffline, @filterLang
 			@panelUsersFiltered = @panelUsersFiltered.concat users
 			if users.length isnt 0
 				if not exactMatch then exactMatch = depExactMatch
@@ -701,10 +708,11 @@ class List
 
 	timer: (stop) ->
 		if stop and @_time
-			@log 'List timer stop: ' + ( Date.now() - @_time )
+			1
+#			@log 'List timer stop: ' + ( Date.now() - @_time )
 		if not stop
 			@_time = Date.now()
-			log 'List timer start'
+#			log 'List timer start'
 
 	beforeUserAction: (user, action)->
 		if @filterFantomUser and user is @filterFantomUser

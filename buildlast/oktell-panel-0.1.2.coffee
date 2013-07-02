@@ -418,7 +418,7 @@ do ($)->
 			@isOpen = if @config().departmentVisibility[@id]? then @config().departmentVisibility[@id] else true
 	
 		getEl: (usersVisible)->
-			@log 'get el, usersVisible - ' + usersVisible + ' , for department ' + @getInfo()
+	#		@log 'get el, usersVisible - ' + usersVisible + ' , for department ' + @getInfo()
 			if not @el
 				@el = $(@template.replace /\{\{department}\}/g, escapeHtml(@name))
 				@el.find('.b_department_header').bind 'click', =>
@@ -437,7 +437,7 @@ do ($)->
 				val = ! @isOpen
 			if not @hideEl
 				@hideEl = @el.find 'table'
-			@log 'department users visibility set ' + val + ' , without save - ' + notSave + '. For ' + @getInfo()
+	#		@log 'department users visibility set ' + val + ' , without save - ' + notSave + '. For ' + @getInfo()
 	
 			@hideEl.stop true, true
 			if not notSave
@@ -477,7 +477,7 @@ do ($)->
 				@el.hide()
 			@visible = false
 	
-		getUsers: (filter, showOffline) ->
+		getUsers: (filter, showOffline, filterLang) ->
 			if not @isSorted
 				@sortUsers()
 	
@@ -485,14 +485,17 @@ do ($)->
 			exactMatch = false
 			if filter is ''
 				if showOffline
-					users = [].concat @users
+					for u in @users
+						u.setSelection()
+						users.push u
 				else
 					for u in @users
 						if u.state isnt 0
+							u.setSelection()
 							users.push u
 			else
 				for u in @users
-					if u.isFiltered filter, showOffline
+					if u.isFiltered filter, showOffline, filterLang
 						users.push u
 						if u.number is filter and not exactMatch
 							exactMatch = u
@@ -622,12 +625,23 @@ do ($)->
 		getInfo: ->
 			'"'+@number+'" ' + @state + ' ' + @name
 	
-		isFiltered: (filter, showOffline) ->
+		isFiltered: (filter, showOffline, lang) ->
 			if ( not filter or typeof filter isnt 'string' ) and ( showOffline or ( not showOffline and @state isnt 0 ) )
+				@setSelection()
 				return true
 	
-			if ( showOffline or ( not showOffline and @state isnt 0 ) ) and ( ( @number and @number.indexOf(filter) isnt -1 ) or ( ' ' + @name ).toLowerCase().indexOf(filter) isnt -1 )
-				return true
+			if ( showOffline or ( not showOffline and @state isnt 0 ) )
+				if ( @number and @number.indexOf(filter) isnt -1 ) or ( ' ' + @name ).toLowerCase().indexOf(filter) isnt -1
+					@setSelection filter
+					return true
+				if lang is 'en' and (fl = @toRu(filter)) and ( ' ' + @name ).toLowerCase().indexOf(fl) isnt -1
+					@setSelection fl
+					return true
+				if lang is 'ru' and (fl = @toEn(filter)) and ( ' ' + @name ).toLowerCase().indexOf(fl) isnt -1
+					@setSelection fl
+					return true
+	
+				return false
 	
 			return false
 	
@@ -648,8 +662,26 @@ do ($)->
 				@setStateCss()
 				if not @el
 					@el = $el
+					@elName = @el.find('.b_contact_name b')
+					@elName2 = @el.find('.b_contact_name span')
+					@elNumber = @el.find('.o_number')
 			$el = $el or @el
 			return $el
+	
+		setSelection: (str)->
+			if @el?
+				if not str
+					if @elHasSelection
+						@elName.text @nameHtml1
+						@elName2.text @nameHtml2
+						@elNumber.text @numberHtml
+						@elHasSelection = false
+				else
+					rx = new RegExp('('+str+')', 'gi')
+					@elName.html @nameHtml1.replace( rx, '<span class="selected_text">$1</span>')
+					@elName2.html @nameHtml2.replace( rx, '<span class="selected_text">$1</span>')
+					@elNumber.html @numberHtml.replace( rx, '<span class="selected_text">$1</span>')
+					@elHasSelection = true
 	
 		initButtonEl: ($el) ->
 			#@log 'init button el for ' + @getInfo()
@@ -729,6 +761,10 @@ do ($)->
 					@oktell.ghostConference target
 				when 'endCall'
 					@oktell.endCall target
+				when 'hold'
+					@oktell.hold?()
+				when 'resume'
+					@oktell.resume?()
 	
 	
 		doLastFirstAction: ->
@@ -743,6 +779,19 @@ do ($)->
 					@el.find('.b_capital_letter span').text @letter
 				else
 					@el.find('.b_capital_letter span').text ''
+	
+		replacerToRu: {"q":"й", "w":"ц", "e":"у", "r":"к", "t":"е", "y":"н", "u":"г", "i":"ш", "o":"щ", "p":"з", "[":"х", "]":"ъ", "a":"ф", "s":"ы", "d":"в", "f":"а", "g":"п", "h":"р", "j":"о", "k":"л", "l":"д", ";":"ж", "'":"э", "z":"я", "x":"ч", "c":"с", "v":"м", "b":"и", "n":"т", "m":"ь", ",":"б", ".":"ю", "/":"."}
+		replacerToEn: {"й":"q", "ц":"w", "у":"e", "к":"r", "е":"t", "н":"y", "г":"u", "ш":"i", "щ":"o", "з":"p", "х":"[", "ъ":"]", "ф":"a", "ы":"s", "в":"d", "а":"f", "п":"g", "р":"h", "о":"j", "л":"k", "д":"l", "ж":";", "э":"'", "я":"z", "ч":"x", "с":"c", "м":"v", "и":"b", "т":"n", "ь":"m", "б":",", "ю":".", ".":"/"}
+	
+		toRu: (str)->
+			str.replace /[A-z\/,.;\'\]\[]/g, (x)=>
+				if x is x.toLowerCase() then @replacerToRu[x] else @replacerToRu[x.toLowerCase()].toUpperCase()
+	
+		toEn: (str)->
+			str.replace /[А-яёЁ]/g, (x)=>
+				if x is x.toLowerCase() then @replacerToEn[x] else @replacerToEn[x.toLowerCase()].toUpperCase()
+	
+	
 	
 	#includecoffee coffee/class/List.coffee
 	class List
@@ -763,6 +812,8 @@ do ($)->
 				endCall : { icon: '/img/icons/action/endcall.png', iconWhite: '/img/icons/action/white/endcall.png', text: @langs.actions.endCall }
 				ghostListen : { icon: '/img/icons/action/ghost_monitor.png', text: @langs.actions.ghostListen }
 				ghostHelp : { icon: '/img/icons/action/ghost_help.png', text: @langs.actions.ghostHelp }
+				hold : { icon: '/img/icons/action/ghost_help.png', text: @langs.actions.hold }
+				resume : { icon: '/img/icons/action/ghost_help.png', text: @langs.actions.resume }
 	
 			@actionCssPrefix = 'i_'
 			@lastDropdownUser = false
@@ -1060,10 +1111,10 @@ do ($)->
 							else
 								dep = @allUserDep
 	#						@log 'current visibility settings are ShowDeps='+@showDeps+' and ShowOffline=' + @showOffline
-							wasFiltered = user.isFiltered @filter, @showOffline
+							wasFiltered = user.isFiltered @filter, @showOffline, @filterLang
 	#						@log 'user was filtered earlier = ' + wasFiltered
 							user.setState n.numstateid
-							userNowIsFiltered = user.isFiltered @filter, @showOffline
+							userNowIsFiltered = user.isFiltered @filter, @showOffline, @filterLang
 	#						@log 'after user.setState, now user filtered = ' + userNowIsFiltered
 							if not userNowIsFiltered
 	#							@log 'now user isnt filtered'
@@ -1075,7 +1126,7 @@ do ($)->
 									user.el?.remove?()
 							else if not wasFiltered
 	#							@log 'user now filtered and was not filtered before state change'
-								dep.getUsers @filter, @showOffline
+								dep.getUsers @filter, @showOffline, @filterLang
 	#							@log 'refilter all user of department ' + dep.getInfo()
 								index = dep.lastFilteredUsers.indexOf user
 	#							@log 'index of user in refiltered users list is ' + index
@@ -1098,8 +1149,8 @@ do ($)->
 	#										@log 'hide prev user letter because it is like user letter ' + user.letter
 											dep.lastFilteredUsers[index+1].letterVisibility false
 	
-							@log 'end user state change'
-							@log ''
+	#						@log 'end user state change'
+	#						@log ''
 	
 	
 				oktell.on 'abonentsChange', ( abonents ) =>
@@ -1323,6 +1374,11 @@ do ($)->
 			if @filter is filter and not reloadAnyway then return false
 			oldFilter = @filter
 			@filter = filter
+	
+			@filterLang = if filter.match(/^[^А-яёЁ]+$/) then 'en' else if filter.match(/^[^A-z]+$/) then 'ru' else ''
+	
+			#@log 'filterLang ' + @filterLang
+	
 			exactMatch = false
 			@timer()
 			@panelUsersFiltered = []
@@ -1331,7 +1387,7 @@ do ($)->
 			renderDep = (dep) =>
 				el = dep.getEl filter isnt ''
 				depExactMatch = false
-				[ users, depExactMatch ] = dep.getUsers filter, @showOffline
+				[ users, depExactMatch ] = dep.getUsers filter, @showOffline, @filterLang
 				@panelUsersFiltered = @panelUsersFiltered.concat users
 				if users.length isnt 0
 					if not exactMatch then exactMatch = depExactMatch
@@ -1448,10 +1504,11 @@ do ($)->
 	
 		timer: (stop) ->
 			if stop and @_time
-				@log 'List timer stop: ' + ( Date.now() - @_time )
+				1
+	#			@log 'List timer stop: ' + ( Date.now() - @_time )
 			if not stop
 				@_time = Date.now()
-				log 'List timer start'
+	#			log 'List timer start'
 	
 		beforeUserAction: (user, action)->
 			if @filterFantomUser and user is @filterFantomUser
@@ -1605,6 +1662,8 @@ do ($)->
 				switch error.errorCode
 					when 12 then @show 1, oktell.getMyInfo().login
 					when 13 then @show 2, oktell.getMyInfo().login
+					when 1204 then @show 1, oktell.getMyInfo().login
+					when 1202 then @show 2, oktell.getMyInfo().login
 	
 		show: (errorType, username) ->
 			if not @errorTypes[errorType] then return false
@@ -1633,7 +1692,7 @@ do ($)->
 	langs = {
 		ru:
 			panel: { inTalk: 'В разговоре', onHold: 'На удержании', queue: 'Очередь ожидания', inputPlaceholder: 'введите имя или номер', withoutDepartment: 'без отдела', showDepartments: 'Группировать по отделам', showDepartmentsClicked: 'Показать общим списком', showOnlineOnly: 'Показать только online', showOnlineOnlyCLicked: 'Показать всех' },
-			actions: { call: 'Позвонить', conference: 'Конференция', transfer: 'Перевести', toggle: 'Переключиться', intercom: 'Интерком', endCall: 'Завершить', ghostListen: 'Прослушка', ghostHelp: 'Помощь' }
+			actions: { call: 'Позвонить', conference: 'Конференция', transfer: 'Перевести', toggle: 'Переключиться', intercom: 'Интерком', endCall: 'Завершить', ghostListen: 'Прослушка', ghostHelp: 'Помощь', hold: 'Удержание', resume: 'Продолжить' }
 			callPopup: { title: 'Входящий вызов', hide: 'Скрыть', answer: 'Ответить', reject: 'Отклонить', undefinedNumber: 'Номер не определен', goPickup: 'Поднимите трубку' }
 			permissionsPopup: { header: 'Запрос на доступ к микрофону', text: 'Для использования веб-телефона необходимо разрешить браузеру доступ к микрофону.' }
 			error:
@@ -1643,7 +1702,7 @@ do ($)->
 				#tryAgain: 'Повторить попытку'
 		en:
 			panel: { inTalk: 'In conversation', onHold: 'On hold', queue: 'Wait queue', inputPlaceholder: 'Enter name or number', withoutDepartment: 'Without department', showDepartments: 'Show departments', showDepartmentsClicked: 'Hide departments', showOnlineOnly: 'Show online only', showOnlineOnlyCLicked: 'Show all' },
-			actions: { call: 'Dial', conference: 'Conference', transfer: 'Transfer', toggle: 'Switch', intercom: 'Intercom', endCall: 'End', ghostListen: 'Audition', ghostHelp: 'Help' }
+			actions: { call: 'Dial', conference: 'Conference', transfer: 'Transfer', toggle: 'Switch', intercom: 'Intercom', endCall: 'End', ghostListen: 'Audition', ghostHelp: 'Help', hold: 'Hold', resume: 'Resume' }
 			callPopup: { title: 'Incoming call', hide: 'Hide', answer: 'Answer', reject: 'Decline', undefinedNumber: 'Phone number is not defined', goPickup: 'Pick up the phone' }
 			permissionsPopup: { header: 'Request for access to the microphone', text: 'To use the web-phone you need to allow browser access to the microphone.' }
 			error:
@@ -1653,7 +1712,7 @@ do ($)->
 				#tryAgain: 'Try again'
 		cz:
 			panel: { inTalk: 'V rozhovoru', onHold: 'Na hold', queue: 'Fronta čekaní', inputPlaceholder: 'zadejte jméno nebo číslo', withoutDepartment: 'Bez oddělení', showDepartments: 'Zobrazit oddělení', showDepartmentsClicked: 'Skrýt oddělení', showOnlineOnly: 'Zobrazit pouze online', showOnlineOnlyCLicked: 'Zobrazit všechny' },
-			actions: { call: 'Zavolat', conference: 'Konference', transfer: 'Převést', toggle: 'Přepnout', intercom: 'Intercom', endCall: 'Ukončit', ghostListen: 'Odposlech', ghostHelp: 'Nápověda' }
+			actions: { call: 'Zavolat', conference: 'Konference', transfer: 'Převést', toggle: 'Přepnout', intercom: 'Intercom', endCall: 'Ukončit', ghostListen: 'Odposlech', ghostHelp: 'Nápověda', hold: 'Udržet', resume: 'Pokračovat' }
 			callPopup: { title: 'Příchozí hovor', hide: 'Schovat', answer: 'Odpovědět', reject: 'Odmítnout', undefinedNumber: '', goPickup: 'Zvedněte sluchátko' }
 			permissionsPopup: { header: 'Žádost o přístup k mikrofonu', text: 'Abyste mohli používat telefon, musíte povolit prohlížeče přístup k mikrofonu.' }
 			error:
@@ -1703,7 +1762,7 @@ do ($)->
 			console[fnName].apply( console, args || [])
 		catch e
 
-	templates = {'templates/actionButton.html':'<ul class="oktell_button_action"><li class="g_first"><i></i></li><li class="g_last drop_down"><i></i></li></ul>', 'templates/actionList.html':'<ul class="oktell_actions_group_list"><li class="{{css}}" data-action="{{action}}"><i></i><span>{{actionText}}</span></li></ul>', 'templates/user.html':'<tr class="b_contact"><td class="b_contact_avatar {{css}}"><img src="{{avatarLink32x32}}"><i></i><div class="o_busy"></div></td><td class="b_capital_letter"><span></span></td><td class="b_contact_title"><div class="wrapword"><a><span class="b_contact_name"><b>{{name1}}</b>{{name2}}</span><span class="o_number">{{number}}</span></a></div>{{button}}</td></tr>', 'templates/department.html':'<tr class="b_contact"><td class="b_contact_department" colspan="3">{{department}}</td></tr>', 'templates/dep.html':'<div class="b_department"><div class="b_department_header"><div class="h_shadow_top"><span>{{department}}</span></div></div><table class="b_main_list"><tbody></tbody></table></div>', 'templates/usersTable.html':'<table class="b_main_list m_without_department"><tbody></tbody></table>', 'templates/panel.html':'<div class="oktell_panel"><div class="i_panel_bookmark"><div class="i_panel_bookmark_bg"></div></div><div class="h_panel_bg"><div class="b_header"><ul class="b_list_filter"><li class="i_group"></li><li class="i_online"></li></ul></div><div class="h_padding"><div class="b_marks i_conference j_abonents"><div class="h_shadow_top"><div class="b_marks_noise"><p class="b_marks_header"><span class="b_marks_label">{{inTalk}}</span><span class="b_marks_time"></span></p><table><tbody></tbody></table></div></div></div><div class="b_marks i_flash j_hold"><div class="h_shadow_top"><div class="b_marks_noise"><p class="b_marks_header"><span class="b_marks_label">{{onHold}}</span></p><table class="j_table_favorite"><tbody></tbody></table></div></div></div><div class="b_marks i_flash j_queue"><div class="h_shadow_top"><div class="b_marks_noise"><p class="b_marks_header"><span class="b_marks_label">{{queue}}</span></p><table class="j_table_queue"><tbody></tbody></table></div></div></div><div class="b_inconversation j_phone_block"><table class="j_table_phone"><tbody></tbody></table></div><div class="b_marks i_phone"><div class="h_shadow_top"><div class="h_phone_number_input"><div class="i_phone_state_bg"></div><div class="h_input_padding"><div class="jInputClear_hover"><input class="b_phone_number_input" type="text" placeholder="{{inputPlaceholder}}"><span class="jInputClear_close">&times;</span></div></div></div></div></div><div class="h_main_list j_main_list"></div></div></div></div>', 'templates/callPopup.html':'<div class="oktell_panel_popup" style="display: none"><div class="m_popup_staff"><div class="m_popup_data"><header><div class="h_header_bg"><i class="o_close"></i><h2>{{title}}</h2></div></header><div class="b_content"><div class="b_abonent"><span data-bind="text: name"></span>&nbsp;<span class="g_light" data-bind="textPhone: number"></span></div></div><div class="footer"><div class="b_take_phone j_pickup"><i></i>&nbsp;<span>{{goPickup}}</span></div><button class="oktell_panel_btn m_big m_button_green j_answer" style="margin-right: 20px; float: left"><i style="background: url(\'/img/icons/action/white/call.png\') no-repeat; vertical-align: -2px"></i>Ответить</button><button class="oktell_panel_btn m_big j_close_action">{{hide}}</button><button class="oktell_panel_btn m_big m_button_red j_abort_action"><i></i>{{reject}}</button></div></div></div></div>', 'templates/permissionsPopup.html':'<div class="oktell_panel_popup" style="display: none"><div class="m_popup_staff"><div class="m_popup_data"><header><div class="h_header_bg"><h2>{{header}}</h2></div></header><div class="b_content"><p>{{text}}</p></div></div></div></div>', 'templates/error.html':'<div class="b_error m_form" style="display: none"><div class="h_padding"><h4>Ошибка</h4><p class="b_error_alert"></p><p class="g_light"></p><p class="g_light"></p></div></div>', }
+	templates = {'templates/actionButton.html':'<ul class="oktell_button_action"><li class="g_first"><i></i></li><li class="g_last drop_down"><i></i></li></ul>', 'templates/actionList.html':'<ul class="oktell_actions_group_list"><li class="{{css}}" data-action="{{action}}"><i></i><span>{{actionText}}</span></li></ul>', 'templates/user.html':'<tr class="b_contact"><td class="b_contact_avatar {{css}}"><img src="{{avatarLink32x32}}"><i></i><div class="o_busy"></div></td><td class="b_capital_letter"><span></span></td><td class="b_contact_title"><div class="wrapword"><a><span class="b_contact_name"><b>{{name1}}</b><span>{{name2}}</span></span><span class="o_number">{{number}}</span></a></div>{{button}}</td></tr>', 'templates/department.html':'<tr class="b_contact"><td class="b_contact_department" colspan="3">{{department}}</td></tr>', 'templates/dep.html':'<div class="b_department"><div class="b_department_header"><div class="h_shadow_top"><span>{{department}}</span></div></div><table class="b_main_list"><tbody></tbody></table></div>', 'templates/usersTable.html':'<table class="b_main_list m_without_department"><tbody></tbody></table>', 'templates/panel.html':'<div class="oktell_panel"><div class="i_panel_bookmark"><div class="i_panel_bookmark_bg"></div></div><div class="h_panel_bg"><div class="b_header"><ul class="b_list_filter"><li class="i_group"></li><li class="i_online"></li></ul></div><div class="h_padding"><div class="b_marks i_conference j_abonents"><div class="h_shadow_top"><div class="b_marks_noise"><p class="b_marks_header"><span class="b_marks_label">{{inTalk}}</span><span class="b_marks_time"></span></p><table><tbody></tbody></table></div></div></div><div class="b_marks i_flash j_hold"><div class="h_shadow_top"><div class="b_marks_noise"><p class="b_marks_header"><span class="b_marks_label">{{onHold}}</span></p><table class="j_table_favorite"><tbody></tbody></table></div></div></div><div class="b_marks i_flash j_queue"><div class="h_shadow_top"><div class="b_marks_noise"><p class="b_marks_header"><span class="b_marks_label">{{queue}}</span></p><table class="j_table_queue"><tbody></tbody></table></div></div></div><div class="b_inconversation j_phone_block"><table class="j_table_phone"><tbody></tbody></table></div><div class="b_marks i_phone"><div class="h_shadow_top"><div class="h_phone_number_input"><div class="i_phone_state_bg"></div><div class="h_input_padding"><div class="jInputClear_hover"><input class="b_phone_number_input" type="text" placeholder="{{inputPlaceholder}}"><span class="jInputClear_close">&times;</span></div></div></div></div></div><div class="h_main_list j_main_list"></div></div></div></div>', 'templates/callPopup.html':'<div class="oktell_panel_popup" style="display: none"><div class="m_popup_staff"><div class="m_popup_data"><header><div class="h_header_bg"><i class="o_close"></i><h2>{{title}}</h2></div></header><div class="b_content"><div class="b_abonent"><span data-bind="text: name"></span>&nbsp;<span class="g_light" data-bind="textPhone: number"></span></div></div><div class="footer"><div class="b_take_phone j_pickup"><i></i>&nbsp;<span>{{goPickup}}</span></div><button class="oktell_panel_btn m_big m_button_green j_answer" style="margin-right: 20px; float: left"><i style="background: url(\'/img/icons/action/white/call.png\') no-repeat; vertical-align: -2px"></i>Ответить</button><button class="oktell_panel_btn m_big j_close_action">{{hide}}</button><button class="oktell_panel_btn m_big m_button_red j_abort_action"><i></i>{{reject}}</button></div></div></div></div>', 'templates/permissionsPopup.html':'<div class="oktell_panel_popup" style="display: none"><div class="m_popup_staff"><div class="m_popup_data"><header><div class="h_header_bg"><h2>{{header}}</h2></div></header><div class="b_content"><p>{{text}}</p></div></div></div></div>', 'templates/error.html':'<div class="b_error m_form" style="display: none"><div class="h_padding"><h4>Ошибка</h4><p class="b_error_alert"></p><p class="g_light"></p><p class="g_light"></p></div></div>', }
 
 	loadTemplate = (path) ->
 		path = path.substr(1) if path[0] is '/'

@@ -37,7 +37,9 @@ var __slice = [].slice;
         intercom: 'Интерком',
         endCall: 'Завершить',
         ghostListen: 'Прослушка',
-        ghostHelp: 'Помощь'
+        ghostHelp: 'Помощь',
+        hold: 'Удержание',
+        resume: 'Продолжить'
       },
       callPopup: {
         title: 'Входящий вызов',
@@ -87,7 +89,9 @@ var __slice = [].slice;
         intercom: 'Intercom',
         endCall: 'End',
         ghostListen: 'Audition',
-        ghostHelp: 'Help'
+        ghostHelp: 'Help',
+        hold: 'Hold',
+        resume: 'Resume'
       },
       callPopup: {
         title: 'Incoming call',
@@ -137,7 +141,9 @@ var __slice = [].slice;
         intercom: 'Intercom',
         endCall: 'Ukončit',
         ghostListen: 'Odposlech',
-        ghostHelp: 'Nápověda'
+        ghostHelp: 'Nápověda',
+        hold: 'Udržet',
+        resume: 'Pokračovat'
       },
       callPopup: {
         title: 'Příchozí hovor',

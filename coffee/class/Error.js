@@ -30,6 +30,10 @@ Error = (function() {
           return _this.show(1, oktell.getMyInfo().login);
         case 13:
           return _this.show(2, oktell.getMyInfo().login);
+        case 1204:
+          return _this.show(1, oktell.getMyInfo().login);
+        case 1202:
+          return _this.show(2, oktell.getMyInfo().login);
       }
     });
   }

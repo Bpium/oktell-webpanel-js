@@ -562,6 +562,9 @@
   margin-bottom: -3px;
   clear: left;
 }
+.oktell_panel .b_contact .selected_text {
+  background-color: yellow
+}
 .oktell_panel .b_contact td.b_contact_avatar,
 .oktell_panel .b_contact td.b_capital_letter {
   width: 24px;

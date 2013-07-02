@@ -18,7 +18,6 @@ Department = (function() {
   Department.prototype.getEl = function(usersVisible) {
     var _this = this;
 
-    this.log('get el, usersVisible - ' + usersVisible + ' , for department ' + this.getInfo());
     if (!this.el) {
       this.el = $(this.template.replace(/\{\{department}\}/g, escapeHtml(this.name)));
       this.el.find('.b_department_header').bind('click', function() {
@@ -47,7 +46,6 @@ Department = (function() {
     if (!this.hideEl) {
       this.hideEl = this.el.find('table');
     }
-    this.log('department users visibility set ' + val + ' , without save - ' + notSave + '. For ' + this.getInfo());
     this.hideEl.stop(true, true);
     if (!notSave) {
       this.isOpen = val;
@@ -96,8 +94,8 @@ Department = (function() {
     return this.visible = false;
   };
 
-  Department.prototype.getUsers = function(filter, showOffline) {
-    var exactMatch, u, users, _i, _j, _len, _len1, _ref, _ref1;
+  Department.prototype.getUsers = function(filter, showOffline, filterLang) {
+    var exactMatch, u, users, _i, _j, _k, _len, _len1, _len2, _ref, _ref1, _ref2;
 
     if (!this.isSorted) {
       this.sortUsers();
@@ -106,21 +104,27 @@ Department = (function() {
     exactMatch = false;
     if (filter === '') {
       if (showOffline) {
-        users = [].concat(this.users);
-      } else {
         _ref = this.users;
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           u = _ref[_i];
+          u.setSelection();
+          users.push(u);
+        }
+      } else {
+        _ref1 = this.users;
+        for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+          u = _ref1[_j];
           if (u.state !== 0) {
+            u.setSelection();
             users.push(u);
           }
         }
       }
     } else {
-      _ref1 = this.users;
-      for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
-        u = _ref1[_j];
-        if (u.isFiltered(filter, showOffline)) {
+      _ref2 = this.users;
+      for (_k = 0, _len2 = _ref2.length; _k < _len2; _k++) {
+        u = _ref2[_k];
+        if (u.isFiltered(filter, showOffline, filterLang)) {
           users.push(u);
           if (u.number === filter && !exactMatch) {
             exactMatch = u;

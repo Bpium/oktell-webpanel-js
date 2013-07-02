@@ -90,12 +90,23 @@ class CUser
 	getInfo: ->
 		'"'+@number+'" ' + @state + ' ' + @name
 
-	isFiltered: (filter, showOffline) ->
+	isFiltered: (filter, showOffline, lang) ->
 		if ( not filter or typeof filter isnt 'string' ) and ( showOffline or ( not showOffline and @state isnt 0 ) )
+			@setSelection()
 			return true
 
-		if ( showOffline or ( not showOffline and @state isnt 0 ) ) and ( ( @number and @number.indexOf(filter) isnt -1 ) or ( ' ' + @name ).toLowerCase().indexOf(filter) isnt -1 )
-			return true
+		if ( showOffline or ( not showOffline and @state isnt 0 ) )
+			if ( @number and @number.indexOf(filter) isnt -1 ) or ( ' ' + @name ).toLowerCase().indexOf(filter) isnt -1
+				@setSelection filter
+				return true
+			if lang is 'en' and (fl = @toRu(filter)) and ( ' ' + @name ).toLowerCase().indexOf(fl) isnt -1
+				@setSelection fl
+				return true
+			if lang is 'ru' and (fl = @toEn(filter)) and ( ' ' + @name ).toLowerCase().indexOf(fl) isnt -1
+				@setSelection fl
+				return true
+
+			return false
 
 		return false
 
@@ -116,8 +127,26 @@ class CUser
 			@setStateCss()
 			if not @el
 				@el = $el
+				@elName = @el.find('.b_contact_name b')
+				@elName2 = @el.find('.b_contact_name span')
+				@elNumber = @el.find('.o_number')
 		$el = $el or @el
 		return $el
+
+	setSelection: (str)->
+		if @el?
+			if not str
+				if @elHasSelection
+					@elName.text @nameHtml1
+					@elName2.text @nameHtml2
+					@elNumber.text @numberHtml
+					@elHasSelection = false
+			else
+				rx = new RegExp('('+str+')', 'gi')
+				@elName.html @nameHtml1.replace( rx, '<span class="selected_text">$1</span>')
+				@elName2.html @nameHtml2.replace( rx, '<span class="selected_text">$1</span>')
+				@elNumber.html @numberHtml.replace( rx, '<span class="selected_text">$1</span>')
+				@elHasSelection = true
 
 	initButtonEl: ($el) ->
 		#@log 'init button el for ' + @getInfo()
@@ -197,6 +226,10 @@ class CUser
 				@oktell.ghostConference target
 			when 'endCall'
 				@oktell.endCall target
+			when 'hold'
+				@oktell.hold?()
+			when 'resume'
+				@oktell.resume?()
 
 
 	doLastFirstAction: ->
@@ -211,3 +244,16 @@ class CUser
 				@el.find('.b_capital_letter span').text @letter
 			else
 				@el.find('.b_capital_letter span').text ''
+
+	replacerToRu: {"q":"й", "w":"ц", "e":"у", "r":"к", "t":"е", "y":"н", "u":"г", "i":"ш", "o":"щ", "p":"з", "[":"х", "]":"ъ", "a":"ф", "s":"ы", "d":"в", "f":"а", "g":"п", "h":"р", "j":"о", "k":"л", "l":"д", ";":"ж", "'":"э", "z":"я", "x":"ч", "c":"с", "v":"м", "b":"и", "n":"т", "m":"ь", ",":"б", ".":"ю", "/":"."}
+	replacerToEn: {"й":"q", "ц":"w", "у":"e", "к":"r", "е":"t", "н":"y", "г":"u", "ш":"i", "щ":"o", "з":"p", "х":"[", "ъ":"]", "ф":"a", "ы":"s", "в":"d", "а":"f", "п":"g", "р":"h", "о":"j", "л":"k", "д":"l", "ж":";", "э":"'", "я":"z", "ч":"x", "с":"c", "м":"v", "и":"b", "т":"n", "ь":"m", "б":",", "ю":".", ".":"/"}
+
+	toRu: (str)->
+		str.replace /[A-z\/,.;\'\]\[]/g, (x)=>
+			if x is x.toLowerCase() then @replacerToRu[x] else @replacerToRu[x.toLowerCase()].toUpperCase()
+
+	toEn: (str)->
+		str.replace /[А-яёЁ]/g, (x)=>
+			if x is x.toLowerCase() then @replacerToEn[x] else @replacerToEn[x.toLowerCase()].toUpperCase()
+
+

@@ -105,12 +105,27 @@ CUser = (function() {
     return '"' + this.number + '" ' + this.state + ' ' + this.name;
   };
 
-  CUser.prototype.isFiltered = function(filter, showOffline) {
+  CUser.prototype.isFiltered = function(filter, showOffline, lang) {
+    var fl;
+
     if ((!filter || typeof filter !== 'string') && (showOffline || (!showOffline && this.state !== 0))) {
+      this.setSelection();
       return true;
     }
-    if ((showOffline || (!showOffline && this.state !== 0)) && ((this.number && this.number.indexOf(filter) !== -1) || (' ' + this.name).toLowerCase().indexOf(filter) !== -1)) {
-      return true;
+    if (showOffline || (!showOffline && this.state !== 0)) {
+      if ((this.number && this.number.indexOf(filter) !== -1) || (' ' + this.name).toLowerCase().indexOf(filter) !== -1) {
+        this.setSelection(filter);
+        return true;
+      }
+      if (lang === 'en' && (fl = this.toRu(filter)) && (' ' + this.name).toLowerCase().indexOf(fl) !== -1) {
+        this.setSelection(fl);
+        return true;
+      }
+      if (lang === 'ru' && (fl = this.toEn(filter)) && (' ' + this.name).toLowerCase().indexOf(fl) !== -1) {
+        this.setSelection(fl);
+        return true;
+      }
+      return false;
     }
     return false;
   };
@@ -133,10 +148,34 @@ CUser = (function() {
       this.setStateCss();
       if (!this.el) {
         this.el = $el;
+        this.elName = this.el.find('.b_contact_name b');
+        this.elName2 = this.el.find('.b_contact_name span');
+        this.elNumber = this.el.find('.o_number');
       }
     }
     $el = $el || this.el;
     return $el;
+  };
+
+  CUser.prototype.setSelection = function(str) {
+    var rx;
+
+    if (this.el != null) {
+      if (!str) {
+        if (this.elHasSelection) {
+          this.elName.text(this.nameHtml1);
+          this.elName2.text(this.nameHtml2);
+          this.elNumber.text(this.numberHtml);
+          return this.elHasSelection = false;
+        }
+      } else {
+        rx = new RegExp('(' + str + ')', 'gi');
+        this.elName.html(this.nameHtml1.replace(rx, '<span class="selected_text">$1</span>'));
+        this.elName2.html(this.nameHtml2.replace(rx, '<span class="selected_text">$1</span>'));
+        this.elNumber.html(this.numberHtml.replace(rx, '<span class="selected_text">$1</span>'));
+        return this.elHasSelection = true;
+      }
+    }
   };
 
   CUser.prototype.initButtonEl = function($el) {
@@ -198,7 +237,7 @@ CUser = (function() {
   };
 
   CUser.prototype.doAction = function(action) {
-    var target;
+    var target, _base, _base1;
 
     if (!action) {
       return;
@@ -226,6 +265,10 @@ CUser = (function() {
         return this.oktell.ghostConference(target);
       case 'endCall':
         return this.oktell.endCall(target);
+      case 'hold':
+        return typeof (_base = this.oktell).hold === "function" ? _base.hold() : void 0;
+      case 'resume':
+        return typeof (_base1 = this.oktell).resume === "function" ? _base1.resume() : void 0;
     }
   };
 
@@ -246,6 +289,102 @@ CUser = (function() {
         return this.el.find('.b_capital_letter span').text('');
       }
     }
+  };
+
+  CUser.prototype.replacerToRu = {
+    "q": "й",
+    "w": "ц",
+    "e": "у",
+    "r": "к",
+    "t": "е",
+    "y": "н",
+    "u": "г",
+    "i": "ш",
+    "o": "щ",
+    "p": "з",
+    "[": "х",
+    "]": "ъ",
+    "a": "ф",
+    "s": "ы",
+    "d": "в",
+    "f": "а",
+    "g": "п",
+    "h": "р",
+    "j": "о",
+    "k": "л",
+    "l": "д",
+    ";": "ж",
+    "'": "э",
+    "z": "я",
+    "x": "ч",
+    "c": "с",
+    "v": "м",
+    "b": "и",
+    "n": "т",
+    "m": "ь",
+    ",": "б",
+    ".": "ю",
+    "/": "."
+  };
+
+  CUser.prototype.replacerToEn = {
+    "й": "q",
+    "ц": "w",
+    "у": "e",
+    "к": "r",
+    "е": "t",
+    "н": "y",
+    "г": "u",
+    "ш": "i",
+    "щ": "o",
+    "з": "p",
+    "х": "[",
+    "ъ": "]",
+    "ф": "a",
+    "ы": "s",
+    "в": "d",
+    "а": "f",
+    "п": "g",
+    "р": "h",
+    "о": "j",
+    "л": "k",
+    "д": "l",
+    "ж": ";",
+    "э": "'",
+    "я": "z",
+    "ч": "x",
+    "с": "c",
+    "м": "v",
+    "и": "b",
+    "т": "n",
+    "ь": "m",
+    "б": ",",
+    "ю": ".",
+    ".": "/"
+  };
+
+  CUser.prototype.toRu = function(str) {
+    var _this = this;
+
+    return str.replace(/[A-z\/,.;\'\]\[]/g, function(x) {
+      if (x === x.toLowerCase()) {
+        return _this.replacerToRu[x];
+      } else {
+        return _this.replacerToRu[x.toLowerCase()].toUpperCase();
+      }
+    });
+  };
+
+  CUser.prototype.toEn = function(str) {
+    var _this = this;
+
+    return str.replace(/[А-яёЁ]/g, function(x) {
+      if (x === x.toLowerCase()) {
+        return _this.replacerToEn[x];
+      } else {
+        return _this.replacerToEn[x.toLowerCase()].toUpperCase();
+      }
+    });
   };
 
   return CUser;
