@@ -806,8 +806,6 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
       if (!action) {
         return;
       }
-      this.log('do action ' + action);
-      return;
       target = this.number;
       if (typeof this.beforeAction === "function") {
         this.beforeAction(action);

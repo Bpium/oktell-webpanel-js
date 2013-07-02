@@ -739,8 +739,6 @@ do ($)->
 			if not action
 				return
 	
-			@log 'do action ' + action
-			return
 			target = @number
 	
 			@beforeAction?(action)
