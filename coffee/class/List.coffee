@@ -491,6 +491,7 @@ class List
 				delete userlist[user.number]
 
 	setAbonents: (abonents) ->
+		@log 'set abonents', abonents
 		@syncAbonentsAndUserlist abonents, @abonents
 		@setAbonentsHtml()
 
@@ -516,6 +517,7 @@ class List
 		@userScrollerToTop()
 
 	setAbonentsHtml: ->
+		@log 'Set abonents html', @abonents
 		@_setActivityPanelUserHtml @abonents, @abonentsListEl, @abonentsListBlock
 
 	setHoldHtml: ->
@@ -529,9 +531,13 @@ class List
 		usersArray.push(u) for own k,u of users
 		@_setUsersHtml usersArray, listEl, true
 		if usersArray.length and blockEl.is(':not(:visible)')
-			blockEl.slideDown 200, @setUserListHeight
+			@log 'Show abonent el'
+			blockEl.stop true, true
+			blockEl.slideDown 50, @setUserListHeight
 		else if usersArray.length is 0 and blockEl.is(':visible')
-			blockEl.slideUp 200, @setUserListHeight
+			@log 'Hide abonent el'
+			blockEl.stop true, true
+			blockEl.slideUp 50, @setUserListHeight
 
 
 	_setUsersHtml: (usersArray, $el, useIndependentCopies ) ->

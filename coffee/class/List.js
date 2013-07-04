@@ -606,6 +606,7 @@ List = (function() {
   };
 
   List.prototype.setAbonents = function(abonents) {
+    this.log('set abonents', abonents);
     this.syncAbonentsAndUserlist(abonents, this.abonents);
     return this.setAbonentsHtml();
   };
@@ -648,6 +649,7 @@ List = (function() {
   };
 
   List.prototype.setAbonentsHtml = function() {
+    this.log('Set abonents html', this.abonents);
     return this._setActivityPanelUserHtml(this.abonents, this.abonentsListEl, this.abonentsListBlock);
   };
 
@@ -670,9 +672,13 @@ List = (function() {
     }
     this._setUsersHtml(usersArray, listEl, true);
     if (usersArray.length && blockEl.is(':not(:visible)')) {
-      return blockEl.slideDown(200, this.setUserListHeight);
+      this.log('Show abonent el');
+      blockEl.stop(true, true);
+      return blockEl.slideDown(50, this.setUserListHeight);
     } else if (usersArray.length === 0 && blockEl.is(':visible')) {
-      return blockEl.slideUp(200, this.setUserListHeight);
+      this.log('Hide abonent el');
+      blockEl.stop(true, true);
+      return blockEl.slideUp(50, this.setUserListHeight);
     }
   };
 

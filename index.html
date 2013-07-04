@@ -43,6 +43,7 @@
 			$('#j_login').val( localStorage.demoLogin || '' )
 			$('#j_pass').val( localStorage.demoPass || '' )
 			$('#j_server').val( localStorage.demoServer || '192.168.0.61' )
+			$('#j_webrtc').attr( 'checked',  Boolean(parseInt(localStorage.useWebRTC)) || false )
 
 			$('#j_login').focus();
 
@@ -330,12 +331,14 @@
 				var login = $('#j_login').val()
 				var pass = $('#j_pass').val()
 				var server = $('#j_server').val()
+				var useWebRTC = $('#j_webrtc').is(':checked')
 
 				//startWebRtcClient(login,pass,server);
 
 				localStorage.demoLogin = login
 				localStorage.demoPass = pass
 				localStorage.demoServer = server
+				localStorage.useWebRTC = useWebRTC ? 1 : 0;
 
 //				OktellVoice.connect({
 //					login: login,
@@ -351,9 +354,8 @@
 					//url: ['192.168.0.12'], login: 'leader', password: '123', // звонить на 183
 					url: server, login: login, password: pass,
 					debugMode: true,
-					oktellVoiceUrl: server.split(':')[0] + ':5061',
 					openTimeout: 5000,
-					oktellVoice: true,
+					oktellVoice: useWebRTC,
 					webSocketSwfLocation: '/jslib/vendor/WebSocketMain.swf',
 					//expires: 84600,
 					queryTimeout: 5000,
@@ -471,6 +473,9 @@
 						<tr>
 							<td>Сервер</td>
 							<td><input type="text" id="j_server" value="192.168.0.61:4066"/></td>
+						</tr>
+						<tr>
+							<td colspan="2"><label><input type="checkbox" id="j_webrtc"/> Использовать WebRTC</label></td>
 						</tr>
 						<tr>
 							<td></td>
