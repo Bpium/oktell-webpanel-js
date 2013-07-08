@@ -2,7 +2,8 @@
 var __slice = [].slice;
 
 (function($) {
-  var actionButtonContainerClass, actionButtonHtml, actionListEl, actionListHtml, addActionButtonToEl, afterOktellConnect, defaultOptions, departmentTemplateHtml, error, errorHtml, getOptions, initActionButtons, initButtonOnElement, initPanel, langs, list, loadTemplate, log, logStr, oktell, oktellConnected, options, panelHtml, panelWasInitialized, permissionsPopup, permissionsPopupHtml, popup, popupHtml, templates, userTemplateHtml, usersTableHtml;
+  var actionButtonContainerClass, actionButtonHtml, actionListEl, actionListHtml, addActionButtonToEl, afterOktellConnect, defaultOptions, departmentTemplateHtml, error, errorHtml, getOptions, initActionButtons, initButtonOnElement, initPanel, langs, list, loadTemplate, log, logStr, oktell, oktellConnected, options, panelHtml, panelWasInitialized, permissionsPopup, permissionsPopupHtml, popup, popupHtml, templates, userTemplateHtml, usersTableHtml,
+    _this = this;
 
   if (!$) {
     throw new Error('Error init oktell panel, jQuery ( $ ) is not defined');
@@ -14,7 +15,8 @@ var __slice = [].slice;
     oktellVoice: window.oktellVoice,
     debug: false,
     lang: 'ru',
-    noavatar: true
+    noavatar: true,
+    hideOnDisconnect: true
   };
   langs = {
     ru: {
@@ -315,6 +317,7 @@ var __slice = [].slice;
     animOptShow[panelPos] = '0px';
     animOptHide = {};
     animOptHide[panelPos] = '-281px';
+    panelEl.hide();
     $("body").append(panelEl);
     list = new List(oktell, panelEl, actionListEl, afterOktellConnect, getOptions().debug);
     if (getOptions().debug) {
@@ -479,9 +482,15 @@ var __slice = [].slice;
       return initPanel(arg);
     }
   };
-  return $.fn.oktellButton = function() {
+  $.fn.oktellButton = function() {
     return $(this).each(function() {
       return addActionButtonToEl($(this));
     });
+  };
+  $.oktellPanel.show = function() {
+    return list.showPanel();
+  };
+  return $.oktellPanel.hide = function() {
+    return list.hidePanel();
   };
 })($);

@@ -34,6 +34,8 @@ Error = (function() {
           return _this.show(1, oktell.getMyInfo().login);
         case 1202:
           return _this.show(2, oktell.getMyInfo().login);
+        default:
+          return _this.show(3, oktell.getMyInfo().login);
       }
     });
   }

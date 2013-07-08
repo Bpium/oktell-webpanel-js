@@ -21,6 +21,7 @@ do ($)->
 		debug: false
 		lang: 'ru'
 		noavatar: true
+		hideOnDisconnect: true
 
 	langs = {
 		ru:
@@ -198,7 +199,7 @@ do ($)->
 		animOptHide = {}
 		animOptHide[panelPos] = '-281px'
 
-
+		panelEl.hide()
 		$("body").append(panelEl)
 
 		list = new List oktell, panelEl, actionListEl, afterOktellConnect, getOptions().debug
@@ -359,6 +360,11 @@ do ($)->
 	$.fn.oktellButton = ->
 		$(this).each ->
 			addActionButtonToEl $(this)
+
+	$.oktellPanel.show = =>
+		list.showPanel()
+	$.oktellPanel.hide = =>
+		list.hidePanel()
 
 
 #	$.fn.oktellActions = ->

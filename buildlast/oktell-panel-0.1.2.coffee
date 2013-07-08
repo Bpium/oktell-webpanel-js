@@ -798,7 +798,7 @@ do ($)->
 	#includecoffee coffee/class/List.coffee
 	class List
 		logGroup: 'List'
-		constructor: (oktell, panelEl, dropdownEl, afterOktellConnect, debugMode) ->
+		constructor: (oktell, panelEl, dropdownEl, options, afterOktellConnect, debugMode) ->
 	
 			@defaultConfig =
 				departmentVisibility: {}
@@ -844,6 +844,7 @@ do ($)->
 				dep: /\{\{department}\}/g
 	
 			oktellConnected = false
+			@options = options
 			@usersByNumber = {}
 			@me = false
 			@oktell = oktell
@@ -1014,7 +1015,14 @@ do ($)->
 			$(window).bind 'resize', ->
 				debouncedSetHeight()
 	
+			#if @options.
+			@hidePanel()
+	
 			oktell.on 'disconnect', =>
+	
+				if @options.hideOnDisconnect
+					@hidePanel()
+	
 				@oktellConnected = false
 				@usersByNumber = {}
 				@panelUsers = []
@@ -1170,7 +1178,6 @@ do ($)->
 					else
 						@talkTimeEl.text formattedTime
 	
-	
 				setTimeout =>
 					@setAbonents oktell.getAbonents()
 					@setHold oktell.getHoldInfo()
@@ -1192,7 +1199,32 @@ do ($)->
 				for user in @usersWithBeforeConnectButtons
 					user.loadActions()
 	
+				@showPanel()
+	
 				if typeof afterOktellConnect is 'function' then afterOktellConnect()
+	
+			oktell.on 'connectError', =>
+				if not @options.hideOnDisconnect
+					@showPanel()
+	
+		showPanel: ->
+			w = @panelEl.width() or @panelEl.data('width')
+			if w > 0
+				@log 'show panel'
+				@panelEl.data('width', w)
+				@panelEl.css {display: ''}
+				@panelEl.animate {width: w+'px'}, 200, =>
+					@panelEl.css { overflow: '' }
+	
+		hidePanel: ->
+			w = @panelEl.width()
+			if w > 0
+				@log 'hide panel'
+				@panelEl.data('width', w)
+				@panelEl.animate {width: '0px'}, 200, =>
+					@panelEl.css {display: '', overflow: 'hidden'}
+	
+	
 	
 		getUserButtonForPlugin: (phone) ->
 			user = @getUser phone
@@ -1672,6 +1704,7 @@ do ($)->
 					when 13 then @show 2, oktell.getMyInfo().login
 					when 1204 then @show 1, oktell.getMyInfo().login
 					when 1202 then @show 2, oktell.getMyInfo().login
+					else @show 3, oktell.getMyInfo().login
 	
 		show: (errorType, username) ->
 			if not @errorTypes[errorType] then return false
@@ -1696,6 +1729,7 @@ do ($)->
 		debug: false
 		lang: 'ru'
 		noavatar: true
+		hideOnDisconnect: true
 
 	langs = {
 		ru:
@@ -1770,7 +1804,7 @@ do ($)->
 			console[fnName].apply( console, args || [])
 		catch e
 
-	templates = {'templates/actionButton.html':'<ul class="oktell_button_action"><li class="g_first"><i></i></li><li class="g_last drop_down"><i></i></li></ul>', 'templates/actionList.html':'<ul class="oktell_actions_group_list"><li class="{{css}}" data-action="{{action}}"><i></i><span>{{actionText}}</span></li></ul>', 'templates/user.html':'<tr class="b_contact"><td class="b_contact_avatar {{css}}"><img src="{{avatarLink32x32}}"><i></i><div class="o_busy"></div></td><td class="b_capital_letter"><span></span></td><td class="b_contact_title"><div class="wrapword"><a><span class="b_contact_name"><b>{{name1}}</b><span>{{name2}}</span></span><span class="o_number">{{number}}</span></a></div>{{button}}</td></tr>', 'templates/department.html':'<tr class="b_contact"><td class="b_contact_department" colspan="3">{{department}}</td></tr>', 'templates/dep.html':'<div class="b_department"><div class="b_department_header"><div class="h_shadow_top"><span>{{department}}</span></div></div><table class="b_main_list"><tbody></tbody></table></div>', 'templates/usersTable.html':'<table class="b_main_list m_without_department"><tbody></tbody></table>', 'templates/panel.html':'<div class="oktell_panel"><div class="i_panel_bookmark"><div class="i_panel_bookmark_bg"></div></div><div class="h_panel_bg"><div class="b_header"><ul class="b_list_filter"><li class="i_group"></li><li class="i_online"></li></ul></div><div class="h_padding"><div class="b_marks i_conference j_abonents"><div class="h_shadow_top"><div class="b_marks_noise"><p class="b_marks_header"><span class="b_marks_label">{{inTalk}}</span><span class="b_marks_time"></span></p><table><tbody></tbody></table></div></div></div><div class="b_marks i_flash j_hold"><div class="h_shadow_top"><div class="b_marks_noise"><p class="b_marks_header"><span class="b_marks_label">{{onHold}}</span></p><table class="j_table_favorite"><tbody></tbody></table></div></div></div><div class="b_marks i_flash j_queue"><div class="h_shadow_top"><div class="b_marks_noise"><p class="b_marks_header"><span class="b_marks_label">{{queue}}</span></p><table class="j_table_queue"><tbody></tbody></table></div></div></div><div class="b_inconversation j_phone_block"><table class="j_table_phone"><tbody></tbody></table></div><div class="b_marks i_phone"><div class="h_shadow_top"><div class="h_phone_number_input"><div class="i_phone_state_bg"></div><div class="h_input_padding"><div class="jInputClear_hover"><input class="b_phone_number_input" type="text" placeholder="{{inputPlaceholder}}"><span class="jInputClear_close">&times;</span></div></div></div></div></div><div class="h_main_list j_main_list"></div></div></div></div>', 'templates/callPopup.html':'<div class="oktell_panel_popup" style="display: none"><div class="m_popup_staff"><div class="m_popup_data"><header><div class="h_header_bg"><i class="o_close"></i><h2>{{title}}</h2></div></header><div class="b_content"><div class="b_abonent"><span data-bind="text: name"></span>&nbsp;<span class="g_light" data-bind="textPhone: number"></span></div></div><div class="footer"><div class="b_take_phone j_pickup"><i></i>&nbsp;<span>{{goPickup}}</span></div><button class="oktell_panel_btn m_big m_button_green j_answer" style="margin-right: 20px; float: left"><i style="background: url(\'/img/icons/action/white/call.png\') no-repeat; vertical-align: -2px"></i>Ответить</button><button class="oktell_panel_btn m_big j_close_action">{{hide}}</button><button class="oktell_panel_btn m_big m_button_red j_abort_action"><i></i>{{reject}}</button></div></div></div></div>', 'templates/permissionsPopup.html':'<div class="oktell_panel_popup" style="display: none"><div class="m_popup_staff"><div class="m_popup_data"><header><div class="h_header_bg"><h2>{{header}}</h2></div></header><div class="b_content"><p>{{text}}</p></div></div></div></div>', 'templates/error.html':'<div class="b_error m_form" style="display: none"><div class="h_padding"><h4>Ошибка</h4><p class="b_error_alert"></p><p class="g_light"></p><p class="g_light"></p></div></div>', }
+	templates = {'templates/actionButton.html':'<ul class="oktell_button_action"><li class="g_first"><i></i></li><li class="g_last drop_down"><i></i></li></ul>', 'templates/actionList.html':'<ul class="oktell_actions_group_list"><li class="{{css}}" data-action="{{action}}"><i></i><span>{{actionText}}</span></li></ul>', 'templates/user.html':'<tr class="b_contact"><td class="b_contact_avatar {{css}}"><img src="{{avatarLink32x32}}"><i></i><div class="o_busy"></div></td><td class="b_capital_letter"><span></span></td><td class="b_contact_title"><div class="wrapword"><span class="b_contact_name"><b>{{name1}}</b><span>{{name2}}</span></span><span class="o_number">{{number}}</span></div>{{button}}</td></tr>', 'templates/department.html':'<tr class="b_contact"><td class="b_contact_department" colspan="3">{{department}}</td></tr>', 'templates/dep.html':'<div class="b_department"><div class="b_department_header"><div class="h_shadow_top"><span>{{department}}</span></div></div><table class="b_main_list"><tbody></tbody></table></div>', 'templates/usersTable.html':'<table class="b_main_list m_without_department"><tbody></tbody></table>', 'templates/panel.html':'<div class="oktell_panel"><div class="i_panel_bookmark"><div class="i_panel_bookmark_bg"></div></div><div class="h_panel_bg"><div class="b_header"><ul class="b_list_filter"><li class="i_group"></li><li class="i_online"></li></ul></div><div class="h_padding"><div class="b_marks i_conference j_abonents"><div class="h_shadow_top"><div class="b_marks_noise"><p class="b_marks_header"><span class="b_marks_label">{{inTalk}}</span><span class="b_marks_time"></span></p><table><tbody></tbody></table></div></div></div><div class="b_marks i_flash j_hold"><div class="h_shadow_top"><div class="b_marks_noise"><p class="b_marks_header"><span class="b_marks_label">{{onHold}}</span></p><table class="j_table_favorite"><tbody></tbody></table></div></div></div><div class="b_marks i_flash j_queue"><div class="h_shadow_top"><div class="b_marks_noise"><p class="b_marks_header"><span class="b_marks_label">{{queue}}</span></p><table class="j_table_queue"><tbody></tbody></table></div></div></div><div class="b_inconversation j_phone_block"><table class="j_table_phone"><tbody></tbody></table></div><div class="b_marks i_phone"><div class="h_shadow_top"><div class="h_phone_number_input"><div class="i_phone_state_bg"></div><div class="h_input_padding"><div class="jInputClear_hover"><input class="b_phone_number_input" type="text" placeholder="{{inputPlaceholder}}"><span class="jInputClear_close">&times;</span></div></div></div></div></div><div class="h_main_list j_main_list"></div></div></div></div>', 'templates/callPopup.html':'<div class="oktell_panel_popup" style="display: none"><div class="m_popup_staff"><div class="m_popup_data"><header><div class="h_header_bg"><i class="o_close"></i><h2>{{title}}</h2></div></header><div class="b_content"><div class="b_abonent"><span data-bind="text: name"></span>&nbsp;<span class="g_light" data-bind="textPhone: number"></span></div></div><div class="footer"><div class="b_take_phone j_pickup"><i></i>&nbsp;<span>{{goPickup}}</span></div><button class="oktell_panel_btn m_big m_button_green j_answer" style="margin-right: 20px; float: left"><i style="background: url(\'/img/icons/action/white/call.png\') no-repeat; vertical-align: -2px"></i>Ответить</button><button class="oktell_panel_btn m_big j_close_action">{{hide}}</button><button class="oktell_panel_btn m_big m_button_red j_abort_action"><i></i>{{reject}}</button></div></div></div></div>', 'templates/permissionsPopup.html':'<div class="oktell_panel_popup" style="display: none"><div class="m_popup_staff"><div class="m_popup_data"><header><div class="h_header_bg"><h2>{{header}}</h2></div></header><div class="b_content"><p>{{text}}</p></div></div></div></div>', 'templates/error.html':'<div class="b_error m_form" style="display: none"><div class="h_padding"><h4>Ошибка</h4><p class="b_error_alert"></p><p class="g_light"></p><p class="g_light"></p></div></div>', }
 
 	loadTemplate = (path) ->
 		path = path.substr(1) if path[0] is '/'
@@ -1873,7 +1907,7 @@ do ($)->
 		animOptHide = {}
 		animOptHide[panelPos] = '-281px'
 
-
+		panelEl.hide()
 		$("body").append(panelEl)
 
 		list = new List oktell, panelEl, actionListEl, afterOktellConnect, getOptions().debug
@@ -2034,6 +2068,11 @@ do ($)->
 	$.fn.oktellButton = ->
 		$(this).each ->
 			addActionButtonToEl $(this)
+
+	$.oktellPanel.show = =>
+		list.showPanel()
+	$.oktellPanel.hide = =>
+		list.hidePanel()
 
 
 #	$.fn.oktellActions = ->

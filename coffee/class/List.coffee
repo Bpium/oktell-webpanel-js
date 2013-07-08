@@ -1,6 +1,6 @@
 class List
 	logGroup: 'List'
-	constructor: (oktell, panelEl, dropdownEl, afterOktellConnect, debugMode) ->
+	constructor: (oktell, panelEl, dropdownEl, options, afterOktellConnect, debugMode) ->
 
 		@defaultConfig =
 			departmentVisibility: {}
@@ -46,6 +46,7 @@ class List
 			dep: /\{\{department}\}/g
 
 		oktellConnected = false
+		@options = options
 		@usersByNumber = {}
 		@me = false
 		@oktell = oktell
@@ -216,7 +217,14 @@ class List
 		$(window).bind 'resize', ->
 			debouncedSetHeight()
 
+		#if @options.
+		@hidePanel()
+
 		oktell.on 'disconnect', =>
+
+			if @options.hideOnDisconnect
+				@hidePanel()
+
 			@oktellConnected = false
 			@usersByNumber = {}
 			@panelUsers = []
@@ -372,7 +380,6 @@ class List
 				else
 					@talkTimeEl.text formattedTime
 
-
 			setTimeout =>
 				@setAbonents oktell.getAbonents()
 				@setHold oktell.getHoldInfo()
@@ -394,7 +401,32 @@ class List
 			for user in @usersWithBeforeConnectButtons
 				user.loadActions()
 
+			@showPanel()
+
 			if typeof afterOktellConnect is 'function' then afterOktellConnect()
+
+		oktell.on 'connectError', =>
+			if not @options.hideOnDisconnect
+				@showPanel()
+
+	showPanel: ->
+		w = @panelEl.width() or @panelEl.data('width')
+		if w > 0
+			@log 'show panel'
+			@panelEl.data('width', w)
+			@panelEl.css {display: ''}
+			@panelEl.animate {width: w+'px'}, 200, =>
+				@panelEl.css { overflow: '' }
+
+	hidePanel: ->
+		w = @panelEl.width()
+		if w > 0
+			@log 'hide panel'
+			@panelEl.data('width', w)
+			@panelEl.animate {width: '0px'}, 200, =>
+				@panelEl.css {display: '', overflow: 'hidden'}
+
+
 
 	getUserButtonForPlugin: (phone) ->
 		user = @getUser phone

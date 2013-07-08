@@ -5,7 +5,8 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
   __hasProp = {}.hasOwnProperty;
 
 (function($) {
-  var CUser, Department, Error, List, PermissionsPopup, Popup, actionButtonContainerClass, actionButtonHtml, actionListEl, actionListHtml, addActionButtonToEl, afterOktellConnect, cookie, debounce, defaultOptions, departmentTemplateHtml, error, errorHtml, escapeHtml, getOptions, initActionButtons, initButtonOnElement, initPanel, jScroll, langs, list, loadTemplate, log, logStr, newGuid, oktell, oktellConnected, options, panelHtml, panelWasInitialized, permissionsPopup, permissionsPopupHtml, popup, popupHtml, templates, userTemplateHtml, usersTableHtml;
+  var CUser, Department, Error, List, PermissionsPopup, Popup, actionButtonContainerClass, actionButtonHtml, actionListEl, actionListHtml, addActionButtonToEl, afterOktellConnect, cookie, debounce, defaultOptions, departmentTemplateHtml, error, errorHtml, escapeHtml, getOptions, initActionButtons, initButtonOnElement, initPanel, jScroll, langs, list, loadTemplate, log, logStr, newGuid, oktell, oktellConnected, options, panelHtml, panelWasInitialized, permissionsPopup, permissionsPopupHtml, popup, popupHtml, templates, userTemplateHtml, usersTableHtml,
+    _this = this;
 
   if (!$) {
     throw new Error('Error init oktell panel, jQuery ( $ ) is not defined');
@@ -957,7 +958,7 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
   List = (function() {
     List.prototype.logGroup = 'List';
 
-    function List(oktell, panelEl, dropdownEl, afterOktellConnect, debugMode) {
+    function List(oktell, panelEl, dropdownEl, options, afterOktellConnect, debugMode) {
       var debouncedSetFilter, debouncedSetHeight, dropdownHideTimer, oktellConnected, self,
         _this = this;
 
@@ -1032,6 +1033,7 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
         dep: /\{\{department}\}/g
       };
       oktellConnected = false;
+      this.options = options;
       this.usersByNumber = {};
       this.me = false;
       this.oktell = oktell;
@@ -1208,9 +1210,13 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
       $(window).bind('resize', function() {
         return debouncedSetHeight();
       });
+      this.hidePanel();
       oktell.on('disconnect', function() {
         var phone, user, _ref, _results;
 
+        if (_this.options.hideOnDisconnect) {
+          _this.hidePanel();
+        }
         _this.oktellConnected = false;
         _this.usersByNumber = {};
         _this.panelUsers = [];
@@ -1404,11 +1410,57 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
           user = _ref2[_i];
           user.loadActions();
         }
+        _this.showPanel();
         if (typeof afterOktellConnect === 'function') {
           return afterOktellConnect();
         }
       });
+      oktell.on('connectError', function() {
+        if (!_this.options.hideOnDisconnect) {
+          return _this.showPanel();
+        }
+      });
     }
+
+    List.prototype.showPanel = function() {
+      var w,
+        _this = this;
+
+      w = this.panelEl.width() || this.panelEl.data('width');
+      if (w > 0) {
+        this.log('show panel');
+        this.panelEl.data('width', w);
+        this.panelEl.css({
+          display: ''
+        });
+        return this.panelEl.animate({
+          width: w + 'px'
+        }, 200, function() {
+          return _this.panelEl.css({
+            overflow: ''
+          });
+        });
+      }
+    };
+
+    List.prototype.hidePanel = function() {
+      var w,
+        _this = this;
+
+      w = this.panelEl.width();
+      if (w > 0) {
+        this.log('hide panel');
+        this.panelEl.data('width', w);
+        return this.panelEl.animate({
+          width: '0px'
+        }, 200, function() {
+          return _this.panelEl.css({
+            display: '',
+            overflow: 'hidden'
+          });
+        });
+      }
+    };
 
     List.prototype.getUserButtonForPlugin = function(phone) {
       var button, user,
@@ -2000,6 +2052,8 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
             return _this.show(1, oktell.getMyInfo().login);
           case 1202:
             return _this.show(2, oktell.getMyInfo().login);
+          default:
+            return _this.show(3, oktell.getMyInfo().login);
         }
       });
     }
@@ -2032,7 +2086,8 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
     oktellVoice: window.oktellVoice,
     debug: false,
     lang: 'ru',
-    noavatar: true
+    noavatar: true,
+    hideOnDisconnect: true
   };
   langs = {
     ru: {
@@ -2246,7 +2301,7 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
   templates = {
     'templates/actionButton.html': '<ul class="oktell_button_action"><li class="g_first"><i></i></li><li class="g_last drop_down"><i></i></li></ul>',
     'templates/actionList.html': '<ul class="oktell_actions_group_list"><li class="{{css}}" data-action="{{action}}"><i></i><span>{{actionText}}</span></li></ul>',
-    'templates/user.html': '<tr class="b_contact"><td class="b_contact_avatar {{css}}"><img src="{{avatarLink32x32}}"><i></i><div class="o_busy"></div></td><td class="b_capital_letter"><span></span></td><td class="b_contact_title"><div class="wrapword"><a><span class="b_contact_name"><b>{{name1}}</b><span>{{name2}}</span></span><span class="o_number">{{number}}</span></a></div>{{button}}</td></tr>',
+    'templates/user.html': '<tr class="b_contact"><td class="b_contact_avatar {{css}}"><img src="{{avatarLink32x32}}"><i></i><div class="o_busy"></div></td><td class="b_capital_letter"><span></span></td><td class="b_contact_title"><div class="wrapword"><span class="b_contact_name"><b>{{name1}}</b><span>{{name2}}</span></span><span class="o_number">{{number}}</span></div>{{button}}</td></tr>',
     'templates/department.html': '<tr class="b_contact"><td class="b_contact_department" colspan="3">{{department}}</td></tr>',
     'templates/dep.html': '<div class="b_department"><div class="b_department_header"><div class="h_shadow_top"><span>{{department}}</span></div></div><table class="b_main_list"><tbody></tbody></table></div>',
     'templates/usersTable.html': '<table class="b_main_list m_without_department"><tbody></tbody></table>',
@@ -2344,6 +2399,7 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
     animOptShow[panelPos] = '0px';
     animOptHide = {};
     animOptHide[panelPos] = '-281px';
+    panelEl.hide();
     $("body").append(panelEl);
     list = new List(oktell, panelEl, actionListEl, afterOktellConnect, getOptions().debug);
     if (getOptions().debug) {
@@ -2508,9 +2564,15 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
       return initPanel(arg);
     }
   };
-  return $.fn.oktellButton = function() {
+  $.fn.oktellButton = function() {
     return $(this).each(function() {
       return addActionButtonToEl($(this));
     });
+  };
+  $.oktellPanel.show = function() {
+    return list.showPanel();
+  };
+  return $.oktellPanel.hide = function() {
+    return list.hidePanel();
   };
 })($);

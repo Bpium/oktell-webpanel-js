@@ -6,7 +6,7 @@ var List,
 List = (function() {
   List.prototype.logGroup = 'List';
 
-  function List(oktell, panelEl, dropdownEl, afterOktellConnect, debugMode) {
+  function List(oktell, panelEl, dropdownEl, options, afterOktellConnect, debugMode) {
     var debouncedSetFilter, debouncedSetHeight, dropdownHideTimer, oktellConnected, self,
       _this = this;
 
@@ -81,6 +81,7 @@ List = (function() {
       dep: /\{\{department}\}/g
     };
     oktellConnected = false;
+    this.options = options;
     this.usersByNumber = {};
     this.me = false;
     this.oktell = oktell;
@@ -257,9 +258,13 @@ List = (function() {
     $(window).bind('resize', function() {
       return debouncedSetHeight();
     });
+    this.hidePanel();
     oktell.on('disconnect', function() {
       var phone, user, _ref, _results;
 
+      if (_this.options.hideOnDisconnect) {
+        _this.hidePanel();
+      }
       _this.oktellConnected = false;
       _this.usersByNumber = {};
       _this.panelUsers = [];
@@ -453,11 +458,57 @@ List = (function() {
         user = _ref2[_i];
         user.loadActions();
       }
+      _this.showPanel();
       if (typeof afterOktellConnect === 'function') {
         return afterOktellConnect();
       }
     });
+    oktell.on('connectError', function() {
+      if (!_this.options.hideOnDisconnect) {
+        return _this.showPanel();
+      }
+    });
   }
+
+  List.prototype.showPanel = function() {
+    var w,
+      _this = this;
+
+    w = this.panelEl.width() || this.panelEl.data('width');
+    if (w > 0) {
+      this.log('show panel');
+      this.panelEl.data('width', w);
+      this.panelEl.css({
+        display: ''
+      });
+      return this.panelEl.animate({
+        width: w + 'px'
+      }, 200, function() {
+        return _this.panelEl.css({
+          overflow: ''
+        });
+      });
+    }
+  };
+
+  List.prototype.hidePanel = function() {
+    var w,
+      _this = this;
+
+    w = this.panelEl.width();
+    if (w > 0) {
+      this.log('hide panel');
+      this.panelEl.data('width', w);
+      return this.panelEl.animate({
+        width: '0px'
+      }, 200, function() {
+        return _this.panelEl.css({
+          display: '',
+          overflow: 'hidden'
+        });
+      });
+    }
+  };
 
   List.prototype.getUserButtonForPlugin = function(phone) {
     var button, user,

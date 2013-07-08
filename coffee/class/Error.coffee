@@ -22,6 +22,7 @@ class Error
 				when 13 then @show 2, oktell.getMyInfo().login
 				when 1204 then @show 1, oktell.getMyInfo().login
 				when 1202 then @show 2, oktell.getMyInfo().login
+				else @show 3, oktell.getMyInfo().login
 
 	show: (errorType, username) ->
 		if not @errorTypes[errorType] then return false
