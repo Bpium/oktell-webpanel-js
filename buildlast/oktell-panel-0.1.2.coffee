@@ -323,30 +323,30 @@ do ($)->
 				"min-height": "100%"
 				"overflow": "hidden"
 	
-			if isTouch
-	
-				# Create scroller inner*/
-				scroller.after '<div class="jscroll_scroller_inner" />'
-				scroller_inner = $(".jscroll_scroller_inner", wrapper)
-				scroller_inner.appendTo '<div></div>'
-	
-				if window.iScroll?
-					myScroll = new window.iScroll wrapper.attr("id") ,
-						hScrollbar: false
-						scrollbarClass: 'jscroll_scroller_inner'
-						checkDOMChanges: true
-						bounceLock: true
-						onScrollMove: =>
-							params.onScroll()
-							true
-						onScrollEnd: =>
-							params.onScroll()
-							true
-	
-				return true
-	
-			else
-				set_bar_bounds wrapper, scroller, scrollbar_cont, scrollbar_inner
+	#		if isTouch
+	#
+	#			# Create scroller inner*/
+	#			scroller.after '<div class="jscroll_scroller_inner" />'
+	#			scroller_inner = $(".jscroll_scroller_inner", wrapper)
+	#			scroller_inner.appendTo '<div></div>'
+	#
+	#			if window.iScroll?
+	#				myScroll = new window.iScroll wrapper.attr("id") ,
+	#					hScrollbar: false
+	#					scrollbarClass: 'jscroll_scroller_inner'
+	#					checkDOMChanges: true
+	#					bounceLock: true
+	#					onScrollMove: =>
+	#						params.onScroll()
+	#						true
+	#					onScrollEnd: =>
+	#						params.onScroll()
+	#						true
+	#
+	#			return true
+	#
+	#		else
+			set_bar_bounds wrapper, scroller, scrollbar_cont, scrollbar_inner
 	
 		init()
 	
@@ -540,6 +540,7 @@ do ($)->
 			@hasHover = false
 			@buttonLastAction = ''
 			@firstLiCssPrefix = 'm_button_action_'
+			@noneActionCss = @firstLiCssPrefix + 'none'
 	
 			@els = $()
 			@buttonEls = $()
@@ -690,7 +691,10 @@ do ($)->
 			$el.children(':first').bind 'click', =>
 				#@log 'log do action'
 				@doAction @buttonLastAction
-			if @buttonLastAction then $el.addClass @firstLiCssPrefix + @buttonLastAction.toLowerCase()
+			if @buttonLastAction
+				$el.removeClass(@noneActionCss).addClass @firstLiCssPrefix + @buttonLastAction.toLowerCase()
+			else
+				$el.addClass @firstLiCssPrefix + 'none'
 	
 		getButtonEl: () ->
 			$el = $(@buttonTemplate)
@@ -724,11 +728,12 @@ do ($)->
 	#			if not @buttonLastAction
 	#				needShowSeparateButtons = true
 				@buttonLastAction = action
-				@buttonEls.addClass @firstLiCssPrefix + @buttonLastAction.toLowerCase()
+				@buttonEls.removeClass(@noneActionCss).addClass @firstLiCssPrefix + @buttonLastAction.toLowerCase()
 	#			if needShowSeparateButtons
 	#				@separateButtonEls.show()
 			else
 				@buttonLastAction = ''
+				@buttonEls.addClass @firstLiCssPrefix + 'none'
 	#			@separateButtonEls.hide()
 			actions
 	
@@ -988,9 +993,7 @@ do ($)->
 				clearTimeout dropdownHideTimer
 			, =>
 				dropdownHideTimer = setTimeout =>
-					@dropdownEl.fadeOut 150, =>
-						@dropdownOpenedOnPanel = false
-	
+					@hideActionListDropdown()
 				, 500
 	
 			@panelEl.find('.j_keypad_expand').bind 'click', =>
@@ -1003,8 +1006,9 @@ do ($)->
 				@filterInput.keyup()
 	
 			@setUserListHeight = =>
+				h = $(window).height() - @usersListBlockEl[0].offsetTop - 5 + 'px'
 				@usersListBlockEl.css
-					height: $(window).height() - @usersListBlockEl[0].offsetTop + 'px'
+					height: h
 	
 			@setUserListHeight()
 	
@@ -1207,6 +1211,11 @@ do ($)->
 				if not @options.hideOnDisconnect
 					@showPanel()
 	
+		hideActionListDropdown: ->
+			@dropdownEl.fadeOut 150, =>
+				@dropdownOpenedOnPanel = false
+	
+	
 		showPanel: ->
 			w = @panelEl.width() or @panelEl.data('width')
 			if w > 0
@@ -1281,8 +1290,8 @@ do ($)->
 	
 					@dropdownEl.append aEls
 	
-					@dropdownEl.children('li:first').addClass 'g_first'
-					@dropdownEl.children('li:last').addClass 'g_last'
+	#				@dropdownEl.children('li:first').addClass 'g_first'
+	#				@dropdownEl.children('li:last').addClass 'g_last'
 	
 					@dropdownEl.data 'user', user
 	
@@ -1468,6 +1477,8 @@ do ($)->
 				allDeps[allDeps.length-1].find('tr:last').addClass 'g_last'
 	
 			@userScrollerToTop()
+	
+			@setUserListHeight()
 	
 			@timer true
 	
@@ -1844,6 +1855,11 @@ do ($)->
 
 	panelWasInitialized = false
 
+	isAndroid = (/android/gi).test(navigator.appVersion)
+	isIDevice = (/iphone|ipad/gi).test(navigator.appVersion)
+	isTouchPad = (/hp-tablet/gi).test(navigator.appVersion)
+	hasTouch = 'ontouchstart' in window and not isTouchPad
+
 	initPanel = (opts)->
 		panelWasInitialized = true
 
@@ -1940,7 +1956,7 @@ do ($)->
 			clearTimeout panelHideTimer
 			panelHideTimer = false
 
-		panelEl.on "mouseenter", ->
+		panelEl.bind "mouseenter", ->
 			mouseOnPanel = true
 			killPanelHideTimer()
 			if parseInt(panelEl.css(panelPos)) < 0 and ( panelStatus is 'closed' or panelStatus is 'closing' )
@@ -1953,6 +1969,32 @@ do ($)->
 					panelEl.addClass("g_hover")
 					panelStatus = 'open'
 			true
+
+		touchClickedContact = null
+		touchClickedCss = 'touch_clicked'
+		touchClickedContactClear = =>
+			touchClickedContact?.removeClass touchClickedCss
+			touchClickedContact = null
+		$(window).bind 'touchstart', (e)=>
+			target = $(e.target)
+			parents = target.parents()
+			parentsArr = parents.toArray()
+			if parentsArr.indexOf( panelEl[0] ) is -1
+				hidePanel()
+			if parentsArr.indexOf( actionListEl[0] ) is -1 and not target.is('.oktell_panel .drop_down') and parents.filter('.oktell_panel .drop_down').size() is 0
+				list?.hideActionListDropdown?()
+			contact = if target.is('.oktell_panel .b_contact') then target else parents.filter('.oktell_panel .b_contact')
+			if contact.size() > 0
+				if not contact.hasClass(touchClickedCss)
+					touchClickedContactClear()
+					touchClickedContact = contact
+					contact.addClass touchClickedCss
+					return false
+			else
+				touchClickedContactClear()
+
+			true
+
 
 		hidePanel = ->
 			if panelEl.hasClass "g_hover" #and ( panelStatus is 'open' or panelStatus is '' )
@@ -1969,7 +2011,7 @@ do ($)->
 				#, 49
 
 
-		panelEl.on "mouseleave", ->
+		panelEl.bind "mouseleave", ->
 			mouseOnPanel = false
 			true
 
@@ -1985,59 +2027,59 @@ do ($)->
 				, 100
 			return true
 
-		if window.navigator.userAgent.indexOf('iPad') isnt -1
-
-			xStartPos = 0
-			xPos = 0
-			element = panelEl
-			elementWidth = 0
-			critWidth = 0
-			cssPos = -281
-			walkAway = 0
-			newCssPos = 0
-			openClass = "j_open"
-			closeClass = "j_close"
-
-			if parseInt(element[0].style.right) < 0
-				element.addClass closeClass
-
-			element.live "click", ->
-				if element.hasClass(closeClass)
-					element.animate animOptShow, 200, "swing", ->
-						element.removeClass(closeClass).addClass openClass
-						walkAway = 0
-
-			element.live "touchstart", (e) ->
-				xStartPos = e.originalEvent.touches[0].pageX
-				elementWidth = element.width()
-				critWidth = (elementWidth/100)*13
-				cssPos = parseInt(element.css(panelPos))
-
-			element.bind "touchmove", (e) ->
-				e.preventDefault()
-				xPos = e.originalEvent.touches[0].pageX
-				walkAway = xPos - xStartPos
-				newCssPos = ( cssPos - walkAway )
-				if newCssPos < -281
-					newCssPos = -281
-				else if newCssPos > 0
-					newCssPos = 0
-				element[0].style.right = newCssPos + 'px'
-
-			element.bind "touchend", (e) ->
-				if walkAway >= critWidth and walkAway < 0
-					element.animate animOptHide, 200, "swing"
-
-			if walkAway * -1 >= critWidth and walkAway > 0
-				element.animate animOptShow, 200, "swing"
-
-			if walkAway < critWidth and walkAway < 0
-				element.animate animOptShow, 100, "swing", ->
-					element.removeClass(closeClass).addClass(openClass)
-
-			if walkAway *-1 < critWidth && walkAway > 0
-				element.animate animOptHide, 100, "swing", ->
-					element.removeClass(openClass).addClass(closeClass)
+#		if window.navigator.userAgent.indexOf('iPad') isnt -1
+#
+#			xStartPos = 0
+#			xPos = 0
+#			element = panelEl
+#			elementWidth = 0
+#			critWidth = 0
+#			cssPos = -281
+#			walkAway = 0
+#			newCssPos = 0
+#			openClass = "j_open"
+#			closeClass = "j_close"
+#
+#			if parseInt(element[0].style.right) < 0
+#				element.addClass closeClass
+#
+#			element.live "click", ->
+#				if element.hasClass(closeClass)
+#					element.animate animOptShow, 200, "swing", ->
+#						element.removeClass(closeClass).addClass openClass
+#						walkAway = 0
+#
+#			element.live "touchstart", (e) ->
+#				xStartPos = e.originalEvent.touches[0].pageX
+#				elementWidth = element.width()
+#				critWidth = (elementWidth/100)*13
+#				cssPos = parseInt(element.css(panelPos))
+#
+#			element.bind "touchmove", (e) ->
+#				e.preventDefault()
+#				xPos = e.originalEvent.touches[0].pageX
+#				walkAway = xPos - xStartPos
+#				newCssPos = ( cssPos - walkAway )
+#				if newCssPos < -281
+#					newCssPos = -281
+#				else if newCssPos > 0
+#					newCssPos = 0
+#				element[0].style.right = newCssPos + 'px'
+#
+#			element.bind "touchend", (e) ->
+#				if walkAway >= critWidth and walkAway < 0
+#					element.animate animOptHide, 200, "swing"
+#
+#			if walkAway * -1 >= critWidth and walkAway > 0
+#				element.animate animOptShow, 200, "swing"
+#
+#			if walkAway < critWidth and walkAway < 0
+#				element.animate animOptShow, 100, "swing", ->
+#					element.removeClass(closeClass).addClass(openClass)
+#
+#			if walkAway *-1 < critWidth && walkAway > 0
+#				element.animate animOptHide, 100, "swing", ->
+#					element.removeClass(openClass).addClass(closeClass)
 
 
 	afterOktellConnect = ->

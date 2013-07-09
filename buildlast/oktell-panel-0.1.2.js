@@ -5,7 +5,7 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
   __hasProp = {}.hasOwnProperty;
 
 (function($) {
-  var CUser, Department, Error, List, PermissionsPopup, Popup, actionButtonContainerClass, actionButtonHtml, actionListEl, actionListHtml, addActionButtonToEl, afterOktellConnect, cookie, debounce, defaultOptions, departmentTemplateHtml, error, errorHtml, escapeHtml, getOptions, initActionButtons, initButtonOnElement, initPanel, jScroll, langs, list, loadTemplate, log, logStr, newGuid, oktell, oktellConnected, options, panelHtml, panelWasInitialized, permissionsPopup, permissionsPopupHtml, popup, popupHtml, templates, userTemplateHtml, usersTableHtml,
+  var CUser, Department, Error, List, PermissionsPopup, Popup, actionButtonContainerClass, actionButtonHtml, actionListEl, actionListHtml, addActionButtonToEl, afterOktellConnect, cookie, debounce, defaultOptions, departmentTemplateHtml, error, errorHtml, escapeHtml, getOptions, hasTouch, initActionButtons, initButtonOnElement, initPanel, isAndroid, isIDevice, isTouchPad, jScroll, langs, list, loadTemplate, log, logStr, newGuid, oktell, oktellConnected, options, panelHtml, panelWasInitialized, permissionsPopup, permissionsPopupHtml, popup, popupHtml, templates, userTemplateHtml, usersTableHtml,
     _this = this;
 
   if (!$) {
@@ -281,7 +281,7 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
       return;
     }
     init = function() {
-      var myScroll, scrollbar_bar, scroller_inner;
+      var scrollbar_bar;
 
       $el.wrapInner('<div class="jscroll_wrapper" />');
       wrapper = $(".jscroll_wrapper", $el);
@@ -323,30 +323,7 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
         "min-height": "100%",
         "overflow": "hidden"
       });
-      if (isTouch) {
-        scroller.after('<div class="jscroll_scroller_inner" />');
-        scroller_inner = $(".jscroll_scroller_inner", wrapper);
-        scroller_inner.appendTo('<div></div>');
-        if (window.iScroll != null) {
-          myScroll = new window.iScroll(wrapper.attr("id"), {
-            hScrollbar: false,
-            scrollbarClass: 'jscroll_scroller_inner',
-            checkDOMChanges: true,
-            bounceLock: true,
-            onScrollMove: function() {
-              params.onScroll();
-              return true;
-            },
-            onScrollEnd: function() {
-              params.onScroll();
-              return true;
-            }
-          });
-        }
-        return true;
-      } else {
-        return set_bar_bounds(wrapper, scroller, scrollbar_cont, scrollbar_inner);
-      }
+      return set_bar_bounds(wrapper, scroller, scrollbar_cont, scrollbar_inner);
     };
     init();
     if (isTouch) {
@@ -575,6 +552,7 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
       this.hasHover = false;
       this.buttonLastAction = '';
       this.firstLiCssPrefix = 'm_button_action_';
+      this.noneActionCss = this.firstLiCssPrefix + 'none';
       this.els = $();
       this.buttonEls = $();
       this.init(data);
@@ -752,7 +730,9 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
         return _this.doAction(_this.buttonLastAction);
       });
       if (this.buttonLastAction) {
-        return $el.addClass(this.firstLiCssPrefix + this.buttonLastAction.toLowerCase());
+        return $el.removeClass(this.noneActionCss).addClass(this.firstLiCssPrefix + this.buttonLastAction.toLowerCase());
+      } else {
+        return $el.addClass(this.firstLiCssPrefix + 'none');
       }
     };
 
@@ -794,9 +774,10 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
       }
       if (action) {
         this.buttonLastAction = action;
-        this.buttonEls.addClass(this.firstLiCssPrefix + this.buttonLastAction.toLowerCase());
+        this.buttonEls.removeClass(this.noneActionCss).addClass(this.firstLiCssPrefix + this.buttonLastAction.toLowerCase());
       } else {
         this.buttonLastAction = '';
+        this.buttonEls.addClass(this.firstLiCssPrefix + 'none');
       }
       return actions;
     };
@@ -1183,9 +1164,7 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
         return clearTimeout(dropdownHideTimer);
       }, function() {
         return dropdownHideTimer = setTimeout(function() {
-          return _this.dropdownEl.fadeOut(150, function() {
-            return _this.dropdownOpenedOnPanel = false;
-          });
+          return _this.hideActionListDropdown();
         }, 500);
       });
       this.panelEl.find('.j_keypad_expand').bind('click', function() {
@@ -1198,8 +1177,11 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
         return _this.filterInput.keyup();
       });
       this.setUserListHeight = function() {
+        var h;
+
+        h = $(window).height() - _this.usersListBlockEl[0].offsetTop - 5 + 'px';
         return _this.usersListBlockEl.css({
-          height: $(window).height() - _this.usersListBlockEl[0].offsetTop + 'px'
+          height: h
         });
       };
       this.setUserListHeight();
@@ -1422,6 +1404,14 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
       });
     }
 
+    List.prototype.hideActionListDropdown = function() {
+      var _this = this;
+
+      return this.dropdownEl.fadeOut(150, function() {
+        return _this.dropdownOpenedOnPanel = false;
+      });
+    };
+
     List.prototype.showPanel = function() {
       var w,
         _this = this;
@@ -1536,8 +1526,6 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
         }
         if (aEls.length) {
           this.dropdownEl.append(aEls);
-          this.dropdownEl.children('li:first').addClass('g_first');
-          this.dropdownEl.children('li:last').addClass('g_last');
           this.dropdownEl.data('user', user);
           this.dropdownEl.css({
             'top': this.dropdownEl.height() + buttonEl.offset().top > $(window).height() ? $(window).height() - this.dropdownEl.height() - this.dropdownPaddingBottomLeft : buttonEl.offset().top,
@@ -1763,6 +1751,7 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
         allDeps[allDeps.length - 1].find('tr:last').addClass('g_last');
       }
       this.userScrollerToTop();
+      this.setUserListHeight();
       return this.timer(true);
     };
 
@@ -2350,8 +2339,13 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
   Error.prototype.log = log;
   Department.prototype.template = departmentTemplateHtml;
   panelWasInitialized = false;
+  isAndroid = /android/gi.test(navigator.appVersion);
+  isIDevice = /iphone|ipad/gi.test(navigator.appVersion);
+  isTouchPad = /hp-tablet/gi.test(navigator.appVersion);
+  hasTouch = __indexOf.call(window, 'ontouchstart') >= 0 && !isTouchPad;
   initPanel = function(opts) {
-    var $user, $userActionButton, animOptHide, animOptShow, bookmarkAnimOptHide, bookmarkAnimOptShow, bookmarkPos, closeClass, critWidth, cssPos, element, elementWidth, errorEl, hidePanel, killPanelHideTimer, mouseOnPanel, newCssPos, oldBinding, openClass, panelBookmarkEl, panelEl, panelHideTimer, panelPos, panelStatus, permissionsPopupEl, popupEl, walkAway, xPos, xStartPos;
+    var $user, $userActionButton, animOptHide, animOptShow, bookmarkAnimOptHide, bookmarkAnimOptShow, bookmarkPos, errorEl, hidePanel, killPanelHideTimer, mouseOnPanel, oldBinding, panelBookmarkEl, panelEl, panelHideTimer, panelPos, panelStatus, permissionsPopupEl, popupEl, touchClickedContact, touchClickedContactClear, touchClickedCss,
+      _this = this;
 
     panelWasInitialized = true;
     options = $.extend(defaultOptions, opts || {});
@@ -2428,7 +2422,7 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
       clearTimeout(panelHideTimer);
       return panelHideTimer = false;
     };
-    panelEl.on("mouseenter", function() {
+    panelEl.bind("mouseenter", function() {
       mouseOnPanel = true;
       killPanelHideTimer();
       if (parseInt(panelEl.css(panelPos)) < 0 && (panelStatus === 'closed' || panelStatus === 'closing')) {
@@ -2440,6 +2434,43 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
           panelEl.addClass("g_hover");
           return panelStatus = 'open';
         });
+      }
+      return true;
+    });
+    touchClickedContact = null;
+    touchClickedCss = 'touch_clicked';
+    touchClickedContactClear = function() {
+      if (touchClickedContact != null) {
+        touchClickedContact.removeClass(touchClickedCss);
+      }
+      return touchClickedContact = null;
+    };
+    $(window).bind('touchstart', function(e) {
+      var contact, parents, parentsArr, target;
+
+      target = $(e.target);
+      parents = target.parents();
+      parentsArr = parents.toArray();
+      if (parentsArr.indexOf(panelEl[0]) === -1) {
+        hidePanel();
+      }
+      if (parentsArr.indexOf(actionListEl[0]) === -1 && !target.is('.oktell_panel .drop_down') && parents.filter('.oktell_panel .drop_down').size() === 0) {
+        if (list != null) {
+          if (typeof list.hideActionListDropdown === "function") {
+            list.hideActionListDropdown();
+          }
+        }
+      }
+      contact = target.is('.oktell_panel .b_contact') ? target : parents.filter('.oktell_panel .b_contact');
+      if (contact.size() > 0) {
+        if (!contact.hasClass(touchClickedCss)) {
+          touchClickedContactClear();
+          touchClickedContact = contact;
+          contact.addClass(touchClickedCss);
+          return false;
+        }
+      } else {
+        touchClickedContactClear();
       }
       return true;
     });
@@ -2458,7 +2489,7 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
         });
       }
     };
-    panelEl.on("mouseleave", function() {
+    panelEl.bind("mouseleave", function() {
       mouseOnPanel = false;
       return true;
     });
@@ -2466,7 +2497,7 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
       killPanelHideTimer();
       return true;
     });
-    $('html').bind('mousemove', function(e) {
+    return $('html').bind('mousemove', function(e) {
       if (!mouseOnPanel && panelHideTimer === false && !list.dropdownOpenedOnPanel) {
         panelHideTimer = setTimeout(function() {
           return hidePanel();
@@ -2474,65 +2505,6 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
       }
       return true;
     });
-    if (window.navigator.userAgent.indexOf('iPad') !== -1) {
-      xStartPos = 0;
-      xPos = 0;
-      element = panelEl;
-      elementWidth = 0;
-      critWidth = 0;
-      cssPos = -281;
-      walkAway = 0;
-      newCssPos = 0;
-      openClass = "j_open";
-      closeClass = "j_close";
-      if (parseInt(element[0].style.right) < 0) {
-        element.addClass(closeClass);
-      }
-      element.live("click", function() {
-        if (element.hasClass(closeClass)) {
-          return element.animate(animOptShow, 200, "swing", function() {
-            element.removeClass(closeClass).addClass(openClass);
-            return walkAway = 0;
-          });
-        }
-      });
-      element.live("touchstart", function(e) {
-        xStartPos = e.originalEvent.touches[0].pageX;
-        elementWidth = element.width();
-        critWidth = (elementWidth / 100) * 13;
-        return cssPos = parseInt(element.css(panelPos));
-      });
-      element.bind("touchmove", function(e) {
-        e.preventDefault();
-        xPos = e.originalEvent.touches[0].pageX;
-        walkAway = xPos - xStartPos;
-        newCssPos = cssPos - walkAway;
-        if (newCssPos < -281) {
-          newCssPos = -281;
-        } else if (newCssPos > 0) {
-          newCssPos = 0;
-        }
-        return element[0].style.right = newCssPos + 'px';
-      });
-      element.bind("touchend", function(e) {
-        if (walkAway >= critWidth && walkAway < 0) {
-          return element.animate(animOptHide, 200, "swing");
-        }
-      });
-      if (walkAway * -1 >= critWidth && walkAway > 0) {
-        element.animate(animOptShow, 200, "swing");
-      }
-      if (walkAway < critWidth && walkAway < 0) {
-        element.animate(animOptShow, 100, "swing", function() {
-          return element.removeClass(closeClass).addClass(openClass);
-        });
-      }
-      if (walkAway * -1 < critWidth && walkAway > 0) {
-        return element.animate(animOptHide, 100, "swing", function() {
-          return element.removeClass(openClass).addClass(closeClass);
-        });
-      }
-    }
   };
   afterOktellConnect = function() {
     return oktellConnected = true;

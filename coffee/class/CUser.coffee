@@ -5,6 +5,7 @@ class CUser
 		@hasHover = false
 		@buttonLastAction = ''
 		@firstLiCssPrefix = 'm_button_action_'
+		@noneActionCss = @firstLiCssPrefix + 'none'
 
 		@els = $()
 		@buttonEls = $()
@@ -155,7 +156,10 @@ class CUser
 		$el.children(':first').bind 'click', =>
 			#@log 'log do action'
 			@doAction @buttonLastAction
-		if @buttonLastAction then $el.addClass @firstLiCssPrefix + @buttonLastAction.toLowerCase()
+		if @buttonLastAction
+			$el.removeClass(@noneActionCss).addClass @firstLiCssPrefix + @buttonLastAction.toLowerCase()
+		else
+			$el.addClass @firstLiCssPrefix + 'none'
 
 	getButtonEl: () ->
 		$el = $(@buttonTemplate)
@@ -189,11 +193,12 @@ class CUser
 #			if not @buttonLastAction
 #				needShowSeparateButtons = true
 			@buttonLastAction = action
-			@buttonEls.addClass @firstLiCssPrefix + @buttonLastAction.toLowerCase()
+			@buttonEls.removeClass(@noneActionCss).addClass @firstLiCssPrefix + @buttonLastAction.toLowerCase()
 #			if needShowSeparateButtons
 #				@separateButtonEls.show()
 		else
 			@buttonLastAction = ''
+			@buttonEls.addClass @firstLiCssPrefix + 'none'
 #			@separateButtonEls.hide()
 		actions
 

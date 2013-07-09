@@ -10,6 +10,7 @@ CUser = (function() {
     this.hasHover = false;
     this.buttonLastAction = '';
     this.firstLiCssPrefix = 'm_button_action_';
+    this.noneActionCss = this.firstLiCssPrefix + 'none';
     this.els = $();
     this.buttonEls = $();
     this.init(data);
@@ -187,7 +188,9 @@ CUser = (function() {
       return _this.doAction(_this.buttonLastAction);
     });
     if (this.buttonLastAction) {
-      return $el.addClass(this.firstLiCssPrefix + this.buttonLastAction.toLowerCase());
+      return $el.removeClass(this.noneActionCss).addClass(this.firstLiCssPrefix + this.buttonLastAction.toLowerCase());
+    } else {
+      return $el.addClass(this.firstLiCssPrefix + 'none');
     }
   };
 
@@ -229,9 +232,10 @@ CUser = (function() {
     }
     if (action) {
       this.buttonLastAction = action;
-      this.buttonEls.addClass(this.firstLiCssPrefix + this.buttonLastAction.toLowerCase());
+      this.buttonEls.removeClass(this.noneActionCss).addClass(this.firstLiCssPrefix + this.buttonLastAction.toLowerCase());
     } else {
       this.buttonLastAction = '';
+      this.buttonEls.addClass(this.firstLiCssPrefix + 'none');
     }
     return actions;
   };

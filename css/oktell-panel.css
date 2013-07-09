@@ -637,6 +637,7 @@
   color: #999;
   padding-left: 6px;
 }
+.oktell_panel .b_contact.touch_clicked,
 .oktell_panel .b_contact:hover,
 .oktell_panel .b_contact:hover:active {
   background: rgba(255,255,255,0.3);
