@@ -136,6 +136,11 @@ do ($)->
 
 	panelWasInitialized = false
 
+	isAndroid = (/android/gi).test(navigator.appVersion)
+	isIDevice = (/iphone|ipad/gi).test(navigator.appVersion)
+	isTouchPad = (/hp-tablet/gi).test(navigator.appVersion)
+	hasTouch = 'ontouchstart' in window and not isTouchPad
+
 	initPanel = (opts)->
 		panelWasInitialized = true
 
@@ -232,7 +237,7 @@ do ($)->
 			clearTimeout panelHideTimer
 			panelHideTimer = false
 
-		panelEl.on "mouseenter", ->
+		panelEl.bind "mouseenter", ->
 			mouseOnPanel = true
 			killPanelHideTimer()
 			if parseInt(panelEl.css(panelPos)) < 0 and ( panelStatus is 'closed' or panelStatus is 'closing' )
@@ -245,6 +250,32 @@ do ($)->
 					panelEl.addClass("g_hover")
 					panelStatus = 'open'
 			true
+
+		touchClickedContact = null
+		touchClickedCss = 'touch_clicked'
+		touchClickedContactClear = =>
+			touchClickedContact?.removeClass touchClickedCss
+			touchClickedContact = null
+		$(window).bind 'touchstart', (e)=>
+			target = $(e.target)
+			parents = target.parents()
+			parentsArr = parents.toArray()
+			if parentsArr.indexOf( panelEl[0] ) is -1
+				hidePanel()
+			if parentsArr.indexOf( actionListEl[0] ) is -1 and not target.is('.oktell_panel .drop_down') and parents.filter('.oktell_panel .drop_down').size() is 0
+				list?.hideActionListDropdown?()
+			contact = if target.is('.oktell_panel .b_contact') then target else parents.filter('.oktell_panel .b_contact')
+			if contact.size() > 0
+				if not contact.hasClass(touchClickedCss)
+					touchClickedContactClear()
+					touchClickedContact = contact
+					contact.addClass touchClickedCss
+					return false
+			else
+				touchClickedContactClear()
+
+			true
+
 
 		hidePanel = ->
 			if panelEl.hasClass "g_hover" #and ( panelStatus is 'open' or panelStatus is '' )
@@ -261,7 +292,7 @@ do ($)->
 				#, 49
 
 
-		panelEl.on "mouseleave", ->
+		panelEl.bind "mouseleave", ->
 			mouseOnPanel = false
 			true
 
@@ -277,59 +308,59 @@ do ($)->
 				, 100
 			return true
 
-		if window.navigator.userAgent.indexOf('iPad') isnt -1
-
-			xStartPos = 0
-			xPos = 0
-			element = panelEl
-			elementWidth = 0
-			critWidth = 0
-			cssPos = -281
-			walkAway = 0
-			newCssPos = 0
-			openClass = "j_open"
-			closeClass = "j_close"
-
-			if parseInt(element[0].style.right) < 0
-				element.addClass closeClass
-
-			element.live "click", ->
-				if element.hasClass(closeClass)
-					element.animate animOptShow, 200, "swing", ->
-						element.removeClass(closeClass).addClass openClass
-						walkAway = 0
-
-			element.live "touchstart", (e) ->
-				xStartPos = e.originalEvent.touches[0].pageX
-				elementWidth = element.width()
-				critWidth = (elementWidth/100)*13
-				cssPos = parseInt(element.css(panelPos))
-
-			element.bind "touchmove", (e) ->
-				e.preventDefault()
-				xPos = e.originalEvent.touches[0].pageX
-				walkAway = xPos - xStartPos
-				newCssPos = ( cssPos - walkAway )
-				if newCssPos < -281
-					newCssPos = -281
-				else if newCssPos > 0
-					newCssPos = 0
-				element[0].style.right = newCssPos + 'px'
-
-			element.bind "touchend", (e) ->
-				if walkAway >= critWidth and walkAway < 0
-					element.animate animOptHide, 200, "swing"
-
-			if walkAway * -1 >= critWidth and walkAway > 0
-				element.animate animOptShow, 200, "swing"
-
-			if walkAway < critWidth and walkAway < 0
-				element.animate animOptShow, 100, "swing", ->
-					element.removeClass(closeClass).addClass(openClass)
-
-			if walkAway *-1 < critWidth && walkAway > 0
-				element.animate animOptHide, 100, "swing", ->
-					element.removeClass(openClass).addClass(closeClass)
+#		if window.navigator.userAgent.indexOf('iPad') isnt -1
+#
+#			xStartPos = 0
+#			xPos = 0
+#			element = panelEl
+#			elementWidth = 0
+#			critWidth = 0
+#			cssPos = -281
+#			walkAway = 0
+#			newCssPos = 0
+#			openClass = "j_open"
+#			closeClass = "j_close"
+#
+#			if parseInt(element[0].style.right) < 0
+#				element.addClass closeClass
+#
+#			element.live "click", ->
+#				if element.hasClass(closeClass)
+#					element.animate animOptShow, 200, "swing", ->
+#						element.removeClass(closeClass).addClass openClass
+#						walkAway = 0
+#
+#			element.live "touchstart", (e) ->
+#				xStartPos = e.originalEvent.touches[0].pageX
+#				elementWidth = element.width()
+#				critWidth = (elementWidth/100)*13
+#				cssPos = parseInt(element.css(panelPos))
+#
+#			element.bind "touchmove", (e) ->
+#				e.preventDefault()
+#				xPos = e.originalEvent.touches[0].pageX
+#				walkAway = xPos - xStartPos
+#				newCssPos = ( cssPos - walkAway )
+#				if newCssPos < -281
+#					newCssPos = -281
+#				else if newCssPos > 0
+#					newCssPos = 0
+#				element[0].style.right = newCssPos + 'px'
+#
+#			element.bind "touchend", (e) ->
+#				if walkAway >= critWidth and walkAway < 0
+#					element.animate animOptHide, 200, "swing"
+#
+#			if walkAway * -1 >= critWidth and walkAway > 0
+#				element.animate animOptShow, 200, "swing"
+#
+#			if walkAway < critWidth and walkAway < 0
+#				element.animate animOptShow, 100, "swing", ->
+#					element.removeClass(closeClass).addClass(openClass)
+#
+#			if walkAway *-1 < critWidth && walkAway > 0
+#				element.animate animOptHide, 100, "swing", ->
+#					element.removeClass(openClass).addClass(closeClass)
 
 
 	afterOktellConnect = ->

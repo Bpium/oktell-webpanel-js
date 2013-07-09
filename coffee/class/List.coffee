@@ -190,9 +190,7 @@ class List
 			clearTimeout dropdownHideTimer
 		, =>
 			dropdownHideTimer = setTimeout =>
-				@dropdownEl.fadeOut 150, =>
-					@dropdownOpenedOnPanel = false
-
+				@hideActionListDropdown()
 			, 500
 
 		@panelEl.find('.j_keypad_expand').bind 'click', =>
@@ -205,8 +203,9 @@ class List
 			@filterInput.keyup()
 
 		@setUserListHeight = =>
+			h = $(window).height() - @usersListBlockEl[0].offsetTop - 5 + 'px'
 			@usersListBlockEl.css
-				height: $(window).height() - @usersListBlockEl[0].offsetTop + 'px'
+				height: h
 
 		@setUserListHeight()
 
@@ -409,6 +408,11 @@ class List
 			if not @options.hideOnDisconnect
 				@showPanel()
 
+	hideActionListDropdown: ->
+		@dropdownEl.fadeOut 150, =>
+			@dropdownOpenedOnPanel = false
+
+
 	showPanel: ->
 		w = @panelEl.width() or @panelEl.data('width')
 		if w > 0
@@ -483,8 +487,8 @@ class List
 
 				@dropdownEl.append aEls
 
-				@dropdownEl.children('li:first').addClass 'g_first'
-				@dropdownEl.children('li:last').addClass 'g_last'
+#				@dropdownEl.children('li:first').addClass 'g_first'
+#				@dropdownEl.children('li:last').addClass 'g_last'
 
 				@dropdownEl.data 'user', user
 
@@ -670,6 +674,8 @@ class List
 			allDeps[allDeps.length-1].find('tr:last').addClass 'g_last'
 
 		@userScrollerToTop()
+
+		@setUserListHeight()
 
 		@timer true
 

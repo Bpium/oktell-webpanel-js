@@ -231,9 +231,7 @@ List = (function() {
       return clearTimeout(dropdownHideTimer);
     }, function() {
       return dropdownHideTimer = setTimeout(function() {
-        return _this.dropdownEl.fadeOut(150, function() {
-          return _this.dropdownOpenedOnPanel = false;
-        });
+        return _this.hideActionListDropdown();
       }, 500);
     });
     this.panelEl.find('.j_keypad_expand').bind('click', function() {
@@ -246,8 +244,11 @@ List = (function() {
       return _this.filterInput.keyup();
     });
     this.setUserListHeight = function() {
+      var h;
+
+      h = $(window).height() - _this.usersListBlockEl[0].offsetTop - 5 + 'px';
       return _this.usersListBlockEl.css({
-        height: $(window).height() - _this.usersListBlockEl[0].offsetTop + 'px'
+        height: h
       });
     };
     this.setUserListHeight();
@@ -470,6 +471,14 @@ List = (function() {
     });
   }
 
+  List.prototype.hideActionListDropdown = function() {
+    var _this = this;
+
+    return this.dropdownEl.fadeOut(150, function() {
+      return _this.dropdownOpenedOnPanel = false;
+    });
+  };
+
   List.prototype.showPanel = function() {
     var w,
       _this = this;
@@ -584,8 +593,6 @@ List = (function() {
       }
       if (aEls.length) {
         this.dropdownEl.append(aEls);
-        this.dropdownEl.children('li:first').addClass('g_first');
-        this.dropdownEl.children('li:last').addClass('g_last');
         this.dropdownEl.data('user', user);
         this.dropdownEl.css({
           'top': this.dropdownEl.height() + buttonEl.offset().top > $(window).height() ? $(window).height() - this.dropdownEl.height() - this.dropdownPaddingBottomLeft : buttonEl.offset().top,
@@ -811,6 +818,7 @@ List = (function() {
       allDeps[allDeps.length - 1].find('tr:last').addClass('g_last');
     }
     this.userScrollerToTop();
+    this.setUserListHeight();
     return this.timer(true);
   };
 

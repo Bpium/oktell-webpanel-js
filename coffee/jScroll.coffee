@@ -246,30 +246,30 @@ jScroll = ( $el )->
 			"min-height": "100%"
 			"overflow": "hidden"
 
-		if isTouch
-
-			# Create scroller inner*/
-			scroller.after '<div class="jscroll_scroller_inner" />'
-			scroller_inner = $(".jscroll_scroller_inner", wrapper)
-			scroller_inner.appendTo '<div></div>'
-
-			if window.iScroll?
-				myScroll = new window.iScroll wrapper.attr("id") ,
-					hScrollbar: false
-					scrollbarClass: 'jscroll_scroller_inner'
-					checkDOMChanges: true
-					bounceLock: true
-					onScrollMove: =>
-						params.onScroll()
-						true
-					onScrollEnd: =>
-						params.onScroll()
-						true
-
-			return true
-
-		else
-			set_bar_bounds wrapper, scroller, scrollbar_cont, scrollbar_inner
+#		if isTouch
+#
+#			# Create scroller inner*/
+#			scroller.after '<div class="jscroll_scroller_inner" />'
+#			scroller_inner = $(".jscroll_scroller_inner", wrapper)
+#			scroller_inner.appendTo '<div></div>'
+#
+#			if window.iScroll?
+#				myScroll = new window.iScroll wrapper.attr("id") ,
+#					hScrollbar: false
+#					scrollbarClass: 'jscroll_scroller_inner'
+#					checkDOMChanges: true
+#					bounceLock: true
+#					onScrollMove: =>
+#						params.onScroll()
+#						true
+#					onScrollEnd: =>
+#						params.onScroll()
+#						true
+#
+#			return true
+#
+#		else
+		set_bar_bounds wrapper, scroller, scrollbar_cont, scrollbar_inner
 
 	init()
 

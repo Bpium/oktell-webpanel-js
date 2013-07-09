@@ -194,7 +194,7 @@ jScroll = function($el) {
     return;
   }
   init = function() {
-    var myScroll, scrollbar_bar, scroller_inner;
+    var scrollbar_bar;
 
     $el.wrapInner('<div class="jscroll_wrapper" />');
     wrapper = $(".jscroll_wrapper", $el);
@@ -236,30 +236,7 @@ jScroll = function($el) {
       "min-height": "100%",
       "overflow": "hidden"
     });
-    if (isTouch) {
-      scroller.after('<div class="jscroll_scroller_inner" />');
-      scroller_inner = $(".jscroll_scroller_inner", wrapper);
-      scroller_inner.appendTo('<div></div>');
-      if (window.iScroll != null) {
-        myScroll = new window.iScroll(wrapper.attr("id"), {
-          hScrollbar: false,
-          scrollbarClass: 'jscroll_scroller_inner',
-          checkDOMChanges: true,
-          bounceLock: true,
-          onScrollMove: function() {
-            params.onScroll();
-            return true;
-          },
-          onScrollEnd: function() {
-            params.onScroll();
-            return true;
-          }
-        });
-      }
-      return true;
-    } else {
-      return set_bar_bounds(wrapper, scroller, scrollbar_cont, scrollbar_inner);
-    }
+    return set_bar_bounds(wrapper, scroller, scrollbar_cont, scrollbar_inner);
   };
   init();
   if (isTouch) {
