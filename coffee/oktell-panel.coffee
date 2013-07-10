@@ -3,7 +3,7 @@ do ($)->
 		throw new Error('Error init oktell panel, jQuery ( $ ) is not defined')
 
 	#includecoffee coffee/utils.coffee
-	#includecoffee coffee/jScroll.coffee
+	#in1cludecoffee coffee/jScroll.coffee
 	#includecoffee coffee/class/Department.coffee
 	#includecoffee coffee/class/CUser.coffee
 	#includecoffee coffee/class/List.coffee
@@ -121,7 +121,7 @@ do ($)->
 	permissionsPopupHtml = loadTemplate '/templates/permissionsPopup.html'
 	errorHtml = loadTemplate '/templates/error.html'
 
-	List.prototype.jScroll = jScroll
+#	List.prototype.jScroll = jScroll
 	List.prototype.usersTableTemplate = usersTableHtml
 
 	CUser.prototype.buttonTemplate = actionButtonHtml

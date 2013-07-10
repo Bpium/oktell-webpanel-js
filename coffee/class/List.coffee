@@ -109,10 +109,11 @@ class List
 
 
 		@userScrollerToTop = =>
-			if not @_jScrolled
-				@jScroll @usersListBlockEl
-				@usersScroller = @usersListBlockEl.find('.jscroll_scroller')
-			@usersScroller.css({top:'0px'})
+#			if not @_jScrolled
+#				@jScroll @usersListBlockEl
+#				@usersScroller = @usersListBlockEl.find('.jscroll_scroller')
+#			@usersScroller.css({top:'0px'})
+#			@usersListBlockEl.jScrollPane()
 
 		@filterClearCross.bind 'click', =>
 			@clearFilter()
@@ -206,6 +207,9 @@ class List
 			h = $(window).height() - @usersListBlockEl[0].offsetTop - 5 + 'px'
 			@usersListBlockEl.css
 				height: h
+			setTimeout =>
+				@usersListBlockEl.jScrollPane { mouseWheelSpeed: 50 }
+			, 1000
 
 		@setUserListHeight()
 

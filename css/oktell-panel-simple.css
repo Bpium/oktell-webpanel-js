@@ -5,3 +5,6 @@
 .oktell_button_action.m_button_action_none {
     visibility: hidden;
 }
+.oktell_panel .b_contact:hover .oktell_button_action.m_button_action_none {
+    visibility: hidden;
+}

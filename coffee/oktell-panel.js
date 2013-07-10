@@ -258,7 +258,6 @@ var __slice = [].slice,
   popupHtml = loadTemplate('/templates/callPopup.html');
   permissionsPopupHtml = loadTemplate('/templates/permissionsPopup.html');
   errorHtml = loadTemplate('/templates/error.html');
-  List.prototype.jScroll = jScroll;
   List.prototype.usersTableTemplate = usersTableHtml;
   CUser.prototype.buttonTemplate = actionButtonHtml;
   CUser.prototype.log = log;

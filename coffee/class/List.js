@@ -137,15 +137,7 @@ List = (function() {
     this.allUserDep.template = this.usersTableTemplate;
     this.exactMatchUserDep = new Department('exact_match_user_dep', 'exactUser');
     this.exactMatchUserDep.template = this.usersTableTemplate;
-    this.userScrollerToTop = function() {
-      if (!_this._jScrolled) {
-        _this.jScroll(_this.usersListBlockEl);
-        _this.usersScroller = _this.usersListBlockEl.find('.jscroll_scroller');
-      }
-      return _this.usersScroller.css({
-        top: '0px'
-      });
-    };
+    this.userScrollerToTop = function() {};
     this.filterClearCross.bind('click', function() {
       return _this.clearFilter();
     });
@@ -247,9 +239,14 @@ List = (function() {
       var h;
 
       h = $(window).height() - _this.usersListBlockEl[0].offsetTop - 5 + 'px';
-      return _this.usersListBlockEl.css({
+      _this.usersListBlockEl.css({
         height: h
       });
+      return setTimeout(function() {
+        return _this.usersListBlockEl.jScrollPane({
+          mouseWheelSpeed: 50
+        });
+      }, 1000);
     };
     this.setUserListHeight();
     debouncedSetHeight = debounce(function() {
