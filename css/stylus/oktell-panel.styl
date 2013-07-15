@@ -1,5 +1,6 @@
 @import "if-ie.styl"
 @import "functions.styl"
+@import "elements.styl"
 
 /* Normalize panel
 ---------------------------------------------------------------*/
@@ -199,6 +200,7 @@
 
         &.h_shadow_top .h_shadow_top,
         &.i_conference .h_shadow_top,
+        &.i_extension .h_shadow_top,
         &.i_flash .h_shadow_top
             padding: 6px 0 0 0
 
@@ -210,6 +212,24 @@
 
         &.i_conference .b_marks_label
             color: #4b793e
+
+        &.i_extension
+            position: relative
+            overflow: hidden
+            background-color: #9db77b
+
+            & .h_btn-group
+                padding: 6px 10px
+
+            & .o_close
+                closeCross(0.5, hover = 0)
+                top: 3px
+
+            & .o_close:hover
+                closeCross(1, hover = 1)
+
+        &.i_extension .b_marks_label
+            color: #36622a
 
         &.i_flash
             background-color: #DAC59A
@@ -364,7 +384,7 @@
 /* Buttons
 ---------------------------------------------------------------*/
 .oktell_panel
-    .g_button
+    .btn
         display: inline-block
         padding: 4px 10px 4px
         line-height: 18px
@@ -384,10 +404,10 @@
         *margin-left: .3em
         text-decoration: none
 
-    .g_button:first-child
+    .btn:first-child
         *margin-left: 0
 
-    .g_button:hover
+    .btn:hover
         color: #333333
         text-decoration: none
         background-color: #e6e6e6
@@ -398,17 +418,17 @@
         -o-transition: background-position 0.1s linear
         transition: background-position 0.1s linear
 
-    .g_button:focus
+    .btn:focus
         outline: 5px auto -webkit-focus-ring-color
         outline-offset: -2px
 
-    .g_button i
+    .btn i
         display: inline-block
         width: 16px
         height: 16px
         vertical-align: text-top
 
-    .g_button.g_active, & .g_button:active
+    .btn.g_active, & .btn:active
         background-image: none
         -webkit-box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(0, 0, 0, 0.05)
         -moz-box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(0, 0, 0, 0.05)
@@ -417,7 +437,7 @@
         color: rgba(0, 0, 0, 0.5)
         outline: 0
 
-    .g_button.disabled, & .g_button[disabled]
+    .btn.disabled, & .btn[disabled]
         cursor: default
         background-image: none
         background-color: #e6e6e6
@@ -426,13 +446,13 @@
         -moz-box-shadow: none
         box-shadow: none
 
-    .g_button.m_big
+    .btn.m_big
         padding: 7px 12px
         font-size: 17px
         line-height: normal
         border-radius(5px)
 
-    .g_button.m_big .icon
+    .btn.m_big .icon
         margin-top: 1px
 
 
@@ -946,10 +966,8 @@
     &.m_button_action_ghostlisten li.g_first i
         background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAAK/INwWK6QAAABl0RVh0U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAAD4SURBVHjaxJOxCsJADIbPw9knqLvgA4h9AZ0VdBfcBXdB92J9AXcdnPsEFfdW3BV07qCLUhP5A/EWhxsMfLRNk/9yyZ0ty9L4YI2neQtUX4+b/q4RXRDimy0nMmJL7L8E1HuHWKmkM7EhCmJADEFKTIgLB1We9ys/l/gpliCoUL4pMPD3iKOFUycXSA6IA3FCBRFWl63uOIYF2k5fMogsiDqCY1WZ7lds3aY4Zf+y0KK0XDuhPkMjZUsG09GWyjnoKxFOXqPLLaKB8c0hbtRoRzIFSeSGjtVW9BjrKjkCRguIBRBpOiumaGIiZ+AjwBfir3fBW+AtwAABdm/0siGKkwAAAABJRU5ErkJggg==')
 
-	&.m_button_action_hold li.g_first i
+    &.m_button_action_hold li.g_first i
         background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAAK/INwWK6QAAABl0RVh0U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAACkSURBVHjaYvz//z/Dv58vGUgAWkCsA8SPmdjFj7MQqVgbiq2Q5HqBGKsB7kCciqYYJ8BmgA4WzceA+CoUWwJxOD4DYGAlEM8G4mto4rLIHCY8BjzBohkDMDFQCAbeABYS1IZBsSw5BoA0TiDkAqw2YIs6bAbgtAEKruASYyFkAxTsBGIXIPZESmRPkA24QoSt17AlLEak7KyFzQa8aYBdnAEgwACZuiYLZIGu+gAAAABJRU5ErkJggg==')
-
-
 
     /* play call */
     &.m_button_action_play li.g_first
@@ -1037,20 +1055,10 @@
         overflow: hidden
 
     .m_popup_staff .o_close
-        position: absolute
-        width: 10px
-        height: 10px
-        right: 9px
-        top: 9px
-        padding: 6px
-        cursor: pointer
-        background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyBpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNSBXaW5kb3dzIiB4bXBNTTpJbnN0YW5jZUlEPSJ4bXAuaWlkOjhFQTMwRjdCNkI1MDExRTE4OTE0QjY0OEI5NDM3ODhFIiB4bXBNTTpEb2N1bWVudElEPSJ4bXAuZGlkOjhFQTMwRjdDNkI1MDExRTE4OTE0QjY0OEI5NDM3ODhFIj4gPHhtcE1NOkRlcml2ZWRGcm9tIHN0UmVmOmluc3RhbmNlSUQ9InhtcC5paWQ6OEVBMzBGNzk2QjUwMTFFMTg5MTRCNjQ4Qjk0Mzc4OEUiIHN0UmVmOmRvY3VtZW50SUQ9InhtcC5kaWQ6OEVBMzBGN0E2QjUwMTFFMTg5MTRCNjQ4Qjk0Mzc4OEUiLz4gPC9yZGY6RGVzY3JpcHRpb24+IDwvcmRmOlJERj4gPC94OnhtcG1ldGE+IDw/eHBhY2tldCBlbmQ9InIiPz48F1o1AAAAiUlEQVR42oyQ0Q0EIQhEWc8abMImdis7qWRLOS3CKmxiZxLcEOPHkRhheCEDh6pK7/3MOVfZxOx9Ukon6t8YQ5C3BSr4bvRasEmKV9D4LhDrQiZSREJIDOZ/OIhDJM4JHjbphRhB/oyw87TzHDfG1bTXM7V5nnv1BL3iLFyq+PNcHvILWq8+AgwAAfVRM0EI9D4AAAAASUVORK5CYII=')
-        background-repeat: no-repeat
-        background-position: 6px 6px
-        opacity: 0.5
+        closeCross(0.5, hover = 0)
 
     .m_popup_staff .o_close:hover
-        opacity: 1
+        closeCross(1, hover = 1)
 
     .m_popup_staff header
         background: #f0f1f3
@@ -1282,3 +1290,5 @@
     .m_form.b_error p.b_error_alert
         font-weight: bold
         font-size: 1.125em
+
+@import "btnGroup.styl"
