@@ -5,7 +5,7 @@ class CUser
 		@hasHover = false
 		@buttonLastAction = ''
 		@firstLiCssPrefix = 'm_button_action_'
-		@noneActionCss = @firstLiCssPrefix + 'none'
+		@noneActionCss = '' #@firstLiCssPrefix + 'none'
 
 		@els = $()
 		@buttonEls = $()
@@ -236,6 +236,8 @@ class CUser
 				@oktell.hold?()
 			when 'resume'
 				@oktell.resume?()
+			when 'answer'
+				@oktell.answer?()
 
 
 	doLastFirstAction: ->

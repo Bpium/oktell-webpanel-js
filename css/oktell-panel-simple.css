@@ -1,7 +1,6 @@
 .oktell_panel .b_contact.touch_clicked .oktell_button_action {
     visibility: visible;
 }
-.oktell_panel .b_contact.touch_clicked .oktell_button_action.m_button_action_none ,
-.oktell_button_action.m_button_action_none {
+.oktell_panel .oktell_button_action.m_button_action_none {
     visibility: hidden;
 }

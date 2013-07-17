@@ -7,7 +7,7 @@ var List,
 List = (function() {
   List.prototype.logGroup = 'List';
 
-  function List(oktell, panelEl, dropdownEl, options, afterOktellConnect, useNotifies, debugMode) {
+  function List(oktell, panelEl, dropdownEl, afterOktellConnect, options, debugMode) {
     this.onPbxNumberStateChange = __bind(this.onPbxNumberStateChange, this);
     var debouncedSetFilter, debouncedSetHeight, dropdownHideTimer, oktellConnected, ringNotify, self,
       _this = this;
@@ -430,7 +430,7 @@ List = (function() {
     });
     ringNotify = null;
     oktell.on('ringStart', function(abonents) {
-      if (useNotifies) {
+      if (_this.options.useNotifies) {
         return ringNotify = new Notify(_this.langs.callPopup.title);
       }
     });

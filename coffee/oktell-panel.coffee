@@ -213,7 +213,7 @@ do ($)->
 		panelEl.hide()
 		$("body").append(panelEl)
 
-		list = new List oktell, panelEl, actionListEl, afterOktellConnect, getOptions().useNotifies, getOptions().debug
+		list = new List oktell, panelEl, actionListEl, afterOktellConnect, getOptions(), getOptions().debug
 		if getOptions().debug
 			window.wList = list
 			window.wPopup = popup
@@ -258,7 +258,7 @@ do ($)->
 			true
 
 		touchClickedContact = null
-		touchClickedCss = 'touch_clicked'
+		touchClickedCss = 'm_touch_clicked'
 		touchClickedContactClear = =>
 			touchClickedContact?.removeClass touchClickedCss
 			touchClickedContact = null

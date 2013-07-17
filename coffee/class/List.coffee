@@ -1,7 +1,6 @@
 class List
 	logGroup: 'List'
-	constructor: (oktell, panelEl, dropdownEl, options, afterOktellConnect, useNotifies, debugMode) ->
-
+	constructor: (oktell, panelEl, dropdownEl, afterOktellConnect, options, debugMode) ->
 		@defaultConfig =
 			departmentVisibility: {}
 			showDeps: true
@@ -365,7 +364,7 @@ class List
 
 		ringNotify = null
 		oktell.on 'ringStart', (abonents) =>
-			if useNotifies
+			if @options.useNotifies
 				ringNotify = new Notify @langs.callPopup.title
 
 		oktell.on 'ringStop', =>
