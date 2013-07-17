@@ -190,7 +190,7 @@ CUser = (function() {
     if (this.buttonLastAction) {
       return $el.removeClass(this.noneActionCss).addClass(this.firstLiCssPrefix + this.buttonLastAction.toLowerCase());
     } else {
-      return $el.addClass(this.firstLiCssPrefix + 'none');
+      return $el.addClass(this.noneActionCss);
     }
   };
 
@@ -235,7 +235,7 @@ CUser = (function() {
       this.buttonEls.removeClass(this.noneActionCss).addClass(this.firstLiCssPrefix + this.buttonLastAction.toLowerCase());
     } else {
       this.buttonLastAction = '';
-      this.buttonEls.addClass(this.firstLiCssPrefix + 'none');
+      this.buttonEls.addClass(this.noneActionCss);
     }
     return actions;
   };

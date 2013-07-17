@@ -575,7 +575,7 @@ do ($)->
 			@hasHover = false
 			@buttonLastAction = ''
 			@firstLiCssPrefix = 'm_button_action_'
-			@noneActionCss = @firstLiCssPrefix + 'none'
+			@noneActionCss = '' #@firstLiCssPrefix + 'none'
 	
 			@els = $()
 			@buttonEls = $()
@@ -729,7 +729,7 @@ do ($)->
 			if @buttonLastAction
 				$el.removeClass(@noneActionCss).addClass @firstLiCssPrefix + @buttonLastAction.toLowerCase()
 			else
-				$el.addClass @firstLiCssPrefix + 'none'
+				$el.addClass @noneActionCss
 	
 		getButtonEl: () ->
 			$el = $(@buttonTemplate)
@@ -768,7 +768,7 @@ do ($)->
 	#				@separateButtonEls.show()
 			else
 				@buttonLastAction = ''
-				@buttonEls.addClass @firstLiCssPrefix + 'none'
+				@buttonEls.addClass @noneActionCss
 	#			@separateButtonEls.hide()
 			actions
 	
@@ -840,7 +840,7 @@ do ($)->
 	#includecoffee coffee/class/List.coffee
 	class List
 		logGroup: 'List'
-		constructor: (oktell, panelEl, dropdownEl, afterOktellConnect, useNotifies, debugMode) ->
+		constructor: (oktell, panelEl, dropdownEl, afterOktellConnect, options, debugMode) ->
 			@defaultConfig =
 				departmentVisibility: {}
 				showDeps: true
@@ -875,7 +875,6 @@ do ($)->
 			@userWithGeneratedButtons = {}
 	
 			@debugMode = debugMode
-			@useNotifies = useNotifies
 	
 			@dropdownPaddingBottomLeft = 3
 			@dropdownOpenedOnPanel = false
@@ -1205,7 +1204,7 @@ do ($)->
 	
 			ringNotify = null
 			oktell.on 'ringStart', (abonents) =>
-				if useNotifies
+				if @options.useNotifies
 					ringNotify = new Notify @langs.callPopup.title
 	
 			oktell.on 'ringStop', =>
@@ -1990,7 +1989,7 @@ do ($)->
 		panelEl.hide()
 		$("body").append(panelEl)
 
-		list = new List oktell, panelEl, actionListEl, afterOktellConnect, getOptions().useNotifies, getOptions().debug
+		list = new List oktell, panelEl, actionListEl, afterOktellConnect, getOptions(), getOptions().debug
 		if getOptions().debug
 			window.wList = list
 			window.wPopup = popup
@@ -2035,7 +2034,7 @@ do ($)->
 			true
 
 		touchClickedContact = null
-		touchClickedCss = 'touch_clicked'
+		touchClickedCss = 'm_touch_clicked'
 		touchClickedContactClear = =>
 			touchClickedContact?.removeClass touchClickedCss
 			touchClickedContact = null

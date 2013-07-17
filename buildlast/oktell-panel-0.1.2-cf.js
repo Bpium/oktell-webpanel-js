@@ -602,7 +602,7 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
       this.hasHover = false;
       this.buttonLastAction = '';
       this.firstLiCssPrefix = 'm_button_action_';
-      this.noneActionCss = this.firstLiCssPrefix + 'none';
+      this.noneActionCss = '';
       this.els = $();
       this.buttonEls = $();
       this.init(data);
@@ -782,7 +782,7 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
       if (this.buttonLastAction) {
         return $el.removeClass(this.noneActionCss).addClass(this.firstLiCssPrefix + this.buttonLastAction.toLowerCase());
       } else {
-        return $el.addClass(this.firstLiCssPrefix + 'none');
+        return $el.addClass(this.noneActionCss);
       }
     };
 
@@ -827,7 +827,7 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
         this.buttonEls.removeClass(this.noneActionCss).addClass(this.firstLiCssPrefix + this.buttonLastAction.toLowerCase());
       } else {
         this.buttonLastAction = '';
-        this.buttonEls.addClass(this.firstLiCssPrefix + 'none');
+        this.buttonEls.addClass(this.noneActionCss);
       }
       return actions;
     };
@@ -991,7 +991,7 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
   List = (function() {
     List.prototype.logGroup = 'List';
 
-    function List(oktell, panelEl, dropdownEl, afterOktellConnect, useNotifies, debugMode) {
+    function List(oktell, panelEl, dropdownEl, afterOktellConnect, options, debugMode) {
       this.onPbxNumberStateChange = __bind(this.onPbxNumberStateChange, this);
       var debouncedSetFilter, debouncedSetHeight, dropdownHideTimer, oktellConnected, ringNotify, self,
         _this = this;
@@ -1063,7 +1063,6 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
       this.filterFantomUserNumber = false;
       this.userWithGeneratedButtons = {};
       this.debugMode = debugMode;
-      this.useNotifies = useNotifies;
       this.dropdownPaddingBottomLeft = 3;
       this.dropdownOpenedOnPanel = false;
       this.regexps = {
@@ -1415,7 +1414,7 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
       });
       ringNotify = null;
       oktell.on('ringStart', function(abonents) {
-        if (useNotifies) {
+        if (_this.options.useNotifies) {
           return ringNotify = new Notify(_this.langs.callPopup.title);
         }
       });
@@ -2494,7 +2493,7 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
     animOptHide[panelPos] = '-281px';
     panelEl.hide();
     $("body").append(panelEl);
-    list = new List(oktell, panelEl, actionListEl, afterOktellConnect, getOptions().useNotifies, getOptions().debug);
+    list = new List(oktell, panelEl, actionListEl, afterOktellConnect, getOptions(), getOptions().debug);
     if (getOptions().debug) {
       window.wList = list;
       window.wPopup = popup;
@@ -2537,7 +2536,7 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
       return true;
     });
     touchClickedContact = null;
-    touchClickedCss = 'touch_clicked';
+    touchClickedCss = 'm_touch_clicked';
     touchClickedContactClear = function() {
       if (touchClickedContact != null) {
         touchClickedContact.removeClass(touchClickedCss);

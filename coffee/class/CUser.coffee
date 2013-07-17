@@ -159,7 +159,7 @@ class CUser
 		if @buttonLastAction
 			$el.removeClass(@noneActionCss).addClass @firstLiCssPrefix + @buttonLastAction.toLowerCase()
 		else
-			$el.addClass @firstLiCssPrefix + 'none'
+			$el.addClass @noneActionCss
 
 	getButtonEl: () ->
 		$el = $(@buttonTemplate)
@@ -198,7 +198,7 @@ class CUser
 #				@separateButtonEls.show()
 		else
 			@buttonLastAction = ''
-			@buttonEls.addClass @firstLiCssPrefix + 'none'
+			@buttonEls.addClass @noneActionCss
 #			@separateButtonEls.hide()
 		actions
 

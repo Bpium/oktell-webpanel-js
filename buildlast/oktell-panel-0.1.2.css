@@ -668,7 +668,6 @@
   color: #999;
   padding-left: 6px;
 }
-.oktell_panel .b_contact.touch_clicked,
 .oktell_panel .b_contact:hover,
 .oktell_panel .b_contact:hover:active {
   background: rgba(255,255,255,0.3);
@@ -841,7 +840,8 @@
   display: inline-block;
 }
 .oktell_actions_group_list li.i_call i,
-.oktell_actions_group_list li.i_resume i {
+.oktell_actions_group_list li.i_resume i,
+.oktell_actions_group_list li.i_answer i {
   background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAAK/INwWK6QAAABl0RVh0U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAADKSURBVHjaYoxdJMkABPxA3ADEBkB8AIgbGYgELFD6AFQzCDhA+QeJMYAJiO2RNDMgGcJArAHYAMUGMJBiALpfPwBxAakuuIAktgCIL5JqwAIksQRotJJswAcoWwCIJ5BqwEc0TSBXxJMaCyADHqCFRT0SXx6I86E0VgNArghA8goDNHmvh2p8gGTJfiD2BylghOYFZKAPTcoCRPhAAVtCughNiQ/INQBmiAHUCx9wqAGlnYMseEz/CM3WE6BhA3KVAlTuASy1AgQYAMumJ3E5CTqrAAAAAElFTkSuQmCC");
   background-repeat: no-repeat;
 }
@@ -883,11 +883,13 @@
   background-repeat: repeat-x;
 }
 .oktell_button_action.m_button_action_call li.g_first,
+.oktell_button_action.m_button_answer_call li.g_first,
 .oktell_button_action.m_button_action_resume li.g_first {
   background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAcCAIAAAAvP0KbAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyBpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNSBXaW5kb3dzIiB4bXBNTTpJbnN0YW5jZUlEPSJ4bXAuaWlkOjZDRUE0MzY0RjU5NjExRTA5RDBDRTVDMTc0RTJDRTE1IiB4bXBNTTpEb2N1bWVudElEPSJ4bXAuZGlkOjZDRUE0MzY1RjU5NjExRTA5RDBDRTVDMTc0RTJDRTE1Ij4gPHhtcE1NOkRlcml2ZWRGcm9tIHN0UmVmOmluc3RhbmNlSUQ9InhtcC5paWQ6NkNFQTQzNjJGNTk2MTFFMDlEMENFNUMxNzRFMkNFMTUiIHN0UmVmOmRvY3VtZW50SUQ9InhtcC5kaWQ6NkNFQTQzNjNGNTk2MTFFMDlEMENFNUMxNzRFMkNFMTUiLz4gPC9yZGY6RGVzY3JpcHRpb24+IDwvcmRmOlJERj4gPC94OnhtcG1ldGE+IDw/eHBhY2tldCBlbmQ9InIiPz6uBz3VAAAAU0lEQVR42kSJwQ2AMAwDHSflwY8X8zEZ07ARUlVBWlLlgayTrTPO66AP5+tBz/b+/G6k9+Cuzto6SVAEhAhlbiB7Jhwk/2LGRY2mharKbd0/AQYAfaYl9IloxscAAAAASUVORK5CYII=");
   background-color: #7cb242;
 }
 .oktell_button_action.m_button_action_call li.g_first:active,
+.oktell_button_action.m_button_answer_call li.g_first:active,
 .oktell_button_action.m_button_action_resume li.g_first:active {
   background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAcCAIAAAAvP0KbAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyBpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNSBXaW5kb3dzIiB4bXBNTTpJbnN0YW5jZUlEPSJ4bXAuaWlkOjdDNTlDRjU4Rjk2RTExRTA5NDE2QjkwOTUzNkQ4MzQzIiB4bXBNTTpEb2N1bWVudElEPSJ4bXAuZGlkOjdDNTlDRjU5Rjk2RTExRTA5NDE2QjkwOTUzNkQ4MzQzIj4gPHhtcE1NOkRlcml2ZWRGcm9tIHN0UmVmOmluc3RhbmNlSUQ9InhtcC5paWQ6N0M1OUNGNTZGOTZFMTFFMDk0MTZCOTA5NTM2RDgzNDMiIHN0UmVmOmRvY3VtZW50SUQ9InhtcC5kaWQ6N0M1OUNGNTdGOTZFMTFFMDk0MTZCOTA5NTM2RDgzNDMiLz4gPC9yZGY6RGVzY3JpcHRpb24+IDwvcmRmOlJERj4gPC94OnhtcG1ldGE+IDw/eHBhY2tldCBlbmQ9InIiPz4316IqAAAATUlEQVR42iyK2w2AMBDD0lyPh1iNuZiGEWlDWviwLCvBdZ9setgBSqIgdsGt2Z/BZmckj7r7X/wrxDR/RmN6dPdWSWaaCFbHumyvAAMAMzEj9Gyw5l8AAAAASUVORK5CYII=");
   background-color: #92be6d;
@@ -1334,7 +1336,7 @@
   font-weight: bold;
   font-size: 1.125em;
 }
-.btn-group {
+.oktell_panel .btn-group {
   position: relative;
   display: inline-block;
   *display: inline;
@@ -1344,13 +1346,13 @@
   white-space: nowrap;
   *margin-left: 0.3em;
 }
-.btn-group:first-child {
+.oktell_panel .btn-group:first-child {
   *margin-left: 0;
 }
-.btn-group + .btn-group {
+.oktell_panel .btn-group + .btn-group {
   margin-left: 5px;
 }
-.btn-group > .btn {
+.oktell_panel .btn-group > .btn {
   position: relative;
   -webkit-border-radius: 0;
   -moz-border-radius: 0;
@@ -1359,17 +1361,17 @@
   border-radius: 0;
   margin-right: 0;
 }
-.btn-group > .btn + .btn {
+.oktell_panel .btn-group > .btn + .btn {
   margin-left: -1px;
 }
-.btn-group > .btn {
+.oktell_panel .btn-group > .btn {
   font-size: 13px;
 }
-.btn-group > .btn-small {
+.oktell_panel .btn-group > .btn-small {
   font-size: 11.9px;
   padding: 3px 6px 3px;
 }
-.btn-group > .btn:first-child {
+.oktell_panel .btn-group > .btn:first-child {
   margin-left: 0;
   -webkit-border-top-left-radius: 4px;
   -moz-border-radius-topleft: 4px;
@@ -1378,8 +1380,8 @@
   -moz-border-radius-bottomleft: 4px;
   border-bottom-left-radius: 4px;
 }
-.btn-group > .btn:last-child,
-.btn-group > .dropdown-toggle {
+.oktell_panel .btn-group > .btn:last-child,
+.oktell_panel .btn-group > .dropdown-toggle {
   -webkit-border-top-right-radius: 4px;
   -moz-border-radius-topright: 4px;
   border-top-right-radius: 4px;
@@ -1387,7 +1389,7 @@
   -moz-border-radius-bottomright: 4px;
   border-bottom-right-radius: 4px;
 }
-.btn-group > .btn.large:first-child {
+.oktell_panel .btn-group > .btn.large:first-child {
   margin-left: 0;
   -webkit-border-top-left-radius: 6px;
   -moz-border-radius-topleft: 6px;
@@ -1396,8 +1398,8 @@
   -moz-border-radius-bottomleft: 6px;
   border-bottom-left-radius: 6px;
 }
-.btn-group > .btn.large:last-child,
-.btn-group > .large.dropdown-toggle {
+.oktell_panel .btn-group > .btn.large:last-child,
+.oktell_panel .btn-group > .large.dropdown-toggle {
   -webkit-border-top-right-radius: 6px;
   -moz-border-radius-topright: 6px;
   border-top-right-radius: 6px;
@@ -1405,9 +1407,9 @@
   -moz-border-radius-bottomright: 6px;
   border-bottom-right-radius: 6px;
 }
-.btn-group > .btn:hover,
-.btn-group > .btn:focus,
-.btn-group > .btn:active,
-.btn-group > .btn.active {
+.oktell_panel .btn-group > .btn:hover,
+.oktell_panel .btn-group > .btn:focus,
+.oktell_panel .btn-group > .btn:active,
+.oktell_panel .btn-group > .btn.active {
   z-index: 2;
 }
