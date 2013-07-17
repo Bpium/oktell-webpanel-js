@@ -376,7 +376,7 @@
 
 /* Buttons
 ---------------------------------------------------------------*/
-.oktell_panel .g_button {
+.oktell_panel .btn {
     display: inline-block;
     padding: 4px 10px 4px;
     line-height: 18px;
@@ -404,10 +404,10 @@
     *margin-left: .3em;
     text-decoration: none;
 }
-.oktell_panel .g_button:first-child {
+.oktell_panel .btn:first-child {
     *margin-left: 0;
 }
-.oktell_panel .g_button:hover {
+.oktell_panel .btn:hover {
     color: #333333;
     text-decoration: none;
     background-color: #e6e6e6;
@@ -418,17 +418,17 @@
     -o-transition: background-position 0.1s linear;
     transition: background-position 0.1s linear;
 }
-.oktell_panel .g_button:focus {
+.oktell_panel .btn:focus {
     outline: 5px auto -webkit-focus-ring-color;
     outline-offset: -2px;
 }
-.oktell_panel .g_button i {
+.oktell_panel .btn i {
     display: inline-block;
     width: 16px;
     height: 16px;
     vertical-align: text-top;
 }
-.oktell_panel .g_button.g_active, .oktell_panel .g_button:active {
+.oktell_panel .btn.g_active, .oktell_panel .btn:active {
     background-image: none;
     -webkit-box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(0, 0, 0, 0.05);
     -moz-box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(0, 0, 0, 0.05);
@@ -438,7 +438,7 @@
     color: rgba(0, 0, 0, 0.5);
     outline: 0;
 }
-.oktell_panel .g_button.disabled, .oktell_panel .g_button[disabled] {
+.oktell_panel .btn.disabled, .oktell_panel .btn[disabled] {
     cursor: default;
     background-image: none;
     background-color: #e6e6e6;
@@ -448,7 +448,7 @@
     -moz-box-shadow: none;
     box-shadow: none;
 }
-.oktell_panel .g_button.m_big {
+.oktell_panel .btn.m_big {
     padding: 7px 12px;
     font-size: 17px;
     line-height: normal;
@@ -456,7 +456,7 @@
     -moz-border-radius: 5px;
     border-radius: 5px;
 }
-.oktell_panel .g_button.m_big .icon {
+.oktell_panel .btn.m_big .icon {
     margin-top: 1px;
 }
 
