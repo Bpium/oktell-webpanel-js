@@ -15,6 +15,9 @@ List = (function() {
       showDeps: true,
       showOffline: false
     };
+    this.jScrollPaneParams = {
+      mouseWheelSpeed: 50
+    };
     this.allActions = {
       call: {
         icon: '/img/icons/action/call.png',
@@ -100,6 +103,8 @@ List = (function() {
     this.keypadEl = this.panelEl.find('.j_phone_keypad');
     this.keypadIsVisible = false;
     this.usersListBlockEl = this.panelEl.find('.j_main_list');
+    this.scrollContainer = '';
+    this.scrollContent = '';
     this.usersListEl = this.simpleListEl.find('tbody');
     this.abonentsListBlock = this.panelEl.find('.j_abonents');
     this.abonentsListEl = this.abonentsListBlock.find('tbody');
@@ -137,7 +142,21 @@ List = (function() {
     this.allUserDep.template = this.usersTableTemplate;
     this.exactMatchUserDep = new Department('exact_match_user_dep', 'exactUser');
     this.exactMatchUserDep.template = this.usersTableTemplate;
-    this.userScrollerToTop = function() {};
+    this.initJScrollPane = function() {
+      _this.usersListBlockEl.jScrollPane(_this.jScrollPaneParams);
+      _this.jScrollPaneAPI = _this.usersListBlockEl.data('jsp');
+      _this.scrollContainer = _this.usersListBlockEl.find('.jspContainer');
+      return _this.scrollContent = _this.usersListBlockEl.find('.jspPane');
+    };
+    this.initJScrollPane();
+    this.reinitScroll = function() {
+      var _ref;
+
+      return (_ref = _this.jScrollPaneAPI) != null ? _ref.reinitialise() : void 0;
+    };
+    this.userScrollerToTop = function() {
+      return _this.jScrollPaneAPI.scrollToY(0);
+    };
     this.filterClearCross.bind('click', function() {
       return _this.clearFilter();
     });
@@ -160,7 +179,7 @@ List = (function() {
         setTimeout(function() {
           var _ref;
 
-          if ((_ref = _this.usersListBlockEl.find('tr:first').data('user')) != null) {
+          if ((_ref = _this.scrollContent.find('tr:first').data('user')) != null) {
             _ref.doLastFirstAction();
           }
           return _this.clearFilter();
@@ -242,18 +261,17 @@ List = (function() {
       _this.usersListBlockEl.css({
         height: h
       });
-      return setTimeout(function() {
-        return _this.usersListBlockEl.jScrollPane({
-          mouseWheelSpeed: 50
-        });
-      }, 1000);
+      return _this.reinitScroll();
     };
     this.setUserListHeight();
     debouncedSetHeight = debounce(function() {
       _this.userScrollerToTop();
       return _this.setUserListHeight();
-    }, 50);
+    }, 150);
     $(window).bind('resize', function() {
+      return debouncedSetHeight();
+    });
+    $(window).bind('orientationchange', function() {
       return debouncedSetHeight();
     });
     this.hidePanel();
@@ -661,7 +679,6 @@ List = (function() {
   };
 
   List.prototype.setAbonents = function(abonents) {
-    this.log('set abonents', abonents);
     this.syncAbonentsAndUserlist(abonents, this.abonents);
     return this.setAbonentsHtml();
   };
@@ -704,7 +721,6 @@ List = (function() {
   };
 
   List.prototype.setAbonentsHtml = function() {
-    this.log('Set abonents html', this.abonents);
     return this._setActivityPanelUserHtml(this.abonents, this.abonentsListEl, this.abonentsListBlock);
   };
 
@@ -727,11 +743,9 @@ List = (function() {
     }
     this._setUsersHtml(usersArray, listEl, true);
     if (usersArray.length && blockEl.is(':not(:visible)')) {
-      this.log('Show abonent el');
       blockEl.stop(true, true);
       return blockEl.slideDown(50, this.setUserListHeight);
     } else if (usersArray.length === 0 && blockEl.is(':visible')) {
-      this.log('Hide abonent el');
       blockEl.stop(true, true);
       return blockEl.slideUp(50, this.setUserListHeight);
     }
@@ -809,8 +823,8 @@ List = (function() {
     } else {
       this.filterFantomUser = false;
     }
-    this.usersListBlockEl.children().detach();
-    this.usersListBlockEl.html(allDeps);
+    this.scrollContent.children().detach();
+    this.scrollContent.html(allDeps);
     if (allDeps.length > 0) {
       allDeps[allDeps.length - 1].find('tr:last').addClass('g_last');
     }

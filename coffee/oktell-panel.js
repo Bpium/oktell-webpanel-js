@@ -374,9 +374,19 @@ var __slice = [].slice,
       }
       return touchClickedContact = null;
     };
+    $(window).bind('touchmove', function(e) {
+      return _this.log('touchmove');
+    });
+    $(window).bind('touchcancel', function(e) {
+      return _this.log('touchcancel');
+    });
+    $(window).bind('touchend', function(e) {
+      return _this.log('touchend');
+    });
     $(window).bind('touchstart', function(e) {
       var contact, parents, parentsArr, target;
 
+      _this.log('touchstart');
       target = $(e.target);
       parents = target.parents();
       parentsArr = parents.toArray();

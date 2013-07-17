@@ -256,7 +256,14 @@ do ($)->
 		touchClickedContactClear = =>
 			touchClickedContact?.removeClass touchClickedCss
 			touchClickedContact = null
+		$(window).bind 'touchmove', (e)=>
+			@log 'touchmove'
+		$(window).bind 'touchcancel', (e)=>
+			@log 'touchcancel'
+		$(window).bind 'touchend', (e)=>
+			@log 'touchend'
 		$(window).bind 'touchstart', (e)=>
+			@log 'touchstart'
 			target = $(e.target)
 			parents = target.parents()
 			parentsArr = parents.toArray()

@@ -7,6 +7,8 @@ class List
 			showDeps: true
 			showOffline: false
 
+		@jScrollPaneParams = { mouseWheelSpeed: 50 }
+
 		@allActions =
 			call: { icon: '/img/icons/action/call.png', iconWhite: '/img/icons/action/white/call.png', text: @langs.actions.call }
 			conference : { icon: '/img/icons/action/confinvite.png', iconWhite: '/img/icons/action/white/confinvite.png', text: @langs.actions.conference }
@@ -65,6 +67,8 @@ class List
 		@keypadEl = @panelEl.find '.j_phone_keypad'
 		@keypadIsVisible = false
 		@usersListBlockEl = @panelEl.find '.j_main_list'
+		@scrollContainer = ''
+		@scrollContent = ''
 		@usersListEl = @simpleListEl.find 'tbody'
 		@abonentsListBlock = @panelEl.find '.j_abonents'
 		@abonentsListEl = @abonentsListBlock.find 'tbody'
@@ -107,13 +111,20 @@ class List
 		@exactMatchUserDep = new Department 'exact_match_user_dep', 'exactUser'
 		@exactMatchUserDep.template = @usersTableTemplate
 
+		@initJScrollPane = =>
+			@usersListBlockEl.jScrollPane @jScrollPaneParams
+			@jScrollPaneAPI = @usersListBlockEl.data 'jsp'
+			@scrollContainer = @usersListBlockEl.find '.jspContainer'
+			@scrollContent = @usersListBlockEl.find '.jspPane'
+
+		@initJScrollPane()
+
+		@reinitScroll = =>
+			@jScrollPaneAPI?.reinitialise()
 
 		@userScrollerToTop = =>
-#			if not @_jScrolled
-#				@jScroll @usersListBlockEl
-#				@usersScroller = @usersListBlockEl.find('.jscroll_scroller')
-#			@usersScroller.css({top:'0px'})
-#			@usersListBlockEl.jScrollPane()
+			#@usersScroller.css({top:'0px'})
+			@jScrollPaneAPI.scrollToY 0
 
 		@filterClearCross.bind 'click', =>
 			@clearFilter()
@@ -134,7 +145,7 @@ class List
 			if e.keyCode is 13
 				@filterInput.blur()
 				setTimeout =>
-					@usersListBlockEl.find('tr:first').data('user')?.doLastFirstAction()
+					@scrollContent.find('tr:first').data('user')?.doLastFirstAction()
 					@clearFilter()
 				, 50
 			else
@@ -207,17 +218,18 @@ class List
 			h = $(window).height() - @usersListBlockEl[0].offsetTop - 5 + 'px'
 			@usersListBlockEl.css
 				height: h
-			setTimeout =>
-				@usersListBlockEl.jScrollPane { mouseWheelSpeed: 50 }
-			, 1000
+			@reinitScroll()
 
 		@setUserListHeight()
 
 		debouncedSetHeight = debounce =>
 			@userScrollerToTop()
 			@setUserListHeight()
-		, 50
+		, 150
 		$(window).bind 'resize', ->
+			debouncedSetHeight()
+
+		$(window).bind 'orientationchange', ->
 			debouncedSetHeight()
 
 		#if @options.
@@ -531,7 +543,7 @@ class List
 				delete userlist[user.number]
 
 	setAbonents: (abonents) ->
-		@log 'set abonents', abonents
+		#@log 'set abonents', abonents
 		@syncAbonentsAndUserlist abonents, @abonents
 		@setAbonentsHtml()
 
@@ -557,7 +569,7 @@ class List
 		@userScrollerToTop()
 
 	setAbonentsHtml: ->
-		@log 'Set abonents html', @abonents
+		#@log 'Set abonents html', @abonents
 		@_setActivityPanelUserHtml @abonents, @abonentsListEl, @abonentsListBlock
 
 	setHoldHtml: ->
@@ -571,11 +583,11 @@ class List
 		usersArray.push(u) for own k,u of users
 		@_setUsersHtml usersArray, listEl, true
 		if usersArray.length and blockEl.is(':not(:visible)')
-			@log 'Show abonent el'
+			#@log 'Show abonent el'
 			blockEl.stop true, true
 			blockEl.slideDown 50, @setUserListHeight
 		else if usersArray.length is 0 and blockEl.is(':visible')
-			@log 'Hide abonent el'
+			#@log 'Hide abonent el'
 			blockEl.stop true, true
 			blockEl.slideUp 50, @setUserListHeight
 
@@ -672,8 +684,9 @@ class List
 		else
 			@filterFantomUser = false
 
-		@usersListBlockEl.children().detach()
-		@usersListBlockEl.html allDeps
+		@scrollContent.children().detach()
+		@scrollContent.html allDeps
+
 		if allDeps.length > 0
 			allDeps[allDeps.length-1].find('tr:last').addClass 'g_last'
 
