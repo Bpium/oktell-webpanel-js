@@ -71,7 +71,7 @@ module.exports = (grunt) ->
 	grunt.loadNpmTasks 'grunt-contrib-clean'
 	grunt.loadNpmTasks 'grunt-contrib-compress'
 
-	grunt.registerTask 'build', ['clean:buildlast', 'createbuildfolder', 'insertfilesasvars', 'includecoffee', 'coffee', 'uglify', 'cssmin', 'copy:css', 'addVersion', 'compress', 'copy:main', 'clean:temp']
+	grunt.registerTask 'build', ['clean:buildlast', 'createbuildfolder', 'insertfilesasvars', 'includecoffee', 'coffee', 'uglify', 'cssmin', 'copy:css', 'addVersion', 'compress', 'clean:temp']
 
 	grunt.registerTask 'default', ['build']
 

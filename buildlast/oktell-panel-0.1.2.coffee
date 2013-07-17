@@ -404,6 +404,41 @@ do ($)->
 			return false
 	
 	
+	#includecoffee coffee/class/Notify.coffee
+	class Notify
+		constructor: (title, autoHide = 0, message, group, onClick)->
+			if not ( typeof title is 'string' and title ) or window.webkitNotifications.checkPermission() isnt 0
+				return
+	
+			if typeof message is 'function'
+				onClick = message
+				message = ''
+				group = null
+			else if typeof group is 'function'
+				onClick = group
+				group = null
+	
+			notify = window.webkitNotifications.createNotification 'favicon.ico', title, message or ''
+			if group
+				notify.tag = group
+			notify.show()
+			autoHide = parseInt(autoHide)
+			if autoHide
+				setTimeout =>
+					notify.close()
+				, autoHide * 1000
+			notify.onclick = (e, args...) =>
+				window.focus?()
+				notify.close()
+				if typeof onClick is 'function'
+					onClick.apply window, []
+	
+			@close = =>
+				notify?.close?()
+	
+	
+	
+	
 	#includecoffee coffee/class/Department.coffee
 	class Department
 		logGroup: 'Department'
@@ -803,7 +838,7 @@ do ($)->
 	#includecoffee coffee/class/List.coffee
 	class List
 		logGroup: 'List'
-		constructor: (oktell, panelEl, dropdownEl, options, afterOktellConnect, debugMode) ->
+		constructor: (oktell, panelEl, dropdownEl, options, afterOktellConnect, useNotifies, debugMode) ->
 	
 			@defaultConfig =
 				departmentVisibility: {}
@@ -811,6 +846,7 @@ do ($)->
 				showOffline: false
 	
 			@allActions =
+				answer: { icon: '/img/icons/action/call.png', iconWhite: '/img/icons/action/white/call.png', text: @langs.actions.answer }
 				call: { icon: '/img/icons/action/call.png', iconWhite: '/img/icons/action/white/call.png', text: @langs.actions.call }
 				conference : { icon: '/img/icons/action/confinvite.png', iconWhite: '/img/icons/action/white/confinvite.png', text: @langs.actions.conference }
 				transfer : { icon: '/img/icons/action/transfer.png', text: @langs.actions.transfer }
@@ -871,6 +907,7 @@ do ($)->
 			@usersListEl = @simpleListEl.find 'tbody'
 			@abonentsListBlock = @panelEl.find '.j_abonents'
 			@abonentsListEl = @abonentsListBlock.find 'tbody'
+			@abonentsHeaderTextEl = @abonentsListBlock.find 'b_marks_label'
 			@talkTimeEl = @abonentsListBlock.find '.b_marks_time'
 			@holdBlockEl = @panelEl.find '.j_hold'
 			@holdListEl = @holdBlockEl.find 'tbody'
@@ -1109,78 +1146,7 @@ do ($)->
 	
 				#@sortPanelUsers @panelUsers
 	
-				oktell.on 'stateChange', ( newState, oldState ) =>
-					@reloadActions()
-	
-				oktell.onNativeEvent 'pbxnumberstatechanged', (data) =>
-	
-					for n in data.numbers
-						numStr = n.num.toString()
-						user = @usersByNumber[numStr]
-						if user
-	#						@log ''
-	#						@log 'start user state change from ' + user.state + ' to ' + n.numstateid + ' for ' + user.getInfo()
-							if @showDeps
-								dep = @departmentsById[user.departmentId]
-							else
-								dep = @allUserDep
-	#						@log 'current visibility settings are ShowDeps='+@showDeps+' and ShowOffline=' + @showOffline
-							wasFiltered = user.isFiltered @filter, @showOffline, @filterLang
-	#						@log 'user was filtered earlier = ' + wasFiltered
-							user.setState n.numstateid
-							userNowIsFiltered = user.isFiltered @filter, @showOffline, @filterLang
-	#						@log 'after user.setState, now user filtered = ' + userNowIsFiltered
-							if not userNowIsFiltered
-	#							@log 'now user isnt filtered'
-								if dep.getContainer().children().length is 1
-	#								@log 'container contains only users el, so refilter all list'
-									@setFilter @filter, true
-								else
-	#								@log 'remove his html element'
-									user.el?.remove?()
-							else if not wasFiltered
-	#							@log 'user now filtered and was not filtered before state change'
-								dep.getUsers @filter, @showOffline, @filterLang
-	#							@log 'refilter all user of department ' + dep.getInfo()
-								index = dep.lastFilteredUsers.indexOf user
-	#							@log 'index of user in refiltered users list is ' + index
-								if index isnt -1
-									if not dep.getContainer().is(':visible')
-	#									@log 'dep container is hidden, so, refilter all users list'
-										@setFilter @filter, true
-									else
-										if index is 0
-	#										@log 'add user html to start of department container'
-											dep.getContainer().prepend user.getEl()
-										else
-	#										@log 'add user html after prev user html element'
-											dep.lastFilteredUsers[index-1]?.el?.after user.getEl()
-	
-										if dep.lastFilteredUsers[index-1]?.letter is user.letter
-	#										@log 'hide user letter because it is like prev user letter ' + user.letter
-											user.letterVisibility false
-										else if dep.lastFilteredUsers[index+1]?.letter is user.letter
-	#										@log 'hide prev user letter because it is like user letter ' + user.letter
-											dep.lastFilteredUsers[index+1].letterVisibility false
-	
-	#						@log 'end user state change'
-	#						@log ''
-	
-	
-				oktell.on 'abonentsChange', ( abonents ) =>
-					@setAbonents abonents
-					@reloadActions()
-	
-				oktell.on 'holdStateChange', ( holdInfo ) =>
-					#@log 'Oktell holdStateChange', holdInfo
-					@setHold holdInfo
-					@reloadActions()
-	
-				oktell.on 'talkTimer', (seconds, formattedTime) =>
-					if seconds is false
-						@talkTimeEl.text ''
-					else
-						@talkTimeEl.text formattedTime
+				oktell.onNativeEvent 'pbxnumberstatechanged', @onPbxNumberStateChange
 	
 				setTimeout =>
 					@setAbonents oktell.getAbonents()
@@ -1195,8 +1161,7 @@ do ($)->
 	
 				@setFilter '', true
 	
-				oktell.on 'queueChange', (queue) =>
-					@setQueue queue
+	
 				oktell.getQueue (data) =>
 					@setQueue data.queue if data.result
 	
@@ -1207,9 +1172,98 @@ do ($)->
 	
 				if typeof afterOktellConnect is 'function' then afterOktellConnect()
 	
+			oktell.on 'abonentsChange', ( abonents ) =>
+				if @oktellConnected
+					@setAbonents abonents
+					@reloadActions()
+	
+			oktell.on 'holdStateChange', ( holdInfo ) =>
+				if @oktellConnected
+					#@log 'Oktell holdStateChange', holdInfo
+					@setHold holdInfo
+					@reloadActions()
+	
+			oktell.on 'talkTimer', (seconds, formattedTime) =>
+				if @oktellConnected
+					if seconds is false
+						@talkTimeEl.text ''
+					else
+						@talkTimeEl.text formattedTime
+	
+			oktell.on 'stateChange', ( newState, oldState ) =>
+				if @oktellConnected
+					@reloadActions()
+			oktell.on 'queueChange', (queue) =>
+				if @oktellConnected
+					@setQueue queue
+	
 			oktell.on 'connectError', =>
 				if not @options.hideOnDisconnect
 					@showPanel()
+	
+			ringNotify = null
+			oktell.on 'ringStart', (abonents) =>
+				if useNotifies
+					ringNotify = new Notify @langs.callPopup.title
+	
+			oktell.on 'ringStop', =>
+				ringNotify?.close?()
+				ringNotify = null
+	
+	
+		onPbxNumberStateChange: (data) =>
+	
+			for n in data.numbers
+				numStr = n.num.toString()
+				user = @usersByNumber[numStr]
+				if user
+	#						@log ''
+	#						@log 'start user state change from ' + user.state + ' to ' + n.numstateid + ' for ' + user.getInfo()
+					if @showDeps
+						dep = @departmentsById[user.departmentId]
+					else
+						dep = @allUserDep
+					#						@log 'current visibility settings are ShowDeps='+@showDeps+' and ShowOffline=' + @showOffline
+					wasFiltered = user.isFiltered @filter, @showOffline, @filterLang
+					#						@log 'user was filtered earlier = ' + wasFiltered
+					user.setState n.numstateid
+					userNowIsFiltered = user.isFiltered @filter, @showOffline, @filterLang
+					#						@log 'after user.setState, now user filtered = ' + userNowIsFiltered
+					if not userNowIsFiltered
+	#							@log 'now user isnt filtered'
+						if dep.getContainer().children().length is 1
+	#								@log 'container contains only users el, so refilter all list'
+							@setFilter @filter, true
+						else
+	#								@log 'remove his html element'
+							user.el?.remove?()
+					else if not wasFiltered
+	#							@log 'user now filtered and was not filtered before state change'
+						dep.getUsers @filter, @showOffline, @filterLang
+						#							@log 'refilter all user of department ' + dep.getInfo()
+						index = dep.lastFilteredUsers.indexOf user
+						#							@log 'index of user in refiltered users list is ' + index
+						if index isnt -1
+							if not dep.getContainer().is(':visible')
+	#									@log 'dep container is hidden, so, refilter all users list'
+								@setFilter @filter, true
+							else
+								if index is 0
+	#										@log 'add user html to start of department container'
+									dep.getContainer().prepend user.getEl()
+								else
+	#										@log 'add user html after prev user html element'
+									dep.lastFilteredUsers[index-1]?.el?.after user.getEl()
+	
+								if dep.lastFilteredUsers[index-1]?.letter is user.letter
+	#										@log 'hide user letter because it is like prev user letter ' + user.letter
+									user.letterVisibility false
+								else if dep.lastFilteredUsers[index+1]?.letter is user.letter
+	#										@log 'hide prev user letter because it is like user letter ' + user.letter
+									dep.lastFilteredUsers[index+1].letterVisibility false
+	
+	#						@log 'end user state change'
+	#						@log ''
 	
 		hideActionListDropdown: ->
 			@dropdownEl.fadeOut 150, =>
@@ -1330,7 +1384,7 @@ do ($)->
 					delete userlist[user.number]
 	
 		setAbonents: (abonents) ->
-			@log 'set abonents', abonents
+			#@log 'set abonents', abonents
 			@syncAbonentsAndUserlist abonents, @abonents
 			@setAbonentsHtml()
 	
@@ -1347,7 +1401,10 @@ do ($)->
 		setHold: (holdInfo) ->
 			abs = []
 			if holdInfo.hasHold
-				abs = [holdInfo.abonent]
+				if holdInfo.conferenceid
+					abs = [{number: holdInfo.conferenceRoom, id: holdInfo.conferenceid, name: holdInfo.conferenceName}]
+				else
+					abs = [holdInfo.abonent]
 			@syncAbonentsAndUserlist abs, @hold
 			@setHoldHtml()
 	
@@ -1356,7 +1413,7 @@ do ($)->
 			@userScrollerToTop()
 	
 		setAbonentsHtml: ->
-			@log 'Set abonents html', @abonents
+			#@log 'Set abonents html', @abonents
 			@_setActivityPanelUserHtml @abonents, @abonentsListEl, @abonentsListBlock
 	
 		setHoldHtml: ->
@@ -1370,11 +1427,11 @@ do ($)->
 			usersArray.push(u) for own k,u of users
 			@_setUsersHtml usersArray, listEl, true
 			if usersArray.length and blockEl.is(':not(:visible)')
-				@log 'Show abonent el'
+				#@log 'Show abonent el'
 				blockEl.stop true, true
 				blockEl.slideDown 50, @setUserListHeight
 			else if usersArray.length is 0 and blockEl.is(':visible')
-				@log 'Hide abonent el'
+				#@log 'Hide abonent el'
 				blockEl.stop true, true
 				blockEl.slideUp 50, @setUserListHeight
 	
@@ -1741,11 +1798,12 @@ do ($)->
 		lang: 'ru'
 		noavatar: true
 		hideOnDisconnect: true
+		useNotifies: false
 
 	langs = {
 		ru:
 			panel: { inTalk: 'В разговоре', onHold: 'На удержании', queue: 'Очередь ожидания', inputPlaceholder: 'введите имя или номер', withoutDepartment: 'без отдела', showDepartments: 'Группировать по отделам', showDepartmentsClicked: 'Показать общим списком', showOnlineOnly: 'Показать только online', showOnlineOnlyCLicked: 'Показать всех' },
-			actions: { call: 'Позвонить', conference: 'Конференция', transfer: 'Перевести', toggle: 'Переключиться', intercom: 'Интерком', endCall: 'Завершить', ghostListen: 'Прослушка', ghostHelp: 'Помощь', hold: 'Удержание', resume: 'Продолжить' }
+			actions: { answer: 'Ответить', call: 'Позвонить', conference: 'Конференция', transfer: 'Перевести', toggle: 'Переключиться', intercom: 'Интерком', endCall: 'Завершить', ghostListen: 'Прослушка', ghostHelp: 'Помощь', hold: 'Удержание', resume: 'Продолжить' }
 			callPopup: { title: 'Входящий вызов', hide: 'Скрыть', answer: 'Ответить', reject: 'Отклонить', undefinedNumber: 'Номер не определен', goPickup: 'Поднимите трубку' }
 			permissionsPopup: { header: 'Запрос на доступ к микрофону', text: 'Для использования веб-телефона необходимо разрешить браузеру доступ к микрофону.' }
 			error:
@@ -1755,7 +1813,7 @@ do ($)->
 				#tryAgain: 'Повторить попытку'
 		en:
 			panel: { inTalk: 'In conversation', onHold: 'On hold', queue: 'Wait queue', inputPlaceholder: 'Enter name or number', withoutDepartment: 'Without department', showDepartments: 'Show departments', showDepartmentsClicked: 'Hide departments', showOnlineOnly: 'Show online only', showOnlineOnlyCLicked: 'Show all' },
-			actions: { call: 'Dial', conference: 'Conference', transfer: 'Transfer', toggle: 'Switch', intercom: 'Intercom', endCall: 'End', ghostListen: 'Audition', ghostHelp: 'Help', hold: 'Hold', resume: 'Resume' }
+			actions: { answer: 'Answer', call: 'Dial', conference: 'Conference', transfer: 'Transfer', toggle: 'Switch', intercom: 'Intercom', endCall: 'End', ghostListen: 'Audition', ghostHelp: 'Help', hold: 'Hold', resume: 'Resume' }
 			callPopup: { title: 'Incoming call', hide: 'Hide', answer: 'Answer', reject: 'Decline', undefinedNumber: 'Phone number is not defined', goPickup: 'Pick up the phone' }
 			permissionsPopup: { header: 'Request for access to the microphone', text: 'To use the web-phone you need to allow browser access to the microphone.' }
 			error:
@@ -1765,7 +1823,7 @@ do ($)->
 				#tryAgain: 'Try again'
 		cz:
 			panel: { inTalk: 'V rozhovoru', onHold: 'Na hold', queue: 'Fronta čekaní', inputPlaceholder: 'zadejte jméno nebo číslo', withoutDepartment: 'Bez oddělení', showDepartments: 'Zobrazit oddělení', showDepartmentsClicked: 'Skrýt oddělení', showOnlineOnly: 'Zobrazit pouze online', showOnlineOnlyCLicked: 'Zobrazit všechny' },
-			actions: { call: 'Zavolat', conference: 'Konference', transfer: 'Převést', toggle: 'Přepnout', intercom: 'Intercom', endCall: 'Ukončit', ghostListen: 'Odposlech', ghostHelp: 'Nápověda', hold: 'Udržet', resume: 'Pokračovat' }
+			actions: { answer: 'Odpověď', call: 'Zavolat', conference: 'Konference', transfer: 'Převést', toggle: 'Přepnout', intercom: 'Intercom', endCall: 'Ukončit', ghostListen: 'Odposlech', ghostHelp: 'Nápověda', hold: 'Udržet', resume: 'Pokračovat' }
 			callPopup: { title: 'Příchozí hovor', hide: 'Schovat', answer: 'Odpovědět', reject: 'Odmítnout', undefinedNumber: '', goPickup: 'Zvedněte sluchátko' }
 			permissionsPopup: { header: 'Žádost o přístup k mikrofonu', text: 'Abyste mohli používat telefon, musíte povolit prohlížeče přístup k mikrofonu.' }
 			error:
@@ -1861,9 +1919,13 @@ do ($)->
 	hasTouch = 'ontouchstart' in window and not isTouchPad
 
 	initPanel = (opts)->
+
 		panelWasInitialized = true
 
 		options = $.extend defaultOptions, opts or {}
+
+		if getOptions().useNotifies and window.webkitNotifications and window.webkitNotifications.checkPermission() is 1
+			webkitNotifications.requestPermission =>
 
 		Department.prototype.withoutDepName = List.prototype.withoutDepName = 'zzzzz_without'
 		langs = langs[options.lang] or langs.ru
@@ -1926,7 +1988,7 @@ do ($)->
 		panelEl.hide()
 		$("body").append(panelEl)
 
-		list = new List oktell, panelEl, actionListEl, afterOktellConnect, getOptions().debug
+		list = new List oktell, panelEl, actionListEl, afterOktellConnect, getOptions().useNotifies, getOptions().debug
 		if getOptions().debug
 			window.wList = list
 			window.wPopup = popup

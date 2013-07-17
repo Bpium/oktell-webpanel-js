@@ -17,7 +17,8 @@ var __slice = [].slice,
     debug: false,
     lang: 'ru',
     noavatar: true,
-    hideOnDisconnect: true
+    hideOnDisconnect: true,
+    useNotifies: false
   };
   langs = {
     ru: {
@@ -33,6 +34,7 @@ var __slice = [].slice,
         showOnlineOnlyCLicked: 'Показать всех'
       },
       actions: {
+        answer: 'Ответить',
         call: 'Позвонить',
         conference: 'Конференция',
         transfer: 'Перевести',
@@ -85,6 +87,7 @@ var __slice = [].slice,
         showOnlineOnlyCLicked: 'Show all'
       },
       actions: {
+        answer: 'Answer',
         call: 'Dial',
         conference: 'Conference',
         transfer: 'Transfer',
@@ -137,6 +140,7 @@ var __slice = [].slice,
         showOnlineOnlyCLicked: 'Zobrazit všechny'
       },
       actions: {
+        answer: 'Odpověď',
         call: 'Zavolat',
         conference: 'Konference',
         transfer: 'Převést',
@@ -279,6 +283,9 @@ var __slice = [].slice,
 
     panelWasInitialized = true;
     options = $.extend(defaultOptions, opts || {});
+    if (getOptions().useNotifies && window.webkitNotifications && window.webkitNotifications.checkPermission() === 1) {
+      webkitNotifications.requestPermission(function() {});
+    }
     Department.prototype.withoutDepName = List.prototype.withoutDepName = 'zzzzz_without';
     langs = langs[options.lang] || langs.ru;
     CUser.prototype.template = userTemplateHtml.replace('{{button}}', actionButtonHtml);
@@ -325,7 +332,7 @@ var __slice = [].slice,
     animOptHide[panelPos] = '-281px';
     panelEl.hide();
     $("body").append(panelEl);
-    list = new List(oktell, panelEl, actionListEl, afterOktellConnect, getOptions().debug);
+    list = new List(oktell, panelEl, actionListEl, afterOktellConnect, getOptions().useNotifies, getOptions().debug);
     if (getOptions().debug) {
       window.wList = list;
       window.wPopup = popup;

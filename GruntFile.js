@@ -112,7 +112,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-compress');
-  grunt.registerTask('build', ['clean:buildlast', 'createbuildfolder', 'insertfilesasvars', 'includecoffee', 'coffee', 'uglify', 'cssmin', 'copy:css', 'addVersion', 'compress', 'copy:main', 'clean:temp']);
+  grunt.registerTask('build', ['clean:buildlast', 'createbuildfolder', 'insertfilesasvars', 'includecoffee', 'coffee', 'uglify', 'cssmin', 'copy:css', 'addVersion', 'compress', 'clean:temp']);
   grunt.registerTask('default', ['build']);
   grunt.registerMultiTask('addVersion', 'Add version to file names and to file content', function() {
     var config, content, fName, file, fileExt, files, path, pos, _i, _len, _results;
