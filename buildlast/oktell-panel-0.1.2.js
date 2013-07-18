@@ -1252,7 +1252,7 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
       $(window).bind('resize', function() {
         return debouncedSetHeight();
       });
-      this.hidePanel();
+      this.hidePanel(true);
       oktell.on('disconnect', function() {
         var phone, user, _ref, _results;
 
@@ -1498,43 +1498,62 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
       });
     };
 
-    List.prototype.showPanel = function() {
+    List.prototype.showPanel = function(notAnimate) {
       var w,
         _this = this;
 
-      w = this.panelEl.width() || this.panelEl.data('width');
-      if (w > 0) {
+      w = this.panelEl.data('width');
+      if (w > 0 && this.panelEl.data('hided')) {
         this.log('show panel');
+        this.log('Set width showpanel ' + w);
         this.panelEl.data('width', w);
+        this.panelEl.data('hided', false);
         this.panelEl.css({
           display: ''
         });
-        return this.panelEl.animate({
-          width: w + 'px'
-        }, 200, function() {
-          return _this.panelEl.css({
-            overflow: ''
+        if (!notAnimate) {
+          return this.panelEl.css({
+            overflow: '',
+            width: w + 'px'
           });
-        });
+        } else {
+          return this.panelEl.animate({
+            width: w + 'px'
+          }, 200, function() {
+            return _this.panelEl.css({
+              overflow: ''
+            });
+          });
+        }
       }
     };
 
-    List.prototype.hidePanel = function() {
+    List.prototype.hidePanel = function(notAnimate) {
       var w,
         _this = this;
 
-      w = this.panelEl.width();
-      if (w > 0) {
+      w = this.panelEl.data('width') != null ? this.panelEl.data('width') : this.panelEl.width();
+      if (w > 0 && !this.panelEl.data('hided')) {
         this.log('hide panel');
+        this.log('Set width hidepanel ' + w);
         this.panelEl.data('width', w);
-        return this.panelEl.animate({
-          width: '0px'
-        }, 200, function() {
-          return _this.panelEl.css({
+        this.panelEl.data('hided', true);
+        if (notAnimate) {
+          return this.panelEl.css({
             display: '',
-            overflow: 'hidden'
+            overflow: 'hidden',
+            width: '0px'
           });
-        });
+        } else {
+          return this.panelEl.animate({
+            width: '0px'
+          }, 200, function() {
+            return _this.panelEl.css({
+              display: '',
+              overflow: 'hidden'
+            });
+          });
+        }
       }
     };
 

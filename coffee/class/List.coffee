@@ -218,7 +218,7 @@ class List
 			debouncedSetHeight()
 
 		#if @options.
-		@hidePanel()
+		@hidePanel(true)
 
 		oktell.on 'disconnect', =>
 
@@ -431,22 +431,32 @@ class List
 			@dropdownOpenedOnPanel = false
 
 
-	showPanel: ->
-		w = @panelEl.width() or @panelEl.data('width')
-		if w > 0
+	showPanel: (notAnimate)->
+		w = @panelEl.data('width')
+		if w > 0 and @panelEl.data('hided')
 			@log 'show panel'
+			@log 'Set width showpanel ' + w
 			@panelEl.data('width', w)
+			@panelEl.data('hided', false)
 			@panelEl.css {display: ''}
-			@panelEl.animate {width: w+'px'}, 200, =>
-				@panelEl.css { overflow: '' }
+			if not notAnimate
+				@panelEl.css { overflow: '', width: w+'px' }
+			else
+				@panelEl.animate {width: w+'px'}, 200, =>
+					@panelEl.css { overflow: '' }
 
-	hidePanel: ->
-		w = @panelEl.width()
-		if w > 0
+	hidePanel: (notAnimate)->
+		w = if @panelEl.data('width')? then @panelEl.data('width') else @panelEl.width()
+		if w > 0 and not @panelEl.data('hided')
 			@log 'hide panel'
+			@log 'Set width hidepanel ' + w
 			@panelEl.data('width', w)
-			@panelEl.animate {width: '0px'}, 200, =>
-				@panelEl.css {display: '', overflow: 'hidden'}
+			@panelEl.data('hided', true)
+			if notAnimate
+				@panelEl.css {display: '', overflow: 'hidden', width: '0px'}
+			else
+				@panelEl.animate {width: '0px'}, 200, =>
+					@panelEl.css {display: '', overflow: 'hidden'}
 
 
 
