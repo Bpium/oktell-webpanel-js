@@ -18,7 +18,10 @@ var __slice = [].slice,
     lang: 'ru',
     noavatar: true,
     hideOnDisconnect: true,
-    useNotifies: false
+    useNotifies: false,
+    withoutPermissionsPopup: false,
+    withoutCallPopup: false,
+    withoutError: false
   };
   langs = {
     ru: {

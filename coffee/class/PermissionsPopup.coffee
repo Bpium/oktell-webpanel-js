@@ -11,7 +11,7 @@ class PermissionsPopup
 				@hide()
 
 			oktellVoice.on 'mediaPermissionsRefuse', =>
-				oktell.endCall();
+				oktell?.endCall();
 				@hide()
 
 

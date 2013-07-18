@@ -2081,7 +2081,9 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
           return _this.hide();
         });
         oktellVoice.on('mediaPermissionsRefuse', function() {
-          oktell.endCall();
+          if (typeof oktell !== "undefined" && oktell !== null) {
+            oktell.endCall();
+          }
           return _this.hide();
         });
       }
@@ -2168,7 +2170,10 @@ var __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; 
     lang: 'ru',
     noavatar: true,
     hideOnDisconnect: true,
-    useNotifies: false
+    useNotifies: false,
+    withoutPermissionsPopup: false,
+    withoutCallPopup: false,
+    withoutError: false
   };
   langs = {
     ru: {

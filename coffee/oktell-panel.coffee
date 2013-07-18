@@ -24,6 +24,9 @@ do ($)->
 		noavatar: true
 		hideOnDisconnect: true
 		useNotifies: false
+		withoutPermissionsPopup: false
+		withoutCallPopup: false
+		withoutError: false
 
 	langs = {
 		ru:
