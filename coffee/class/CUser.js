@@ -68,6 +68,7 @@ CUser = (function() {
     name1: /\{\{name1\}\}/,
     name2: /\{\{name2\}\}/,
     number: /\{\{number\}\}/,
+    dtmf: /\{\{dtmf\}\}/,
     avatarLink32x32: /\{\{avatarLink32x32\}\}/,
     css: /\{\{css\}\}/,
     letter: /\{\{letter\}\}/
@@ -141,7 +142,7 @@ CUser = (function() {
     var $el, str;
 
     if (!this.el || createIndependent) {
-      str = this.template.replace(this.regexps.name1, this.nameHtml1).replace(this.regexps.name2, this.nameHtml2).replace(this.regexps.number, this.numberHtml).replace(this.regexps.avatarLink32x32, this.avatarLink32x32).replace(this.regexps.css, this.defaultAvatarCss);
+      str = this.template.replace(this.regexps.name1, this.nameHtml1).replace(this.regexps.name2, this.nameHtml2).replace(this.regexps.number, this.numberHtml).replace(this.regexps.dtmf, this.langs.panel.dtmf).replace(this.regexps.avatarLink32x32, this.avatarLink32x32).replace(this.regexps.css, this.defaultAvatarCss);
       $el = $(str);
       $el.data('user', this);
       this.initButtonEl($el.find('.oktell_button_action'));
@@ -152,6 +153,7 @@ CUser = (function() {
         this.elName = this.el.find('.b_contact_name b');
         this.elName2 = this.el.find('.b_contact_name span');
         this.elNumber = this.el.find('.o_number');
+        this.elDtmf = this.el.find('.o_dtmf');
       }
     }
     $el = $el || this.el;

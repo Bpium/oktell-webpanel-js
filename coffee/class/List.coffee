@@ -61,6 +61,7 @@ class List
 		CUser.prototype.oktell = oktell
 		@filter = false
 		@panelEl = panelEl
+		@dtmfEl = @panelEl.find('.i_extension')
 		@dropdownEl = dropdownEl
 		@dropdownElLiTemplate = @dropdownEl.html()
 		@dropdownEl.empty()
@@ -95,7 +96,10 @@ class List
 				showDeps: not @showDeps
 			@setFilter @filter, true
 
-
+		@dtmfEl.find('.o_close').bind 'click', =>
+			@hideDtmf()
+		@dtmfEl.find('.btn-small').bind 'click', (e)=>
+			@sendDtmf $(e.target).text()
 
 		@usersWithBeforeConnectButtons = []
 
@@ -166,6 +170,10 @@ class List
 			if target.is('.b_department_header') or target.parents('.b_department_header').size() > 0
 				target.parents('.b_department').data('department')?.showUsers?()
 				@setUserListHeight()
+				return false
+
+			if target.is('.o_dtmf')
+				@showDtmf()
 				return false
 
 			if target.is('.oktell_button_action .g_first')
@@ -240,6 +248,12 @@ class List
 
 		#if @options.
 		@hidePanel(true)
+
+		oktell.on 'webphoneConnect', =>
+			@panelEl.addClass 'webphone'
+		oktell.on 'webphoneDisconnect', =>
+			@panelEl.removeClass 'webphone'
+
 
 		oktell.on 'disconnect', =>
 
@@ -375,6 +389,11 @@ class List
 		oktell.on 'stateChange', ( newState, oldState ) =>
 			if @oktellConnected
 				@reloadActions()
+				if newState is 'talk'
+					@panelEl.addClass 'talking'
+				else
+					@hideDtmf()
+					@panelEl.removeClass 'talking'
 		oktell.on 'queueChange', (queue) =>
 			if @oktellConnected
 				@setQueue queue
@@ -391,6 +410,27 @@ class List
 		oktell.on 'ringStop', =>
 			ringNotify?.close?()
 			ringNotify = null
+
+	sendDtmf: (code)->
+		@oktell.dtmf code.toString().replace('∗', '*')
+
+	showDtmf: (dontAnimate) ->
+		if @oktell.getState() is 'talk' and @panelEl.hasClass('webphone') and not @panelEl.hasClass('dtmf')
+			@panelEl.addClass('dtmf')
+			@dtmfEl.stop(true,true)
+			if dontAnimate
+				@dtmfEl.show()
+			else
+				@dtmfEl.slideDown 200, =>
+
+	hideDtmf: (dontAnimate)->
+		if @panelEl.hasClass('dtmf')
+			@panelEl.removeClass('dtmf')
+			@dtmfEl.stop(true,true)
+			if dontAnimate
+				@dtmfEl.hide()
+			else
+				@dtmfEl.slideUp 200, =>
 
 
 	onPbxNumberStateChange: (data) =>

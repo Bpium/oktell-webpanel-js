@@ -62,6 +62,7 @@ class CUser
 		name1: /\{\{name1\}\}/
 		name2: /\{\{name2\}\}/
 		number: /\{\{number\}\}/
+		dtmf: /\{\{dtmf\}\}/
 		avatarLink32x32: /\{\{avatarLink32x32\}\}/
 		css: /\{\{css\}\}/
 		letter: /\{\{letter\}\}/
@@ -119,6 +120,7 @@ class CUser
 			str = @template.replace( @regexps.name1, @nameHtml1)
 				.replace( @regexps.name2, @nameHtml2 )
 				.replace( @regexps.number, @numberHtml )
+				.replace( @regexps.dtmf, @langs.panel.dtmf )
 				.replace( @regexps.avatarLink32x32, @avatarLink32x32)
 				.replace( @regexps.css, @defaultAvatarCss )
 			$el = $(str)
@@ -131,6 +133,7 @@ class CUser
 				@elName = @el.find('.b_contact_name b')
 				@elName2 = @el.find('.b_contact_name span')
 				@elNumber = @el.find('.o_number')
+				@elDtmf = @el.find('.o_dtmf')
 		$el = $el or @el
 		return $el
 

@@ -106,6 +106,7 @@ List = (function() {
     CUser.prototype.oktell = oktell;
     this.filter = false;
     this.panelEl = panelEl;
+    this.dtmfEl = this.panelEl.find('.i_extension');
     this.dropdownEl = dropdownEl;
     this.dropdownElLiTemplate = this.dropdownEl.html();
     this.dropdownEl.empty();
@@ -139,6 +140,12 @@ List = (function() {
         showDeps: !_this.showDeps
       });
       return _this.setFilter(_this.filter, true);
+    });
+    this.dtmfEl.find('.o_close').bind('click', function() {
+      return _this.hideDtmf();
+    });
+    this.dtmfEl.find('.btn-small').bind('click', function(e) {
+      return _this.sendDtmf($(e.target).text());
     });
     this.usersWithBeforeConnectButtons = [];
     this.config();
@@ -210,6 +217,10 @@ List = (function() {
           }
         }
         _this.setUserListHeight();
+        return false;
+      }
+      if (target.is('.o_dtmf')) {
+        _this.showDtmf();
         return false;
       }
       if (target.is('.oktell_button_action .g_first')) {
@@ -291,6 +302,12 @@ List = (function() {
       return debouncedSetHeight();
     });
     this.hidePanel(true);
+    oktell.on('webphoneConnect', function() {
+      return _this.panelEl.addClass('webphone');
+    });
+    oktell.on('webphoneDisconnect', function() {
+      return _this.panelEl.removeClass('webphone');
+    });
     oktell.on('disconnect', function() {
       var phone, user, _ref, _results;
 
@@ -438,7 +455,13 @@ List = (function() {
     });
     oktell.on('stateChange', function(newState, oldState) {
       if (_this.oktellConnected) {
-        return _this.reloadActions();
+        _this.reloadActions();
+        if (newState === 'talk') {
+          return _this.panelEl.addClass('talking');
+        } else {
+          _this.hideDtmf();
+          return _this.panelEl.removeClass('talking');
+        }
       }
     });
     oktell.on('queueChange', function(queue) {
@@ -466,6 +489,38 @@ List = (function() {
       return ringNotify = null;
     });
   }
+
+  List.prototype.sendDtmf = function(code) {
+    return this.oktell.dtmf(code.toString().replace('∗', '*'));
+  };
+
+  List.prototype.showDtmf = function(dontAnimate) {
+    var _this = this;
+
+    if (this.oktell.getState() === 'talk' && this.panelEl.hasClass('webphone') && !this.panelEl.hasClass('dtmf')) {
+      this.panelEl.addClass('dtmf');
+      this.dtmfEl.stop(true, true);
+      if (dontAnimate) {
+        return this.dtmfEl.show();
+      } else {
+        return this.dtmfEl.slideDown(200, function() {});
+      }
+    }
+  };
+
+  List.prototype.hideDtmf = function(dontAnimate) {
+    var _this = this;
+
+    if (this.panelEl.hasClass('dtmf')) {
+      this.panelEl.removeClass('dtmf');
+      this.dtmfEl.stop(true, true);
+      if (dontAnimate) {
+        return this.dtmfEl.hide();
+      } else {
+        return this.dtmfEl.slideUp(200, function() {});
+      }
+    }
+  };
 
   List.prototype.onPbxNumberStateChange = function(data) {
     var dep, index, n, numStr, user, userNowIsFiltered, wasFiltered, _i, _len, _ref, _ref1, _ref2, _ref3, _ref4, _ref5, _results;

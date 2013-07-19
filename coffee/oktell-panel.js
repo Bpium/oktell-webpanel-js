@@ -26,6 +26,7 @@ var __slice = [].slice,
   langs = {
     ru: {
       panel: {
+        dtmf: 'донабор',
         inTalk: 'В разговоре',
         onHold: 'На удержании',
         queue: 'Очередь ожидания',
@@ -79,6 +80,7 @@ var __slice = [].slice,
     },
     en: {
       panel: {
+        dtfm: 'ext',
         inTalk: 'In conversation',
         onHold: 'On hold',
         queue: 'Wait queue',
@@ -132,6 +134,7 @@ var __slice = [].slice,
     },
     cz: {
       panel: {
+        dtmf: 'ext',
         inTalk: 'V rozhovoru',
         onHold: 'Na hold',
         queue: 'Fronta čekaní',
