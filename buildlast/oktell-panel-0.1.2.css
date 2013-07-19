@@ -1414,3 +1414,80 @@
 .oktell_panel .btn-group > .btn.active {
   z-index: 2;
 }
+
+/*
+ * CSS Styles that are needed by jScrollPane for it to operate correctly.
+ *
+ * Include this stylesheet in your site or copy and paste the styles below into your stylesheet - jScrollPane
+ * may not operate correctly without them.
+ */
+
+.oktell_panel .jspContainer
+{
+	overflow: hidden;
+	position: relative;
+}
+
+.oktell_panel .jspPane
+{
+	position: absolute;
+}
+
+.jspVerticalBar
+{
+	position: absolute;
+	top: 0;
+	right: 0;
+	width: 13px;
+	height: 100%;
+	background: transparent;
+}
+
+.oktell_panel .jspVerticalBar *
+{
+	margin: 0;
+	padding: 0;
+}
+
+.oktell_panel .jspCap
+{
+	display: none;
+}
+
+.oktell_panel .jspTrack
+{
+	background: transparent;
+	position: relative;
+}
+
+.oktell_panel .jspDrag
+{
+	background: transparent;
+	position: relative;
+    top: 0;
+	left: 0;
+    cursor: pointer;
+}
+
+.oktell_panel .jspDragInner {
+    position: relative;
+    border-radius: 3px;
+    background: black;
+    opacity: 0.4;
+    width: 5px;
+    margin: 0 auto;
+    height: 100%;
+}
+
+.oktell_panel .jspCorner
+{
+	background: #eeeef4;
+	float: left;
+	height: 100%;
+}
+
+/* Yuk! CSS Hack for IE6 3 pixel bug :( */
+* html .oktell_panel .jspCorner
+{
+	margin: 0 -3px 0 0;
+}

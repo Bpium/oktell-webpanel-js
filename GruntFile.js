@@ -13,15 +13,15 @@ module.exports = function(grunt) {
     insertfilesasvars: {
       htmlminTaskName: 'templates',
       target: 'coffee/oktell-panel.coffee',
-      dest: 'buildlast/oktell-panel-cf.coffee',
+      dest: 'temp/oktell-panel-cf.coffee',
       regexFind: /loadTemplate(?:\s*\(\s*|\s+)[\"\'](.+?)[\"\']\s*\)*/,
       find: 'templates = {}',
       replace: 'templates = '
     },
     includecoffee: {
       main: {
-        target: 'buildlast/oktell-panel-cf.coffee',
-        dest: 'buildlast/oktell-panel-cf.coffee',
+        target: 'temp/oktell-panel-cf.coffee',
+        dest: 'temp/oktell-panel-cf.coffee',
         regexp: /\#includecoffee\s+(.+?)[ \r\n]+/
       }
     },
@@ -40,14 +40,14 @@ module.exports = function(grunt) {
           bare: true
         },
         files: {
-          'buildlast/oktell-panel.js': 'buildlast/oktell-panel-cf.coffee'
+          'buildlast/oktell-panel.js': 'temp/oktell-panel-cf.coffee'
         }
       }
     },
     cssmin: {
       css: {
         files: {
-          'buildlast/oktell-panel.min.css': 'css/oktell-panel.css'
+          'buildlast/oktell-panel.min.css': ['buildlast/oktell-panel.css']
         }
       }
     },
@@ -69,7 +69,7 @@ module.exports = function(grunt) {
     uglify: {
       main: {
         files: {
-          'buildlast/oktell-panel.min.js': 'buildlast/oktell-panel.js'
+          'buildlast/oktell-panel.min.js': ['buildlast/oktell-panel.js']
         }
       }
     },
@@ -94,6 +94,23 @@ module.exports = function(grunt) {
             flatten: true
           }
         ]
+      },
+      jsfiles: {
+        options: {
+          archive: 'buildlast/oktell-panel.js-' + grunt.file.read('version.json') + '.zip',
+          mode: 'zip',
+          pretty: true
+        },
+        files: [
+          {
+            cwd: 'buildlast/',
+            src: '*',
+            dest: '',
+            expand: true,
+            filter: 'isFile',
+            flatten: true
+          }
+        ]
       }
     },
     addVersion: {
@@ -103,6 +120,18 @@ module.exports = function(grunt) {
         replace: '$1-' + grunt.file.read('version.json') + '$2',
         comment: 'Oktell-panel.js ' + grunt.file.read('version.json') + " http://js.oktell.ru/webpanel"
       }
+    },
+    concat: {
+      js: {
+        files: {
+          'buildlast/oktell-panel.js': ['js/jquery.mousewheel.js', 'js/mwheelIntent.js', 'js/jquery.jscrollpane.js', 'buildlast/oktell-panel.js']
+        }
+      },
+      css: {
+        files: {
+          'buildlast/oktell-panel.css': ['css/oktell-panel.css', 'css/jquery.jscrollpane.css']
+        }
+      }
     }
   });
   grunt.loadNpmTasks('grunt-contrib-htmlmin');
@@ -111,8 +140,9 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-clean');
+  grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-compress');
-  grunt.registerTask('build', ['clean:buildlast', 'insertfilesasvars', 'includecoffee', 'coffee', 'uglify', 'cssmin', 'copy:css', 'addVersion', 'compress', 'clean:temp']);
+  grunt.registerTask('build', ['clean:buildlast', 'insertfilesasvars', 'includecoffee', 'coffee', 'concat:js', 'uglify', 'concat:css', 'cssmin', 'addVersion', 'compress', 'clean:temp']);
   grunt.registerTask('default', ['build']);
   grunt.registerMultiTask('addVersion', 'Add version to file names and to file content', function() {
     var config, content, fName, file, fileExt, files, path, pos, _i, _len, _results;

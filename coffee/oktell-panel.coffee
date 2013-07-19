@@ -4,7 +4,6 @@ do ($)->
 
 	#includecoffee coffee/utils.coffee
 	#includecoffee coffee/class/Notify.coffee
-	#in1cludecoffee coffee/jScroll.coffee
 	#includecoffee coffee/class/Department.coffee
 	#includecoffee coffee/class/CUser.coffee
 	#includecoffee coffee/class/List.coffee

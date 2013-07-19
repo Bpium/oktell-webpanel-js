@@ -6,7 +6,7 @@ class List
 			showDeps: true
 			showOffline: false
 
-		@jScrollPaneParams = { mouseWheelSpeed: 50, hideFocus: true, enableKeyboardNavigation: false, verticalGutter: -13 }
+		@jScrollPaneParams = { mouseWheelSpeed: 50, hideFocus: true, verticalGutter: -13 }
 
 		@allActions =
 			answer: { icon: '/img/icons/action/call.png', iconWhite: '/img/icons/action/white/call.png', text: @langs.actions.answer }
@@ -113,7 +113,7 @@ class List
 		@exactMatchUserDep.template = @usersTableTemplate
 
 		@initJScrollPane = =>
-			@usersListBlockEl.jScrollPane @jScrollPaneParams
+			@usersListBlockEl.oktellPanelJScrollPane @jScrollPaneParams
 			@jScrollPaneAPI = @usersListBlockEl.data 'jsp'
 			@scrollContainer = @usersListBlockEl.find '.jspContainer'
 			@scrollContent = @usersListBlockEl.find '.jspPane'
@@ -236,9 +236,6 @@ class List
 			@setUserListHeight()
 		, 150
 		$(window).bind 'resize', ->
-			debouncedSetHeight()
-
-		$(window).bind 'orientationchange', ->
 			debouncedSetHeight()
 
 		#if @options.

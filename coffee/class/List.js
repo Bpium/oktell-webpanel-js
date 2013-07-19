@@ -20,7 +20,6 @@ List = (function() {
     this.jScrollPaneParams = {
       mouseWheelSpeed: 50,
       hideFocus: true,
-      enableKeyboardNavigation: false,
       verticalGutter: -13
     };
     this.allActions = {
@@ -154,7 +153,7 @@ List = (function() {
     this.exactMatchUserDep = new Department('exact_match_user_dep', 'exactUser');
     this.exactMatchUserDep.template = this.usersTableTemplate;
     this.initJScrollPane = function() {
-      _this.usersListBlockEl.jScrollPane(_this.jScrollPaneParams);
+      _this.usersListBlockEl.oktellPanelJScrollPane(_this.jScrollPaneParams);
       _this.jScrollPaneAPI = _this.usersListBlockEl.data('jsp');
       _this.scrollContainer = _this.usersListBlockEl.find('.jspContainer');
       return _this.scrollContent = _this.usersListBlockEl.find('.jspPane');
@@ -289,9 +288,6 @@ List = (function() {
       return _this.setUserListHeight();
     }, 150);
     $(window).bind('resize', function() {
-      return debouncedSetHeight();
-    });
-    $(window).bind('orientationchange', function() {
       return debouncedSetHeight();
     });
     this.hidePanel(true);
