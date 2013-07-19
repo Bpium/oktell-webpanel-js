@@ -3,6 +3,7 @@ do ($)->
 		throw new Error('Error init oktell panel, jQuery ( $ ) is not defined')
 
 	#includecoffee coffee/utils.coffee
+	#includecoffee coffee/class/Notify.coffee
 	#in1cludecoffee coffee/jScroll.coffee
 	#includecoffee coffee/class/Department.coffee
 	#includecoffee coffee/class/CUser.coffee
@@ -22,11 +23,15 @@ do ($)->
 		lang: 'ru'
 		noavatar: true
 		hideOnDisconnect: true
+		useNotifies: false
+		withoutPermissionsPopup: false
+		withoutCallPopup: false
+		withoutError: false
 
 	langs = {
 		ru:
 			panel: { inTalk: 'В разговоре', onHold: 'На удержании', queue: 'Очередь ожидания', inputPlaceholder: 'введите имя или номер', withoutDepartment: 'без отдела', showDepartments: 'Группировать по отделам', showDepartmentsClicked: 'Показать общим списком', showOnlineOnly: 'Показать только online', showOnlineOnlyCLicked: 'Показать всех' },
-			actions: { call: 'Позвонить', conference: 'Конференция', transfer: 'Перевести', toggle: 'Переключиться', intercom: 'Интерком', endCall: 'Завершить', ghostListen: 'Прослушка', ghostHelp: 'Помощь', hold: 'Удержание', resume: 'Продолжить' }
+			actions: { answer: 'Ответить', call: 'Позвонить', conference: 'Конференция', transfer: 'Перевести', toggle: 'Переключиться', intercom: 'Интерком', endCall: 'Завершить', ghostListen: 'Прослушка', ghostHelp: 'Помощь', hold: 'Удержание', resume: 'Продолжить' }
 			callPopup: { title: 'Входящий вызов', hide: 'Скрыть', answer: 'Ответить', reject: 'Отклонить', undefinedNumber: 'Номер не определен', goPickup: 'Поднимите трубку' }
 			permissionsPopup: { header: 'Запрос на доступ к микрофону', text: 'Для использования веб-телефона необходимо разрешить браузеру доступ к микрофону.' }
 			error:
@@ -36,7 +41,7 @@ do ($)->
 				#tryAgain: 'Повторить попытку'
 		en:
 			panel: { inTalk: 'In conversation', onHold: 'On hold', queue: 'Wait queue', inputPlaceholder: 'Enter name or number', withoutDepartment: 'Without department', showDepartments: 'Show departments', showDepartmentsClicked: 'Hide departments', showOnlineOnly: 'Show online only', showOnlineOnlyCLicked: 'Show all' },
-			actions: { call: 'Dial', conference: 'Conference', transfer: 'Transfer', toggle: 'Switch', intercom: 'Intercom', endCall: 'End', ghostListen: 'Audition', ghostHelp: 'Help', hold: 'Hold', resume: 'Resume' }
+			actions: { answer: 'Answer', call: 'Dial', conference: 'Conference', transfer: 'Transfer', toggle: 'Switch', intercom: 'Intercom', endCall: 'End', ghostListen: 'Audition', ghostHelp: 'Help', hold: 'Hold', resume: 'Resume' }
 			callPopup: { title: 'Incoming call', hide: 'Hide', answer: 'Answer', reject: 'Decline', undefinedNumber: 'Phone number is not defined', goPickup: 'Pick up the phone' }
 			permissionsPopup: { header: 'Request for access to the microphone', text: 'To use the web-phone you need to allow browser access to the microphone.' }
 			error:
@@ -46,7 +51,7 @@ do ($)->
 				#tryAgain: 'Try again'
 		cz:
 			panel: { inTalk: 'V rozhovoru', onHold: 'Na hold', queue: 'Fronta čekaní', inputPlaceholder: 'zadejte jméno nebo číslo', withoutDepartment: 'Bez oddělení', showDepartments: 'Zobrazit oddělení', showDepartmentsClicked: 'Skrýt oddělení', showOnlineOnly: 'Zobrazit pouze online', showOnlineOnlyCLicked: 'Zobrazit všechny' },
-			actions: { call: 'Zavolat', conference: 'Konference', transfer: 'Převést', toggle: 'Přepnout', intercom: 'Intercom', endCall: 'Ukončit', ghostListen: 'Odposlech', ghostHelp: 'Nápověda', hold: 'Udržet', resume: 'Pokračovat' }
+			actions: { answer: 'Odpověď', call: 'Zavolat', conference: 'Konference', transfer: 'Převést', toggle: 'Přepnout', intercom: 'Intercom', endCall: 'Ukončit', ghostListen: 'Odposlech', ghostHelp: 'Nápověda', hold: 'Udržet', resume: 'Pokračovat' }
 			callPopup: { title: 'Příchozí hovor', hide: 'Schovat', answer: 'Odpovědět', reject: 'Odmítnout', undefinedNumber: '', goPickup: 'Zvedněte sluchátko' }
 			permissionsPopup: { header: 'Žádost o přístup k mikrofonu', text: 'Abyste mohli používat telefon, musíte povolit prohlížeče přístup k mikrofonu.' }
 			error:
@@ -142,9 +147,13 @@ do ($)->
 	hasTouch = 'ontouchstart' in window and not isTouchPad
 
 	initPanel = (opts)->
+
 		panelWasInitialized = true
 
 		options = $.extend defaultOptions, opts or {}
+
+		if getOptions().useNotifies and window.webkitNotifications and window.webkitNotifications.checkPermission() is 1
+			webkitNotifications.requestPermission =>
 
 		Department.prototype.withoutDepName = List.prototype.withoutDepName = 'zzzzz_without'
 		langs = langs[options.lang] or langs.ru
@@ -207,7 +216,7 @@ do ($)->
 		panelEl.hide()
 		$("body").append(panelEl)
 
-		list = new List oktell, panelEl, actionListEl, afterOktellConnect, getOptions().debug
+		list = new List oktell, panelEl, actionListEl, afterOktellConnect, getOptions(), getOptions().debug
 		if getOptions().debug
 			window.wList = list
 			window.wPopup = popup
@@ -252,7 +261,7 @@ do ($)->
 			true
 
 		touchClickedContact = null
-		touchClickedCss = 'touch_clicked'
+		touchClickedCss = 'm_touch_clicked'
 		touchClickedContactClear = =>
 			touchClickedContact?.removeClass touchClickedCss
 			touchClickedContact = null

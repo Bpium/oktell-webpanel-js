@@ -14,7 +14,9 @@ PermissionsPopup = (function() {
         return _this.hide();
       });
       oktellVoice.on('mediaPermissionsRefuse', function() {
-        oktell.endCall();
+        if (typeof oktell !== "undefined" && oktell !== null) {
+          oktell.endCall();
+        }
         return _this.hide();
       });
     }

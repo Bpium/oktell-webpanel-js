@@ -10,7 +10,7 @@ CUser = (function() {
     this.hasHover = false;
     this.buttonLastAction = '';
     this.firstLiCssPrefix = 'm_button_action_';
-    this.noneActionCss = this.firstLiCssPrefix + 'none';
+    this.noneActionCss = '';
     this.els = $();
     this.buttonEls = $();
     this.init(data);
@@ -190,7 +190,7 @@ CUser = (function() {
     if (this.buttonLastAction) {
       return $el.removeClass(this.noneActionCss).addClass(this.firstLiCssPrefix + this.buttonLastAction.toLowerCase());
     } else {
-      return $el.addClass(this.firstLiCssPrefix + 'none');
+      return $el.addClass(this.noneActionCss);
     }
   };
 
@@ -235,13 +235,13 @@ CUser = (function() {
       this.buttonEls.removeClass(this.noneActionCss).addClass(this.firstLiCssPrefix + this.buttonLastAction.toLowerCase());
     } else {
       this.buttonLastAction = '';
-      this.buttonEls.addClass(this.firstLiCssPrefix + 'none');
+      this.buttonEls.addClass(this.noneActionCss);
     }
     return actions;
   };
 
   CUser.prototype.doAction = function(action) {
-    var target, _base, _base1;
+    var target, _base, _base1, _base2;
 
     if (!action) {
       return;
@@ -273,6 +273,8 @@ CUser = (function() {
         return typeof (_base = this.oktell).hold === "function" ? _base.hold() : void 0;
       case 'resume':
         return typeof (_base1 = this.oktell).resume === "function" ? _base1.resume() : void 0;
+      case 'answer':
+        return typeof (_base2 = this.oktell).answer === "function" ? _base2.answer() : void 0;
     }
   };
 

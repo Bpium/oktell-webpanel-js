@@ -14,13 +14,14 @@ class Department
 #		@log 'get el, usersVisible - ' + usersVisible + ' , for department ' + @getInfo()
 		if not @el
 			@el = $(@template.replace /\{\{department}\}/g, escapeHtml(@name))
-			@el.find('.b_department_header').bind 'click', =>
-				@showUsers()
+#			@el.find('.b_department_header').bind 'click', =>
+#				@showUsers()
 		if usersVisible
 			@_oldIsOpen = @isOpen
 			@showUsers true, true
 		else
 			@showUsers if @_oldIsOpen? then @_oldIsOpen else @isOpen
+		@el.data 'department', @
 		@el
 	getContainer: ->
 		@el.find('tbody')

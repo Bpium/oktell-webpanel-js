@@ -74,336 +74,42 @@ do ($)->
 			r = Math.random()*16|0
 			v = if c is 'x' then r else (r&0x3|0x8)
 			v.toString(16)
-	#includecoffee coffee/jScroll.coffee
-	jScroll = ( $el )->
-		wrapper = ''
-		scroller = ''
-		scrollbar_cont = ''
-		scrollbar_inner = ''
-		scroller_left_while_scrolling = ''
-		move_by_bar = ''
-		pageY_end = ''
-		pageY_start = ''
-		pos = ''
-		pos_start = ''
-		scrolling = ''
-		params = {}
-	
-		scrollWheelPos = (e, wrapper, scroller, scrollbar_cont, scrollbar_inner) =>
-			#koef = get_koef(wrapper, scroller)
-			#deltaY = deltaScale = ''
-			e = e.originalEvent
-			wheelDeltaY = if e.detail then e.detail*(-14) else e.wheelDelta / 3
-			pos_start = get_position scroller
-			pageY_end = get_pageY e
-	
-			if pos_start >=0 and wheelDeltaY > 0 or (pos_start+wheelDeltaY) > 0
-				wheelDeltaY = 0
-				pos_start = 0
-	
-			if (pos_start <= ( wrapper.height() - scroller.height() ) ) and wheelDeltaY < 0 or (pos_start+wheelDeltaY) < wrapper.height() - scroller.height()
-				pos_start = wrapper.height() - scroller.height()
-				wheelDeltaY = 0
-	
-			pos = pos_start + wheelDeltaY;
-			return pos
-	
-		scrollClick = ( e, wrapper, scroller, scrollbar_cont, scrollbar_inner ) =>
-			if e.type is START_EVENT
-				if params.noMoveMouse
-					return
-				pageY_start = get_pageY e
-				pos_start = get_position scroller
-				scrolling = true
-				#//document.title =  pos_start;
-	
-	
-				$('body').css
-					'-moz-user-select': 'none'
-					'-ms-user-select': 'none'
-					'-khtml-user-select': 'none'
-					'-webkit-user-select': 'none'
-					'-webkit-touch-callout': 'none'
-					'user-select': 'none'
-	
-			else if e.type is MOVE_EVENT
-				if not scrolling
-					return
-	
-				if isTouch
-					scroll_show scrollbar_inner
-	
-				koef_bar = get_koef wrapper, scroller
-				pageY_end = get_pageY e
-				if move_by_bar
-					pos = pos_start*koef_bar - (pageY_end - pageY_start)
-					pos = pos/koef_bar
-				else
-					pos = pos_start + (pageY_end - pageY_start)
-	
-	
-				#// near borders
-				if pos >= 0
-					pos_start = get_position scroller
-					pageY_start = pageY_end
-					pos = 0
-	
-				max_pos = wrapper.height() - scroller.height()
-				if pos <= max_pos
-					pos_start = get_position scroller
-					pageY_start = pageY_end
-					pos = max_pos
-	
-				scrollTo pos, wrapper, scroller, scrollbar_cont, scrollbar_inner
-				params.noMoveMouse = true
-	
-			else if e.type is END_EVENT
-				if not scrolling
-					return
-				scrolling = false
-				move_by_bar = false
-	
-				if isTouch
-					scroll_hide scrollbar_inner
-	
-				$('body').css
-					'-moz-user-select': ''
-					'-ms-user-select': ''
-					'-khtml-user-select': ''
-					'-webkit-user-select': ''
-					'-webkit-touch-callout': ''
-					'user-select': ''
-	
-				if scroller_left_while_scrolling
-					scroll_hide scrollbar_inner
-			else
+	#includecoffee coffee/class/Notify.coffee
+	class Notify
+		constructor: (title, autoHide = 0, message, group, onClick)->
+			if not ( typeof title is 'string' and title ) or window.webkitNotifications.checkPermission() isnt 0
 				return
 	
-		#		SetHeightFromTo = (objFrom, objTo) =>
-		#			if typeof objFrom is "object"
-		#				height = objFrom.height()
-		#			else if typeof objFrom is "number"
-		#				height = objFrom
-		#			objTo.css 'height', height + 'px'
+			if typeof message is 'function'
+				onClick = message
+				message = ''
+				group = null
+			else if typeof group is 'function'
+				onClick = group
+				group = null
 	
-		scrollTo = (posTop, wrapper, scroller, scrollbar_cont, scrollbar_inner) =>
-			scroll_show scrollbar_inner
-			set_position scroller, posTop
-			set_bar_bounds wrapper, scroller, scrollbar_cont, scrollbar_inner
+			notify = window.webkitNotifications.createNotification 'favicon.ico', title, message or ''
+			if group
+				notify.tag = group
+			notify.show()
+			autoHide = parseInt(autoHide)
+			if autoHide
+				setTimeout =>
+					notify.close()
+				, autoHide * 1000
+			notify.onclick = (e, args...) =>
+				window.focus?()
+				notify.close()
+				if typeof onClick is 'function'
+					onClick.apply window, []
 	
-		get_pageY = (e) =>
-			if isTouch then e.originalEvent.targetTouches[0].clientY else e.clientY
-	
-		set_position = ( object, pos ) =>
-			object.css
-				'position': 'relative',
-				'top': pos
-	
-		get_position = ( object ) =>
-			position = object.css 'top'
-			if position is 'auto'
-				position = 0
-	
-			parseInt position
-	
-		get_koef = ( wrapper, scroller ) =>
-			w_height = wrapper.height()
-			s_height = scroller.height()
-			koef = w_height/s_height
-			koef
-	
-		scroll_show = (scrollbar_inner) =>
-			scrollbar_inner.stop true, true
-			scrollbar_inner.fadeIn 100
-	
-		scroll_hide = (scrollbar_inner) =>
-			scrollbar_inner.stop true, true
-			scrollbar_inner.fadeOut "slow"
-	
-		set_bar_bounds = ( wrapper, scroller, scrollbar_cont, scrollbar_inner ) =>
-			c_height = scrollbar_cont.height()
-			koef = get_koef wrapper, scroller
-			inner_height = c_height*koef;
-			#/* hidden scroll if box size is bigger than content size */
-			if koef >= 1
-				visibility = 'hidden'
-			else
-				visibility = 'visible'
-	
-			scrollbar_inner.css
-				'height': inner_height,
-				'visibility': visibility
-	
-			scroller_position = get_position scroller
-			wrapper_height = wrapper.height()
-			scroller_height = scroller.height()
-	
-			if scroller_position <= 0 and scroller_position <= ( wrapper_height - scroller_height )
-				pos = wrapper_height - scroller_height
-				pos = Math.min pos, 0
-				set_position scroller, pos
-	
-			pos_koef = scroller_position / wrapper_height
-			pos = wrapper_height*pos_koef
-			set_position scrollbar_inner, pos*koef*-1
-			params?.onScroll?( { wrapper: wrapper, scroller: scroller, position: scroller_position, length: scroller_height } )
-	
-		scrolling = false
-		move_by_bar = false
-	
-		# Device sniffing
-		vendor = if (/webkit/i).test(navigator.appVersion)
-			'webkit'
-		else if (/firefox/i).test(navigator.userAgent)
-			'Moz'
-		else if 'opera' in window
-			'O'
-		else
-			''
-		#isIthing = (/iphone|ipad/gi).test(navigator.appVersion)
-		isTouch = typeof window['ontouchstart'] isnt 'undefined'
-		#has3d = window['WebKitCSSMatrix']? and (new window['WebKitCSSMatrix']() )['m11']?
-		# Event sniffing
-		START_EVENT = if isTouch then 'touchstart' else 'mousedown'
-		MOVE_EVENT = if isTouch then 'touchmove' else 'mousemove'
-		END_EVENT = if isTouch then 'touchend' else 'mouseup'
-		WHEEL_EV = if vendor == 'Moz' then 'DOMMouseScroll' else 'mousewheel'
+			@close = =>
+				notify?.close?()
 	
 	
-		if not isTouch and $('.jscroll_wrapper', $el).size()
-			return
-	
-		init = =>
-			# Create wrapper */
-			$el.wrapInner '<div class="jscroll_wrapper" />'
-			wrapper = $(".jscroll_wrapper", $el)
-			wrapper.attr "id", "jscroll_id" + Math.round(Math.random()*10000000)
-	
-			# Create scroller */
-			scroller = wrapper.wrapInner '<div class="jscroll_scroller" />'
-			scroller = $(".jscroll_scroller", wrapper)
-	
-			# Create scrollbar cont */
-			scrollbar_cont = $('<div class="jscroll_scrollbar_cont"></div>').insertAfter scroller
-			scrollbar_cont.css
-				'position': 'absolute'
-				'right': '0px'
-				'width': '13px'
-				'top': '3px'
-				'bottom': '6px'
-	
-			# Create scrollbar inner */
-			scrollbar_inner = $('<div class="jscroll_scrollbar_inner"></div>').appendTo scrollbar_cont
-			scrollbar_inner.css
-				'position': 'relative'
-				'width': '100%'
-				'display': 'none'
-				'opacity': '0.4'
-				'cursor': 'pointer'
-	
-			scrollbar_bar = $('<div class="jscroll_scrollbar_bar"></div>').appendTo scrollbar_inner
-			scrollbar_bar.css
-				'position': 'relative'
-				'background': 'black'
-				'width': '5px'
-				'margin': '0 auto'
-				'border-radius': '3px'
-				'height': '100%'
-				'-webkit-border-radius': '3px'
 	
 	
-			# set wrapper style*/
-			wrapper.css
-				"position": "relative"
-				"height": "100%"
-				"overflow": "hidden"
-	
-			# set scroller style*/
-			scroller.css
-				"min-height": "100%"
-				"overflow": "hidden"
-	
-	#		if isTouch
-	#
-	#			# Create scroller inner*/
-	#			scroller.after '<div class="jscroll_scroller_inner" />'
-	#			scroller_inner = $(".jscroll_scroller_inner", wrapper)
-	#			scroller_inner.appendTo '<div></div>'
-	#
-	#			if window.iScroll?
-	#				myScroll = new window.iScroll wrapper.attr("id") ,
-	#					hScrollbar: false
-	#					scrollbarClass: 'jscroll_scroller_inner'
-	#					checkDOMChanges: true
-	#					bounceLock: true
-	#					onScrollMove: =>
-	#						params.onScroll()
-	#						true
-	#					onScrollEnd: =>
-	#						params.onScroll()
-	#						true
-	#
-	#			return true
-	#
-	#		else
-			set_bar_bounds wrapper, scroller, scrollbar_cont, scrollbar_inner
-	
-		init()
-	
-		if isTouch
-			return
-	
-		# EVENTS */
-	
-		# resize container or change data
-		jscroll_timer = new Array
-		wrapper.bind 'resize', (e) =>
-			timer_id = wrapper.attr('id')
-			if typeof jscroll_timer[ timer_id ] isnt 'undefined'
-				clearTimeout( jscroll_timer[ timer_id ] )
-	
-			jscroll_timer[ timer_id ] = setTimeout =>
-				set_bar_bounds wrapper, scroller, scrollbar_cont, scrollbar_inner
-				delete jscroll_timer[ timer_id ]
-			, 100
-			return
-	
-		if not isTouch
-			wrapper.hover =>
-				scroller_left_while_scrolling = false
-				set_bar_bounds wrapper, scroller, scrollbar_cont, scrollbar_inner
-				scroll_show scrollbar_inner
-				return
-			, =>
-				scroller_left_while_scrolling = true
-				if scrolling
-					return
-				scroll_hide scrollbar_inner
-				return
-	
-		scrollbar_inner.bind START_EVENT, (e) =>
-			move_by_bar = true
-			params.noMoveMouse = false
-			return true
-	
-		wrapper.bind START_EVENT, (e) =>
-			scrollClick e, wrapper, scroller, scrollbar_cont, scrollbar_inner
-			return true
-	
-		$(document).bind MOVE_EVENT, (e) =>
-			scrollClick e, wrapper, scroller, scrollbar_cont, scrollbar_inner
-			return true
-	
-		$(document).bind END_EVENT, (e) =>
-			scrollClick e, wrapper, scroller, scrollbar_cont, scrollbar_inner
-			return true
-	
-		wrapper.on WHEEL_EV, (e) =>
-			wheelPos = scrollWheelPos e, wrapper, scroller, scrollbar_cont, scrollbar_inner
-			scrollTo wheelPos, wrapper, scroller, scrollbar_cont, scrollbar_inner
-			return false
-	
-	
+	#in1cludecoffee coffee/jScroll.coffee
 	#includecoffee coffee/class/Department.coffee
 	class Department
 		logGroup: 'Department'
@@ -421,13 +127,14 @@ do ($)->
 	#		@log 'get el, usersVisible - ' + usersVisible + ' , for department ' + @getInfo()
 			if not @el
 				@el = $(@template.replace /\{\{department}\}/g, escapeHtml(@name))
-				@el.find('.b_department_header').bind 'click', =>
-					@showUsers()
+	#			@el.find('.b_department_header').bind 'click', =>
+	#				@showUsers()
 			if usersVisible
 				@_oldIsOpen = @isOpen
 				@showUsers true, true
 			else
 				@showUsers if @_oldIsOpen? then @_oldIsOpen else @isOpen
+			@el.data 'department', @
 			@el
 		getContainer: ->
 			@el.find('tbody')
@@ -540,7 +247,7 @@ do ($)->
 			@hasHover = false
 			@buttonLastAction = ''
 			@firstLiCssPrefix = 'm_button_action_'
-			@noneActionCss = @firstLiCssPrefix + 'none'
+			@noneActionCss = '' #@firstLiCssPrefix + 'none'
 	
 			@els = $()
 			@buttonEls = $()
@@ -694,7 +401,7 @@ do ($)->
 			if @buttonLastAction
 				$el.removeClass(@noneActionCss).addClass @firstLiCssPrefix + @buttonLastAction.toLowerCase()
 			else
-				$el.addClass @firstLiCssPrefix + 'none'
+				$el.addClass @noneActionCss
 	
 		getButtonEl: () ->
 			$el = $(@buttonTemplate)
@@ -733,7 +440,7 @@ do ($)->
 	#				@separateButtonEls.show()
 			else
 				@buttonLastAction = ''
-				@buttonEls.addClass @firstLiCssPrefix + 'none'
+				@buttonEls.addClass @noneActionCss
 	#			@separateButtonEls.hide()
 			actions
 	
@@ -771,6 +478,8 @@ do ($)->
 					@oktell.hold?()
 				when 'resume'
 					@oktell.resume?()
+				when 'answer'
+					@oktell.answer?()
 	
 	
 		doLastFirstAction: ->
@@ -803,14 +512,16 @@ do ($)->
 	#includecoffee coffee/class/List.coffee
 	class List
 		logGroup: 'List'
-		constructor: (oktell, panelEl, dropdownEl, options, afterOktellConnect, debugMode) ->
-	
+		constructor: (oktell, panelEl, dropdownEl, afterOktellConnect, options, debugMode) ->
 			@defaultConfig =
 				departmentVisibility: {}
 				showDeps: true
 				showOffline: false
 	
+			@jScrollPaneParams = { mouseWheelSpeed: 50, hideFocus: true, enableKeyboardNavigation: false, verticalGutter: -13 }
+	
 			@allActions =
+				answer: { icon: '/img/icons/action/call.png', iconWhite: '/img/icons/action/white/call.png', text: @langs.actions.answer }
 				call: { icon: '/img/icons/action/call.png', iconWhite: '/img/icons/action/white/call.png', text: @langs.actions.call }
 				conference : { icon: '/img/icons/action/confinvite.png', iconWhite: '/img/icons/action/white/confinvite.png', text: @langs.actions.conference }
 				transfer : { icon: '/img/icons/action/transfer.png', text: @langs.actions.transfer }
@@ -868,9 +579,12 @@ do ($)->
 			@keypadEl = @panelEl.find '.j_phone_keypad'
 			@keypadIsVisible = false
 			@usersListBlockEl = @panelEl.find '.j_main_list'
+			@scrollContainer = ''
+			@scrollContent = ''
 			@usersListEl = @simpleListEl.find 'tbody'
 			@abonentsListBlock = @panelEl.find '.j_abonents'
 			@abonentsListEl = @abonentsListBlock.find 'tbody'
+			@abonentsHeaderTextEl = @abonentsListBlock.find 'b_marks_label'
 			@talkTimeEl = @abonentsListBlock.find '.b_marks_time'
 			@holdBlockEl = @panelEl.find '.j_hold'
 			@holdListEl = @holdBlockEl.find 'tbody'
@@ -910,12 +624,21 @@ do ($)->
 			@exactMatchUserDep = new Department 'exact_match_user_dep', 'exactUser'
 			@exactMatchUserDep.template = @usersTableTemplate
 	
+			@initJScrollPane = =>
+				@usersListBlockEl.jScrollPane @jScrollPaneParams
+				@jScrollPaneAPI = @usersListBlockEl.data 'jsp'
+				@scrollContainer = @usersListBlockEl.find '.jspContainer'
+				@scrollContent = @usersListBlockEl.find '.jspPane'
+	
+			@initJScrollPane()
+	
+			@reinitScroll = =>
+				@jScrollPaneAPI?.reinitialise()
+				#@usersListBlockEl.find('.jspPane').css 'width', parseInt(@usersListBlockEl.css('width') ) - 5 + 'px'
 	
 			@userScrollerToTop = =>
-				if not @_jScrolled
-					@jScroll @usersListBlockEl
-					@usersScroller = @usersListBlockEl.find('.jscroll_scroller')
-				@usersScroller.css({top:'0px'})
+				#@usersScroller.css({top:'0px'})
+				@jScrollPaneAPI.scrollToY 0
 	
 			@filterClearCross.bind 'click', =>
 				@clearFilter()
@@ -936,7 +659,7 @@ do ($)->
 				if e.keyCode is 13
 					@filterInput.blur()
 					setTimeout =>
-						@usersListBlockEl.find('tr:first').data('user')?.doLastFirstAction()
+						@scrollContent.find('tr:first').data('user')?.doLastFirstAction()
 						@clearFilter()
 					, 50
 				else
@@ -951,6 +674,12 @@ do ($)->
 	
 			@panelEl.bind 'click', (e)=>
 				target = $(e.target)
+	
+				if target.is('.b_department_header') or target.parents('.b_department_header').size() > 0
+					target.parents('.b_department').data('department')?.showUsers?()
+					@setUserListHeight()
+					return false
+	
 				if target.is('.oktell_button_action .g_first')
 					actionButton = target.parent()
 				else if target.is('.oktell_button_action .g_first i')
@@ -959,6 +688,7 @@ do ($)->
 					buttonEl = target.parent()
 				else if target.is('.b_contact .drop_down i')
 					buttonEl = target.parent().parent()
+	
 				if (not actionButton? and not buttonEl?) or ( actionButton and actionButton.size() is 0 ) or ( buttonEl and buttonEl.size() is 0 )
 					return true
 	
@@ -1006,21 +736,25 @@ do ($)->
 				@filterInput.keyup()
 	
 			@setUserListHeight = =>
-				h = $(window).height() - @usersListBlockEl[0].offsetTop - 5 + 'px'
+				h = $(window).height() - @usersListBlockEl[0].offsetTop + 'px'
 				@usersListBlockEl.css
 					height: h
+				@reinitScroll()
 	
 			@setUserListHeight()
 	
 			debouncedSetHeight = debounce =>
 				@userScrollerToTop()
 				@setUserListHeight()
-			, 50
+			, 150
 			$(window).bind 'resize', ->
 				debouncedSetHeight()
 	
+			$(window).bind 'orientationchange', ->
+				debouncedSetHeight()
+	
 			#if @options.
-			@hidePanel()
+			@hidePanel(true)
 	
 			oktell.on 'disconnect', =>
 	
@@ -1109,78 +843,7 @@ do ($)->
 	
 				#@sortPanelUsers @panelUsers
 	
-				oktell.on 'stateChange', ( newState, oldState ) =>
-					@reloadActions()
-	
-				oktell.onNativeEvent 'pbxnumberstatechanged', (data) =>
-	
-					for n in data.numbers
-						numStr = n.num.toString()
-						user = @usersByNumber[numStr]
-						if user
-	#						@log ''
-	#						@log 'start user state change from ' + user.state + ' to ' + n.numstateid + ' for ' + user.getInfo()
-							if @showDeps
-								dep = @departmentsById[user.departmentId]
-							else
-								dep = @allUserDep
-	#						@log 'current visibility settings are ShowDeps='+@showDeps+' and ShowOffline=' + @showOffline
-							wasFiltered = user.isFiltered @filter, @showOffline, @filterLang
-	#						@log 'user was filtered earlier = ' + wasFiltered
-							user.setState n.numstateid
-							userNowIsFiltered = user.isFiltered @filter, @showOffline, @filterLang
-	#						@log 'after user.setState, now user filtered = ' + userNowIsFiltered
-							if not userNowIsFiltered
-	#							@log 'now user isnt filtered'
-								if dep.getContainer().children().length is 1
-	#								@log 'container contains only users el, so refilter all list'
-									@setFilter @filter, true
-								else
-	#								@log 'remove his html element'
-									user.el?.remove?()
-							else if not wasFiltered
-	#							@log 'user now filtered and was not filtered before state change'
-								dep.getUsers @filter, @showOffline, @filterLang
-	#							@log 'refilter all user of department ' + dep.getInfo()
-								index = dep.lastFilteredUsers.indexOf user
-	#							@log 'index of user in refiltered users list is ' + index
-								if index isnt -1
-									if not dep.getContainer().is(':visible')
-	#									@log 'dep container is hidden, so, refilter all users list'
-										@setFilter @filter, true
-									else
-										if index is 0
-	#										@log 'add user html to start of department container'
-											dep.getContainer().prepend user.getEl()
-										else
-	#										@log 'add user html after prev user html element'
-											dep.lastFilteredUsers[index-1]?.el?.after user.getEl()
-	
-										if dep.lastFilteredUsers[index-1]?.letter is user.letter
-	#										@log 'hide user letter because it is like prev user letter ' + user.letter
-											user.letterVisibility false
-										else if dep.lastFilteredUsers[index+1]?.letter is user.letter
-	#										@log 'hide prev user letter because it is like user letter ' + user.letter
-											dep.lastFilteredUsers[index+1].letterVisibility false
-	
-	#						@log 'end user state change'
-	#						@log ''
-	
-	
-				oktell.on 'abonentsChange', ( abonents ) =>
-					@setAbonents abonents
-					@reloadActions()
-	
-				oktell.on 'holdStateChange', ( holdInfo ) =>
-					#@log 'Oktell holdStateChange', holdInfo
-					@setHold holdInfo
-					@reloadActions()
-	
-				oktell.on 'talkTimer', (seconds, formattedTime) =>
-					if seconds is false
-						@talkTimeEl.text ''
-					else
-						@talkTimeEl.text formattedTime
+				oktell.onNativeEvent 'pbxnumberstatechanged', @onPbxNumberStateChange
 	
 				setTimeout =>
 					@setAbonents oktell.getAbonents()
@@ -1195,8 +858,7 @@ do ($)->
 	
 				@setFilter '', true
 	
-				oktell.on 'queueChange', (queue) =>
-					@setQueue queue
+	
 				oktell.getQueue (data) =>
 					@setQueue data.queue if data.result
 	
@@ -1207,31 +869,131 @@ do ($)->
 	
 				if typeof afterOktellConnect is 'function' then afterOktellConnect()
 	
+			oktell.on 'abonentsChange', ( abonents ) =>
+				if @oktellConnected
+					@setAbonents abonents
+					@reloadActions()
+	
+			oktell.on 'holdStateChange', ( holdInfo ) =>
+				if @oktellConnected
+					#@log 'Oktell holdStateChange', holdInfo
+					@setHold holdInfo
+					@reloadActions()
+	
+			oktell.on 'talkTimer', (seconds, formattedTime) =>
+				if @oktellConnected
+					if seconds is false
+						@talkTimeEl.text ''
+					else
+						@talkTimeEl.text formattedTime
+	
+			oktell.on 'stateChange', ( newState, oldState ) =>
+				if @oktellConnected
+					@reloadActions()
+			oktell.on 'queueChange', (queue) =>
+				if @oktellConnected
+					@setQueue queue
+	
 			oktell.on 'connectError', =>
 				if not @options.hideOnDisconnect
 					@showPanel()
+	
+			ringNotify = null
+			oktell.on 'ringStart', (abonents) =>
+				if @options.useNotifies
+					ringNotify = new Notify @langs.callPopup.title
+	
+			oktell.on 'ringStop', =>
+				ringNotify?.close?()
+				ringNotify = null
+	
+	
+		onPbxNumberStateChange: (data) =>
+	
+			for n in data.numbers
+				numStr = n.num.toString()
+				user = @usersByNumber[numStr]
+				if user
+	#						@log ''
+	#						@log 'start user state change from ' + user.state + ' to ' + n.numstateid + ' for ' + user.getInfo()
+					dep = null
+					if @showDeps
+						dep = @departmentsById[user.departmentId]
+					else
+						dep = @allUserDep
+					#						@log 'current visibility settings are ShowDeps='+@showDeps+' and ShowOffline=' + @showOffline
+					wasFiltered = user.isFiltered @filter, @showOffline, @filterLang
+					#						@log 'user was filtered earlier = ' + wasFiltered
+					user.setState n.numstateid
+					userNowIsFiltered = user.isFiltered @filter, @showOffline, @filterLang
+					#						@log 'after user.setState, now user filtered = ' + userNowIsFiltered
+					if not userNowIsFiltered
+	#							@log 'now user isnt filtered'
+						if dep.getContainer().children().length is 1
+	#								@log 'container contains only users el, so refilter all list'
+							@setFilter @filter, true
+						else
+	#								@log 'remove his html element'
+							user.el?.remove?()
+					else if not wasFiltered
+	#							@log 'user now filtered and was not filtered before state change'
+						dep.getUsers @filter, @showOffline, @filterLang
+						#							@log 'refilter all user of department ' + dep.getInfo()
+						index = dep.lastFilteredUsers.indexOf user
+						#							@log 'index of user in refiltered users list is ' + index
+						if index isnt -1
+							if not dep.getContainer().is(':visible')
+	#									@log 'dep container is hidden, so, refilter all users list'
+								@setFilter @filter, true
+							else
+								if index is 0
+	#										@log 'add user html to start of department container'
+									dep.getContainer().prepend user.getEl()
+								else
+	#										@log 'add user html after prev user html element'
+									dep.lastFilteredUsers[index-1]?.el?.after user.getEl()
+	
+								if dep.lastFilteredUsers[index-1]?.letter is user.letter
+	#										@log 'hide user letter because it is like prev user letter ' + user.letter
+									user.letterVisibility false
+								else if dep.lastFilteredUsers[index+1]?.letter is user.letter
+	#										@log 'hide prev user letter because it is like user letter ' + user.letter
+									dep.lastFilteredUsers[index+1].letterVisibility false
+	
+	#						@log 'end user state change'
+	#						@log ''
 	
 		hideActionListDropdown: ->
 			@dropdownEl.fadeOut 150, =>
 				@dropdownOpenedOnPanel = false
 	
 	
-		showPanel: ->
-			w = @panelEl.width() or @panelEl.data('width')
-			if w > 0
+		showPanel: (notAnimate)->
+			w = @panelEl.data('width')
+			if w > 0 and @panelEl.data('hided')
 				@log 'show panel'
+				@log 'Set width showpanel ' + w
 				@panelEl.data('width', w)
+				@panelEl.data('hided', false)
 				@panelEl.css {display: ''}
-				@panelEl.animate {width: w+'px'}, 200, =>
-					@panelEl.css { overflow: '' }
+				if notAnimate
+					@panelEl.css { overflow: '', width: w+'px' }
+				else
+					@panelEl.animate {width: w+'px'}, 200, =>
+						@panelEl.css { overflow: '' }
 	
-		hidePanel: ->
-			w = @panelEl.width()
-			if w > 0
+		hidePanel: (notAnimate)->
+			w = if @panelEl.data('width')? then @panelEl.data('width') else @panelEl.width()
+			if w > 0 and not @panelEl.data('hided')
 				@log 'hide panel'
+				@log 'Set width hidepanel ' + w
 				@panelEl.data('width', w)
-				@panelEl.animate {width: '0px'}, 200, =>
-					@panelEl.css {display: '', overflow: 'hidden'}
+				@panelEl.data('hided', true)
+				if notAnimate
+					@panelEl.css {display: '', overflow: 'hidden', width: '0px'}
+				else
+					@panelEl.animate {width: '0px'}, 200, =>
+						@panelEl.css {display: '', overflow: 'hidden'}
 	
 	
 	
@@ -1330,9 +1092,10 @@ do ($)->
 					delete userlist[user.number]
 	
 		setAbonents: (abonents) ->
-			@log 'set abonents', abonents
+			#@log 'set abonents', abonents
 			@syncAbonentsAndUserlist abonents, @abonents
 			@setAbonentsHtml()
+			@setUserListHeight()
 	
 		setQueue: (queue) ->
 			if @oktell.getState() is 'ring'
@@ -1347,7 +1110,10 @@ do ($)->
 		setHold: (holdInfo) ->
 			abs = []
 			if holdInfo.hasHold
-				abs = [holdInfo.abonent]
+				if holdInfo.conferenceid
+					abs = [{number: holdInfo.conferenceRoom, id: holdInfo.conferenceid, name: holdInfo.conferenceName}]
+				else
+					abs = [holdInfo.abonent]
 			@syncAbonentsAndUserlist abs, @hold
 			@setHoldHtml()
 	
@@ -1356,7 +1122,7 @@ do ($)->
 			@userScrollerToTop()
 	
 		setAbonentsHtml: ->
-			@log 'Set abonents html', @abonents
+			#@log 'Set abonents html', @abonents
 			@_setActivityPanelUserHtml @abonents, @abonentsListEl, @abonentsListBlock
 	
 		setHoldHtml: ->
@@ -1370,11 +1136,11 @@ do ($)->
 			usersArray.push(u) for own k,u of users
 			@_setUsersHtml usersArray, listEl, true
 			if usersArray.length and blockEl.is(':not(:visible)')
-				@log 'Show abonent el'
+				#@log 'Show abonent el'
 				blockEl.stop true, true
 				blockEl.slideDown 50, @setUserListHeight
 			else if usersArray.length is 0 and blockEl.is(':visible')
-				@log 'Hide abonent el'
+				#@log 'Hide abonent el'
 				blockEl.stop true, true
 				blockEl.slideUp 50, @setUserListHeight
 	
@@ -1471,8 +1237,9 @@ do ($)->
 			else
 				@filterFantomUser = false
 	
-			@usersListBlockEl.children().detach()
-			@usersListBlockEl.html allDeps
+			@scrollContent.children().detach()
+			@scrollContent.html allDeps
+	
 			if allDeps.length > 0
 				allDeps[allDeps.length-1].find('tr:last').addClass 'g_last'
 	
@@ -1676,7 +1443,7 @@ do ($)->
 					@hide()
 	
 				oktellVoice.on 'mediaPermissionsRefuse', =>
-					oktell.endCall();
+					oktell?.endCall();
 					@hide()
 	
 	
@@ -1741,11 +1508,15 @@ do ($)->
 		lang: 'ru'
 		noavatar: true
 		hideOnDisconnect: true
+		useNotifies: false
+		withoutPermissionsPopup: false
+		withoutCallPopup: false
+		withoutError: false
 
 	langs = {
 		ru:
 			panel: { inTalk: 'В разговоре', onHold: 'На удержании', queue: 'Очередь ожидания', inputPlaceholder: 'введите имя или номер', withoutDepartment: 'без отдела', showDepartments: 'Группировать по отделам', showDepartmentsClicked: 'Показать общим списком', showOnlineOnly: 'Показать только online', showOnlineOnlyCLicked: 'Показать всех' },
-			actions: { call: 'Позвонить', conference: 'Конференция', transfer: 'Перевести', toggle: 'Переключиться', intercom: 'Интерком', endCall: 'Завершить', ghostListen: 'Прослушка', ghostHelp: 'Помощь', hold: 'Удержание', resume: 'Продолжить' }
+			actions: { answer: 'Ответить', call: 'Позвонить', conference: 'Конференция', transfer: 'Перевести', toggle: 'Переключиться', intercom: 'Интерком', endCall: 'Завершить', ghostListen: 'Прослушка', ghostHelp: 'Помощь', hold: 'Удержание', resume: 'Продолжить' }
 			callPopup: { title: 'Входящий вызов', hide: 'Скрыть', answer: 'Ответить', reject: 'Отклонить', undefinedNumber: 'Номер не определен', goPickup: 'Поднимите трубку' }
 			permissionsPopup: { header: 'Запрос на доступ к микрофону', text: 'Для использования веб-телефона необходимо разрешить браузеру доступ к микрофону.' }
 			error:
@@ -1755,7 +1526,7 @@ do ($)->
 				#tryAgain: 'Повторить попытку'
 		en:
 			panel: { inTalk: 'In conversation', onHold: 'On hold', queue: 'Wait queue', inputPlaceholder: 'Enter name or number', withoutDepartment: 'Without department', showDepartments: 'Show departments', showDepartmentsClicked: 'Hide departments', showOnlineOnly: 'Show online only', showOnlineOnlyCLicked: 'Show all' },
-			actions: { call: 'Dial', conference: 'Conference', transfer: 'Transfer', toggle: 'Switch', intercom: 'Intercom', endCall: 'End', ghostListen: 'Audition', ghostHelp: 'Help', hold: 'Hold', resume: 'Resume' }
+			actions: { answer: 'Answer', call: 'Dial', conference: 'Conference', transfer: 'Transfer', toggle: 'Switch', intercom: 'Intercom', endCall: 'End', ghostListen: 'Audition', ghostHelp: 'Help', hold: 'Hold', resume: 'Resume' }
 			callPopup: { title: 'Incoming call', hide: 'Hide', answer: 'Answer', reject: 'Decline', undefinedNumber: 'Phone number is not defined', goPickup: 'Pick up the phone' }
 			permissionsPopup: { header: 'Request for access to the microphone', text: 'To use the web-phone you need to allow browser access to the microphone.' }
 			error:
@@ -1765,7 +1536,7 @@ do ($)->
 				#tryAgain: 'Try again'
 		cz:
 			panel: { inTalk: 'V rozhovoru', onHold: 'Na hold', queue: 'Fronta čekaní', inputPlaceholder: 'zadejte jméno nebo číslo', withoutDepartment: 'Bez oddělení', showDepartments: 'Zobrazit oddělení', showDepartmentsClicked: 'Skrýt oddělení', showOnlineOnly: 'Zobrazit pouze online', showOnlineOnlyCLicked: 'Zobrazit všechny' },
-			actions: { call: 'Zavolat', conference: 'Konference', transfer: 'Převést', toggle: 'Přepnout', intercom: 'Intercom', endCall: 'Ukončit', ghostListen: 'Odposlech', ghostHelp: 'Nápověda', hold: 'Udržet', resume: 'Pokračovat' }
+			actions: { answer: 'Odpověď', call: 'Zavolat', conference: 'Konference', transfer: 'Převést', toggle: 'Přepnout', intercom: 'Intercom', endCall: 'Ukončit', ghostListen: 'Odposlech', ghostHelp: 'Nápověda', hold: 'Udržet', resume: 'Pokračovat' }
 			callPopup: { title: 'Příchozí hovor', hide: 'Schovat', answer: 'Odpovědět', reject: 'Odmítnout', undefinedNumber: '', goPickup: 'Zvedněte sluchátko' }
 			permissionsPopup: { header: 'Žádost o přístup k mikrofonu', text: 'Abyste mohli používat telefon, musíte povolit prohlížeče přístup k mikrofonu.' }
 			error:
@@ -1815,7 +1586,7 @@ do ($)->
 			console[fnName].apply( console, args || [])
 		catch e
 
-	templates = {'templates/actionButton.html':'<ul class="oktell_button_action"><li class="g_first"><i></i></li><li class="g_last drop_down"><i></i></li></ul>', 'templates/actionList.html':'<ul class="oktell_actions_group_list"><li class="{{css}}" data-action="{{action}}"><i></i><span>{{actionText}}</span></li></ul>', 'templates/user.html':'<tr class="b_contact"><td class="b_contact_avatar {{css}}"><img src="{{avatarLink32x32}}"><i></i><div class="o_busy"></div></td><td class="b_capital_letter"><span></span></td><td class="b_contact_title"><div class="wrapword"><span class="b_contact_name"><b>{{name1}}</b><span>{{name2}}</span></span><span class="o_number">{{number}}</span></div>{{button}}</td></tr>', 'templates/department.html':'<tr class="b_contact"><td class="b_contact_department" colspan="3">{{department}}</td></tr>', 'templates/dep.html':'<div class="b_department"><div class="b_department_header"><div class="h_shadow_top"><span>{{department}}</span></div></div><table class="b_main_list"><tbody></tbody></table></div>', 'templates/usersTable.html':'<table class="b_main_list m_without_department"><tbody></tbody></table>', 'templates/panel.html':'<div class="oktell_panel"><div class="i_panel_bookmark"><div class="i_panel_bookmark_bg"></div></div><div class="h_panel_bg"><div class="b_header"><ul class="b_list_filter"><li class="i_group"></li><li class="i_online"></li></ul></div><div class="h_padding"><div class="b_marks i_conference j_abonents"><div class="h_shadow_top"><div class="b_marks_noise"><p class="b_marks_header"><span class="b_marks_label">{{inTalk}}</span><span class="b_marks_time"></span></p><table><tbody></tbody></table></div></div></div><div class="b_marks i_flash j_hold"><div class="h_shadow_top"><div class="b_marks_noise"><p class="b_marks_header"><span class="b_marks_label">{{onHold}}</span></p><table class="j_table_favorite"><tbody></tbody></table></div></div></div><div class="b_marks i_flash j_queue"><div class="h_shadow_top"><div class="b_marks_noise"><p class="b_marks_header"><span class="b_marks_label">{{queue}}</span></p><table class="j_table_queue"><tbody></tbody></table></div></div></div><div class="b_inconversation j_phone_block"><table class="j_table_phone"><tbody></tbody></table></div><div class="b_marks i_phone"><div class="h_shadow_top"><div class="h_phone_number_input"><div class="i_phone_state_bg"></div><div class="h_input_padding"><div class="jInputClear_hover"><input class="b_phone_number_input" type="text" placeholder="{{inputPlaceholder}}"><span class="jInputClear_close">&times;</span></div></div></div></div></div><div class="h_main_list j_main_list"></div></div></div></div>', 'templates/callPopup.html':'<div class="oktell_panel_popup" style="display: none"><div class="m_popup_staff"><div class="m_popup_data"><header><div class="h_header_bg"><i class="o_close"></i><h2>{{title}}</h2></div></header><div class="b_content"><div class="b_abonent"><span data-bind="text: name"></span>&nbsp;<span class="g_light" data-bind="textPhone: number"></span></div></div><div class="footer"><div class="b_take_phone j_pickup"><i></i>&nbsp;<span>{{goPickup}}</span></div><button class="oktell_panel_btn m_big m_button_green j_answer" style="margin-right: 20px; float: left"><i style="background: url(\'/img/icons/action/white/call.png\') no-repeat; vertical-align: -2px"></i>Ответить</button><button class="oktell_panel_btn m_big j_close_action">{{hide}}</button><button class="oktell_panel_btn m_big m_button_red j_abort_action"><i></i>{{reject}}</button></div></div></div></div>', 'templates/permissionsPopup.html':'<div class="oktell_panel_popup" style="display: none"><div class="m_popup_staff"><div class="m_popup_data"><header><div class="h_header_bg"><h2>{{header}}</h2></div></header><div class="b_content"><p>{{text}}</p></div></div></div></div>', 'templates/error.html':'<div class="b_error m_form" style="display: none"><div class="h_padding"><h4>Ошибка</h4><p class="b_error_alert"></p><p class="g_light"></p><p class="g_light"></p></div></div>', }
+	templates = {'templates/actionButton.html':'<ul class="oktell_button_action"><li class="g_first"><i></i></li><li class="g_last drop_down"><i></i></li></ul>', 'templates/actionList.html':'<ul class="oktell_actions_group_list"><li class="{{css}}" data-action="{{action}}"><i></i><span>{{actionText}}</span></li></ul>', 'templates/user.html':'<tr class="b_contact"><td class="b_contact_avatar {{css}}"><img src="{{avatarLink32x32}}"><i></i><div class="o_busy"></div></td><td class="b_capital_letter"><span></span></td><td class="b_contact_title"><div class="wrapword"><span class="b_contact_name"><b>{{name1}}</b><span>{{name2}}</span></span><span class="o_number">{{number}}</span></div>{{button}}</td></tr>', 'templates/department.html':'<tr class="b_contact"><td class="b_contact_department" colspan="3">{{department}}</td></tr>', 'templates/dep.html':'<div class="b_department"><div class="b_department_header"><div class="h_shadow_top"><span>{{department}}</span></div></div><table class="b_main_list"><tbody></tbody></table></div>', 'templates/usersTable.html':'<table class="b_main_list m_without_department"><tbody></tbody></table>', 'templates/panel.html':'<div class="oktell_panel"><div class="i_panel_bookmark"><div class="i_panel_bookmark_bg"></div></div><div class="h_panel_bg"><div class="b_header"><ul class="b_list_filter"><li class="i_group"></li><li class="i_online"></li></ul></div><div class="h_padding"><div class="b_marks i_conference j_abonents"><div class="h_shadow_top"><div class="b_marks_noise"><p class="b_marks_header"><span class="b_marks_label">{{inTalk}}</span><span class="b_marks_time"></span></p><table><tbody></tbody></table></div></div></div><div class="b_marks i_extension" style="display: none"><div class="h_shadow_top"><div class="b_marks_noise"><p class="b_marks_header"><span class="b_marks_label">Донабор</span></p><div class="h_btn-group"><div class="btn-group"><button class="btn btn-small">1</button><button class="btn btn-small">2</button><button class="btn btn-small">3</button><button class="btn btn-small">4</button><button class="btn btn-small">5</button><button class="btn btn-small">6</button><button class="btn btn-small">7</button><button class="btn btn-small">8</button><button class="btn btn-small">9</button><button class="btn btn-small">0</button></div><div class="btn-group"><button class="btn btn-small">&lowast;</button><button class="btn btn-small">#</button></div></div></div></div><i class="o_close"></i></div><div class="b_marks i_flash j_hold"><div class="h_shadow_top"><div class="b_marks_noise"><p class="b_marks_header"><span class="b_marks_label">{{onHold}}</span></p><table class="j_table_favorite"><tbody></tbody></table></div></div></div><div class="b_marks i_flash j_queue"><div class="h_shadow_top"><div class="b_marks_noise"><p class="b_marks_header"><span class="b_marks_label">{{queue}}</span></p><table class="j_table_queue"><tbody></tbody></table></div></div></div><div class="b_inconversation j_phone_block"><table class="j_table_phone"><tbody></tbody></table></div><div class="b_marks i_phone"><div class="h_shadow_top"><div class="h_phone_number_input"><div class="i_phone_state_bg"></div><div class="h_input_padding"><div class="jInputClear_hover"><input class="b_phone_number_input" type="text" placeholder="{{inputPlaceholder}}"><span class="jInputClear_close">&times;</span></div></div></div></div></div><div class="h_main_list j_main_list"></div></div></div></div>', 'templates/callPopup.html':'<div class="oktell_panel_popup" style="display: none"><div class="m_popup_staff"><div class="m_popup_data"><header><div class="h_header_bg"><i class="o_close"></i><h2>{{title}}</h2></div></header><div class="b_content"><div class="b_abonent"><span data-bind="text: name"></span>&nbsp;<span class="g_light" data-bind="textPhone: number"></span></div></div><div class="footer"><div class="b_take_phone j_pickup"><i></i>&nbsp;<span>{{goPickup}}</span></div><button class="oktell_panel_btn m_big m_button_green j_answer" style="margin-right: 20px; float: left"><i style="background: url(\'/img/icons/action/white/call.png\') no-repeat; vertical-align: -2px"></i>Ответить</button><button class="oktell_panel_btn m_big j_close_action">{{hide}}</button><button class="oktell_panel_btn m_big m_button_red j_abort_action"><i></i>{{reject}}</button></div></div></div></div>', 'templates/permissionsPopup.html':'<div class="oktell_panel_popup" style="display: none"><div class="m_popup_staff"><div class="m_popup_data"><header><div class="h_header_bg"><h2>{{header}}</h2></div></header><div class="b_content"><p>{{text}}</p></div></div></div></div>', 'templates/error.html':'<div class="b_error m_form" style="display: none"><div class="h_padding"><h4>Ошибка</h4><p class="b_error_alert"></p><p class="g_light"></p><p class="g_light"></p></div></div>', }
 
 	loadTemplate = (path) ->
 		path = path.substr(1) if path[0] is '/'
@@ -1840,7 +1611,7 @@ do ($)->
 	permissionsPopupHtml = loadTemplate '/templates/permissionsPopup.html'
 	errorHtml = loadTemplate '/templates/error.html'
 
-	List.prototype.jScroll = jScroll
+#	List.prototype.jScroll = jScroll
 	List.prototype.usersTableTemplate = usersTableHtml
 
 	CUser.prototype.buttonTemplate = actionButtonHtml
@@ -1861,9 +1632,13 @@ do ($)->
 	hasTouch = 'ontouchstart' in window and not isTouchPad
 
 	initPanel = (opts)->
+
 		panelWasInitialized = true
 
 		options = $.extend defaultOptions, opts or {}
+
+		if getOptions().useNotifies and window.webkitNotifications and window.webkitNotifications.checkPermission() is 1
+			webkitNotifications.requestPermission =>
 
 		Department.prototype.withoutDepName = List.prototype.withoutDepName = 'zzzzz_without'
 		langs = langs[options.lang] or langs.ru
@@ -1926,7 +1701,7 @@ do ($)->
 		panelEl.hide()
 		$("body").append(panelEl)
 
-		list = new List oktell, panelEl, actionListEl, afterOktellConnect, getOptions().debug
+		list = new List oktell, panelEl, actionListEl, afterOktellConnect, getOptions(), getOptions().debug
 		if getOptions().debug
 			window.wList = list
 			window.wPopup = popup
@@ -1971,11 +1746,18 @@ do ($)->
 			true
 
 		touchClickedContact = null
-		touchClickedCss = 'touch_clicked'
+		touchClickedCss = 'm_touch_clicked'
 		touchClickedContactClear = =>
 			touchClickedContact?.removeClass touchClickedCss
 			touchClickedContact = null
+		$(window).bind 'touchmove', (e)=>
+			@log 'touchmove'
+		$(window).bind 'touchcancel', (e)=>
+			@log 'touchcancel'
+		$(window).bind 'touchend', (e)=>
+			@log 'touchend'
 		$(window).bind 'touchstart', (e)=>
+			@log 'touchstart'
 			target = $(e.target)
 			parents = target.parents()
 			parentsArr = parents.toArray()

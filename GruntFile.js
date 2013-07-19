@@ -13,15 +13,15 @@ module.exports = function(grunt) {
     insertfilesasvars: {
       htmlminTaskName: 'templates',
       target: 'coffee/oktell-panel.coffee',
-      dest: 'buildlast/oktell-panel.coffee',
+      dest: 'buildlast/oktell-panel-cf.coffee',
       regexFind: /loadTemplate(?:\s*\(\s*|\s+)[\"\'](.+?)[\"\']\s*\)*/,
       find: 'templates = {}',
       replace: 'templates = '
     },
     includecoffee: {
       main: {
-        target: 'buildlast/oktell-panel.coffee',
-        dest: 'buildlast/oktell-panel.coffee',
+        target: 'buildlast/oktell-panel-cf.coffee',
+        dest: 'buildlast/oktell-panel-cf.coffee',
         regexp: /\#includecoffee\s+(.+?)[ \r\n]+/
       }
     },
@@ -40,7 +40,7 @@ module.exports = function(grunt) {
           bare: true
         },
         files: {
-          'buildlast/oktell-panel.js': 'buildlast/oktell-panel.coffee'
+          'buildlast/oktell-panel.js': 'buildlast/oktell-panel-cf.coffee'
         }
       }
     },
@@ -112,7 +112,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-compress');
-  grunt.registerTask('build', ['clean:buildlast', 'createbuildfolder', 'insertfilesasvars', 'includecoffee', 'coffee', 'uglify', 'cssmin', 'copy:css', 'addVersion', 'compress', 'copy:main', 'clean:temp']);
+  grunt.registerTask('build', ['clean:buildlast', 'insertfilesasvars', 'includecoffee', 'coffee', 'uglify', 'cssmin', 'copy:css', 'addVersion', 'compress', 'clean:temp']);
   grunt.registerTask('default', ['build']);
   grunt.registerMultiTask('addVersion', 'Add version to file names and to file content', function() {
     var config, content, fName, file, fileExt, files, path, pos, _i, _len, _results;

@@ -5,7 +5,7 @@ class CUser
 		@hasHover = false
 		@buttonLastAction = ''
 		@firstLiCssPrefix = 'm_button_action_'
-		@noneActionCss = @firstLiCssPrefix + 'none'
+		@noneActionCss = '' #@firstLiCssPrefix + 'none'
 
 		@els = $()
 		@buttonEls = $()
@@ -159,7 +159,7 @@ class CUser
 		if @buttonLastAction
 			$el.removeClass(@noneActionCss).addClass @firstLiCssPrefix + @buttonLastAction.toLowerCase()
 		else
-			$el.addClass @firstLiCssPrefix + 'none'
+			$el.addClass @noneActionCss
 
 	getButtonEl: () ->
 		$el = $(@buttonTemplate)
@@ -198,7 +198,7 @@ class CUser
 #				@separateButtonEls.show()
 		else
 			@buttonLastAction = ''
-			@buttonEls.addClass @firstLiCssPrefix + 'none'
+			@buttonEls.addClass @noneActionCss
 #			@separateButtonEls.hide()
 		actions
 
@@ -236,6 +236,8 @@ class CUser
 				@oktell.hold?()
 			when 'resume'
 				@oktell.resume?()
+			when 'answer'
+				@oktell.answer?()
 
 
 	doLastFirstAction: ->

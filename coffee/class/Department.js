@@ -16,13 +16,8 @@ Department = (function() {
   }
 
   Department.prototype.getEl = function(usersVisible) {
-    var _this = this;
-
     if (!this.el) {
       this.el = $(this.template.replace(/\{\{department}\}/g, escapeHtml(this.name)));
-      this.el.find('.b_department_header').bind('click', function() {
-        return _this.showUsers();
-      });
     }
     if (usersVisible) {
       this._oldIsOpen = this.isOpen;
@@ -30,6 +25,7 @@ Department = (function() {
     } else {
       this.showUsers(this._oldIsOpen != null ? this._oldIsOpen : this.isOpen);
     }
+    this.el.data('department', this);
     return this.el;
   };
 

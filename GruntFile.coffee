@@ -9,15 +9,15 @@ module.exports = (grunt) ->
 		insertfilesasvars:
 			htmlminTaskName: 'templates'
 			target: 'coffee/oktell-panel.coffee'
-			dest: 'buildlast/oktell-panel.coffee'
+			dest: 'buildlast/oktell-panel-cf.coffee'
 			regexFind: /loadTemplate(?:\s*\(\s*|\s+)[\"\'](.+?)[\"\']\s*\)*/
 			find: 'templates = {}'
 			replace: 'templates = '
 
 		includecoffee:
 			main:
-				target: 'buildlast/oktell-panel.coffee'
-				dest: 'buildlast/oktell-panel.coffee'
+				target: 'buildlast/oktell-panel-cf.coffee'
+				dest: 'buildlast/oktell-panel-cf.coffee'
 				regexp: /\#includecoffee\s+(.+?)[ \r\n]+/
 		htmlmin:
 			templates:
@@ -30,7 +30,7 @@ module.exports = (grunt) ->
 				options:
 					bare: true
 				files:
-					'buildlast/oktell-panel.js': 'buildlast/oktell-panel.coffee'
+					'buildlast/oktell-panel.js': 'buildlast/oktell-panel-cf.coffee'
 		cssmin:
 			css:
 				files:
@@ -71,7 +71,8 @@ module.exports = (grunt) ->
 	grunt.loadNpmTasks 'grunt-contrib-clean'
 	grunt.loadNpmTasks 'grunt-contrib-compress'
 
-	grunt.registerTask 'build', ['clean:buildlast', 'createbuildfolder', 'insertfilesasvars', 'includecoffee', 'coffee', 'uglify', 'cssmin', 'copy:css', 'addVersion', 'compress', 'copy:main', 'clean:temp']
+	grunt.registerTask 'build', ['clean:buildlast', 'insertfilesasvars', 'includecoffee', 'coffee', 'uglify', 'cssmin', 'copy:css', 'addVersion', 'compress', 'clean:temp']
+	#grunt.registerTask 'build', ['clean:buildlast', 'createbuildfolder', 'insertfilesasvars', 'includecoffee', 'coffee', 'uglify', 'cssmin', 'copy:css', 'addVersion', 'compress', 'copy:main', 'clean:temp']
 
 	grunt.registerTask 'default', ['build']
 
