@@ -1311,6 +1311,7 @@ var __slice = [].slice,
       name1: /\{\{name1\}\}/,
       name2: /\{\{name2\}\}/,
       number: /\{\{number\}\}/,
+      dtmf: /\{\{dtmf\}\}/,
       avatarLink32x32: /\{\{avatarLink32x32\}\}/,
       css: /\{\{css\}\}/,
       letter: /\{\{letter\}\}/
@@ -1384,7 +1385,7 @@ var __slice = [].slice,
       var $el, str;
 
       if (!this.el || createIndependent) {
-        str = this.template.replace(this.regexps.name1, this.nameHtml1).replace(this.regexps.name2, this.nameHtml2).replace(this.regexps.number, this.numberHtml).replace(this.regexps.avatarLink32x32, this.avatarLink32x32).replace(this.regexps.css, this.defaultAvatarCss);
+        str = this.template.replace(this.regexps.name1, this.nameHtml1).replace(this.regexps.name2, this.nameHtml2).replace(this.regexps.number, this.numberHtml).replace(this.regexps.dtmf, this.langs.panel.dtmf).replace(this.regexps.avatarLink32x32, this.avatarLink32x32).replace(this.regexps.css, this.defaultAvatarCss);
         $el = $(str);
         $el.data('user', this);
         this.initButtonEl($el.find('.oktell_button_action'));
@@ -1395,6 +1396,7 @@ var __slice = [].slice,
           this.elName = this.el.find('.b_contact_name b');
           this.elName2 = this.el.find('.b_contact_name span');
           this.elNumber = this.el.find('.o_number');
+          this.elDtmf = this.el.find('.o_dtmf');
         }
       }
       $el = $el || this.el;
@@ -1741,6 +1743,7 @@ var __slice = [].slice,
       CUser.prototype.oktell = oktell;
       this.filter = false;
       this.panelEl = panelEl;
+      this.dtmfEl = this.panelEl.find('.i_extension');
       this.dropdownEl = dropdownEl;
       this.dropdownElLiTemplate = this.dropdownEl.html();
       this.dropdownEl.empty();
@@ -1774,6 +1777,12 @@ var __slice = [].slice,
           showDeps: !_this.showDeps
         });
         return _this.setFilter(_this.filter, true);
+      });
+      this.dtmfEl.find('.o_close').bind('click', function() {
+        return _this.hideDtmf();
+      });
+      this.dtmfEl.find('.btn-small').bind('click', function(e) {
+        return _this.sendDtmf($(e.target).text());
       });
       this.usersWithBeforeConnectButtons = [];
       this.config();
@@ -1845,6 +1854,10 @@ var __slice = [].slice,
             }
           }
           _this.setUserListHeight();
+          return false;
+        }
+        if (target.is('.o_dtmf')) {
+          _this.showDtmf();
           return false;
         }
         if (target.is('.oktell_button_action .g_first')) {
@@ -1926,6 +1939,12 @@ var __slice = [].slice,
         return debouncedSetHeight();
       });
       this.hidePanel(true);
+      oktell.on('webphoneConnect', function() {
+        return _this.panelEl.addClass('webphone');
+      });
+      oktell.on('webphoneDisconnect', function() {
+        return _this.panelEl.removeClass('webphone');
+      });
       oktell.on('disconnect', function() {
         var phone, user, _ref, _results;
 
@@ -2074,7 +2093,13 @@ var __slice = [].slice,
       });
       oktell.on('stateChange', function(newState, oldState) {
         if (_this.oktellConnected) {
-          return _this.reloadActions();
+          _this.reloadActions();
+          if (newState === 'talk') {
+            return _this.panelEl.addClass('talking');
+          } else {
+            _this.hideDtmf();
+            return _this.panelEl.removeClass('talking');
+          }
         }
       });
       oktell.on('queueChange', function(queue) {
@@ -2102,6 +2127,38 @@ var __slice = [].slice,
         return ringNotify = null;
       });
     }
+
+    List.prototype.sendDtmf = function(code) {
+      return this.oktell.dtmf(code.toString().replace('∗', '*'));
+    };
+
+    List.prototype.showDtmf = function(dontAnimate) {
+      var _this = this;
+
+      if (this.oktell.getState() === 'talk' && this.panelEl.hasClass('webphone') && !this.panelEl.hasClass('dtmf')) {
+        this.panelEl.addClass('dtmf');
+        this.dtmfEl.stop(true, true);
+        if (dontAnimate) {
+          return this.dtmfEl.show();
+        } else {
+          return this.dtmfEl.slideDown(200, function() {});
+        }
+      }
+    };
+
+    List.prototype.hideDtmf = function(dontAnimate) {
+      var _this = this;
+
+      if (this.panelEl.hasClass('dtmf')) {
+        this.panelEl.removeClass('dtmf');
+        this.dtmfEl.stop(true, true);
+        if (dontAnimate) {
+          return this.dtmfEl.hide();
+        } else {
+          return this.dtmfEl.slideUp(200, function() {});
+        }
+      }
+    };
 
     List.prototype.onPbxNumberStateChange = function(data) {
       var dep, index, n, numStr, user, userNowIsFiltered, wasFiltered, _i, _len, _ref, _ref1, _ref2, _ref3, _ref4, _ref5, _results;
@@ -2874,6 +2931,7 @@ var __slice = [].slice,
   langs = {
     ru: {
       panel: {
+        dtmf: 'донабор',
         inTalk: 'В разговоре',
         onHold: 'На удержании',
         queue: 'Очередь ожидания',
@@ -2927,6 +2985,7 @@ var __slice = [].slice,
     },
     en: {
       panel: {
+        dtfm: 'ext',
         inTalk: 'In conversation',
         onHold: 'On hold',
         queue: 'Wait queue',
@@ -2980,6 +3039,7 @@ var __slice = [].slice,
     },
     cz: {
       panel: {
+        dtmf: 'ext',
         inTalk: 'V rozhovoru',
         onHold: 'Na hold',
         queue: 'Fronta čekaní',
@@ -3086,7 +3146,7 @@ var __slice = [].slice,
   templates = {
     'templates/actionButton.html': '<ul class="oktell_button_action"><li class="g_first"><i></i></li><li class="g_last drop_down"><i></i></li></ul>',
     'templates/actionList.html': '<ul class="oktell_actions_group_list"><li class="{{css}}" data-action="{{action}}"><i></i><span>{{actionText}}</span></li></ul>',
-    'templates/user.html': '<tr class="b_contact"><td class="b_contact_avatar {{css}}"><img src="{{avatarLink32x32}}"><i></i><div class="o_busy"></div></td><td class="b_capital_letter"><span></span></td><td class="b_contact_title"><div class="wrapword"><span class="b_contact_name"><b>{{name1}}</b><span>{{name2}}</span></span><span class="o_number">{{number}}</span></div>{{button}}</td></tr>',
+    'templates/user.html': '<tr class="b_contact"><td class="b_contact_avatar {{css}}"><img src="{{avatarLink32x32}}"><i></i><div class="o_busy"></div></td><td class="b_capital_letter"><span></span></td><td class="b_contact_title"><div class="wrapword"><span class="b_contact_name"><b>{{name1}}</b><span>{{name2}}</span></span><span class="o_number">{{number}}</span><span class="o_dtmf">{{dtmf}}</span></div>{{button}}</td></tr>',
     'templates/department.html': '<tr class="b_contact"><td class="b_contact_department" colspan="3">{{department}}</td></tr>',
     'templates/dep.html': '<div class="b_department"><div class="b_department_header"><div class="h_shadow_top"><span>{{department}}</span></div></div><table class="b_main_list"><tbody></tbody></table></div>',
     'templates/usersTable.html': '<table class="b_main_list m_without_department"><tbody></tbody></table>',
