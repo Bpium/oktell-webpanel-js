@@ -429,6 +429,7 @@ List = (function() {
         user.loadActions();
       }
       _this.showPanel();
+      _this.setTalking(oktell.getState() === 'talk');
       if (typeof afterOktellConnect === 'function') {
         return afterOktellConnect();
       }
@@ -457,12 +458,7 @@ List = (function() {
     oktell.on('stateChange', function(newState, oldState) {
       if (_this.oktellConnected) {
         _this.reloadActions();
-        if (newState === 'talk') {
-          return _this.panelEl.addClass('talking');
-        } else {
-          _this.hideDtmf();
-          return _this.panelEl.removeClass('talking');
-        }
+        return _this.setTalking(newState === 'talk');
       }
     });
     oktell.on('queueChange', function(queue) {
@@ -490,6 +486,15 @@ List = (function() {
       return ringNotify = null;
     });
   }
+
+  List.prototype.setTalking = function(isTalking) {
+    if (isTalking) {
+      return this.panelEl.addClass('talking');
+    } else {
+      this.hideDtmf();
+      return this.panelEl.removeClass('talking');
+    }
+  };
 
   List.prototype.sendDtmf = function(code) {
     return this.oktell.dtmf(code.toString().replace('∗', '*'));

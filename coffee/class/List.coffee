@@ -367,6 +367,8 @@ class List
 
 			@showPanel()
 
+			@setTalking oktell.getState() is 'talk'
+
 			if typeof afterOktellConnect is 'function' then afterOktellConnect()
 
 		oktell.on 'abonentsChange', ( abonents ) =>
@@ -390,11 +392,8 @@ class List
 		oktell.on 'stateChange', ( newState, oldState ) =>
 			if @oktellConnected
 				@reloadActions()
-				if newState is 'talk'
-					@panelEl.addClass 'talking'
-				else
-					@hideDtmf()
-					@panelEl.removeClass 'talking'
+				@setTalking newState is 'talk'
+
 		oktell.on 'queueChange', (queue) =>
 			if @oktellConnected
 				@setQueue queue
@@ -411,6 +410,13 @@ class List
 		oktell.on 'ringStop', =>
 			ringNotify?.close?()
 			ringNotify = null
+
+	setTalking: (isTalking)->
+		if isTalking
+			@panelEl.addClass 'talking'
+		else
+			@hideDtmf()
+			@panelEl.removeClass 'talking'
 
 	sendDtmf: (code)->
 		@oktell.dtmf code.toString().replace('∗', '*')
