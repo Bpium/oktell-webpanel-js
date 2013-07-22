@@ -673,7 +673,8 @@
   cursor: pointer;
 }
 .oktell_panel .b_contact:hover,
-.oktell_panel .b_contact:hover:active {
+.oktell_panel .b_contact:hover:active,
+.oktell_panel .b_contact.m_touch_clicked {
   background: rgba(255,255,255,0.3);
 }
 .oktell_panel .b_contact.m_offline .b_contact_title .wrapword {
@@ -782,7 +783,8 @@
 .oktell_panel .b_contact .oktell_button_action[class*="m_button_action_"] {
   visibility: hidden;
 }
-.oktell_panel .b_contact:hover .oktell_button_action[class*="m_button_action_"] {
+.oktell_panel .b_contact:hover .oktell_button_action[class*="m_button_action_"],
+.oktell_panel .b_contact.m_touch_clicked .oktell_button_action[class*="m_button_action_"] {
   visibility: visible;
 }
 .oktell_button_action.m_static {
