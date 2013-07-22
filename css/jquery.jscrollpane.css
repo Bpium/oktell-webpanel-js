@@ -24,6 +24,7 @@
 	width: 13px;
 	height: 100%;
 	background: transparent;
+    z-index: 3;
 }
 
 .oktell_panel .jspVerticalBar *

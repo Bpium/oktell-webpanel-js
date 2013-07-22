@@ -1800,7 +1800,10 @@ var __slice = [].slice,
         _this.usersListBlockEl.oktellPanelJScrollPane(_this.jScrollPaneParams);
         _this.jScrollPaneAPI = _this.usersListBlockEl.data('jsp');
         _this.scrollContainer = _this.usersListBlockEl.find('.jspContainer');
-        return _this.scrollContent = _this.usersListBlockEl.find('.jspPane');
+        _this.scrollContent = _this.usersListBlockEl.find('.jspPane');
+        return _this.usersListBlockEl.bind('scroll', function() {
+          return _this.processStickyHeaders();
+        });
       };
       this.initJScrollPane();
       this.reinitScroll = function() {
@@ -2124,6 +2127,85 @@ var __slice = [].slice,
       });
     }
 
+    List.prototype.initStickyHeaders = function() {
+      var conTop, h, i, _i, _j, _len, _len1, _ref, _ref1,
+        _this = this;
+
+      this.headerEls = this.usersListBlockEl.find('.b_department_header').toArray();
+      if (this.headerEls.length === 0) {
+        return;
+      } else if ($(this.headerEls[0]).width() === 0) {
+        setTimeout(function() {
+          return _this.initStickyHeaders();
+        }, 500);
+        return;
+      }
+      this.headerFisrt = this.headerEls[0];
+      this.headerLast = this.headerEls.length ? this.headerEls[this.headerEls.length - 1] : null;
+      _ref = this.headerEls;
+      for (i = _i = 0, _len = _ref.length; _i < _len; i = ++_i) {
+        h = _ref[i];
+        this.headerEls[i] = $(h);
+      }
+      conTop = this.scrollContainer.offset().top;
+      _ref1 = this.headerEls;
+      for (i = _j = 0, _len1 = _ref1.length; _j < _len1; i = ++_j) {
+        h = _ref1[i];
+        if (h.offset().top > conTop) {
+          this.processStickyHeaders(i - 1);
+          break;
+        }
+      }
+      return this.processStickyHeaders();
+    };
+
+    List.prototype.headerHeight = 24;
+
+    List.prototype.processStickyHeaders = function(elIndex) {
+      var conTop, curTop, nexTop, _ref, _ref1;
+
+      if (((_ref = this.headerEls) != null ? _ref.length : void 0) > 0) {
+        if (elIndex != null) {
+          this.currentTopIndex = elIndex;
+          if ((_ref1 = this.currentTopHeaderClone) != null) {
+            _ref1.remove();
+          }
+          this.currentTopHeaderClone = this.headerEls[this.currentTopIndex].clone();
+          this.headerEls[this.currentTopIndex].after(this.currentTopHeaderClone);
+          this.currentTopHeaderClone.css({
+            position: 'fixed',
+            zIndex: 1,
+            width: this.scrollContainer.width() + 'px'
+          });
+          this.currentTopHeaderClone.offset({
+            top: this.scrollContainer.offset().top
+          });
+          return this.processStickyHeaders();
+        } else if (this.currentTopIndex != null) {
+          conTop = this.scrollContainer.offset().top;
+          curTop = this.headerEls[this.currentTopIndex].offset().top;
+          if (curTop > conTop) {
+            return this.processStickyHeaders(this.currentTopIndex - 1);
+          } else {
+            if (this.headerEls[this.currentTopIndex + 1]) {
+              nexTop = this.headerEls[this.currentTopIndex + 1].offset().top;
+              if (nexTop > conTop + this.headerHeight) {
+                return this.currentTopHeaderClone.offset({
+                  top: conTop
+                });
+              } else if (nexTop > conTop) {
+                return this.currentTopHeaderClone.offset({
+                  top: nexTop - this.headerHeight
+                });
+              } else if (nexTop < conTop) {
+                return this.processStickyHeaders(this.currentTopIndex + 1);
+              }
+            }
+          }
+        }
+      }
+    };
+
     List.prototype.setTalking = function(isTalking) {
       if (isTalking) {
         return this.panelEl.addClass('talking');
@@ -2241,8 +2323,6 @@ var __slice = [].slice,
 
       w = this.panelEl.data('width');
       if (w > 0 && this.panelEl.data('hided')) {
-        this.log('show panel');
-        this.log('Set width showpanel ' + w);
         this.panelEl.data('width', w);
         this.panelEl.data('hided', false);
         this.panelEl.css({
@@ -2271,8 +2351,6 @@ var __slice = [].slice,
 
       w = this.panelEl.data('width') != null ? this.panelEl.data('width') : this.panelEl.width();
       if (w > 0 && !this.panelEl.data('hided')) {
-        this.log('hide panel');
-        this.log('Set width hidepanel ' + w);
         this.panelEl.data('width', w);
         this.panelEl.data('hided', true);
         if (notAnimate) {
@@ -2601,6 +2679,7 @@ var __slice = [].slice,
       }
       this.userScrollerToTop();
       this.setUserListHeight();
+      this.initStickyHeaders();
       return this.timer(true);
     };
 
@@ -3224,6 +3303,9 @@ var __slice = [].slice,
     panelEl = $(panelHtml);
     if (getOptions().noavatar) {
       panelEl.addClass('noavatar');
+    }
+    if (hasTouch) {
+      panelEl.addClass('touch');
     }
     $user = $(userTemplateHtml);
     $userActionButton = $(actionButtonHtml);

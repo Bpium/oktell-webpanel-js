@@ -121,6 +121,9 @@ class List
 			@jScrollPaneAPI = @usersListBlockEl.data 'jsp'
 			@scrollContainer = @usersListBlockEl.find '.jspContainer'
 			@scrollContent = @usersListBlockEl.find '.jspPane'
+			@usersListBlockEl.bind 'scroll', =>
+				#@log 'scroll'
+				@processStickyHeaders()
 
 		@initJScrollPane()
 
@@ -411,6 +414,65 @@ class List
 			ringNotify?.close?()
 			ringNotify = null
 
+	initStickyHeaders: ->
+		@headerEls = @usersListBlockEl.find('.b_department_header').toArray()
+		if @headerEls.length is 0
+			return
+		else if $(@headerEls[0]).width() is 0
+			#@log 'set timeout for @initStickyHeaders'
+			setTimeout =>
+				@initStickyHeaders()
+			, 500
+			return
+		#@log 'initStickyHeaders',@headerEls
+		@headerFisrt = @headerEls[0]
+		@headerLast = if @headerEls.length then @headerEls[@headerEls.length - 1] else null
+		for h, i in @headerEls
+			@headerEls[i] = $(h)
+		conTop = @scrollContainer.offset().top
+		#@log 'conTop', conTop
+		for h, i in @headerEls
+			#@log 'h top', h.offset().top
+			if h.offset().top > conTop
+				#@log 'initStickyHeaders', i-1
+				@processStickyHeaders i-1
+				break
+		@processStickyHeaders()
+
+	headerHeight: 24
+
+	processStickyHeaders: (elIndex)->
+		if @headerEls?.length > 0
+			if elIndex?
+				#@log 'processStickyHeaders if', elIndex, @scrollContainer.width()
+				@currentTopIndex = elIndex
+				@currentTopHeaderClone?.remove()
+				@currentTopHeaderClone = @headerEls[@currentTopIndex].clone()
+				@headerEls[@currentTopIndex].after @currentTopHeaderClone
+				@currentTopHeaderClone.css
+					position: 'fixed'
+					zIndex: 1
+					width: @scrollContainer.width() + 'px'
+				@currentTopHeaderClone.offset({top:@scrollContainer.offset().top})
+				@processStickyHeaders()
+
+			else if @currentTopIndex?
+
+				conTop = @scrollContainer.offset().top
+				curTop = @headerEls[@currentTopIndex].offset().top
+				#@log 'processStickyHeaders else', conTop, curTop, @headerEls[@currentTopIndex]?.offset?().top
+				if curTop > conTop
+					@processStickyHeaders @currentTopIndex - 1
+				else
+					if @headerEls[@currentTopIndex+1]
+						nexTop = @headerEls[@currentTopIndex+1].offset().top
+						if nexTop > conTop + @headerHeight
+							@currentTopHeaderClone.offset({top:conTop})
+						else if nexTop > conTop
+							@currentTopHeaderClone.offset({top:nexTop - @headerHeight })
+						else if nexTop < conTop
+							@processStickyHeaders @currentTopIndex + 1
+
 	setTalking: (isTalking)->
 		if isTalking
 			@panelEl.addClass 'talking'
@@ -503,8 +565,7 @@ class List
 	showPanel: (notAnimate)->
 		w = @panelEl.data('width')
 		if w > 0 and @panelEl.data('hided')
-			@log 'show panel'
-			@log 'Set width showpanel ' + w
+			#@log 'show panel'
 			@panelEl.data('width', w)
 			@panelEl.data('hided', false)
 			@panelEl.css {display: ''}
@@ -517,8 +578,7 @@ class List
 	hidePanel: (notAnimate)->
 		w = if @panelEl.data('width')? then @panelEl.data('width') else @panelEl.width()
 		if w > 0 and not @panelEl.data('hided')
-			@log 'hide panel'
-			@log 'Set width hidepanel ' + w
+			#@log 'hide panel'
 			@panelEl.data('width', w)
 			@panelEl.data('hided', true)
 			if notAnimate
@@ -778,6 +838,8 @@ class List
 		@userScrollerToTop()
 
 		@setUserListHeight()
+
+		@initStickyHeaders()
 
 		@timer true
 
