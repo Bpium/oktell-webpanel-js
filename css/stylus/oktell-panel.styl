@@ -178,6 +178,9 @@
     &.noavatar table .b_contact .b_contact_avatar
         display: none
 
+    &.webphone.talking.dtmf .i_conference .b_contact td.b_contact_title span.o_dtmf
+        display: inline !important
+
 /* Marks
 ---------------------------------------------------------------*/
 .oktell_panel
@@ -561,10 +564,6 @@
     table
         width: 100%
 
-/*    .h_main_list .b_main_list.m_without_department .b_contact:last-child,
-    .h_main_list .b_department:last-child .b_contact:last-child
-        margin-bottom: 20px*/
-
     .b_contact
         height: 35px
         display: inline-block !important
@@ -647,6 +646,13 @@
     .b_contact td.b_contact_title span.o_number
         color: #999
         padding-left: 6px
+
+    .b_contact td.b_contact_title span.o_dtmf
+        display: none
+        color: #6b844a
+        margin-left: 5px
+        text-decoration: underline
+        cursor: pointer
 
     .b_contact:hover,
     .b_contact:hover:active
