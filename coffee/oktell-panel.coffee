@@ -170,6 +170,8 @@ do ($)->
 
 		if getOptions().noavatar
 			panelEl.addClass('noavatar')
+		if hasTouch
+			panelEl.addClass('touch')
 
 		$user = $(userTemplateHtml)
 		$userActionButton = $(actionButtonHtml)

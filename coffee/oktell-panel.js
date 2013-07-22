@@ -304,6 +304,9 @@ var __slice = [].slice,
     if (getOptions().noavatar) {
       panelEl.addClass('noavatar');
     }
+    if (hasTouch) {
+      panelEl.addClass('touch');
+    }
     $user = $(userTemplateHtml);
     $userActionButton = $(actionButtonHtml);
     oldBinding = $userActionButton.attr('data-bind');
