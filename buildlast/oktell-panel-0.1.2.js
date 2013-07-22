@@ -2029,6 +2029,7 @@ var __slice = [].slice,
           }
         });
         _this.departments.push(otherDep);
+        oktell.offNativeEvent('pbxnumberstatechanged', _this.onPbxNumberStateChange);
         oktell.onNativeEvent('pbxnumberstatechanged', _this.onPbxNumberStateChange);
         setTimeout(function() {
           _this.setAbonents(oktell.getAbonents());

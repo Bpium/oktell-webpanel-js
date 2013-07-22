@@ -328,6 +328,7 @@ class List
 
 			#@sortPanelUsers @panelUsers
 
+			oktell.offNativeEvent 'pbxnumberstatechanged', @onPbxNumberStateChange
 			oktell.onNativeEvent 'pbxnumberstatechanged', @onPbxNumberStateChange
 
 			setTimeout =>
