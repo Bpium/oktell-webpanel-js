@@ -835,6 +835,8 @@ List = (function() {
       }
       if (aEls.length) {
         this.dropdownEl.append(aEls);
+        this.dropdownEl.children('li:first').addClass('g_first');
+        this.dropdownEl.children('li:last').addClass('g_last');
         this.dropdownEl.data('user', user);
         this.dropdownEl.css({
           'top': this.dropdownEl.height() + buttonEl.offset().top > $(window).height() ? $(window).height() - this.dropdownEl.height() - this.dropdownPaddingBottomLeft : buttonEl.offset().top,
