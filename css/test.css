@@ -1,9 +1,12 @@
-.show {
-    -webkit-transform: translate(-281px,0px);
-    -moz-transform: translate(-281px,0px);
-    -o-transform: translate(-281px,0px);
-    -ms-transform: translate(-281px,0px);
-    transform: translate(-281px,0px);
+.oktell_panel.show_right {
+    /*-webkit-transform-origin: 0px 0px;*/
+    /*transform-origin: 0px 0px;*/
+    /*-webkit-transform: translate(-281px,0px);*/
+    /*-moz-transform: translate(-281px,0px);*/
+    /*-o-transform: translate(-281px,0px);*/
+    /*-ms-transform: translate(-281px,0px);*/
+    /*transform: translate(-281px,0px);*/
+    right: 0px !important;
 
     -webkit-transition: all .1s ease-in-out;
     -moz-transition: all .1s ease-in-out;
@@ -11,16 +14,51 @@
     -ms-transition: all .1s ease-in-out;
     transition: all .1s ease-in-out;
 }
-.hide {
-    -webkit-transform: translate(0px,0px);
-    -moz-transform: translate(0px,0px);
-    -o-transform: translate(0px,0px);
-    -ms-transform: translate(0px,0px);
-    transform: translate(0px,0px);
+.oktell_panel.hide_right {
+    /*-webkit-transform-origin: 0px 0px;*/
+    /*transform-origin: 0px 0px;*/
+    /*-webkit-transform: translate(0px,0px);*/
+    /*-moz-transform: translate(0px,0px);*/
+    /*-o-transform: translate(0px,0px);*/
+    /*-ms-transform: translate(0px,0px);*/
+    /*transform: translate(0px,0px);*/
+    right: -281px !important;
+
+    -webkit-transition: all .3s ease-in-out;
+    -moz-transition: all .3s ease-in-out;
+    -o-transition: all .3s ease-in-out;
+    -ms-transition: all .3s ease-in-out;
+    transition: all .3s ease-in-out;
+}
+.oktell_panel.show_left {
+    /*-webkit-transform-origin: 0px 0px;*/
+    /*transform-origin: 0px 0px;*/
+    /*-webkit-transform: translate(-281px,0px);*/
+    /*-moz-transform: translate(-281px,0px);*/
+    /*-o-transform: translate(-281px,0px);*/
+    /*-ms-transform: translate(-281px,0px);*/
+    /*transform: translate(-281px,0px);*/
+    left: 0px !important;
 
     -webkit-transition: all .1s ease-in-out;
     -moz-transition: all .1s ease-in-out;
     -o-transition: all .1s ease-in-out;
     -ms-transition: all .1s ease-in-out;
     transition: all .1s ease-in-out;
+}
+.oktell_panel.hide_left {
+    /*-webkit-transform-origin: 0px 0px;*/
+    /*transform-origin: 0px 0px;*/
+    /*-webkit-transform: translate(0px,0px);*/
+    /*-moz-transform: translate(0px,0px);*/
+    /*-o-transform: translate(0px,0px);*/
+    /*-ms-transform: translate(0px,0px);*/
+    /*transform: translate(0px,0px);*/
+    left: -281px !important;
+
+    -webkit-transition: all .3s ease-in-out;
+    -moz-transition: all .3s ease-in-out;
+    -o-transition: all .3s ease-in-out;
+    -ms-transition: all .3s ease-in-out;
+    transition: all .3s ease-in-out;
 }

@@ -279,7 +279,7 @@ do ($)->
 				if not cssAnimNow
 					cssAnimNow = true
 					clearTimeout showTimer
-					panelEl.removeClass('hide').addClass('show')
+					panelEl.removeClass('hide_'+panelPos).addClass('show_'+panelPos)
 					showTimer = setTimeout =>
 						list.afterShow()
 						panelEl.addClass("g_hover")
@@ -297,14 +297,14 @@ do ($)->
 
 
 		hidePanel = ->
-			list.beforeHide()
 			#if panelEl.hasClass "g_hover" #and ( panelStatus is 'open' or panelStatus is '' )
-			panelStatus 'closing'
 			if useCssAnim
 				if not cssAnimNow
+					panelStatus 'closing'
+					list.beforeHide()
 					cssAnimNow = true
 					clearTimeout hideTimer
-					panelEl.removeClass('show').addClass('hide')
+					panelEl.removeClass('show_'+panelPos).addClass('hide_'+panelPos)
 					hideTimer = setTimeout =>
 						panelEl.css({panelPos: 0});
 						list.afterHide()
@@ -312,8 +312,10 @@ do ($)->
 						panelBookmarkEl.css bookmarkAnimOptHide
 						panelStatus 'closed'
 						cssAnimNow = false
-					, 200
+					, 400
 			else
+				panelStatus 'closing'
+				list.beforeHide()
 				panelEl.stop(true, true);
 				panelEl.animate animOptHide, 300, "swing", ->
 					panelEl.css({panelPos: 0});
@@ -442,10 +444,11 @@ do ($)->
 
 
 		$('html').bind 'mousemove', (e) ->
-			if not mouseOnPanel and panelHideTimer is false and not list.dropdownOpenedOnPanel
+			if panelStatus() is 'open' and not mouseOnPanel and panelHideTimer is false and not list.dropdownOpenedOnPanel
 				panelHideTimer = setTimeout ->
 					hidePanel()
 				, 100
+				1
 			return true
 
 #		if window.navigator.userAgent.indexOf('iPad') isnt -1

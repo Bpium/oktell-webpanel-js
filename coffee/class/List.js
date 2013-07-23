@@ -20,7 +20,10 @@ List = (function() {
     this.jScrollPaneParams = {
       mouseWheelSpeed: 50,
       hideFocus: true,
-      verticalGutter: -13
+      verticalGutter: -13,
+      onScroll: function() {
+        return _this.processStickyHeaders.apply(_this);
+      }
     };
     this.allActions = {
       answer: {
@@ -487,11 +490,109 @@ List = (function() {
     });
   }
 
+  List.prototype.initStickyHeaders = function() {
+    var conTop, h, i, _i, _j, _len, _len1, _ref, _ref1,
+      _this = this;
+
+    this.resetStickyHeaders();
+    this.headerEls = this.usersListBlockEl.find('.b_department_header').toArray();
+    if (this.headerEls.length === 0) {
+      return;
+    } else if ($(this.headerEls[0]).width() === 0) {
+      setTimeout(function() {
+        return _this.initStickyHeaders();
+      }, 500);
+      return;
+    }
+    this.headerFisrt = this.headerEls[0];
+    this.headerLast = this.headerEls.length ? this.headerEls[this.headerEls.length - 1] : null;
+    _ref = this.headerEls;
+    for (i = _i = 0, _len = _ref.length; _i < _len; i = ++_i) {
+      h = _ref[i];
+      this.headerEls[i] = $(h);
+    }
+    conTop = this.scrollContainer.offset().top;
+    _ref1 = this.headerEls;
+    for (i = _j = 0, _len1 = _ref1.length; _j < _len1; i = ++_j) {
+      h = _ref1[i];
+      if (h.offset().top > conTop) {
+        this.processStickyHeaders(i - 1);
+        break;
+      }
+    }
+    return this.processStickyHeaders();
+  };
+
+  List.prototype.headerHeight = 24;
+
+  List.prototype.processStickyHeaders = function(elIndex) {
+    var conTop, curTop, nexTop, tt, _ref, _ref1;
+
+    if (((_ref = this.headerEls) != null ? _ref.length : void 0) > 0) {
+      if (elIndex != null) {
+        this.currentTopIndex = elIndex;
+        if ((_ref1 = this.currentTopHeaderClone) != null) {
+          _ref1.remove();
+        }
+        this.currentTopHeaderClone = this.headerEls[this.currentTopIndex].clone();
+        this.headerEls[this.currentTopIndex].after(this.currentTopHeaderClone);
+        this.currentTopHeaderClone.css({
+          position: 'fixed',
+          zIndex: 1,
+          width: this.scrollContainer.width() + 'px'
+        });
+        tt = this.scrollContainer.offset().top;
+        this.currentTopHeaderClone.offset({
+          top: tt
+        });
+        return this.processStickyHeaders();
+      } else if (this.currentTopIndex != null) {
+        conTop = this.scrollContainer.offset().top;
+        curTop = this.headerEls[this.currentTopIndex].offset().top;
+        if (curTop > conTop) {
+          return this.processStickyHeaders(this.currentTopIndex - 1);
+        } else {
+          if (this.headerEls[this.currentTopIndex + 1]) {
+            nexTop = this.headerEls[this.currentTopIndex + 1].offset().top;
+            if (nexTop > conTop + this.headerHeight) {
+              return this.currentTopHeaderClone.offset({
+                top: conTop
+              });
+            } else if (nexTop > conTop) {
+              return this.currentTopHeaderClone.offset({
+                top: nexTop - this.headerHeight
+              });
+            } else if (nexTop < conTop) {
+              return this.processStickyHeaders(this.currentTopIndex + 1);
+            }
+          }
+        }
+      }
+    }
+  };
+
+  List.prototype.resetStickyHeaders = function() {
+    var _ref;
+
+    if ((_ref = this.currentTopHeaderClone) != null) {
+      if (typeof _ref.remove === "function") {
+        _ref.remove();
+      }
+    }
+    this.currentTopHeaderClone = null;
+    this.currentTopIndex = null;
+    return this.headerEls = null;
+  };
+
   List.prototype.beforeShow = function() {};
 
-  List.prototype.afterShow = function() {};
+  List.prototype.afterShow = function() {
+    return this.initStickyHeaders();
+  };
 
-  List.prototype.beforeHide = function() {};
+  List.prototype.beforeHide = function() {
+    return this.resetStickyHeaders();
+  };
 
   List.prototype.afterHide = function() {};
 
@@ -612,8 +713,6 @@ List = (function() {
 
     w = this.panelEl.data('width');
     if (w > 0 && this.panelEl.data('hided')) {
-      this.log('show panel');
-      this.log('Set width showpanel ' + w);
       this.panelEl.data('width', w);
       this.panelEl.data('hided', false);
       this.panelEl.css({
@@ -642,8 +741,6 @@ List = (function() {
 
     w = this.panelEl.data('width') != null ? this.panelEl.data('width') : this.panelEl.width();
     if (w > 0 && !this.panelEl.data('hided')) {
-      this.log('hide panel');
-      this.log('Set width hidepanel ' + w);
       this.panelEl.data('width', w);
       this.panelEl.data('hided', true);
       if (notAnimate) {
@@ -974,6 +1071,7 @@ List = (function() {
     }
     this.userScrollerToTop();
     this.setUserListHeight();
+    this.initStickyHeaders();
     return this.timer(true);
   };
 

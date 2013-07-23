@@ -497,7 +497,10 @@
 						var dY = verticalDragPosition;
 						jsp.scrollByY(-deltaY * settings.mouseWheelSpeed, false);
 						// return true if there was no movement so rest of screen can scroll
-						return false; // dY == verticalDragPosition;
+						if ( settings.onScroll ){
+							settings.onScroll();
+						}
+						return false; //dY == verticalDragPosition;
 					}
 				);
 			}
@@ -544,7 +547,11 @@
 						jsp.scrollToY(startY + touchStartY - touchPos.pageY);
 						
 						moved = moved || Math.abs(touchStartY - touchPos.pageY) > 5;
-						
+
+						if ( settings.onScroll ){
+							settings.onScroll();
+						}
+
 						// return true if there was no movement so rest of screen can scroll
 						return false; //dY == verticalDragPosition;
 					}
@@ -742,7 +749,8 @@
 		initialDelay                : 300,        // Delay before starting repeating
 		speed						: 30,		// Default speed when others falsey
 		scrollPagePercent			: .8,		// Percent of visible area scrolled when pageUp/Down or track area pressed
-		dragInnerAnimation			: true		//
+		dragInnerAnimation			: true,		//
+		onScroll					: null
 	};
 
 })(jQuery,this);
