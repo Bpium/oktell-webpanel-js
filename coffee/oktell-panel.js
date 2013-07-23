@@ -398,10 +398,11 @@ var __slice = [].slice,
     touchMoving = false;
     panelBookmarkEl.bind('touchstart', function() {
       if (panelStatus() === 'closed') {
-        return panelStatus('touchopening');
+        panelStatus('touchopening');
       } else if (panelStatus() === 'open') {
-        return panelStatus('touchclosing');
+        panelStatus('touchclosing');
       }
+      return true;
     });
     panelBookmarkEl.bind('touchmove', function(e) {
       var pos, t, _ref, _ref1;
@@ -416,36 +417,40 @@ var __slice = [].slice,
             pos = parseInt(panelEl.css(panelPos));
             panelEl.css(panelPos, Math.max(panelMinPos, Math.min(0, pos + pageX - t.pageX)) + 'px');
           }
-          return pageX = t.pageX;
+          pageX = t.pageX;
         }
       }
+      return true;
     });
     panelBookmarkEl.bind('touchend', function() {
       var pos;
 
       if (!touchMoving) {
         if (panelStatus() === 'touchopening') {
-          return showPanel();
+          showPanel();
         }
       } else {
         touchMoving = false;
         pos = parseInt(panelEl.css(panelPos));
         if (panelStatus() === 'touchopening') {
           if (pos > minPosOpen) {
-            return showPanel();
+            showPanel();
           } else {
-            return hidePanel();
+            hidePanel();
           }
         } else if (panelStatus() === 'touchclosing') {
           if (pos < maxPosClose) {
-            return hidePanel();
+            hidePanel();
           } else {
-            return openPanel();
+            openPanel();
           }
         }
       }
+      return true;
     });
-    panelBookmarkEl.bind('touchcancel', function() {});
+    panelBookmarkEl.bind('touchcancel', function() {
+      return true;
+    });
     touchClickedContact = null;
     touchClickedCss = 'm_touch_clicked';
     touchClickedContactClear = function() {
@@ -454,7 +459,9 @@ var __slice = [].slice,
       }
       return touchClickedContact = null;
     };
-    $(window).bind('touchcancel', function(e) {});
+    $(window).bind('touchcancel', function(e) {
+      return true;
+    });
     $(window).bind('touchend', function(e) {
       var parents, parentsArr, target;
 
@@ -462,8 +469,9 @@ var __slice = [].slice,
       parents = target.parents();
       parentsArr = parents.toArray();
       if (parentsArr.indexOf(panelEl[0]) === -1) {
-        return hidePanel();
+        hidePanel();
       }
+      return true;
     });
     panelEl.bind('touchend', function(e) {
       var contact, parents, parentsArr, target;

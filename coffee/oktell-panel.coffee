@@ -283,6 +283,7 @@ do ($)->
 				panelStatus 'touchopening'
 			else if panelStatus() is 'open'
 				panelStatus 'touchclosing'
+			true
 
 		panelBookmarkEl.bind 'touchmove', (e)=>
 			if panelStatus() is 'touchopening' or panelStatus() is 'touchclosing'
@@ -296,7 +297,7 @@ do ($)->
 #						@log 'moving pos='+pos+' pageX='+pageX+' t.pageX='+t.pageX
 						panelEl.css panelPos, Math.max( panelMinPos, Math.min( 0, pos + pageX - t.pageX ) ) + 'px'
 					pageX = t.pageX
-
+			true
 
 
 		panelBookmarkEl.bind 'touchend', =>
@@ -319,9 +320,11 @@ do ($)->
 						hidePanel()
 					else
 						openPanel()
+			true
 
 
 		panelBookmarkEl.bind 'touchcancel', =>
+			true
 
 
 		touchClickedContact = null
@@ -332,6 +335,7 @@ do ($)->
 
 		$(window).bind 'touchcancel', (e)=>
 			#@log 'touchcancel'
+			true
 
 		$(window).bind 'touchend', (e)=>
 			target = $(e.target)
@@ -339,6 +343,7 @@ do ($)->
 			parentsArr = parents.toArray()
 			if parentsArr.indexOf( panelEl[0] ) is -1
 				hidePanel()
+			true
 
 		panelEl.bind 'touchend', (e)=>
 			#@log 'touchstart'
