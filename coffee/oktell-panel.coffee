@@ -213,6 +213,7 @@ do ($)->
 		animOptShow[panelPos] = '0px'
 		animOptHide = {}
 		animOptHide[panelPos] = '-281px'
+		panelMinPos = -281
 
 		panelEl.hide()
 		$("body").append(panelEl)
@@ -241,44 +242,109 @@ do ($)->
 		# Panel Bookmark hover
 		mouseOnPanel = false
 		panelHideTimer = false
-		panelStatus = 'closed'
+		_panelStatus = 'closed'
+		panelStatus = (st)=>
+			if st and st isnt _panelStatus
+				#@log 'set panel status - ' + st
+				_panelStatus = st
+			_panelStatus
 
 		killPanelHideTimer = ->
 			clearTimeout panelHideTimer
 			panelHideTimer = false
 
-		panelEl.bind "mouseenter", ->
+		showPanel = =>
+			panelStatus 'opening'
+			#panelBookmarkEl.stop(true,true)
+			#panelBookmarkEl.animate bookmarkAnimOptShow, 1, 'swing'
+			panelBookmarkEl.css bookmarkAnimOptShow
+			panelEl.stop true, true
+			panelEl.animate animOptShow, 100, "swing", ->
+				panelEl.addClass("g_hover")
+				panelStatus 'open'
+				panelBookmarkEl.css bookmarkAnimOptShow
+
+		panelEl.bind "mouseenter", =>
 			mouseOnPanel = true
 			killPanelHideTimer()
-			if parseInt(panelEl.css(panelPos)) < 0 and ( panelStatus is 'closed' or panelStatus is 'closing' )
-				panelStatus = 'opening'
-				panelBookmarkEl.stop(true,true)
-				#panelBookmarkEl.animate bookmarkAnimOptShow, 1, 'swing'
-				panelBookmarkEl.css bookmarkAnimOptShow
-				panelEl.stop true, true
-				panelEl.animate animOptShow, 100, "swing", ->
-					panelEl.addClass("g_hover")
-					panelStatus = 'open'
+			if parseInt(panelEl.css(panelPos)) < 0 and ( panelStatus() is 'closed' or panelStatus() is 'closing' )
+				#@log 'show panel on mouseenter'
+				showPanel()
 			true
+
+		pageX = false
+		minPosOpen = -250
+		maxPosClose = 30
+		touchMoving = false
+
+		panelBookmarkEl.bind 'touchstart', =>
+			#@log 'touchstart'
+			if panelStatus() is 'closed'
+				panelStatus 'touchopening'
+			else if panelStatus() is 'open'
+				panelStatus 'touchclosing'
+
+		panelBookmarkEl.bind 'touchmove', (e)=>
+			if panelStatus() is 'touchopening' or panelStatus() is 'touchclosing'
+				touchMoving = true
+
+			if touchMoving
+				t = e?.originalEvent?.touches?[0]
+				if t
+					if pageX isnt false
+						pos = parseInt panelEl.css panelPos
+#						@log 'moving pos='+pos+' pageX='+pageX+' t.pageX='+t.pageX
+						panelEl.css panelPos, Math.max( panelMinPos, Math.min( 0, pos + pageX - t.pageX ) ) + 'px'
+					pageX = t.pageX
+
+
+
+		panelBookmarkEl.bind 'touchend', =>
+			#@log 'touchend'
+			if not touchMoving
+				if panelStatus() is 'touchopening'
+					#@log 'show panel on touch end'
+					showPanel()
+			else
+				touchMoving = false
+				pos = parseInt panelEl.css panelPos
+				#@log 'pos = ' + pos
+				if panelStatus() is 'touchopening'
+					if pos > minPosOpen
+						showPanel()
+					else
+						hidePanel()
+				else if panelStatus() is 'touchclosing'
+					if pos < maxPosClose
+						hidePanel()
+					else
+						openPanel()
+
+
+		panelBookmarkEl.bind 'touchcancel', =>
+
 
 		touchClickedContact = null
 		touchClickedCss = 'm_touch_clicked'
 		touchClickedContactClear = =>
 			touchClickedContact?.removeClass touchClickedCss
 			touchClickedContact = null
-		$(window).bind 'touchmove', (e)=>
-			@log 'touchmove'
+
 		$(window).bind 'touchcancel', (e)=>
-			@log 'touchcancel'
+			#@log 'touchcancel'
+
 		$(window).bind 'touchend', (e)=>
-			@log 'touchend'
-		$(window).bind 'touchstart', (e)=>
-			@log 'touchstart'
 			target = $(e.target)
 			parents = target.parents()
 			parentsArr = parents.toArray()
 			if parentsArr.indexOf( panelEl[0] ) is -1
 				hidePanel()
+
+		panelEl.bind 'touchend', (e)=>
+			#@log 'touchstart'
+			target = $(e.target)
+			parents = target.parents()
+			parentsArr = parents.toArray()
 			if parentsArr.indexOf( actionListEl[0] ) is -1 and not target.is('.oktell_panel .drop_down') and parents.filter('.oktell_panel .drop_down').size() is 0
 				list?.hideActionListDropdown?()
 			contact = if target.is('.oktell_panel .b_contact') then target else parents.filter('.oktell_panel .b_contact')
@@ -295,18 +361,18 @@ do ($)->
 
 
 		hidePanel = ->
-			if panelEl.hasClass "g_hover" #and ( panelStatus is 'open' or panelStatus is '' )
-				panelStatus = 'closing'
-				panelEl.stop(true, true);
-				panelEl.animate animOptHide, 300, "swing", ->
-					panelEl.css({panelPos: 0});
-					panelEl.removeClass("g_hover");
-					panelStatus = 'closed'
-				#setTimeout ->
-					panelBookmarkEl.stop(true,true)
-					#panelBookmarkEl.animate bookmarkAnimOptHide, 50, 'swing'
-					panelBookmarkEl.css bookmarkAnimOptHide
-				#, 49
+			#if panelEl.hasClass "g_hover" #and ( panelStatus is 'open' or panelStatus is '' )
+			panelStatus 'closing'
+			panelEl.stop(true, true);
+			panelEl.animate animOptHide, 300, "swing", ->
+				panelEl.css({panelPos: 0});
+				panelEl.removeClass("g_hover");
+				panelBookmarkEl.css bookmarkAnimOptHide
+				panelStatus 'closed'
+			#setTimeout ->
+				#panelBookmarkEl.stop(true,true)
+				#panelBookmarkEl.animate bookmarkAnimOptHide, 50, 'swing'
+			#, 49
 
 
 		panelEl.bind "mouseleave", ->
