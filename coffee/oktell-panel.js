@@ -283,7 +283,7 @@ var __slice = [].slice,
   isTouchPad = /hp-tablet/gi.test(navigator.appVersion);
   hasTouch = __indexOf.call(window, 'ontouchstart') >= 0 && !isTouchPad;
   initPanel = function(opts) {
-    var $user, $userActionButton, animOptHide, animOptShow, bookmarkAnimOptHide, bookmarkAnimOptShow, bookmarkPos, errorEl, hidePanel, killPanelHideTimer, mouseOnPanel, oldBinding, panelBookmarkEl, panelEl, panelHideTimer, panelPos, panelStatus, permissionsPopupEl, popupEl, touchClickedContact, touchClickedContactClear, touchClickedCss,
+    var $user, $userActionButton, animOptHide, animOptShow, bookmarkAnimOptHide, bookmarkAnimOptShow, bookmarkPos, errorEl, hidePanel, killPanelHideTimer, maxPosClose, minPosOpen, mouseOnPanel, oldBinding, pageX, panelBookmarkEl, panelEl, panelHideTimer, panelMinPos, panelPos, panelStatus, permissionsPopupEl, popupEl, showPanel, touchClickedContact, touchClickedContactClear, touchClickedCss, touchMoving, _panelStatus,
       _this = this;
 
     panelWasInitialized = true;
@@ -338,6 +338,7 @@ var __slice = [].slice,
     animOptShow[panelPos] = '0px';
     animOptHide = {};
     animOptHide[panelPos] = '-281px';
+    panelMinPos = -281;
     panelEl.hide();
     $("body").append(panelEl);
     list = new List(oktell, panelEl, actionListEl, afterOktellConnect, getOptions(), getOptions().debug);
@@ -362,26 +363,89 @@ var __slice = [].slice,
     bookmarkAnimOptHide[bookmarkPos] = '-40px';
     mouseOnPanel = false;
     panelHideTimer = false;
-    panelStatus = 'closed';
+    _panelStatus = 'closed';
+    panelStatus = function(st) {
+      if (st && st !== _panelStatus) {
+        _panelStatus = st;
+      }
+      return _panelStatus;
+    };
     killPanelHideTimer = function() {
       clearTimeout(panelHideTimer);
       return panelHideTimer = false;
     };
+    showPanel = function() {
+      panelStatus('opening');
+      panelBookmarkEl.css(bookmarkAnimOptShow);
+      panelEl.stop(true, true);
+      return panelEl.animate(animOptShow, 100, "swing", function() {
+        panelEl.addClass("g_hover");
+        panelStatus('open');
+        return panelBookmarkEl.css(bookmarkAnimOptShow);
+      });
+    };
     panelEl.bind("mouseenter", function() {
       mouseOnPanel = true;
       killPanelHideTimer();
-      if (parseInt(panelEl.css(panelPos)) < 0 && (panelStatus === 'closed' || panelStatus === 'closing')) {
-        panelStatus = 'opening';
-        panelBookmarkEl.stop(true, true);
-        panelBookmarkEl.css(bookmarkAnimOptShow);
-        panelEl.stop(true, true);
-        panelEl.animate(animOptShow, 100, "swing", function() {
-          panelEl.addClass("g_hover");
-          return panelStatus = 'open';
-        });
+      if (parseInt(panelEl.css(panelPos)) < 0 && (panelStatus() === 'closed' || panelStatus() === 'closing')) {
+        showPanel();
       }
       return true;
     });
+    pageX = false;
+    minPosOpen = -250;
+    maxPosClose = 30;
+    touchMoving = false;
+    panelBookmarkEl.bind('touchstart', function() {
+      if (panelStatus() === 'closed') {
+        return panelStatus('touchopening');
+      } else if (panelStatus() === 'open') {
+        return panelStatus('touchclosing');
+      }
+    });
+    panelBookmarkEl.bind('touchmove', function(e) {
+      var pos, t, _ref, _ref1;
+
+      if (panelStatus() === 'touchopening' || panelStatus() === 'touchclosing') {
+        touchMoving = true;
+      }
+      if (touchMoving) {
+        t = e != null ? (_ref = e.originalEvent) != null ? (_ref1 = _ref.touches) != null ? _ref1[0] : void 0 : void 0 : void 0;
+        if (t) {
+          if (pageX !== false) {
+            pos = parseInt(panelEl.css(panelPos));
+            panelEl.css(panelPos, Math.max(panelMinPos, Math.min(0, pos + pageX - t.pageX)) + 'px');
+          }
+          return pageX = t.pageX;
+        }
+      }
+    });
+    panelBookmarkEl.bind('touchend', function() {
+      var pos;
+
+      if (!touchMoving) {
+        if (panelStatus() === 'touchopening') {
+          return showPanel();
+        }
+      } else {
+        touchMoving = false;
+        pos = parseInt(panelEl.css(panelPos));
+        if (panelStatus() === 'touchopening') {
+          if (pos > minPosOpen) {
+            return showPanel();
+          } else {
+            return hidePanel();
+          }
+        } else if (panelStatus() === 'touchclosing') {
+          if (pos < maxPosClose) {
+            return hidePanel();
+          } else {
+            return openPanel();
+          }
+        }
+      }
+    });
+    panelBookmarkEl.bind('touchcancel', function() {});
     touchClickedContact = null;
     touchClickedCss = 'm_touch_clicked';
     touchClickedContactClear = function() {
@@ -390,25 +454,23 @@ var __slice = [].slice,
       }
       return touchClickedContact = null;
     };
-    $(window).bind('touchmove', function(e) {
-      return _this.log('touchmove');
-    });
-    $(window).bind('touchcancel', function(e) {
-      return _this.log('touchcancel');
-    });
+    $(window).bind('touchcancel', function(e) {});
     $(window).bind('touchend', function(e) {
-      return _this.log('touchend');
-    });
-    $(window).bind('touchstart', function(e) {
-      var contact, parents, parentsArr, target;
+      var parents, parentsArr, target;
 
-      _this.log('touchstart');
       target = $(e.target);
       parents = target.parents();
       parentsArr = parents.toArray();
       if (parentsArr.indexOf(panelEl[0]) === -1) {
-        hidePanel();
+        return hidePanel();
       }
+    });
+    panelEl.bind('touchend', function(e) {
+      var contact, parents, parentsArr, target;
+
+      target = $(e.target);
+      parents = target.parents();
+      parentsArr = parents.toArray();
       if (parentsArr.indexOf(actionListEl[0]) === -1 && !target.is('.oktell_panel .drop_down') && parents.filter('.oktell_panel .drop_down').size() === 0) {
         if (list != null) {
           if (typeof list.hideActionListDropdown === "function") {
@@ -430,19 +492,16 @@ var __slice = [].slice,
       return true;
     });
     hidePanel = function() {
-      if (panelEl.hasClass("g_hover")) {
-        panelStatus = 'closing';
-        panelEl.stop(true, true);
-        return panelEl.animate(animOptHide, 300, "swing", function() {
-          panelEl.css({
-            panelPos: 0
-          });
-          panelEl.removeClass("g_hover");
-          panelStatus = 'closed';
-          panelBookmarkEl.stop(true, true);
-          return panelBookmarkEl.css(bookmarkAnimOptHide);
+      panelStatus('closing');
+      panelEl.stop(true, true);
+      return panelEl.animate(animOptHide, 300, "swing", function() {
+        panelEl.css({
+          panelPos: 0
         });
-      }
+        panelEl.removeClass("g_hover");
+        panelBookmarkEl.css(bookmarkAnimOptHide);
+        return panelStatus('closed');
+      });
     };
     panelEl.bind("mouseleave", function() {
       mouseOnPanel = false;
