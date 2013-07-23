@@ -254,12 +254,14 @@ do ($)->
 			panelHideTimer = false
 
 		showPanel = =>
+			list.beforeShow()
 			panelStatus 'opening'
 			#panelBookmarkEl.stop(true,true)
 			#panelBookmarkEl.animate bookmarkAnimOptShow, 1, 'swing'
 			panelBookmarkEl.css bookmarkAnimOptShow
 			panelEl.stop true, true
 			panelEl.animate animOptShow, 100, "swing", ->
+				list.afterShow()
 				panelEl.addClass("g_hover")
 				panelStatus 'open'
 				panelBookmarkEl.css bookmarkAnimOptShow
@@ -366,11 +368,13 @@ do ($)->
 
 
 		hidePanel = ->
+			list.beforeHide()
 			#if panelEl.hasClass "g_hover" #and ( panelStatus is 'open' or panelStatus is '' )
 			panelStatus 'closing'
 			panelEl.stop(true, true);
 			panelEl.animate animOptHide, 300, "swing", ->
 				panelEl.css({panelPos: 0});
+				list.afterHide()
 				panelEl.removeClass("g_hover");
 				panelBookmarkEl.css bookmarkAnimOptHide
 				panelStatus 'closed'

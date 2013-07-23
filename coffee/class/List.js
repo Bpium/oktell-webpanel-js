@@ -487,6 +487,14 @@ List = (function() {
     });
   }
 
+  List.prototype.beforeShow = function() {};
+
+  List.prototype.afterShow = function() {};
+
+  List.prototype.beforeHide = function() {};
+
+  List.prototype.afterHide = function() {};
+
   List.prototype.setTalking = function(isTalking) {
     if (isTalking) {
       return this.panelEl.addClass('talking');

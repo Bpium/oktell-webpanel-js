@@ -411,6 +411,12 @@ class List
 			ringNotify?.close?()
 			ringNotify = null
 
+	beforeShow: ->
+	afterShow: ->
+	beforeHide: ->
+	afterHide: ->
+
+
 	setTalking: (isTalking)->
 		if isTalking
 			@panelEl.addClass 'talking'
