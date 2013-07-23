@@ -473,15 +473,21 @@ var __slice = [].slice,
       if (parentsArr.indexOf(panelEl[0]) === -1) {
         hidePanel();
       }
+      if (!target.is('.oktell_button_action .drop_down') && parents.filter('.oktell_button_action .drop_down').size() === 0) {
+        if (list != null) {
+          if (typeof list.hideActionListDropdown === "function") {
+            list.hideActionListDropdown();
+          }
+        }
+      }
       return true;
     });
     panelEl.bind('touchend', function(e) {
-      var contact, parents, parentsArr, target;
+      var contact, parents, target;
 
       target = $(e.target);
       parents = target.parents();
-      parentsArr = parents.toArray();
-      if (parentsArr.indexOf(actionListEl[0]) === -1 && !target.is('.oktell_panel .drop_down') && parents.filter('.oktell_panel .drop_down').size() === 0) {
+      if (!target.is('.oktell_button_action .drop_down') && parents.filter('.oktell_button_action .drop_down').size() === 0) {
         if (list != null) {
           if (typeof list.hideActionListDropdown === "function") {
             list.hideActionListDropdown();

@@ -590,8 +590,8 @@ class List
 
 				@dropdownEl.append aEls
 
-#				@dropdownEl.children('li:first').addClass 'g_first'
-#				@dropdownEl.children('li:last').addClass 'g_last'
+				@dropdownEl.children('li:first').addClass 'g_first'
+				@dropdownEl.children('li:last').addClass 'g_last'
 
 				@dropdownEl.data 'user', user
 

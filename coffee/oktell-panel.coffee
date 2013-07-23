@@ -345,14 +345,15 @@ do ($)->
 			parentsArr = parents.toArray()
 			if parentsArr.indexOf( panelEl[0] ) is -1
 				hidePanel()
+			if not target.is('.oktell_button_action .drop_down') and parents.filter('.oktell_button_action .drop_down').size() is 0 # and parentsArr.indexOf( actionListEl[0] ) is -1
+				list?.hideActionListDropdown?()
 			true
 
 		panelEl.bind 'touchend', (e)=>
 			#@log 'touchstart'
 			target = $(e.target)
 			parents = target.parents()
-			parentsArr = parents.toArray()
-			if parentsArr.indexOf( actionListEl[0] ) is -1 and not target.is('.oktell_panel .drop_down') and parents.filter('.oktell_panel .drop_down').size() is 0
+			if not target.is('.oktell_button_action .drop_down') and parents.filter('.oktell_button_action .drop_down').size() is 0 # and parentsArr.indexOf( actionListEl[0] ) is -1
 				list?.hideActionListDropdown?()
 			contact = if target.is('.oktell_panel .b_contact') then target else parents.filter('.oktell_panel .b_contact')
 			if contact.size() > 0
