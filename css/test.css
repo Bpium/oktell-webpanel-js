@@ -1,0 +1,26 @@
+.show {
+    -webkit-transform: translate(-281px,0px);
+    -moz-transform: translate(-281px,0px);
+    -o-transform: translate(-281px,0px);
+    -ms-transform: translate(-281px,0px);
+    transform: translate(-281px,0px);
+
+    -webkit-transition: all .1s ease-in-out;
+    -moz-transition: all .1s ease-in-out;
+    -o-transition: all .1s ease-in-out;
+    -ms-transition: all .1s ease-in-out;
+    transition: all .1s ease-in-out;
+}
+.hide {
+    -webkit-transform: translate(0px,0px);
+    -moz-transform: translate(0px,0px);
+    -o-transform: translate(0px,0px);
+    -ms-transform: translate(0px,0px);
+    transform: translate(0px,0px);
+
+    -webkit-transition: all .1s ease-in-out;
+    -moz-transition: all .1s ease-in-out;
+    -o-transition: all .1s ease-in-out;
+    -ms-transition: all .1s ease-in-out;
+    transition: all .1s ease-in-out;
+}

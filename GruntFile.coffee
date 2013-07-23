@@ -74,7 +74,7 @@ module.exports = (grunt) ->
 			js:
 				files: { 'buildlast/oktell-panel.js': ['js/jquery.mousewheel.js', 'js/mwheelIntent.js', 'js/jquery.jscrollpane.js', 'buildlast/oktell-panel.js'] }
 			css:
-				files: { 'buildlast/oktell-panel.css': ['css/oktell-panel.css', 'css/jquery.jscrollpane.css'] }
+				files: { 'buildlast/oktell-panel.css': ['css/oktell-panel.css', 'css/test.css', 'css/jquery.jscrollpane.css'] }
 
 	grunt.loadNpmTasks 'grunt-contrib-htmlmin'
 	grunt.loadNpmTasks 'grunt-contrib-coffee'
