@@ -402,7 +402,7 @@ var __slice = [].slice,
         if (!cssAnimNow) {
           cssAnimNow = true;
           clearTimeout(showTimer);
-          panelEl.removeClass('hide').addClass('show');
+          panelEl.removeClass('hide_' + panelPos).addClass('show_' + panelPos);
           return showTimer = setTimeout(function() {
             list.afterShow();
             panelEl.addClass("g_hover");
@@ -424,13 +424,13 @@ var __slice = [].slice,
     hidePanel = function() {
       var _this = this;
 
-      list.beforeHide();
-      panelStatus('closing');
       if (useCssAnim) {
         if (!cssAnimNow) {
+          panelStatus('closing');
+          list.beforeHide();
           cssAnimNow = true;
           clearTimeout(hideTimer);
-          panelEl.removeClass('show').addClass('hide');
+          panelEl.removeClass('show_' + panelPos).addClass('hide_' + panelPos);
           return hideTimer = setTimeout(function() {
             panelEl.css({
               panelPos: 0
@@ -440,9 +440,11 @@ var __slice = [].slice,
             panelBookmarkEl.css(bookmarkAnimOptHide);
             panelStatus('closed');
             return cssAnimNow = false;
-          }, 200);
+          }, 400);
         }
       } else {
+        panelStatus('closing');
+        list.beforeHide();
         panelEl.stop(true, true);
         return panelEl.animate(animOptHide, 300, "swing", function() {
           panelEl.css({
@@ -586,10 +588,11 @@ var __slice = [].slice,
       return true;
     });
     return $('html').bind('mousemove', function(e) {
-      if (!mouseOnPanel && panelHideTimer === false && !list.dropdownOpenedOnPanel) {
+      if (panelStatus() === 'open' && !mouseOnPanel && panelHideTimer === false && !list.dropdownOpenedOnPanel) {
         panelHideTimer = setTimeout(function() {
           return hidePanel();
         }, 100);
+        1;
       }
       return true;
     });

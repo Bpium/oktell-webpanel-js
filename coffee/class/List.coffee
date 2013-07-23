@@ -6,7 +6,12 @@ class List
 			showDeps: true
 			showOffline: false
 
-		@jScrollPaneParams = { mouseWheelSpeed: 50, hideFocus: true, verticalGutter: -13 }
+		@jScrollPaneParams =
+			mouseWheelSpeed: 50,
+			hideFocus: true,
+			verticalGutter: -13,
+			onScroll: =>
+				@processStickyHeaders.apply @
 
 		@allActions =
 			answer: { icon: '/img/icons/action/call.png', iconWhite: '/img/icons/action/white/call.png', text: @langs.actions.answer }
@@ -450,6 +455,7 @@ class List
 				@currentTopHeaderClone?.remove()
 				@currentTopHeaderClone = @headerEls[@currentTopIndex].clone()
 				@headerEls[@currentTopIndex].after @currentTopHeaderClone
+				#@currentTopHeaderClone.find('.h_shadow_top span').text('Клон')
 				@currentTopHeaderClone.css
 					position: 'fixed'
 					zIndex: 1

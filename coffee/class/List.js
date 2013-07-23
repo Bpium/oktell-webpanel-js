@@ -20,7 +20,10 @@ List = (function() {
     this.jScrollPaneParams = {
       mouseWheelSpeed: 50,
       hideFocus: true,
-      verticalGutter: -13
+      verticalGutter: -13,
+      onScroll: function() {
+        return _this.processStickyHeaders.apply(_this);
+      }
     };
     this.allActions = {
       answer: {
