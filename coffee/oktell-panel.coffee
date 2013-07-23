@@ -76,6 +76,17 @@ do ($)->
 
 	logStr = ''
 
+	checkCssAnimationSupport = =>
+		div = document.createElement("div")
+		divStyle = div.style
+		suffix = "Transform"
+		testProperties = ["o" + suffix, "ms" + suffix, "webkit" + suffix, "Webkit" + suffix, "Moz" + suffix, 'transform']
+		for v in testProperties
+			if divStyle[v]?
+				return true
+		return divStyle
+		return false
+
 	log = (args...)->
 		if not getOptions().debug then return
 		d = new Date()
@@ -253,18 +264,68 @@ do ($)->
 			clearTimeout panelHideTimer
 			panelHideTimer = false
 
+		useCssAnim = checkCssAnimationSupport()
+		showTimer = null
+		hideTimer = null
+		cssAnimNow = false
+
 		showPanel = =>
 			list.beforeShow()
 			panelStatus 'opening'
 			#panelBookmarkEl.stop(true,true)
 			#panelBookmarkEl.animate bookmarkAnimOptShow, 1, 'swing'
 			panelBookmarkEl.css bookmarkAnimOptShow
-			panelEl.stop true, true
-			panelEl.animate animOptShow, 100, "swing", ->
-				list.afterShow()
-				panelEl.addClass("g_hover")
-				panelStatus 'open'
-				panelBookmarkEl.css bookmarkAnimOptShow
+			if useCssAnim
+				if not cssAnimNow
+					cssAnimNow = true
+					clearTimeout showTimer
+					panelEl.removeClass('hide').addClass('show')
+					showTimer = setTimeout =>
+						list.afterShow()
+						panelEl.addClass("g_hover")
+						panelStatus 'open'
+						panelBookmarkEl.css bookmarkAnimOptShow
+						cssAnimNow = false
+					, 200
+			else
+				panelEl.stop true, true
+				panelEl.animate animOptShow, 100, "swing", ->
+					list.afterShow()
+					panelEl.addClass("g_hover")
+					panelStatus 'open'
+					panelBookmarkEl.css bookmarkAnimOptShow
+
+
+		hidePanel = ->
+			list.beforeHide()
+			#if panelEl.hasClass "g_hover" #and ( panelStatus is 'open' or panelStatus is '' )
+			panelStatus 'closing'
+			if useCssAnim
+				if not cssAnimNow
+					cssAnimNow = true
+					clearTimeout hideTimer
+					panelEl.removeClass('show').addClass('hide')
+					hideTimer = setTimeout =>
+						panelEl.css({panelPos: 0});
+						list.afterHide()
+						panelEl.removeClass("g_hover");
+						panelBookmarkEl.css bookmarkAnimOptHide
+						panelStatus 'closed'
+						cssAnimNow = false
+					, 200
+			else
+				panelEl.stop(true, true);
+				panelEl.animate animOptHide, 300, "swing", ->
+					panelEl.css({panelPos: 0});
+					list.afterHide()
+					panelEl.removeClass("g_hover");
+					panelBookmarkEl.css bookmarkAnimOptHide
+					panelStatus 'closed'
+		#setTimeout ->
+		#panelBookmarkEl.stop(true,true)
+		#panelBookmarkEl.animate bookmarkAnimOptHide, 50, 'swing'
+		#, 49
+
 
 		panelEl.bind "mouseenter", =>
 			mouseOnPanel = true
@@ -278,6 +339,7 @@ do ($)->
 		minPosOpen = -250
 		maxPosClose = 30
 		touchMoving = false
+		enableMoving = false
 
 		panelBookmarkEl.bind 'touchstart', =>
 			#@log 'touchstart'
@@ -291,7 +353,7 @@ do ($)->
 			if panelStatus() is 'touchopening' or panelStatus() is 'touchclosing'
 				touchMoving = true
 
-			if touchMoving
+			if enableMoving and touchMoving
 				t = e?.originalEvent?.touches?[0]
 				if t
 					if pageX isnt false
@@ -368,21 +430,6 @@ do ($)->
 			true
 
 
-		hidePanel = ->
-			list.beforeHide()
-			#if panelEl.hasClass "g_hover" #and ( panelStatus is 'open' or panelStatus is '' )
-			panelStatus 'closing'
-			panelEl.stop(true, true);
-			panelEl.animate animOptHide, 300, "swing", ->
-				panelEl.css({panelPos: 0});
-				list.afterHide()
-				panelEl.removeClass("g_hover");
-				panelBookmarkEl.css bookmarkAnimOptHide
-				panelStatus 'closed'
-			#setTimeout ->
-				#panelBookmarkEl.stop(true,true)
-				#panelBookmarkEl.animate bookmarkAnimOptHide, 50, 'swing'
-			#, 49
 
 
 		panelEl.bind "mouseleave", ->

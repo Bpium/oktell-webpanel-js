@@ -129,7 +129,7 @@ module.exports = function(grunt) {
       },
       css: {
         files: {
-          'buildlast/oktell-panel.css': ['css/oktell-panel.css', 'css/jquery.jscrollpane.css']
+          'buildlast/oktell-panel.css': ['css/oktell-panel.css', 'css/test.css', 'css/jquery.jscrollpane.css']
         }
       }
     }
