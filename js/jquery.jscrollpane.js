@@ -497,7 +497,7 @@
 						var dY = verticalDragPosition;
 						jsp.scrollByY(-deltaY * settings.mouseWheelSpeed, false);
 						// return true if there was no movement so rest of screen can scroll
-						return dY == verticalDragPosition;
+						return false; // dY == verticalDragPosition;
 					}
 				);
 			}
@@ -546,7 +546,7 @@
 						moved = moved || Math.abs(touchStartY - touchPos.pageY) > 5;
 						
 						// return true if there was no movement so rest of screen can scroll
-						return dY == verticalDragPosition;
+						return false; //dY == verticalDragPosition;
 					}
 				).bind(
 					'touchend.jsp',

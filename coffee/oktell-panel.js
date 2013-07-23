@@ -375,10 +375,12 @@ var __slice = [].slice,
       return panelHideTimer = false;
     };
     showPanel = function() {
+      list.beforeShow();
       panelStatus('opening');
       panelBookmarkEl.css(bookmarkAnimOptShow);
       panelEl.stop(true, true);
       return panelEl.animate(animOptShow, 100, "swing", function() {
+        list.afterShow();
         panelEl.addClass("g_hover");
         panelStatus('open');
         return panelBookmarkEl.css(bookmarkAnimOptShow);
@@ -500,12 +502,14 @@ var __slice = [].slice,
       return true;
     });
     hidePanel = function() {
+      list.beforeHide();
       panelStatus('closing');
       panelEl.stop(true, true);
       return panelEl.animate(animOptHide, 300, "swing", function() {
         panelEl.css({
           panelPos: 0
         });
+        list.afterHide();
         panelEl.removeClass("g_hover");
         panelBookmarkEl.css(bookmarkAnimOptHide);
         return panelStatus('closed');

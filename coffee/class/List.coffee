@@ -415,6 +415,7 @@ class List
 			ringNotify = null
 
 	initStickyHeaders: ->
+		@resetStickyHeaders()
 		@headerEls = @usersListBlockEl.find('.b_department_header').toArray()
 		if @headerEls.length is 0
 			return
@@ -472,6 +473,20 @@ class List
 							@currentTopHeaderClone.offset({top:nexTop - @headerHeight })
 						else if nexTop < conTop
 							@processStickyHeaders @currentTopIndex + 1
+
+	resetStickyHeaders: ->
+		@currentTopHeaderClone?.remove?()
+		@currentTopHeaderClone = null
+		@currentTopIndex = null
+		@headerEls = null
+
+
+	beforeShow: ->
+	afterShow: ->
+		@initStickyHeaders()
+	beforeHide: ->
+		@resetStickyHeaders()
+	afterHide: ->
 
 	setTalking: (isTalking)->
 		if isTalking

@@ -494,6 +494,7 @@ List = (function() {
     var conTop, h, i, _i, _j, _len, _len1, _ref, _ref1,
       _this = this;
 
+    this.resetStickyHeaders();
     this.headerEls = this.usersListBlockEl.find('.b_department_header').toArray();
     if (this.headerEls.length === 0) {
       return;
@@ -568,6 +569,31 @@ List = (function() {
       }
     }
   };
+
+  List.prototype.resetStickyHeaders = function() {
+    var _ref;
+
+    if ((_ref = this.currentTopHeaderClone) != null) {
+      if (typeof _ref.remove === "function") {
+        _ref.remove();
+      }
+    }
+    this.currentTopHeaderClone = null;
+    this.currentTopIndex = null;
+    return this.headerEls = null;
+  };
+
+  List.prototype.beforeShow = function() {};
+
+  List.prototype.afterShow = function() {
+    return this.initStickyHeaders();
+  };
+
+  List.prototype.beforeHide = function() {
+    return this.resetStickyHeaders();
+  };
+
+  List.prototype.afterHide = function() {};
 
   List.prototype.setTalking = function(isTalking) {
     if (isTalking) {
