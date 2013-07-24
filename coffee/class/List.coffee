@@ -11,7 +11,8 @@ class List
 			hideFocus: true,
 			verticalGutter: -13,
 			onScroll: =>
-				@processStickyHeaders.apply @
+				if @oktellConnected
+					@processStickyHeaders.apply @
 
 		@allActions =
 			answer: { icon: '/img/icons/action/call.png', iconWhite: '/img/icons/action/white/call.png', text: @langs.actions.answer }
@@ -268,6 +269,7 @@ class List
 			if @options.hideOnDisconnect
 				@hidePanel()
 
+			@resetStickyHeaders()
 			@oktellConnected = false
 			@usersByNumber = {}
 			@panelUsers = []
@@ -421,6 +423,8 @@ class List
 
 	initStickyHeaders: ->
 		@resetStickyHeaders()
+		if not @oktellConnected
+			return
 		@headerEls = @usersListBlockEl.find('.b_department_header').toArray()
 		if @headerEls.length is 0
 			return
@@ -450,6 +454,8 @@ class List
 	processStickyHeaders: (elIndex)->
 		if @headerEls?.length > 0
 			if elIndex?
+				if elIndex < 0
+					elIndex = 0
 				#@log 'processStickyHeaders if', elIndex, @scrollContainer.width()
 				@currentTopIndex = elIndex
 				@currentTopHeaderClone?.remove()
@@ -464,13 +470,20 @@ class List
 				@processStickyHeaders()
 
 			else if @currentTopIndex?
-
 				conTop = @scrollContainer.offset().top
 				curTop = @headerEls[@currentTopIndex].offset().top
-				#@log 'processStickyHeaders else', conTop, curTop, @headerEls[@currentTopIndex]?.offset?().top
+				@log 'processStickyHeaders else', @currentTopIndex, conTop, curTop, @headerEls[@currentTopIndex]?.offset?().top
 				if curTop > conTop
-					@processStickyHeaders @currentTopIndex - 1
+					if @currentTopIndex is 0
+						if not @currentTopHeaderClone.data('hidden')
+							@currentTopHeaderClone.data 'hidden', true
+							@currentTopHeaderClone.hide()
+					else
+						@processStickyHeaders @currentTopIndex - 1
 				else
+					if @currentTopHeaderClone.data('hidden')
+						@currentTopHeaderClone.data 'hidden', false
+						@currentTopHeaderClone.show()
 					if @headerEls[@currentTopIndex+1]
 						nexTop = @headerEls[@currentTopIndex+1].offset().top
 						if nexTop > conTop + @headerHeight
@@ -491,8 +504,9 @@ class List
 	afterShow: ->
 		@initStickyHeaders()
 	beforeHide: ->
-		@resetStickyHeaders()
+
 	afterHide: ->
+		@resetStickyHeaders()
 
 	setTalking: (isTalking)->
 		if isTalking
@@ -771,33 +785,6 @@ class List
 		$el.children().detach()
 		$el.html html
 
-#	sortPanelUsers: ( usersArray ) ->
-#		usersArray.sort (a,b) =>
-#			if a.departmentId is @withoutDepName and b.departmentId isnt @withoutDepName
-#				1
-#			else if b.departmentId is @withoutDepName and a.departmentId isnt @withoutDepName
-#				-1
-#			else
-#				if a.department > b.department
-#					1
-#				else if b.department > a.department
-#					-1
-#				else
-#					if a.number and not b.number
-#						-1
-#					else if not a.number and b.number
-#						1
-#					else
-#						if a.state and not b.state
-#							-1
-#						else if not a.state and b.state
-#							1
-#						else
-#							if a.name > b.name
-#								1
-#							else if a.name < b.name
-#								-1
-
 	setFilter: (filter, reloadAnyway) ->
 		if @filter is filter and not reloadAnyway then return false
 		oldFilter = @filter
@@ -856,41 +843,15 @@ class List
 		if allDeps.length > 0
 			allDeps[allDeps.length-1].find('tr:last').addClass 'g_last'
 
+		@initStickyHeaders()
+
 		@userScrollerToTop()
 
 		@setUserListHeight()
 
-		@initStickyHeaders()
 
 		@timer true
 
-
-#		else
-#
-#			@usersListBlockEl.html @simpleListEl
-#
-#			if filter is ''
-#				@panelUsersFiltered = [].concat @panelUsers
-#				@afterSetFilter(@panelUsersFiltered)
-#				return @panelUsersFiltered
-#			filteredUsers = []
-#			exactMatch = false
-#
-#			for u in @panelUsers
-#				if u.isFiltered filter
-#					filteredUsers.push u
-#					if u.number is filter and not exactMatch
-#						exactMatch = u
-#			if not exactMatch and filter.match /[0-9\(\)\+\-]/
-#				@filterFantomUser = @getUser({name:filter, number: filter}, true)
-#				@panelUsersFiltered = [@filterFantomUser].concat(filteredUsers)
-#			else
-#				@panelUsersFiltered = filteredUsers
-#			@afterSetFilter(@panelUsersFiltered)
-#
-#			@timer true
-#
-#			@panelUsersFiltered
 
 	afterSetFilter: (filteredUsersArray) ->
 		@setPanelUsersHtml filteredUsersArray

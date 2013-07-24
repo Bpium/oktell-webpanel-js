@@ -22,7 +22,9 @@ List = (function() {
       hideFocus: true,
       verticalGutter: -13,
       onScroll: function() {
-        return _this.processStickyHeaders.apply(_this);
+        if (_this.oktellConnected) {
+          return _this.processStickyHeaders.apply(_this);
+        }
       }
     };
     this.allActions = {
@@ -320,6 +322,7 @@ List = (function() {
       if (_this.options.hideOnDisconnect) {
         _this.hidePanel();
       }
+      _this.resetStickyHeaders();
       _this.oktellConnected = false;
       _this.usersByNumber = {};
       _this.panelUsers = [];
@@ -498,6 +501,9 @@ List = (function() {
       _this = this;
 
     this.resetStickyHeaders();
+    if (!this.oktellConnected) {
+      return;
+    }
     this.headerEls = this.usersListBlockEl.find('.b_department_header').toArray();
     if (this.headerEls.length === 0) {
       return;
@@ -529,10 +535,13 @@ List = (function() {
   List.prototype.headerHeight = 24;
 
   List.prototype.processStickyHeaders = function(elIndex) {
-    var conTop, curTop, nexTop, _ref, _ref1;
+    var conTop, curTop, nexTop, _ref, _ref1, _ref2;
 
     if (((_ref = this.headerEls) != null ? _ref.length : void 0) > 0) {
       if (elIndex != null) {
+        if (elIndex < 0) {
+          elIndex = 0;
+        }
         this.currentTopIndex = elIndex;
         if ((_ref1 = this.currentTopHeaderClone) != null) {
           _ref1.remove();
@@ -551,9 +560,21 @@ List = (function() {
       } else if (this.currentTopIndex != null) {
         conTop = this.scrollContainer.offset().top;
         curTop = this.headerEls[this.currentTopIndex].offset().top;
+        this.log('processStickyHeaders else', this.currentTopIndex, conTop, curTop, (_ref2 = this.headerEls[this.currentTopIndex]) != null ? typeof _ref2.offset === "function" ? _ref2.offset().top : void 0 : void 0);
         if (curTop > conTop) {
-          return this.processStickyHeaders(this.currentTopIndex - 1);
+          if (this.currentTopIndex === 0) {
+            if (!this.currentTopHeaderClone.data('hidden')) {
+              this.currentTopHeaderClone.data('hidden', true);
+              return this.currentTopHeaderClone.hide();
+            }
+          } else {
+            return this.processStickyHeaders(this.currentTopIndex - 1);
+          }
         } else {
+          if (this.currentTopHeaderClone.data('hidden')) {
+            this.currentTopHeaderClone.data('hidden', false);
+            this.currentTopHeaderClone.show();
+          }
           if (this.headerEls[this.currentTopIndex + 1]) {
             nexTop = this.headerEls[this.currentTopIndex + 1].offset().top;
             if (nexTop > conTop + this.headerHeight) {
@@ -592,11 +613,11 @@ List = (function() {
     return this.initStickyHeaders();
   };
 
-  List.prototype.beforeHide = function() {
+  List.prototype.beforeHide = function() {};
+
+  List.prototype.afterHide = function() {
     return this.resetStickyHeaders();
   };
-
-  List.prototype.afterHide = function() {};
 
   List.prototype.setTalking = function(isTalking) {
     if (isTalking) {
@@ -1071,9 +1092,9 @@ List = (function() {
     if (allDeps.length > 0) {
       allDeps[allDeps.length - 1].find('tr:last').addClass('g_last');
     }
+    this.initStickyHeaders();
     this.userScrollerToTop();
     this.setUserListHeight();
-    this.initStickyHeaders();
     return this.timer(true);
   };
 

@@ -230,6 +230,13 @@ do ($)->
 		$("body").append(panelEl)
 
 		list = new List oktell, panelEl, actionListEl, afterOktellConnect, getOptions(), getOptions().debug
+
+#		if error
+#			error.onShow = =>
+#				list.resetStickyHeaders()
+#			error.onHide = =>
+#				list.initStickyHeaders()
+
 		if getOptions().debug
 			window.wList = list
 			window.wPopup = popup
@@ -278,9 +285,12 @@ do ($)->
 			if useCssAnim
 				if not cssAnimNow
 					cssAnimNow = true
+					panelEl.css 'right', ''
 					clearTimeout showTimer
-					panelEl.removeClass('hide_'+panelPos).addClass('show_'+panelPos)
+					panelEl.removeClass('hide_t_'+panelPos).addClass('show_t_'+panelPos)
 					showTimer = setTimeout =>
+						panelEl.css 'right', '0px'
+						panelEl.removeClass 'show_t_'+panelPos
 						list.afterShow()
 						panelEl.addClass("g_hover")
 						panelStatus 'open'
@@ -303,10 +313,12 @@ do ($)->
 					panelStatus 'closing'
 					list.beforeHide()
 					cssAnimNow = true
+					panelEl.css 'right', ''
 					clearTimeout hideTimer
-					panelEl.removeClass('show_'+panelPos).addClass('hide_'+panelPos)
+					panelEl.removeClass('show_t_'+panelPos).addClass('hide_t_'+panelPos)
 					hideTimer = setTimeout =>
-						panelEl.css({panelPos: 0});
+						panelEl.css 'right', '-281px'
+						panelEl.removeClass 'hide_t_'+panelPos
 						list.afterHide()
 						panelEl.removeClass("g_hover");
 						panelBookmarkEl.css bookmarkAnimOptHide

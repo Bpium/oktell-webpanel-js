@@ -694,7 +694,10 @@ $(function(){
 						var dY = verticalDragPosition;
 						jsp.scrollByY(-deltaY * settings.mouseWheelSpeed, false);
 						// return true if there was no movement so rest of screen can scroll
-						return dY == verticalDragPosition;
+						if ( settings.onScroll ){
+							settings.onScroll();
+						}
+						return false; //dY == verticalDragPosition;
 					}
 				);
 			}
@@ -741,9 +744,13 @@ $(function(){
 						jsp.scrollToY(startY + touchStartY - touchPos.pageY);
 						
 						moved = moved || Math.abs(touchStartY - touchPos.pageY) > 5;
-						
+
+						if ( settings.onScroll ){
+							settings.onScroll();
+						}
+
 						// return true if there was no movement so rest of screen can scroll
-						return dY == verticalDragPosition;
+						return false; //dY == verticalDragPosition;
 					}
 				).bind(
 					'touchend.jsp',
@@ -939,7 +946,8 @@ $(function(){
 		initialDelay                : 300,        // Delay before starting repeating
 		speed						: 30,		// Default speed when others falsey
 		scrollPagePercent			: .8,		// Percent of visible area scrolled when pageUp/Down or track area pressed
-		dragInnerAnimation			: true		//
+		dragInnerAnimation			: true,		//
+		onScroll					: null
 	};
 
 })(jQuery,this);
@@ -951,7 +959,7 @@ var __slice = [].slice,
   __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
 (function($) {
-  var CUser, Department, Error, List, Notify, PermissionsPopup, Popup, actionButtonContainerClass, actionButtonHtml, actionListEl, actionListHtml, addActionButtonToEl, afterOktellConnect, cookie, debounce, defaultOptions, departmentTemplateHtml, error, errorHtml, escapeHtml, getOptions, hasTouch, initActionButtons, initButtonOnElement, initPanel, isAndroid, isIDevice, isTouchPad, langs, list, loadTemplate, log, logStr, newGuid, oktell, oktellConnected, options, panelHtml, panelWasInitialized, permissionsPopup, permissionsPopupHtml, popup, popupHtml, templates, userTemplateHtml, usersTableHtml,
+  var CUser, Department, Error, List, Notify, PermissionsPopup, Popup, actionButtonContainerClass, actionButtonHtml, actionListEl, actionListHtml, addActionButtonToEl, afterOktellConnect, checkCssAnimationSupport, cookie, debounce, defaultOptions, departmentTemplateHtml, error, errorHtml, escapeHtml, getOptions, hasTouch, initActionButtons, initButtonOnElement, initPanel, isAndroid, isIDevice, isTouchPad, langs, list, loadTemplate, log, logStr, newGuid, oktell, oktellConnected, options, panelHtml, panelWasInitialized, permissionsPopup, permissionsPopupHtml, popup, popupHtml, templates, userTemplateHtml, usersTableHtml,
     _this = this;
 
   if (!$) {
@@ -1657,7 +1665,12 @@ var __slice = [].slice,
       this.jScrollPaneParams = {
         mouseWheelSpeed: 50,
         hideFocus: true,
-        verticalGutter: -13
+        verticalGutter: -13,
+        onScroll: function() {
+          if (_this.oktellConnected) {
+            return _this.processStickyHeaders.apply(_this);
+          }
+        }
       };
       this.allActions = {
         answer: {
@@ -1954,6 +1967,7 @@ var __slice = [].slice,
         if (_this.options.hideOnDisconnect) {
           _this.hidePanel();
         }
+        _this.resetStickyHeaders();
         _this.oktellConnected = false;
         _this.usersByNumber = {};
         _this.panelUsers = [];
@@ -2131,6 +2145,10 @@ var __slice = [].slice,
       var conTop, h, i, _i, _j, _len, _len1, _ref, _ref1,
         _this = this;
 
+      this.resetStickyHeaders();
+      if (!this.oktellConnected) {
+        return;
+      }
       this.headerEls = this.usersListBlockEl.find('.b_department_header').toArray();
       if (this.headerEls.length === 0) {
         return;
@@ -2162,10 +2180,13 @@ var __slice = [].slice,
     List.prototype.headerHeight = 24;
 
     List.prototype.processStickyHeaders = function(elIndex) {
-      var conTop, curTop, nexTop, _ref, _ref1;
+      var conTop, curTop, nexTop, _ref, _ref1, _ref2;
 
       if (((_ref = this.headerEls) != null ? _ref.length : void 0) > 0) {
         if (elIndex != null) {
+          if (elIndex < 0) {
+            elIndex = 0;
+          }
           this.currentTopIndex = elIndex;
           if ((_ref1 = this.currentTopHeaderClone) != null) {
             _ref1.remove();
@@ -2184,9 +2205,21 @@ var __slice = [].slice,
         } else if (this.currentTopIndex != null) {
           conTop = this.scrollContainer.offset().top;
           curTop = this.headerEls[this.currentTopIndex].offset().top;
+          this.log('processStickyHeaders else', this.currentTopIndex, conTop, curTop, (_ref2 = this.headerEls[this.currentTopIndex]) != null ? typeof _ref2.offset === "function" ? _ref2.offset().top : void 0 : void 0);
           if (curTop > conTop) {
-            return this.processStickyHeaders(this.currentTopIndex - 1);
+            if (this.currentTopIndex === 0) {
+              if (!this.currentTopHeaderClone.data('hidden')) {
+                this.currentTopHeaderClone.data('hidden', true);
+                return this.currentTopHeaderClone.hide();
+              }
+            } else {
+              return this.processStickyHeaders(this.currentTopIndex - 1);
+            }
           } else {
+            if (this.currentTopHeaderClone.data('hidden')) {
+              this.currentTopHeaderClone.data('hidden', false);
+              this.currentTopHeaderClone.show();
+            }
             if (this.headerEls[this.currentTopIndex + 1]) {
               nexTop = this.headerEls[this.currentTopIndex + 1].offset().top;
               if (nexTop > conTop + this.headerHeight) {
@@ -2204,6 +2237,31 @@ var __slice = [].slice,
           }
         }
       }
+    };
+
+    List.prototype.resetStickyHeaders = function() {
+      var _ref;
+
+      if ((_ref = this.currentTopHeaderClone) != null) {
+        if (typeof _ref.remove === "function") {
+          _ref.remove();
+        }
+      }
+      this.currentTopHeaderClone = null;
+      this.currentTopIndex = null;
+      return this.headerEls = null;
+    };
+
+    List.prototype.beforeShow = function() {};
+
+    List.prototype.afterShow = function() {
+      return this.initStickyHeaders();
+    };
+
+    List.prototype.beforeHide = function() {};
+
+    List.prototype.afterHide = function() {
+      return this.resetStickyHeaders();
     };
 
     List.prototype.setTalking = function(isTalking) {
@@ -2446,6 +2504,8 @@ var __slice = [].slice,
         }
         if (aEls.length) {
           this.dropdownEl.append(aEls);
+          this.dropdownEl.children('li:first').addClass('g_first');
+          this.dropdownEl.children('li:last').addClass('g_last');
           this.dropdownEl.data('user', user);
           this.dropdownEl.css({
             'top': this.dropdownEl.height() + buttonEl.offset().top > $(window).height() ? $(window).height() - this.dropdownEl.height() - this.dropdownPaddingBottomLeft : buttonEl.offset().top,
@@ -2677,9 +2737,9 @@ var __slice = [].slice,
       if (allDeps.length > 0) {
         allDeps[allDeps.length - 1].find('tr:last').addClass('g_last');
       }
+      this.initStickyHeaders();
       this.userScrollerToTop();
       this.setUserListHeight();
-      this.initStickyHeaders();
       return this.timer(true);
     };
 
@@ -2977,6 +3037,8 @@ var __slice = [].slice,
       });
     }
 
+    Error.prototype.onShow = function() {};
+
     Error.prototype.show = function(errorType, username) {
       var type, _ref, _ref1;
 
@@ -2988,6 +3050,9 @@ var __slice = [].slice,
       this.el.find('p:eq(0)').text(this.langs[type].header.replace('%username%', username));
       this.el.find('p:eq(1)').text(((_ref = this.langs[type].message) != null ? _ref.replace('%username%', username) : void 0) || '');
       this.el.find('p:eq(3)').text(((_ref1 = this.langs[type].message2) != null ? _ref1.replace('%username%', username) : void 0) || '');
+      if (typeof this.onShow === "function") {
+        this.onShow();
+      }
       return this.el.fadeIn(200);
     };
 
@@ -3190,6 +3255,22 @@ var __slice = [].slice,
     return options || defaultOptions;
   };
   logStr = '';
+  checkCssAnimationSupport = function() {
+    var div, divStyle, suffix, testProperties, v, _i, _len;
+
+    div = document.createElement("div");
+    divStyle = div.style;
+    suffix = "Transform";
+    testProperties = ["o" + suffix, "ms" + suffix, "webkit" + suffix, "Webkit" + suffix, "Moz" + suffix, 'transform'];
+    for (_i = 0, _len = testProperties.length; _i < _len; _i++) {
+      v = testProperties[_i];
+      if (divStyle[v] != null) {
+        return true;
+      }
+    }
+    return divStyle;
+    return false;
+  };
   log = function() {
     var args, d, dd, e, fnName, i, t, val, _i, _len;
 
@@ -3283,7 +3364,7 @@ var __slice = [].slice,
   isTouchPad = /hp-tablet/gi.test(navigator.appVersion);
   hasTouch = __indexOf.call(window, 'ontouchstart') >= 0 && !isTouchPad;
   initPanel = function(opts) {
-    var $user, $userActionButton, animOptHide, animOptShow, bookmarkAnimOptHide, bookmarkAnimOptShow, bookmarkPos, errorEl, hidePanel, killPanelHideTimer, mouseOnPanel, oldBinding, panelBookmarkEl, panelEl, panelHideTimer, panelPos, panelStatus, permissionsPopupEl, popupEl, touchClickedContact, touchClickedContactClear, touchClickedCss,
+    var $user, $userActionButton, animOptHide, animOptShow, bookmarkAnimOptHide, bookmarkAnimOptShow, bookmarkPos, cssAnimNow, enableMoving, errorEl, hidePanel, hideTimer, killPanelHideTimer, maxPosClose, minPosOpen, mouseOnPanel, oldBinding, pageX, panelBookmarkEl, panelEl, panelHideTimer, panelMinPos, panelPos, panelStatus, permissionsPopupEl, popupEl, showPanel, showTimer, touchClickedContact, touchClickedContactClear, touchClickedCss, touchMoving, useCssAnim, _panelStatus,
       _this = this;
 
     panelWasInitialized = true;
@@ -3338,6 +3419,7 @@ var __slice = [].slice,
     animOptShow[panelPos] = '0px';
     animOptHide = {};
     animOptHide[panelPos] = '-281px';
+    panelMinPos = -281;
     panelEl.hide();
     $("body").append(panelEl);
     list = new List(oktell, panelEl, actionListEl, afterOktellConnect, getOptions(), getOptions().debug);
@@ -3362,24 +3444,153 @@ var __slice = [].slice,
     bookmarkAnimOptHide[bookmarkPos] = '-40px';
     mouseOnPanel = false;
     panelHideTimer = false;
-    panelStatus = 'closed';
+    _panelStatus = 'closed';
+    panelStatus = function(st) {
+      if (st && st !== _panelStatus) {
+        _panelStatus = st;
+      }
+      return _panelStatus;
+    };
     killPanelHideTimer = function() {
       clearTimeout(panelHideTimer);
       return panelHideTimer = false;
     };
+    useCssAnim = checkCssAnimationSupport();
+    showTimer = null;
+    hideTimer = null;
+    cssAnimNow = false;
+    showPanel = function() {
+      list.beforeShow();
+      panelStatus('opening');
+      panelBookmarkEl.css(bookmarkAnimOptShow);
+      if (useCssAnim) {
+        if (!cssAnimNow) {
+          cssAnimNow = true;
+          panelEl.css('right', '');
+          clearTimeout(showTimer);
+          panelEl.removeClass('hide_t_' + panelPos).addClass('show_t_' + panelPos);
+          return showTimer = setTimeout(function() {
+            panelEl.css('right', '0px');
+            panelEl.removeClass('show_t_' + panelPos);
+            list.afterShow();
+            panelEl.addClass("g_hover");
+            panelStatus('open');
+            panelBookmarkEl.css(bookmarkAnimOptShow);
+            return cssAnimNow = false;
+          }, 200);
+        }
+      } else {
+        panelEl.stop(true, true);
+        return panelEl.animate(animOptShow, 100, "swing", function() {
+          list.afterShow();
+          panelEl.addClass("g_hover");
+          panelStatus('open');
+          return panelBookmarkEl.css(bookmarkAnimOptShow);
+        });
+      }
+    };
+    hidePanel = function() {
+      var _this = this;
+
+      if (useCssAnim) {
+        if (!cssAnimNow) {
+          panelStatus('closing');
+          list.beforeHide();
+          cssAnimNow = true;
+          panelEl.css('right', '');
+          clearTimeout(hideTimer);
+          panelEl.removeClass('show_t_' + panelPos).addClass('hide_t_' + panelPos);
+          return hideTimer = setTimeout(function() {
+            panelEl.css('right', '-281px');
+            panelEl.removeClass('hide_t_' + panelPos);
+            list.afterHide();
+            panelEl.removeClass("g_hover");
+            panelBookmarkEl.css(bookmarkAnimOptHide);
+            panelStatus('closed');
+            return cssAnimNow = false;
+          }, 400);
+        }
+      } else {
+        panelStatus('closing');
+        list.beforeHide();
+        panelEl.stop(true, true);
+        return panelEl.animate(animOptHide, 300, "swing", function() {
+          panelEl.css({
+            panelPos: 0
+          });
+          list.afterHide();
+          panelEl.removeClass("g_hover");
+          panelBookmarkEl.css(bookmarkAnimOptHide);
+          return panelStatus('closed');
+        });
+      }
+    };
     panelEl.bind("mouseenter", function() {
       mouseOnPanel = true;
       killPanelHideTimer();
-      if (parseInt(panelEl.css(panelPos)) < 0 && (panelStatus === 'closed' || panelStatus === 'closing')) {
-        panelStatus = 'opening';
-        panelBookmarkEl.stop(true, true);
-        panelBookmarkEl.css(bookmarkAnimOptShow);
-        panelEl.stop(true, true);
-        panelEl.animate(animOptShow, 100, "swing", function() {
-          panelEl.addClass("g_hover");
-          return panelStatus = 'open';
-        });
+      if (parseInt(panelEl.css(panelPos)) < 0 && (panelStatus() === 'closed' || panelStatus() === 'closing')) {
+        showPanel();
       }
+      return true;
+    });
+    pageX = false;
+    minPosOpen = -250;
+    maxPosClose = 30;
+    touchMoving = false;
+    enableMoving = false;
+    panelBookmarkEl.bind('touchstart', function() {
+      if (panelStatus() === 'closed') {
+        panelStatus('touchopening');
+      } else if (panelStatus() === 'open') {
+        panelStatus('touchclosing');
+      }
+      return true;
+    });
+    panelBookmarkEl.bind('touchmove', function(e) {
+      var pos, t, _ref, _ref1;
+
+      if (panelStatus() === 'touchopening' || panelStatus() === 'touchclosing') {
+        touchMoving = true;
+      }
+      if (enableMoving && touchMoving) {
+        t = e != null ? (_ref = e.originalEvent) != null ? (_ref1 = _ref.touches) != null ? _ref1[0] : void 0 : void 0 : void 0;
+        if (t) {
+          if (pageX !== false) {
+            pos = parseInt(panelEl.css(panelPos));
+            panelEl.css(panelPos, Math.max(panelMinPos, Math.min(0, pos + pageX - t.pageX)) + 'px');
+          }
+          pageX = t.pageX;
+        }
+      }
+      return true;
+    });
+    panelBookmarkEl.bind('touchend', function() {
+      var pos;
+
+      if (!touchMoving) {
+        if (panelStatus() === 'touchopening') {
+          showPanel();
+        }
+      } else {
+        touchMoving = false;
+        pos = parseInt(panelEl.css(panelPos));
+        if (panelStatus() === 'touchopening') {
+          if (pos > minPosOpen) {
+            showPanel();
+          } else {
+            hidePanel();
+          }
+        } else if (panelStatus() === 'touchclosing') {
+          if (pos < maxPosClose) {
+            hidePanel();
+          } else {
+            openPanel();
+          }
+        }
+      }
+      return true;
+    });
+    panelBookmarkEl.bind('touchcancel', function() {
       return true;
     });
     touchClickedContact = null;
@@ -3390,26 +3601,33 @@ var __slice = [].slice,
       }
       return touchClickedContact = null;
     };
-    $(window).bind('touchmove', function(e) {
-      return _this.log('touchmove');
-    });
     $(window).bind('touchcancel', function(e) {
-      return _this.log('touchcancel');
+      return true;
     });
     $(window).bind('touchend', function(e) {
-      return _this.log('touchend');
-    });
-    $(window).bind('touchstart', function(e) {
-      var contact, parents, parentsArr, target;
+      var parents, parentsArr, target;
 
-      _this.log('touchstart');
       target = $(e.target);
       parents = target.parents();
       parentsArr = parents.toArray();
       if (parentsArr.indexOf(panelEl[0]) === -1) {
         hidePanel();
       }
-      if (parentsArr.indexOf(actionListEl[0]) === -1 && !target.is('.oktell_panel .drop_down') && parents.filter('.oktell_panel .drop_down').size() === 0) {
+      if (!target.is('.oktell_button_action .drop_down') && parents.filter('.oktell_button_action .drop_down').size() === 0) {
+        if (list != null) {
+          if (typeof list.hideActionListDropdown === "function") {
+            list.hideActionListDropdown();
+          }
+        }
+      }
+      return true;
+    });
+    panelEl.bind('touchend', function(e) {
+      var contact, parents, target;
+
+      target = $(e.target);
+      parents = target.parents();
+      if (!target.is('.oktell_button_action .drop_down') && parents.filter('.oktell_button_action .drop_down').size() === 0) {
         if (list != null) {
           if (typeof list.hideActionListDropdown === "function") {
             list.hideActionListDropdown();
@@ -3429,21 +3647,6 @@ var __slice = [].slice,
       }
       return true;
     });
-    hidePanel = function() {
-      if (panelEl.hasClass("g_hover")) {
-        panelStatus = 'closing';
-        panelEl.stop(true, true);
-        return panelEl.animate(animOptHide, 300, "swing", function() {
-          panelEl.css({
-            panelPos: 0
-          });
-          panelEl.removeClass("g_hover");
-          panelStatus = 'closed';
-          panelBookmarkEl.stop(true, true);
-          return panelBookmarkEl.css(bookmarkAnimOptHide);
-        });
-      }
-    };
     panelEl.bind("mouseleave", function() {
       mouseOnPanel = false;
       return true;
@@ -3453,10 +3656,11 @@ var __slice = [].slice,
       return true;
     });
     return $('html').bind('mousemove', function(e) {
-      if (!mouseOnPanel && panelHideTimer === false && !list.dropdownOpenedOnPanel) {
+      if (panelStatus() === 'open' && !mouseOnPanel && panelHideTimer === false && !list.dropdownOpenedOnPanel) {
         panelHideTimer = setTimeout(function() {
           return hidePanel();
         }, 100);
+        1;
       }
       return true;
     });

@@ -40,6 +40,8 @@ Error = (function() {
     });
   }
 
+  Error.prototype.onShow = function() {};
+
   Error.prototype.show = function(errorType, username) {
     var type, _ref, _ref1;
 
@@ -51,6 +53,9 @@ Error = (function() {
     this.el.find('p:eq(0)').text(this.langs[type].header.replace('%username%', username));
     this.el.find('p:eq(1)').text(((_ref = this.langs[type].message) != null ? _ref.replace('%username%', username) : void 0) || '');
     this.el.find('p:eq(3)').text(((_ref1 = this.langs[type].message2) != null ? _ref1.replace('%username%', username) : void 0) || '');
+    if (typeof this.onShow === "function") {
+      this.onShow();
+    }
     return this.el.fadeIn(200);
   };
 

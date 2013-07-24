@@ -24,6 +24,8 @@ class Error
 				when 1202 then @show 2, oktell.getMyInfo().login
 				else @show 3, oktell.getMyInfo().login
 
+	onShow: ->
+
 	show: (errorType, username) ->
 		if not @errorTypes[errorType] then return false
 		@log 'show ' + errorType
@@ -31,6 +33,7 @@ class Error
 		@el.find('p:eq(0)').text @langs[type].header.replace('%username%', username )
 		@el.find('p:eq(1)').text @langs[type].message?.replace('%username%', username ) or ''
 		@el.find('p:eq(3)').text @langs[type].message2?.replace('%username%', username ) or ''
+		@onShow?()
 		@el.fadeIn 200
 
 	hide: ->

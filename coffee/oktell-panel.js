@@ -401,9 +401,12 @@ var __slice = [].slice,
       if (useCssAnim) {
         if (!cssAnimNow) {
           cssAnimNow = true;
+          panelEl.css('right', '');
           clearTimeout(showTimer);
-          panelEl.removeClass('hide_' + panelPos).addClass('show_' + panelPos);
+          panelEl.removeClass('hide_t_' + panelPos).addClass('show_t_' + panelPos);
           return showTimer = setTimeout(function() {
+            panelEl.css('right', '0px');
+            panelEl.removeClass('show_t_' + panelPos);
             list.afterShow();
             panelEl.addClass("g_hover");
             panelStatus('open');
@@ -429,12 +432,12 @@ var __slice = [].slice,
           panelStatus('closing');
           list.beforeHide();
           cssAnimNow = true;
+          panelEl.css('right', '');
           clearTimeout(hideTimer);
-          panelEl.removeClass('show_' + panelPos).addClass('hide_' + panelPos);
+          panelEl.removeClass('show_t_' + panelPos).addClass('hide_t_' + panelPos);
           return hideTimer = setTimeout(function() {
-            panelEl.css({
-              panelPos: 0
-            });
+            panelEl.css('right', '-281px');
+            panelEl.removeClass('hide_t_' + panelPos);
             list.afterHide();
             panelEl.removeClass("g_hover");
             panelBookmarkEl.css(bookmarkAnimOptHide);
