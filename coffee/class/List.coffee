@@ -472,7 +472,7 @@ class List
 			else if @currentTopIndex?
 				conTop = @scrollContainer.offset().top
 				curTop = @headerEls[@currentTopIndex].offset().top
-				@log 'processStickyHeaders else', @currentTopIndex, conTop, curTop, @headerEls[@currentTopIndex]?.offset?().top
+				#@log 'processStickyHeaders else', @currentTopIndex, conTop, curTop, @headerEls[@currentTopIndex]?.offset?().top
 				if curTop > conTop
 					if @currentTopIndex is 0
 						if not @currentTopHeaderClone.data('hidden')

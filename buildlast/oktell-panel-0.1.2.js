@@ -2180,7 +2180,7 @@ var __slice = [].slice,
     List.prototype.headerHeight = 24;
 
     List.prototype.processStickyHeaders = function(elIndex) {
-      var conTop, curTop, nexTop, _ref, _ref1, _ref2;
+      var conTop, curTop, nexTop, _ref, _ref1;
 
       if (((_ref = this.headerEls) != null ? _ref.length : void 0) > 0) {
         if (elIndex != null) {
@@ -2205,7 +2205,6 @@ var __slice = [].slice,
         } else if (this.currentTopIndex != null) {
           conTop = this.scrollContainer.offset().top;
           curTop = this.headerEls[this.currentTopIndex].offset().top;
-          this.log('processStickyHeaders else', this.currentTopIndex, conTop, curTop, (_ref2 = this.headerEls[this.currentTopIndex]) != null ? typeof _ref2.offset === "function" ? _ref2.offset().top : void 0 : void 0);
           if (curTop > conTop) {
             if (this.currentTopIndex === 0) {
               if (!this.currentTopHeaderClone.data('hidden')) {
