@@ -1,4 +1,4 @@
-/* Oktell-panel.js 0.2.0.1010 http://js.oktell.ru/webpanel */
+/* Oktell-panel.js 0.2.0.1011 http://js.oktell.ru/webpanel */
 
 /* Normalize panel
 ---------------------------------------------------------------*/
@@ -1511,29 +1511,6 @@
 .oktell_panel .selected_text {
     padding: 0 !important;
     margin: 0 !important;
-}
-
-/*
-.oktell_panel .b_department_header .h_shadow_top {
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: moz-none;
-    -ms-user-select: none;
-    user-select: none;
-}
-.oktell_panel .b_department_header .h_shadow_top span {
-    -webkit-touch-callout: text;
-    -webkit-user-select: text;
-    -khtml-user-select: text;
-    -moz-user-select: text;
-    -ms-user-select: text;
-    user-select: text;
-}
-*/
-
-.oktell_panel .b_department {
-    width: 100%;
 }
 
 /*

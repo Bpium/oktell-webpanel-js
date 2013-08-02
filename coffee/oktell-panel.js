@@ -607,6 +607,7 @@ var __slice = [].slice;
 
     el.addClass(getOptions().buttonCss);
     phone = el.attr('data-phone');
+    el.empty();
     if (phone) {
       button = list.getUserButtonForPlugin(phone);
       return el.html(button);

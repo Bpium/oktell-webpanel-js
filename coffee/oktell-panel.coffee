@@ -530,6 +530,7 @@ do ($)->
 	initButtonOnElement = (el) ->
 		el.addClass(getOptions().buttonCss)
 		phone = el.attr('data-phone')
+		el.empty()
 		if phone
 			button = list.getUserButtonForPlugin phone
 			#log 'generated button for ' + phone, button

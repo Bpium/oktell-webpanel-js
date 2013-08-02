@@ -1,4 +1,4 @@
-/* Oktell-panel.js 0.2.0.1010 http://js.oktell.ru/webpanel */
+/* Oktell-panel.js 0.2.0.1011 http://js.oktell.ru/webpanel */
 
 /*! Copyright (c) 2013 Brandon Aaron (http://brandonaaron.net)
  * Licensed under the MIT License (LICENSE.txt).
@@ -3701,6 +3701,7 @@ var __slice = [].slice,
 
     el.addClass(getOptions().buttonCss);
     phone = el.attr('data-phone');
+    el.empty();
     if (phone) {
       button = list.getUserButtonForPlugin(phone);
       return el.html(button);
