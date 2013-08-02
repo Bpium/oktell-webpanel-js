@@ -51,14 +51,14 @@ module.exports = (grunt) ->
 		compress:
 			main:
 				options: {
-					archive: 'buildlast/oktell-panel.js-' + grunt.file.read('version.json') + '.zip'
+					archive: 'buildlast/oktell-panel.js-' + grunt.file.read('version.json').toString().split('.').slice(0,3).join('.') + '.zip'
 					mode: 'zip'
 					pretty: true
 				},
 				files: [{cwd: 'buildlast/', src: '*', dest: '', expand: true, filter: 'isFile', flatten: true}]
 			jsfiles:
 				options: {
-					archive: 'buildlast/oktell-panel.js-' + grunt.file.read('version.json') + '.zip'
+					archive: 'buildlast/oktell-panel.js-' + grunt.file.read('version.json').toString().split('.').slice(0,3).join('.') + '.zip'
 					mode: 'zip'
 					pretty: true
 				},
@@ -67,8 +67,9 @@ module.exports = (grunt) ->
 			panel:
 				fileNames: ['buildlast/*.coffee', 'buildlast/*.js', 'buildlast/*.css']
 				find: /^(oktell-panel)(.+)/
-				replace:  '$1-' + grunt.file.read('version.json') + '$2'
-				comment: 'Oktell-panel.js ' + grunt.file.read('version.json') + " http://js.oktell.ru/webpanel"
+				replace:  '$1-version$2'
+				comment: 'Oktell-panel.js version http://js.oktell.ru/webpanel'
+				versionFile: 'version.json'
 
 		concat:
 			js:
@@ -93,6 +94,13 @@ module.exports = (grunt) ->
 	grunt.registerMultiTask 'addVersion', 'Add version to file names and to file content', ->
 		config = @data
 		files = grunt.file.expand {filter:'isFile'}, config.fileNames
+		versionArr = grunt.file.read(config.versionFile).toString().split('.')
+		version = versionArr.slice(0,3).join('.')
+		build = versionArr[3] or '1000'
+		build = parseInt build
+		build++
+		config.replace = config.replace.replace('version', version)
+		config.comment = config.comment.replace('version', version + '.' + build)
 		for file in files
 			pos = file.lastIndexOf '/'
 			fName = file.substr(pos+1)
@@ -107,9 +115,7 @@ module.exports = (grunt) ->
 				content = '/* ' + config.comment + " */\n\n" + content
 			grunt.file.write file, content
 			fs.renameSync file, path + '/' + fName.replace( config.find, config.replace )
-#		curVersion = grunt.file.read('version.json').split('.')
-#		curVersion[3] = parseInt(curVersion[3]) + 1
-#		grunt.file.write 'version.json', curVersion.join('.')
+		grunt.file.write config.versionFile, version + '.' + build
 
 
 	grunt.registerTask 'createbuildfolder', 'Create new folder in builds path with date in name', ->

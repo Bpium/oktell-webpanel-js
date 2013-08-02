@@ -20,7 +20,7 @@ do ($)->
 		#buttonCss: 'oktellActionButton'
 		debug: false
 		lang: 'ru'
-		noavatar: true
+		showAvatar: false
 		hideOnDisconnect: true
 		useNotifies: false
 		withoutPermissionsPopup: false
@@ -151,16 +151,22 @@ do ($)->
 
 	panelWasInitialized = false
 
-	isAndroid = (/android/gi).test(navigator.appVersion)
-	isIDevice = (/iphone|ipad/gi).test(navigator.appVersion)
-	isTouchPad = (/hp-tablet/gi).test(navigator.appVersion)
-	hasTouch = 'ontouchstart' in window and not isTouchPad
+#	isAndroid = (/android/gi).test(navigator.appVersion)
+#	isIDevice = (/iphone|ipad/gi).test(navigator.appVersion)
+#	isTouchPad = (/hp-tablet/gi).test(navigator.appVersion)
+#	hasTouch = 'ontouchstart' in window and not isTouchPad
 
 	initPanel = (opts)->
 
 		panelWasInitialized = true
 
-		options = $.extend defaultOptions, opts or {}
+		options = $.extend {}, defaultOptions, opts or {}
+
+		if options.oktellVoice
+			if options.oktellVoice.isOktellVoice is true
+				options.oktellVoice = options.oktellVoice
+			else if window.oktellVoice window.oktellVoice.isOktellVoice is true
+				options.oktellVoice = window.oktellVoice
 
 		if getOptions().useNotifies and window.webkitNotifications and window.webkitNotifications.checkPermission() is 1
 			webkitNotifications.requestPermission =>
@@ -179,10 +185,10 @@ do ($)->
 		Department.prototype.langs = langs
 		panelEl = $(panelHtml)
 
-		if getOptions().noavatar
+		if not getOptions().showAvatar
 			panelEl.addClass('noavatar')
-		if hasTouch
-			panelEl.addClass('touch')
+#		if hasTouch
+#			panelEl.addClass('touch')
 
 		$user = $(userTemplateHtml)
 		$userActionButton = $(actionButtonHtml)

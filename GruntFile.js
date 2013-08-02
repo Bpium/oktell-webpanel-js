@@ -80,7 +80,7 @@ module.exports = function(grunt) {
     compress: {
       main: {
         options: {
-          archive: 'buildlast/oktell-panel.js-' + grunt.file.read('version.json') + '.zip',
+          archive: 'buildlast/oktell-panel.js-' + grunt.file.read('version.json').toString().split('.').slice(0, 3).join('.') + '.zip',
           mode: 'zip',
           pretty: true
         },
@@ -97,7 +97,7 @@ module.exports = function(grunt) {
       },
       jsfiles: {
         options: {
-          archive: 'buildlast/oktell-panel.js-' + grunt.file.read('version.json') + '.zip',
+          archive: 'buildlast/oktell-panel.js-' + grunt.file.read('version.json').toString().split('.').slice(0, 3).join('.') + '.zip',
           mode: 'zip',
           pretty: true
         },
@@ -117,8 +117,9 @@ module.exports = function(grunt) {
       panel: {
         fileNames: ['buildlast/*.coffee', 'buildlast/*.js', 'buildlast/*.css'],
         find: /^(oktell-panel)(.+)/,
-        replace: '$1-' + grunt.file.read('version.json') + '$2',
-        comment: 'Oktell-panel.js ' + grunt.file.read('version.json') + " http://js.oktell.ru/webpanel"
+        replace: '$1-version$2',
+        comment: 'Oktell-panel.js version http://js.oktell.ru/webpanel',
+        versionFile: 'version.json'
       }
     },
     concat: {
@@ -145,13 +146,19 @@ module.exports = function(grunt) {
   grunt.registerTask('build', ['clean:buildlast', 'insertfilesasvars', 'includecoffee', 'coffee', 'concat:js', 'uglify', 'concat:css', 'cssmin', 'addVersion', 'compress', 'clean:temp']);
   grunt.registerTask('default', ['build']);
   grunt.registerMultiTask('addVersion', 'Add version to file names and to file content', function() {
-    var config, content, fName, file, fileExt, files, path, pos, _i, _len, _results;
+    var build, config, content, fName, file, fileExt, files, path, pos, version, versionArr, _i, _len;
 
     config = this.data;
     files = grunt.file.expand({
       filter: 'isFile'
     }, config.fileNames);
-    _results = [];
+    versionArr = grunt.file.read(config.versionFile).toString().split('.');
+    version = versionArr.slice(0, 3).join('.');
+    build = versionArr[3] || '1000';
+    build = parseInt(build);
+    build++;
+    config.replace = config.replace.replace('version', version);
+    config.comment = config.comment.replace('version', version + '.' + build);
     for (_i = 0, _len = files.length; _i < _len; _i++) {
       file = files[_i];
       pos = file.lastIndexOf('/');
@@ -167,9 +174,9 @@ module.exports = function(grunt) {
         content = '/* ' + config.comment + " */\n\n" + content;
       }
       grunt.file.write(file, content);
-      _results.push(fs.renameSync(file, path + '/' + fName.replace(config.find, config.replace)));
+      fs.renameSync(file, path + '/' + fName.replace(config.find, config.replace));
     }
-    return _results;
+    return grunt.file.write(config.versionFile, version + '.' + build);
   });
   grunt.registerTask('createbuildfolder', 'Create new folder in builds path with date in name', function() {
     var config, copyConf, folder, moment;

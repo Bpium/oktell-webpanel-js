@@ -179,6 +179,17 @@ List = (function() {
 
       return (_ref = _this.jScrollPaneAPI) != null ? _ref.reinitialise() : void 0;
     };
+    this.resetDepsWidth = function() {
+      var w, _ref;
+
+      if (_this.scrollContent) {
+        w = parseInt(_this.scrollContent.css('width'));
+        _this.scrollContent.find('.b_department').css('width', w + 'px');
+        return (_ref = _this.currentTopHeaderClone) != null ? _ref.css({
+          width: w + 'px'
+        }) : void 0;
+      }
+    };
     this.userScrollerToTop = function() {
       return _this.jScrollPaneAPI.scrollToY(0);
     };
@@ -215,14 +226,15 @@ List = (function() {
       return true;
     });
     this.panelEl.bind('click', function(e) {
-      var actionButton, buttonEl, target, user, _ref;
+      var actionButton, buttonEl, dep, target, user;
 
       target = $(e.target);
       if (target.is('.b_department_header') || target.parents('.b_department_header').size() > 0) {
-        if ((_ref = target.parents('.b_department').data('department')) != null) {
-          if (typeof _ref.showUsers === "function") {
-            _ref.showUsers();
-          }
+        dep = target.parents('.b_department').data('department');
+        if ((dep != null ? dep.showUsers : void 0) != null) {
+          dep.showUsers();
+          _this.clearSelection();
+          _this.reinitScroll();
         }
         _this.setUserListHeight();
         return false;
@@ -299,7 +311,8 @@ List = (function() {
       _this.usersListBlockEl.css({
         height: h
       });
-      return _this.reinitScroll();
+      _this.reinitScroll();
+      return _this.resetDepsWidth();
     };
     this.setUserListHeight();
     debouncedSetHeight = debounce(function() {
@@ -309,7 +322,9 @@ List = (function() {
     $(window).bind('resize', function() {
       return debouncedSetHeight();
     });
-    this.hidePanel(true);
+    if (this.options.hideOnDisconnect) {
+      this.hidePanel(true);
+    }
     oktell.on('webphoneConnect', function() {
       return _this.panelEl.addClass('webphone');
     });
@@ -437,7 +452,11 @@ List = (function() {
         user = _ref2[_i];
         user.loadActions();
       }
-      _this.showPanel();
+      if (_this.options.hideOnDisconnect) {
+        _this.showPanel();
+      } else {
+        _this.panelEl.show();
+      }
       _this.setTalking(oktell.getState() === 'talk');
       if (typeof afterOktellConnect === 'function') {
         return afterOktellConnect();
@@ -495,6 +514,17 @@ List = (function() {
       return ringNotify = null;
     });
   }
+
+  List.prototype.clearSelection = function() {
+    var sel;
+
+    if (document.selection && document.selection.empty) {
+      return document.selection.empty();
+    } else if (window.getSelection) {
+      sel = window.getSelection();
+      return sel.removeAllRanges();
+    }
+  };
 
   List.prototype.initStickyHeaders = function() {
     var conTop, h, i, _i, _j, _len, _len1, _ref, _ref1,

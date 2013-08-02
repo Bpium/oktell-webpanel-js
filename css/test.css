@@ -1,20 +1,20 @@
 .oktell_panel.show_right {
     right: 0px !important;
 
-    -webkit-transition: all .1s ease-in-out;
-    -moz-transition: all .1s ease-in-out;
-    -o-transition: all .1s ease-in-out;
-    -ms-transition: all .1s ease-in-out;
-    transition: all .1s ease-in-out;
+    -webkit-transition: all .1s ease-out;
+    -moz-transition: all .1s ease-out;
+    -o-transition: all .1s ease-out;
+    -ms-transition: all .1s ease-out;
+    transition: all .1s ease-out;
 }
 .oktell_panel.hide_right {
     right: -281px !important;
 
-    -webkit-transition: all .3s ease-in-out;
-    -moz-transition: all .3s ease-in-out;
-    -o-transition: all .3s ease-in-out;
-    -ms-transition: all .3s ease-in-out;
-    transition: all .3s ease-in-out;
+    -webkit-transition: all .3s ease-out;
+    -moz-transition: all .3s ease-out;
+    -o-transition: all .3s ease-out;
+    -ms-transition: all .3s ease-out;
+    transition: all .3s ease-out;
 }
 .oktell_panel.show_t_right {
     -webkit-transform-origin: 0px 0px;
@@ -25,11 +25,11 @@
     -ms-transform: translate(-281px,0px);
     transform: translate(-281px,0px);
 
-    -webkit-transition: all .1s ease-in-out;
-    -moz-transition: all .1s ease-in-out;
-    -o-transition: all .1s ease-in-out;
-    -ms-transition: all .1s ease-in-out;
-    transition: all .1s ease-in-out;
+    -webkit-transition: all .1s ease-out;
+    -moz-transition: all .1s ease-out;
+    -o-transition: all .1s ease-out;
+    -ms-transition: all .1s ease-out;
+    transition: all .1s ease-out;
 }
 .oktell_panel.hide_t_right {
     -webkit-transform-origin: 0px 0px;
@@ -40,11 +40,11 @@
     -ms-transform: translate(0px,0px);
     transform: translate(0px,0px);
 
-    -webkit-transition: all .3s ease-in-out;
-    -moz-transition: all .3s ease-in-out;
-    -o-transition: all .3s ease-in-out;
-    -ms-transition: all .3s ease-in-out;
-    transition: all .3s ease-in-out;
+    -webkit-transition: all .3s ease-out;
+    -moz-transition: all .3s ease-out;
+    -o-transition: all .3s ease-out;
+    -ms-transition: all .3s ease-out;
+    transition: all .3s ease-out;
 }
 .oktell_panel.show_left {
     /*-webkit-transform-origin: 0px 0px;*/
@@ -56,11 +56,11 @@
     /*transform: translate(-281px,0px);*/
     left: 0px !important;
 
-    -webkit-transition: all .1s ease-in-out;
-    -moz-transition: all .1s ease-in-out;
-    -o-transition: all .1s ease-in-out;
-    -ms-transition: all .1s ease-in-out;
-    transition: all .1s ease-in-out;
+    -webkit-transition: all .1s ease-out;
+    -moz-transition: all .1s ease-out;
+    -o-transition: all .1s ease-out;
+    -ms-transition: all .1s ease-out;
+    transition: all .1s ease-out;
 }
 .oktell_panel.hide_left {
     /*-webkit-transform-origin: 0px 0px;*/
@@ -72,11 +72,11 @@
     /*transform: translate(0px,0px);*/
     left: -281px !important;
 
-    -webkit-transition: all .3s ease-in-out;
-    -moz-transition: all .3s ease-in-out;
-    -o-transition: all .3s ease-in-out;
-    -ms-transition: all .3s ease-in-out;
-    transition: all .3s ease-in-out;
+    -webkit-transition: all .3s ease-out;
+    -moz-transition: all .3s ease-out;
+    -o-transition: all .3s ease-out;
+    -ms-transition: all .3s ease-out;
+    transition: all .3s ease-out;
 }
 
 .oktell_panel .m_form.b_error {

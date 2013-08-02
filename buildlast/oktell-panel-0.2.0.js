@@ -1,4 +1,4 @@
-/* Oktell-panel.js 0.1.2 http://js.oktell.ru/webpanel */
+/* Oktell-panel.js 0.2.0.1010 http://js.oktell.ru/webpanel */
 
 /*! Copyright (c) 2013 Brandon Aaron (http://brandonaaron.net)
  * Licensed under the MIT License (LICENSE.txt).
@@ -955,11 +955,10 @@ $(function(){
 
 var __slice = [].slice,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
-  __hasProp = {}.hasOwnProperty,
-  __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
+  __hasProp = {}.hasOwnProperty;
 
 (function($) {
-  var CUser, Department, Error, List, Notify, PermissionsPopup, Popup, actionButtonContainerClass, actionButtonHtml, actionListEl, actionListHtml, addActionButtonToEl, afterOktellConnect, checkCssAnimationSupport, cookie, debounce, defaultOptions, departmentTemplateHtml, error, errorHtml, escapeHtml, getOptions, hasTouch, initActionButtons, initButtonOnElement, initPanel, isAndroid, isIDevice, isTouchPad, langs, list, loadTemplate, log, logStr, newGuid, oktell, oktellConnected, options, panelHtml, panelWasInitialized, permissionsPopup, permissionsPopupHtml, popup, popupHtml, templates, userTemplateHtml, usersTableHtml,
+  var CUser, Department, Error, List, Notify, PermissionsPopup, Popup, actionButtonContainerClass, actionButtonHtml, actionListEl, actionListHtml, addActionButtonToEl, afterOktellConnect, checkCssAnimationSupport, cookie, debounce, defaultOptions, departmentTemplateHtml, error, errorHtml, escapeHtml, getOptions, initActionButtons, initButtonOnElement, initPanel, langs, list, loadTemplate, log, logStr, newGuid, oktell, oktellConnected, options, panelHtml, panelWasInitialized, permissionsPopup, permissionsPopupHtml, popup, popupHtml, templates, userTemplateHtml, usersTableHtml,
     _this = this;
 
   if (!$) {
@@ -1824,6 +1823,17 @@ var __slice = [].slice,
 
         return (_ref = _this.jScrollPaneAPI) != null ? _ref.reinitialise() : void 0;
       };
+      this.resetDepsWidth = function() {
+        var w, _ref;
+
+        if (_this.scrollContent) {
+          w = parseInt(_this.scrollContent.css('width'));
+          _this.scrollContent.find('.b_department').css('width', w + 'px');
+          return (_ref = _this.currentTopHeaderClone) != null ? _ref.css({
+            width: w + 'px'
+          }) : void 0;
+        }
+      };
       this.userScrollerToTop = function() {
         return _this.jScrollPaneAPI.scrollToY(0);
       };
@@ -1860,14 +1870,15 @@ var __slice = [].slice,
         return true;
       });
       this.panelEl.bind('click', function(e) {
-        var actionButton, buttonEl, target, user, _ref;
+        var actionButton, buttonEl, dep, target, user;
 
         target = $(e.target);
         if (target.is('.b_department_header') || target.parents('.b_department_header').size() > 0) {
-          if ((_ref = target.parents('.b_department').data('department')) != null) {
-            if (typeof _ref.showUsers === "function") {
-              _ref.showUsers();
-            }
+          dep = target.parents('.b_department').data('department');
+          if ((dep != null ? dep.showUsers : void 0) != null) {
+            dep.showUsers();
+            _this.clearSelection();
+            _this.reinitScroll();
           }
           _this.setUserListHeight();
           return false;
@@ -1944,7 +1955,8 @@ var __slice = [].slice,
         _this.usersListBlockEl.css({
           height: h
         });
-        return _this.reinitScroll();
+        _this.reinitScroll();
+        return _this.resetDepsWidth();
       };
       this.setUserListHeight();
       debouncedSetHeight = debounce(function() {
@@ -1954,7 +1966,9 @@ var __slice = [].slice,
       $(window).bind('resize', function() {
         return debouncedSetHeight();
       });
-      this.hidePanel(true);
+      if (this.options.hideOnDisconnect) {
+        this.hidePanel(true);
+      }
       oktell.on('webphoneConnect', function() {
         return _this.panelEl.addClass('webphone');
       });
@@ -2082,7 +2096,11 @@ var __slice = [].slice,
           user = _ref2[_i];
           user.loadActions();
         }
-        _this.showPanel();
+        if (_this.options.hideOnDisconnect) {
+          _this.showPanel();
+        } else {
+          _this.panelEl.show();
+        }
         _this.setTalking(oktell.getState() === 'talk');
         if (typeof afterOktellConnect === 'function') {
           return afterOktellConnect();
@@ -2140,6 +2158,17 @@ var __slice = [].slice,
         return ringNotify = null;
       });
     }
+
+    List.prototype.clearSelection = function() {
+      var sel;
+
+      if (document.selection && document.selection.empty) {
+        return document.selection.empty();
+      } else if (window.getSelection) {
+        sel = window.getSelection();
+        return sel.removeAllRanges();
+      }
+    };
 
     List.prototype.initStickyHeaders = function() {
       var conTop, h, i, _i, _j, _len, _len1, _ref, _ref1,
@@ -3069,7 +3098,7 @@ var __slice = [].slice,
     oktellVoice: window.oktellVoice,
     debug: false,
     lang: 'ru',
-    noavatar: true,
+    showAvatar: false,
     hideOnDisconnect: true,
     useNotifies: false,
     withoutPermissionsPopup: false,
@@ -3358,16 +3387,19 @@ var __slice = [].slice,
   Error.prototype.log = log;
   Department.prototype.template = departmentTemplateHtml;
   panelWasInitialized = false;
-  isAndroid = /android/gi.test(navigator.appVersion);
-  isIDevice = /iphone|ipad/gi.test(navigator.appVersion);
-  isTouchPad = /hp-tablet/gi.test(navigator.appVersion);
-  hasTouch = __indexOf.call(window, 'ontouchstart') >= 0 && !isTouchPad;
   initPanel = function(opts) {
     var $user, $userActionButton, animOptHide, animOptShow, bookmarkAnimOptHide, bookmarkAnimOptShow, bookmarkPos, cssAnimNow, enableMoving, errorEl, hidePanel, hideTimer, killPanelHideTimer, maxPosClose, minPosOpen, mouseOnPanel, oldBinding, pageX, panelBookmarkEl, panelEl, panelHideTimer, panelMinPos, panelPos, panelStatus, permissionsPopupEl, popupEl, showPanel, showTimer, touchClickedContact, touchClickedContactClear, touchClickedCss, touchMoving, useCssAnim, _panelStatus,
       _this = this;
 
     panelWasInitialized = true;
-    options = $.extend(defaultOptions, opts || {});
+    options = $.extend({}, defaultOptions, opts || {});
+    if (options.oktellVoice) {
+      if (options.oktellVoice.isOktellVoice === true) {
+        options.oktellVoice = options.oktellVoice;
+      } else if (window.oktellVoice(window.oktellVoice.isOktellVoice === true)) {
+        options.oktellVoice = window.oktellVoice;
+      }
+    }
     if (getOptions().useNotifies && window.webkitNotifications && window.webkitNotifications.checkPermission() === 1) {
       webkitNotifications.requestPermission(function() {});
     }
@@ -3381,11 +3413,8 @@ var __slice = [].slice,
     CUser.prototype.langs = langs;
     Department.prototype.langs = langs;
     panelEl = $(panelHtml);
-    if (getOptions().noavatar) {
+    if (!getOptions().showAvatar) {
       panelEl.addClass('noavatar');
-    }
-    if (hasTouch) {
-      panelEl.addClass('touch');
     }
     $user = $(userTemplateHtml);
     $userActionButton = $(actionButtonHtml);

@@ -1,4 +1,4 @@
-/* Oktell-panel.js 0.1.2 http://js.oktell.ru/webpanel */
+/* Oktell-panel.js 0.2.0.1010 http://js.oktell.ru/webpanel */
 
 /* Normalize panel
 ---------------------------------------------------------------*/
@@ -1426,20 +1426,20 @@
 .oktell_panel.show_right {
     right: 0px !important;
 
-    -webkit-transition: all .1s ease-in-out;
-    -moz-transition: all .1s ease-in-out;
-    -o-transition: all .1s ease-in-out;
-    -ms-transition: all .1s ease-in-out;
-    transition: all .1s ease-in-out;
+    -webkit-transition: all .1s ease-out;
+    -moz-transition: all .1s ease-out;
+    -o-transition: all .1s ease-out;
+    -ms-transition: all .1s ease-out;
+    transition: all .1s ease-out;
 }
 .oktell_panel.hide_right {
     right: -281px !important;
 
-    -webkit-transition: all .3s ease-in-out;
-    -moz-transition: all .3s ease-in-out;
-    -o-transition: all .3s ease-in-out;
-    -ms-transition: all .3s ease-in-out;
-    transition: all .3s ease-in-out;
+    -webkit-transition: all .3s ease-out;
+    -moz-transition: all .3s ease-out;
+    -o-transition: all .3s ease-out;
+    -ms-transition: all .3s ease-out;
+    transition: all .3s ease-out;
 }
 .oktell_panel.show_t_right {
     -webkit-transform-origin: 0px 0px;
@@ -1450,11 +1450,11 @@
     -ms-transform: translate(-281px,0px);
     transform: translate(-281px,0px);
 
-    -webkit-transition: all .1s ease-in-out;
-    -moz-transition: all .1s ease-in-out;
-    -o-transition: all .1s ease-in-out;
-    -ms-transition: all .1s ease-in-out;
-    transition: all .1s ease-in-out;
+    -webkit-transition: all .1s ease-out;
+    -moz-transition: all .1s ease-out;
+    -o-transition: all .1s ease-out;
+    -ms-transition: all .1s ease-out;
+    transition: all .1s ease-out;
 }
 .oktell_panel.hide_t_right {
     -webkit-transform-origin: 0px 0px;
@@ -1465,11 +1465,11 @@
     -ms-transform: translate(0px,0px);
     transform: translate(0px,0px);
 
-    -webkit-transition: all .3s ease-in-out;
-    -moz-transition: all .3s ease-in-out;
-    -o-transition: all .3s ease-in-out;
-    -ms-transition: all .3s ease-in-out;
-    transition: all .3s ease-in-out;
+    -webkit-transition: all .3s ease-out;
+    -moz-transition: all .3s ease-out;
+    -o-transition: all .3s ease-out;
+    -ms-transition: all .3s ease-out;
+    transition: all .3s ease-out;
 }
 .oktell_panel.show_left {
     /*-webkit-transform-origin: 0px 0px;*/
@@ -1481,11 +1481,11 @@
     /*transform: translate(-281px,0px);*/
     left: 0px !important;
 
-    -webkit-transition: all .1s ease-in-out;
-    -moz-transition: all .1s ease-in-out;
-    -o-transition: all .1s ease-in-out;
-    -ms-transition: all .1s ease-in-out;
-    transition: all .1s ease-in-out;
+    -webkit-transition: all .1s ease-out;
+    -moz-transition: all .1s ease-out;
+    -o-transition: all .1s ease-out;
+    -ms-transition: all .1s ease-out;
+    transition: all .1s ease-out;
 }
 .oktell_panel.hide_left {
     /*-webkit-transform-origin: 0px 0px;*/
@@ -1497,11 +1497,11 @@
     /*transform: translate(0px,0px);*/
     left: -281px !important;
 
-    -webkit-transition: all .3s ease-in-out;
-    -moz-transition: all .3s ease-in-out;
-    -o-transition: all .3s ease-in-out;
-    -ms-transition: all .3s ease-in-out;
-    transition: all .3s ease-in-out;
+    -webkit-transition: all .3s ease-out;
+    -moz-transition: all .3s ease-out;
+    -o-transition: all .3s ease-out;
+    -ms-transition: all .3s ease-out;
+    transition: all .3s ease-out;
 }
 
 .oktell_panel .m_form.b_error {
@@ -1511,6 +1511,29 @@
 .oktell_panel .selected_text {
     padding: 0 !important;
     margin: 0 !important;
+}
+
+/*
+.oktell_panel .b_department_header .h_shadow_top {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: moz-none;
+    -ms-user-select: none;
+    user-select: none;
+}
+.oktell_panel .b_department_header .h_shadow_top span {
+    -webkit-touch-callout: text;
+    -webkit-user-select: text;
+    -khtml-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
+}
+*/
+
+.oktell_panel .b_department {
+    width: 100%;
 }
 
 /*

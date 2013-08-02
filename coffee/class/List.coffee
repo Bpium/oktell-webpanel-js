@@ -137,6 +137,15 @@ class List
 			@jScrollPaneAPI?.reinitialise()
 			#@usersListBlockEl.find('.jspPane').css 'width', parseInt(@usersListBlockEl.css('width') ) - 5 + 'px'
 
+		@resetDepsWidth = =>
+			if @scrollContent
+				w = parseInt @scrollContent.css 'width'
+				@scrollContent.find('.b_department').css 'width', w + 'px'
+				@currentTopHeaderClone?.css
+					width: w  + 'px'
+
+
+
 		@userScrollerToTop = =>
 			#@usersScroller.css({top:'0px'})
 			@jScrollPaneAPI.scrollToY 0
@@ -177,7 +186,11 @@ class List
 			target = $(e.target)
 
 			if target.is('.b_department_header') or target.parents('.b_department_header').size() > 0
-				target.parents('.b_department').data('department')?.showUsers?()
+				dep = target.parents('.b_department').data('department')
+				if dep?.showUsers?
+					dep.showUsers()
+					@clearSelection()
+					@reinitScroll()
 				@setUserListHeight()
 				return false
 
@@ -245,6 +258,7 @@ class List
 			@usersListBlockEl.css
 				height: h
 			@reinitScroll()
+			@resetDepsWidth()
 
 		@setUserListHeight()
 
@@ -255,8 +269,8 @@ class List
 		$(window).bind 'resize', ->
 			debouncedSetHeight()
 
-		#if @options.
-		@hidePanel(true)
+		if @options.hideOnDisconnect
+			@hidePanel(true)
 
 		oktell.on 'webphoneConnect', =>
 			@panelEl.addClass 'webphone'
@@ -375,7 +389,10 @@ class List
 			for user in @usersWithBeforeConnectButtons
 				user.loadActions()
 
-			@showPanel()
+			if @options.hideOnDisconnect
+				@showPanel()
+			else
+				@panelEl.show()
 
 			@setTalking oktell.getState() is 'talk'
 
@@ -420,6 +437,13 @@ class List
 		oktell.on 'ringStop', =>
 			ringNotify?.close?()
 			ringNotify = null
+
+	clearSelection: ->
+		if document.selection and document.selection.empty
+			document.selection.empty()
+		else if window.getSelection
+			sel = window.getSelection()
+			sel.removeAllRanges()
 
 	initStickyHeaders: ->
 		@resetStickyHeaders()
