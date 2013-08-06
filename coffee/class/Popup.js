@@ -4,10 +4,11 @@ var Popup;
 Popup = (function() {
   Popup.prototype.logGroup = 'Popup';
 
-  function Popup(popupEl, oktell) {
+  function Popup(popupEl, oktell, ringtone) {
     var _this = this;
 
     this.el = popupEl;
+    this.ringtone = ringtone;
     this.absContainer = this.el.find('.b_content');
     this.abonentEl = this.absContainer.find('.b_abonent').remove();
     this.answerActive = false;
@@ -28,14 +29,27 @@ Popup = (function() {
       return _this.hide();
     });
     oktell.on('ringStart', function(abonents) {
+      _this.playRingtone(true);
       _this.setAbonents(abonents);
       _this.answerButtonVisible(oktell.webphoneIsActive());
       return _this.show();
     });
     oktell.on('ringStop', function() {
+      _this.playRingtone(false);
       return _this.hide();
     });
   }
+
+  Popup.prototype.playRingtone = function(play) {
+    if (this.ringtone) {
+      if (play) {
+        this.ringtone.currentTime = 0;
+        return this.ringtone.play();
+      } else {
+        return this.ringtone.pause();
+      }
+    }
+  };
 
   Popup.prototype.show = function(abonents) {
     this.log('Popup show! ', abonents);

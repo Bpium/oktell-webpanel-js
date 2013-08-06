@@ -1,7 +1,8 @@
 class Popup
 	logGroup: 'Popup'
-	constructor: (popupEl, oktell)->
+	constructor: (popupEl, oktell, ringtone)->
 		@el = popupEl
+		@ringtone = ringtone
 		@absContainer = @el.find('.b_content')
 		@abonentEl = @absContainer.find('.b_abonent').remove()
 
@@ -24,14 +25,22 @@ class Popup
 			@hide()
 
 		oktell.on 'ringStart', (abonents) =>
+			@playRingtone true
 			@setAbonents abonents
 			@answerButtonVisible oktell.webphoneIsActive()
 			@show()
 
 		oktell.on 'ringStop', =>
+			@playRingtone false
 			@hide()
 
-
+	playRingtone: (play)->
+		if @ringtone
+			if play
+				@ringtone.currentTime = 0
+				@ringtone.play()
+			else
+				@ringtone.pause()
 
 	show: (abonents) ->
 		@log 'Popup show! ', abonents

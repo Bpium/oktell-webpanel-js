@@ -13,6 +13,7 @@ var __slice = [].slice;
     dynamic: false,
     oktell: window.oktell,
     oktellVoice: window.oktellVoice,
+    ringtone: 'ringtone.mp3',
     debug: false,
     lang: 'ru',
     showAvatar: false,
@@ -294,7 +295,7 @@ var __slice = [].slice;
   Department.prototype.template = departmentTemplateHtml;
   panelWasInitialized = false;
   initPanel = function(opts) {
-    var $user, $userActionButton, animOptHide, animOptShow, bookmarkAnimOptHide, bookmarkAnimOptShow, bookmarkPos, cssAnimNow, enableMoving, errorEl, hidePanel, hideTimer, killPanelHideTimer, maxPosClose, minPosOpen, mouseOnPanel, oldBinding, pageX, panelBookmarkEl, panelEl, panelHideTimer, panelMinPos, panelPos, panelStatus, permissionsPopupEl, popupEl, showPanel, showTimer, touchClickedContact, touchClickedContactClear, touchClickedCss, touchMoving, useCssAnim, _panelStatus,
+    var $user, $userActionButton, animOptHide, animOptShow, bookmarkAnimOptHide, bookmarkAnimOptShow, bookmarkPos, cssAnimNow, enableMoving, errorEl, hidePanel, hideTimer, killPanelHideTimer, maxPosClose, minPosOpen, mouseOnPanel, oldBinding, pageX, panelBookmarkEl, panelEl, panelHideTimer, panelMinPos, panelPos, panelStatus, permissionsPopupEl, popupEl, ringtone, showPanel, showTimer, touchClickedContact, touchClickedContactClear, touchClickedCss, touchMoving, useCssAnim, _panelStatus,
       _this = this;
 
     panelWasInitialized = true;
@@ -331,11 +332,17 @@ var __slice = [].slice;
     $('body').append(actionListEl);
     oktell = getOptions().oktell;
     CUser.prototype.formatPhone = oktell.formatPhone;
+    ringtone = null;
+    if (getOptions().ringtone) {
+      ringtone = $('<audio src="' + getOptions().ringtone + '" id="oktell_panel_ringtone" preload="auto"></audio>')[0];
+      $("body").append(ringtone);
+      ringtone.loop = true;
+    }
     if (!getOptions().withoutCallPopup) {
       popupHtml = popupHtml.replace('{{title}}', langs.callPopup.title).replace('{{goPickup}}', langs.callPopup.goPickup).replace('{{hide}}', langs.callPopup.hide).replace('{{reject}}', langs.callPopup.reject);
       popupEl = $(popupHtml);
       $('body').append(popupEl);
-      popup = new Popup(popupEl, oktell);
+      popup = new Popup(popupEl, oktell, ringtone);
     }
     if (!getOptions().withoutPermissionsPopup) {
       permissionsPopupHtml = permissionsPopupHtml.replace('{{header}}', langs.permissionsPopup.header).replace('{{text}}', langs.permissionsPopup.text);
