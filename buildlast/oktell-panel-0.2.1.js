@@ -1,4 +1,4 @@
-/* Oktell-panel.js 0.2.0.1012 http://js.oktell.ru/webpanel */
+/* Oktell-panel.js 0.2.1.1001 http://js.oktell.ru/webpanel */
 
 /*! Copyright (c) 2013 Brandon Aaron (http://brandonaaron.net)
  * Licensed under the MIT License (LICENSE.txt).
@@ -2312,9 +2312,13 @@ var __slice = [].slice,
         this.panelEl.addClass('dtmf');
         this.dtmfEl.stop(true, true);
         if (dontAnimate) {
-          return this.dtmfEl.show();
+          this.dtmfEl.show();
+          return this.initStickyHeaders();
         } else {
-          return this.dtmfEl.slideDown(200, function() {});
+          this.resetStickyHeaders();
+          return this.dtmfEl.slideDown(200, function() {
+            return _this.initStickyHeaders();
+          });
         }
       }
     };
@@ -2326,9 +2330,13 @@ var __slice = [].slice,
         this.panelEl.removeClass('dtmf');
         this.dtmfEl.stop(true, true);
         if (dontAnimate) {
-          return this.dtmfEl.hide();
+          this.dtmfEl.hide();
+          return this.initStickyHeaders();
         } else {
-          return this.dtmfEl.slideUp(200, function() {});
+          this.resetStickyHeaders();
+          return this.dtmfEl.slideUp(200, function() {
+            return _this.initStickyHeaders();
+          });
         }
       }
     };
@@ -2488,20 +2496,29 @@ var __slice = [].slice,
     };
 
     List.prototype.setKeypadVisibility = function(visible) {
+      var _this = this;
+
       if ((visible != null) && Boolean(this.keypadIsVisible) !== Boolean(visible)) {
         this.keypadIsVisible = Boolean(visible);
         this.keypadEl.stop(true, true);
+        this.resetStickyHeaders();
         if (this.keypadIsVisible) {
           return this.keypadEl.slideDown({
             duration: 200,
             easing: 'linear',
-            done: this.setUserListHeight
+            done: function() {
+              _this.setUserListHeight();
+              return _this.initStickyHeaders();
+            }
           });
         } else {
           return this.keypadEl.slideUp({
             duration: 200,
             easing: 'linear',
-            done: this.setUserListHeight
+            done: function() {
+              _this.setUserListHeight();
+              return _this.initStickyHeaders();
+            }
           });
         }
       }
@@ -2670,7 +2687,8 @@ var __slice = [].slice,
     };
 
     List.prototype._setActivityPanelUserHtml = function(users, listEl, blockEl) {
-      var k, u, usersArray;
+      var k, u, usersArray,
+        _this = this;
 
       usersArray = [];
       for (k in users) {
@@ -2681,10 +2699,18 @@ var __slice = [].slice,
       this._setUsersHtml(usersArray, listEl, true);
       if (usersArray.length && blockEl.is(':not(:visible)')) {
         blockEl.stop(true, true);
-        return blockEl.slideDown(50, this.setUserListHeight);
+        this.resetStickyHeaders();
+        return blockEl.slideDown(50, function() {
+          _this.setUserListHeight();
+          return _this.initStickyHeaders();
+        });
       } else if (usersArray.length === 0 && blockEl.is(':visible')) {
         blockEl.stop(true, true);
-        return blockEl.slideUp(50, this.setUserListHeight);
+        this.resetStickyHeaders();
+        return blockEl.slideUp(50, function() {
+          _this.setUserListHeight();
+          return _this.initStickyHeaders();
+        });
       }
     };
 
