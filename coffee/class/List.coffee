@@ -548,8 +548,11 @@ class List
 			@dtmfEl.stop(true,true)
 			if dontAnimate
 				@dtmfEl.show()
+				@initStickyHeaders()
 			else
+				@resetStickyHeaders()
 				@dtmfEl.slideDown 200, =>
+					@initStickyHeaders()
 
 	hideDtmf: (dontAnimate)->
 		if @panelEl.hasClass('dtmf')
@@ -557,8 +560,11 @@ class List
 			@dtmfEl.stop(true,true)
 			if dontAnimate
 				@dtmfEl.hide()
+				@initStickyHeaders()
 			else
+				@resetStickyHeaders()
 				@dtmfEl.slideUp 200, =>
+					@initStickyHeaders()
 
 
 	onPbxNumberStateChange: (data) =>
@@ -672,16 +678,21 @@ class List
 		if visible? and Boolean(@keypadIsVisible) isnt Boolean(visible)
 			@keypadIsVisible = Boolean(visible)
 			@keypadEl.stop true, true
+			@resetStickyHeaders()
 			if @keypadIsVisible
 				@keypadEl.slideDown
 					duration: 200
 					easing: 'linear'
-					done: @setUserListHeight
+					done: =>
+						@setUserListHeight()
+						@initStickyHeaders()
 			else
 				@keypadEl.slideUp
 					duration: 200
 					easing: 'linear'
-					done: @setUserListHeight
+					done: =>
+						@setUserListHeight()
+						@initStickyHeaders()
 
 	addEventListenersForButton: (user, button) ->
 		button.bind 'click', =>
@@ -789,11 +800,17 @@ class List
 		if usersArray.length and blockEl.is(':not(:visible)')
 			#@log 'Show abonent el'
 			blockEl.stop true, true
-			blockEl.slideDown 50, @setUserListHeight
+			@resetStickyHeaders()
+			blockEl.slideDown 50, =>
+				@setUserListHeight()
+				@initStickyHeaders()
 		else if usersArray.length is 0 and blockEl.is(':visible')
 			#@log 'Hide abonent el'
 			blockEl.stop true, true
-			blockEl.slideUp 50, @setUserListHeight
+			@resetStickyHeaders()
+			blockEl.slideUp 50, =>
+				@setUserListHeight()
+				@initStickyHeaders()
 
 
 	_setUsersHtml: (usersArray, $el, useIndependentCopies ) ->
