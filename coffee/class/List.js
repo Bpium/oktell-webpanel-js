@@ -721,7 +721,7 @@ List = (function() {
         userNowIsFiltered = user.isFiltered(this.filter, this.showOffline, this.filterLang);
         if (!userNowIsFiltered) {
           if (dep.getContainer().children().length === 1) {
-            _results.push(this.setFilter(this.filter, true));
+            _results.push(this.setFilter(this.filter, true, true));
           } else {
             _results.push((_ref1 = user.el) != null ? typeof _ref1.remove === "function" ? _ref1.remove() : void 0 : void 0);
           }
@@ -730,7 +730,7 @@ List = (function() {
           index = dep.lastFilteredUsers.indexOf(user);
           if (index !== -1) {
             if (!dep.getContainer().is(':visible')) {
-              _results.push(this.setFilter(this.filter, true));
+              _results.push(this.setFilter(this.filter, true, true));
             } else {
               if (index === 0) {
                 dep.getContainer().prepend(user.getEl());
@@ -1090,7 +1090,7 @@ List = (function() {
     return $el.html(html);
   };
 
-  List.prototype.setFilter = function(filter, reloadAnyway) {
+  List.prototype.setFilter = function(filter, reloadAnyway, notScrollTop) {
     var allDeps, dep, el, exactMatch, oldFilter, renderDep, _i, _len, _ref,
       _this = this;
 
@@ -1100,6 +1100,7 @@ List = (function() {
     oldFilter = this.filter;
     this.filter = filter;
     this.filterLang = filter.match(/^[^А-яёЁ]+$/) ? 'en' : filter.match(/^[^A-z]+$/) ? 'ru' : '';
+    this.log('set filter');
     exactMatch = false;
     this.timer();
     this.panelUsersFiltered = [];
@@ -1152,8 +1153,12 @@ List = (function() {
       allDeps[allDeps.length - 1].find('tr:last').addClass('g_last');
     }
     this.initStickyHeaders();
-    this.userScrollerToTop();
-    this.setUserListHeight();
+    if (!notScrollTop) {
+      this.userScrollerToTop();
+    }
+    setTimeout(function() {
+      return _this.setUserListHeight();
+    }, 1);
     return this.timer(true);
   };
 

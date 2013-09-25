@@ -586,7 +586,7 @@ class List
 				userNowIsFiltered = user.isFiltered @filter, @showOffline, @filterLang
 				if not userNowIsFiltered
 					if dep.getContainer().children().length is 1
-						@setFilter @filter, true
+						@setFilter @filter, true, true
 					else
 						user.el?.remove?()
 				else if not wasFiltered
@@ -594,7 +594,7 @@ class List
 					index = dep.lastFilteredUsers.indexOf user
 					if index isnt -1
 						if not dep.getContainer().is(':visible')
-							@setFilter @filter, true
+							@setFilter @filter, true, true
 						else
 							if index is 0
 								dep.getContainer().prepend user.getEl()
@@ -810,13 +810,14 @@ class List
 		$el.children().detach()
 		$el.html html
 
-	setFilter: (filter, reloadAnyway) ->
+	setFilter: (filter, reloadAnyway, notScrollTop) ->
 		if @filter is filter and not reloadAnyway then return false
 		oldFilter = @filter
 		@filter = filter
 
 		@filterLang = if filter.match(/^[^А-яёЁ]+$/) then 'en' else if filter.match(/^[^A-z]+$/) then 'ru' else ''
 
+		@log 'set filter'
 
 		exactMatch = false
 		@timer()
@@ -869,9 +870,12 @@ class List
 
 		@initStickyHeaders()
 
-		@userScrollerToTop()
+		if not notScrollTop
+			@userScrollerToTop()
 
-		@setUserListHeight()
+		setTimeout =>
+			@setUserListHeight()
+		, 1
 
 
 		@timer true
