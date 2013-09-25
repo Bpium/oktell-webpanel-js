@@ -172,7 +172,7 @@ do ($)->
 		if getOptions().useNotifies and window.webkitNotifications and window.webkitNotifications.checkPermission() is 1
 			webkitNotifications.requestPermission =>
 
-		Department.prototype.withoutDepName = List.prototype.withoutDepName = 'zzzzz_without'
+		Department.prototype.withoutDepName = List.prototype.withoutDepName = CUser.prototype.withoutDepName = 'zzzzz_without'
 		langs = langs[options.lang] or langs.ru
 		CUser.prototype.template = userTemplateHtml.replace '{{button}}', actionButtonHtml
 		panelHtml = panelHtml.replace('{{inTalk}}',langs.panel.inTalk)

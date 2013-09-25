@@ -382,6 +382,9 @@ class List
 
 			@setFilter '', true
 
+			setTimeout =>
+				@setUserListHeight()
+			, 500
 
 			oktell.getQueue (data) =>
 				@setQueue data.queue if data.result
@@ -573,54 +576,35 @@ class List
 			numStr = n.num.toString()
 			user = @usersByNumber[numStr]
 			if user
-#						@log ''
-#						@log 'start user state change from ' + user.state + ' to ' + n.numstateid + ' for ' + user.getInfo()
 				dep = null
 				if @showDeps
 					dep = @departmentsById[user.departmentId]
 				else
 					dep = @allUserDep
-				#						@log 'current visibility settings are ShowDeps='+@showDeps+' and ShowOffline=' + @showOffline
 				wasFiltered = user.isFiltered @filter, @showOffline, @filterLang
-				#						@log 'user was filtered earlier = ' + wasFiltered
 				user.setState n.numstateid
 				userNowIsFiltered = user.isFiltered @filter, @showOffline, @filterLang
-				#						@log 'after user.setState, now user filtered = ' + userNowIsFiltered
 				if not userNowIsFiltered
-#							@log 'now user isnt filtered'
 					if dep.getContainer().children().length is 1
-#								@log 'container contains only users el, so refilter all list'
 						@setFilter @filter, true
 					else
-#								@log 'remove his html element'
 						user.el?.remove?()
 				else if not wasFiltered
-#							@log 'user now filtered and was not filtered before state change'
 					dep.getUsers @filter, @showOffline, @filterLang
-					#							@log 'refilter all user of department ' + dep.getInfo()
 					index = dep.lastFilteredUsers.indexOf user
-					#							@log 'index of user in refiltered users list is ' + index
 					if index isnt -1
 						if not dep.getContainer().is(':visible')
-#									@log 'dep container is hidden, so, refilter all users list'
 							@setFilter @filter, true
 						else
 							if index is 0
-#										@log 'add user html to start of department container'
 								dep.getContainer().prepend user.getEl()
 							else
-#										@log 'add user html after prev user html element'
 								dep.lastFilteredUsers[index-1]?.el?.after user.getEl()
 
 							if dep.lastFilteredUsers[index-1]?.letter is user.letter
-#										@log 'hide user letter because it is like prev user letter ' + user.letter
 								user.letterVisibility false
 							else if dep.lastFilteredUsers[index+1]?.letter is user.letter
-#										@log 'hide prev user letter because it is like user letter ' + user.letter
 								dep.lastFilteredUsers[index+1].letterVisibility false
-
-#						@log 'end user state change'
-#						@log ''
 
 	hideActionListDropdown: ->
 		@dropdownEl.fadeOut 150, =>
@@ -754,7 +738,7 @@ class List
 				delete userlist[user.number]
 
 	setAbonents: (abonents) ->
-		#@log 'set abonents', abonents
+		@log 'setAbonents', abonents
 		@syncAbonentsAndUserlist abonents, @abonents
 		@setAbonentsHtml()
 		@setUserListHeight()
@@ -833,7 +817,6 @@ class List
 
 		@filterLang = if filter.match(/^[^А-яёЁ]+$/) then 'en' else if filter.match(/^[^A-z]+$/) then 'ru' else ''
 
-		#@log 'filterLang ' + @filterLang
 
 		exactMatch = false
 		@timer()
@@ -893,9 +876,6 @@ class List
 
 		@timer true
 
-
-	afterSetFilter: (filteredUsersArray) ->
-		@setPanelUsersHtml filteredUsersArray
 
 	getUser: (data, dontRemember) ->
 		if typeof data is 'string' or typeof data is 'number'
