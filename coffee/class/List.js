@@ -442,6 +442,9 @@ List = (function() {
         return _this.setHold(oktell.getHoldInfo());
       }, 1000);
       _this.setFilter('', true);
+      setTimeout(function() {
+        return _this.setUserListHeight();
+      }, 500);
       oktell.getQueue(function(data) {
         if (data.result) {
           return _this.setQueue(data.queue);
@@ -978,6 +981,7 @@ List = (function() {
   };
 
   List.prototype.setAbonents = function(abonents) {
+    this.log('setAbonents', abonents);
     this.syncAbonentsAndUserlist(abonents, this.abonents);
     this.setAbonentsHtml();
     return this.setUserListHeight();
@@ -1151,10 +1155,6 @@ List = (function() {
     this.userScrollerToTop();
     this.setUserListHeight();
     return this.timer(true);
-  };
-
-  List.prototype.afterSetFilter = function(filteredUsersArray) {
-    return this.setPanelUsersHtml(filteredUsersArray);
   };
 
   List.prototype.getUser = function(data, dontRemember) {
