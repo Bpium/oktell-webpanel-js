@@ -14,6 +14,7 @@ class CUser
 		@init(data)
 
 
+
 	init: (data) ->
 		#@log 'init user', data
 		@id = data.id?.toString().toLowerCase()
