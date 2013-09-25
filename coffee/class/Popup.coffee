@@ -24,15 +24,30 @@ class Popup
 		@el.find('i.o_close').bind 'click', =>
 			@hide()
 
-		oktell.on 'ringStart', (abonents) =>
+
+		abonentsSet = false
+
+		oktell.on 'webrtcRingStart', (name, identity) =>
+			@log 'webrtcRingStart, ' + identity
 			@playRingtone true
+			@answerButtonVisible true
+			if not abonentsSet
+				@setAbonents [{name:name, phone: identity.match(/<sip:([\s\S]+?)@/)?[1] or ''}]
+			@show()
+
+		oktell.on 'ringStart', (abonents) =>
+			@log 'ringStart', abonents
 			@setAbonents abonents
-			@answerButtonVisible oktell.webphoneIsActive()
+			abonentsSet = true
 			@show()
 
 		oktell.on 'ringStop', =>
 			@playRingtone false
 			@hide()
+			abonentsSet = false
+			@setAbonents []
+
+		@answerButtonVisible false
 
 	playRingtone: (play)->
 		if @ringtone

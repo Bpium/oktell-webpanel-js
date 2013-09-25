@@ -5,7 +5,8 @@ Popup = (function() {
   Popup.prototype.logGroup = 'Popup';
 
   function Popup(popupEl, oktell, ringtone) {
-    var _this = this;
+    var abonentsSet,
+      _this = this;
 
     this.el = popupEl;
     this.ringtone = ringtone;
@@ -28,16 +29,36 @@ Popup = (function() {
     this.el.find('i.o_close').bind('click', function() {
       return _this.hide();
     });
-    oktell.on('ringStart', function(abonents) {
+    abonentsSet = false;
+    oktell.on('webrtcRingStart', function(name, identity) {
+      var _ref;
+
+      _this.log('webrtcRingStart, ' + identity);
       _this.playRingtone(true);
+      _this.answerButtonVisible(true);
+      if (!abonentsSet) {
+        _this.setAbonents([
+          {
+            name: name,
+            phone: ((_ref = identity.match(/<sip:([\s\S]+?)@/)) != null ? _ref[1] : void 0) || ''
+          }
+        ]);
+      }
+      return _this.show();
+    });
+    oktell.on('ringStart', function(abonents) {
+      _this.log('ringStart', abonents);
       _this.setAbonents(abonents);
-      _this.answerButtonVisible(oktell.webphoneIsActive());
+      abonentsSet = true;
       return _this.show();
     });
     oktell.on('ringStop', function() {
       _this.playRingtone(false);
-      return _this.hide();
+      _this.hide();
+      abonentsSet = false;
+      return _this.setAbonents([]);
     });
+    this.answerButtonVisible(false);
   }
 
   Popup.prototype.playRingtone = function(play) {
