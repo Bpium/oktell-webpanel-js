@@ -467,6 +467,12 @@ List = (function() {
     });
     oktell.on('abonentsChange', function(abonents) {
       if (_this.oktellConnected) {
+        if (oktell.conferenceId()) {
+          _this.panelEl.addClass('conference');
+          _this.hideDtmf();
+        } else {
+          _this.panelEl.removeClass('conference');
+        }
         _this.setAbonents(abonents);
         return _this.reloadActions();
       }

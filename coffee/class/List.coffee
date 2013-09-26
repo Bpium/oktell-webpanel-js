@@ -403,6 +403,11 @@ class List
 
 		oktell.on 'abonentsChange', ( abonents ) =>
 			if @oktellConnected
+				if oktell.conferenceId()
+					@panelEl.addClass 'conference'
+					@hideDtmf()
+				else
+					@panelEl.removeClass 'conference'
 				@setAbonents abonents
 				@reloadActions()
 
