@@ -30,6 +30,9 @@ class CUser
 		if @numberHtml is @nameHtml
 			@numberHtml = ''
 
+		@isIvr = data.isIvr
+		@ivrName = data.ivrName
+
 		ns = @nameHtml.split(/\s+/)
 		if ns.length > 1 and data.name.toString() isnt @number
 			@nameHtml1 = ns[0]
@@ -178,7 +181,10 @@ class CUser
 			@loadActions(true)
 
 	loadOktellActions: ->
-		actions = @oktell.getPhoneActions @id or @number
+		if @isIvr
+			actions = ['endCall']
+		else
+			actions = @oktell.getPhoneActions @id or @number
 		#@log 'actions for ' + @getInfo(), actions
 		actions
 
