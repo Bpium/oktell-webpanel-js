@@ -557,7 +557,7 @@ List = (function() {
     _ref1 = this.headerEls;
     for (i = _j = 0, _len1 = _ref1.length; _j < _len1; i = ++_j) {
       h = _ref1[i];
-      if (h.offset().top > conTop) {
+      if (h.offset().top > conTop || i === this.headerEls.length - 1) {
         this.processStickyHeaders(i - 1);
         break;
       }
@@ -942,29 +942,38 @@ List = (function() {
   };
 
   List.prototype.syncAbonentsAndUserlist = function(abonents, userlist) {
-    var absByNumber, uNumber, user, _results,
+    var absByNumber, uNumber, user, _ref, _results,
       _this = this;
 
     absByNumber = {};
+    if ((abonents != null ? abonents.length : void 0) === 0 || (abonents.length === 1 && (abonents != null ? (_ref = abonents[0]) != null ? _ref.isIvr : void 0 : void 0))) {
+      for (uNumber in userlist) {
+        if (!__hasProp.call(userlist, uNumber)) continue;
+        user = userlist[uNumber];
+        delete userlist[uNumber];
+      }
+    }
     $.each(abonents, function(i, ab) {
-      var number, u;
+      var number, u, _ref1;
 
       if (!ab) {
         return;
       }
-      number = ab.phone.toString() || '';
+      number = ((_ref1 = ab.phone) != null ? typeof _ref1.toString === "function" ? _ref1.toString() : void 0 : void 0) || ab.ivrName || '';
       if (!number) {
         return;
       }
       absByNumber[number] = ab;
-      if (!userlist[ab.phone.toString()]) {
+      if (!userlist[number.toString()]) {
         u = _this.getUser({
           name: ab.name,
-          number: ab.phone,
+          number: ab.phone || '',
           id: ab.userid,
-          state: 1
-        });
-        return userlist[u.number] = u;
+          state: ab.isIvr ? 5 : 1,
+          isIvr: ab.isIvr,
+          ivrName: ab.ivrName
+        }, ab.isIvr);
+        return userlist[number.toString()] = u;
       }
     });
     _results = [];
@@ -981,10 +990,14 @@ List = (function() {
   };
 
   List.prototype.setAbonents = function(abonents) {
-    this.log('setAbonents', abonents);
+    var _this = this;
+
+    this.log('setAbonents', abonents, this.abonents);
     this.syncAbonentsAndUserlist(abonents, this.abonents);
     this.setAbonentsHtml();
-    return this.setUserListHeight();
+    return setTimeout(function() {
+      return _this.setUserListHeight();
+    }, 200);
   };
 
   List.prototype.setQueue = function(queue) {
@@ -1177,12 +1190,12 @@ List = (function() {
     if (!data.numberFormatted) {
       data.numberFormatted = numberFormatted;
     }
-    if (!dontRemember && ((_ref = this.filterFantomUser) != null ? _ref.number : void 0) === strNumber) {
+    if (!data.isIvr && !dontRemember && ((_ref = this.filterFantomUser) != null ? _ref.number : void 0) === strNumber) {
       this.usersByNumber[strNumber] = this.filterFantomUser;
       data.isFantom = true;
       this.filterFantomUser = false;
     }
-    if (this.usersByNumber[strNumber]) {
+    if (!data.isIvr && this.usersByNumber[strNumber]) {
       if (this.usersByNumber[strNumber].isFantom) {
         this.usersByNumber[strNumber].init(data);
       }
@@ -1193,7 +1206,9 @@ List = (function() {
       numberFormatted: numberFormatted,
       name: data.name,
       isFantom: true,
-      state: ((data != null ? data.state : void 0) != null ? data.state : 1)
+      state: ((data != null ? data.state : void 0) != null ? data.state : 1),
+      isIvr: data != null ? data.isIvr : void 0,
+      ivrName: data != null ? data.ivrName : void 0
     });
     if (!dontRemember) {
       this.usersByNumber[strNumber] = fantom;

@@ -34,6 +34,8 @@ CUser = (function() {
     if (this.numberHtml === this.nameHtml) {
       this.numberHtml = '';
     }
+    this.isIvr = data.isIvr;
+    this.ivrName = data.ivrName;
     ns = this.nameHtml.split(/\s+/);
     if (ns.length > 1 && data.name.toString() !== this.number) {
       this.nameHtml1 = ns[0];
@@ -217,7 +219,11 @@ CUser = (function() {
   CUser.prototype.loadOktellActions = function() {
     var actions;
 
-    actions = this.oktell.getPhoneActions(this.id || this.number);
+    if (this.isIvr) {
+      actions = ['endCall'];
+    } else {
+      actions = this.oktell.getPhoneActions(this.id || this.number);
+    }
     return actions;
   };
 

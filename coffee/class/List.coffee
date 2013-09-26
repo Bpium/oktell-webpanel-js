@@ -470,7 +470,7 @@ class List
 		#@log 'conTop', conTop
 		for h, i in @headerEls
 			#@log 'h top', h.offset().top
-			if h.offset().top > conTop
+			if h.offset().top > conTop or i is @headerEls.length - 1
 				#@log 'initStickyHeaders', i-1
 				@processStickyHeaders i-1
 				break
@@ -720,28 +720,36 @@ class List
 
 	syncAbonentsAndUserlist: (abonents, userlist) ->
 		absByNumber = {}
+		if abonents?.length is 0 or ( abonents.length is 1 and abonents?[0]?.isIvr )
+			for own uNumber, user of userlist
+				delete userlist[uNumber]
 		$.each abonents, (i, ab) =>
 			if not ab then return
-			number = ab.phone.toString() or ''
+			number = ab.phone?.toString?() or ab.ivrName or ''
 			if not number then return
 			absByNumber[number] = ab
-			if not userlist[ab.phone.toString()]
+			if not userlist[number.toString()]
 				u = @getUser
 					name: ab.name
-					number: ab.phone
+					number: ab.phone or ''
 					id: ab.userid
-					state: 1
-				userlist[u.number] = u
+					state: if ab.isIvr then 5 else 1
+					isIvr: ab.isIvr
+					ivrName: ab.ivrName
+				, ab.isIvr
+				userlist[number.toString()] = u
 
 		for own uNumber, user of userlist
 			if not absByNumber[user.number]
 				delete userlist[user.number]
 
 	setAbonents: (abonents) ->
-		@log 'setAbonents', abonents
+		@log 'setAbonents', abonents, @abonents
 		@syncAbonentsAndUserlist abonents, @abonents
 		@setAbonentsHtml()
-		@setUserListHeight()
+		setTimeout =>
+			@setUserListHeight()
+		, 200
 
 	setQueue: (queue) ->
 		if @oktell.getState() is 'ring'
@@ -877,7 +885,6 @@ class List
 			@setUserListHeight()
 		, 1
 
-
 		@timer true
 
 
@@ -891,12 +898,12 @@ class List
 		numberFormatted = data.phoneFormatted or oktell.formatPhone?(strNumber) or strNumber
 		data.numberFormatted = numberFormatted unless data.numberFormatted
 
-		if not dontRemember and @filterFantomUser?.number is strNumber
+		if not data.isIvr and not dontRemember and @filterFantomUser?.number is strNumber
 			@usersByNumber[strNumber] = @filterFantomUser
 			data.isFantom = true
 			@filterFantomUser = false
 
-		if @usersByNumber[strNumber]
+		if not data.isIvr and @usersByNumber[strNumber]
 			@usersByNumber[strNumber].init(data) if @usersByNumber[strNumber].isFantom
 			return @usersByNumber[strNumber]
 
@@ -906,6 +913,8 @@ class List
 			name: data.name
 			isFantom: true
 			state: ( if data?.state? then data.state else 1 )
+			isIvr: data?.isIvr
+			ivrName: data?.ivrName
 
 		if not dontRemember
 			@usersByNumber[strNumber] = fantom
