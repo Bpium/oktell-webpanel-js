@@ -1,4 +1,4 @@
-/* Oktell-panel.js 0.2.2.1004 http://js.oktell.ru/webpanel */
+/* Oktell-panel.js 0.2.2.1005 http://js.oktell.ru/webpanel */
 
 /* Normalize panel
 ---------------------------------------------------------------*/
@@ -667,7 +667,7 @@
 }
 .oktell_panel .b_contact td.b_contact_title span.o_number {
   color: #999;
-  padding-left: 0px;
+  padding-left: 6px;
 }
 .oktell_panel .b_contact td.b_contact_title span.o_dtmf {
   display: none;
