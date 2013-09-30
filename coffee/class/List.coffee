@@ -26,6 +26,7 @@ class List
 			ghostHelp : { icon: '/img/icons/action/ghost_help.png', text: @langs.actions.ghostHelp }
 			hold : { icon: '/img/icons/action/ghost_help.png', text: @langs.actions.hold }
 			resume : { icon: '/img/icons/action/ghost_help.png', text: @langs.actions.resume }
+			dtmf : { icon: '', text: @langs.actions.dtmf }
 
 		@actionCssPrefix = 'i_'
 		@lastDropdownUser = false
@@ -550,6 +551,12 @@ class List
 	sendDtmf: (code)->
 		@oktell.dtmf code.toString().replace('∗', '*')
 
+	toggleDtmf: ->
+		if @panelEl.hasClass('dtmf')
+			@hideDtmf()
+		else
+			@showDtmf()
+
 	showDtmf: (dontAnimate) ->
 		if @oktell.getState() is 'talk' and @panelEl.hasClass('webphone') and not @panelEl.hasClass('dtmf')
 			@panelEl.addClass('dtmf')
@@ -750,7 +757,13 @@ class List
 
 	setAbonents: (abonents) ->
 		@log 'setAbonents', abonents, @abonents
+		for own number, abonent of @abonents
+			abonent.removeAction 'dtmf'
 		@syncAbonentsAndUserlist abonents, @abonents
+		if not @oktell.conferenceId
+			for own number, abonent of @abonents
+				abonent.addAction 'dtmf', =>
+					@toggleDtmf()
 		@setAbonentsHtml()
 		setTimeout =>
 			@setUserListHeight()

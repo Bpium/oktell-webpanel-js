@@ -1,4 +1,4 @@
-/* Oktell-panel.js 0.2.2.1005 http://js.oktell.ru/webpanel */
+/* Oktell-panel.js 0.2.2.1007 http://js.oktell.ru/webpanel */
 
 /*! Copyright (c) 2013 Brandon Aaron (http://brandonaaron.net)
  * Licensed under the MIT License (LICENSE.txt).
@@ -1257,6 +1257,7 @@ var __slice = [].slice,
 
     function CUser(data) {
       this.doAction = __bind(this.doAction, this);      this.state = false;
+      this.additionalActions = {};
       this.hasHover = false;
       this.buttonLastAction = '';
       this.firstLiCssPrefix = 'm_button_action_';
@@ -1467,20 +1468,40 @@ var __slice = [].slice,
     };
 
     CUser.prototype.loadOktellActions = function() {
-      var actions;
+      var action, actions, _ref;
 
       if (this.isIvr) {
         actions = ['endCall'];
       } else {
         actions = this.oktell.getPhoneActions(this.id || this.number);
       }
+      _ref = this.additionalActions;
+      for (action in _ref) {
+        if (!__hasProp.call(_ref, action)) continue;
+        actions.push(action);
+      }
       return actions;
     };
 
+    CUser.prototype.addAction = function(action, callback) {
+      if (action && typeof action === 'string' && typeof callback === 'function') {
+        return this.additionalActions[action] = callback;
+      }
+    };
+
+    CUser.prototype.removeAction = function(action) {
+      return action && delete this.additionalActions[action];
+    };
+
     CUser.prototype.loadActions = function() {
-      var action, actions;
+      var action, actions, _ref;
 
       actions = this.loadOktellActions();
+      _ref = this.additionalActions;
+      for (action in _ref) {
+        if (!__hasProp.call(_ref, action)) continue;
+        actions.push(action);
+      }
       action = (actions != null ? actions[0] : void 0) || '';
       if (this.buttonLastAction === action) {
         return actions;
@@ -1499,7 +1520,7 @@ var __slice = [].slice,
     };
 
     CUser.prototype.doAction = function(action) {
-      var target, _base, _base1, _base2;
+      var target, _base, _base1, _base2, _base3;
 
       if (!action) {
         return;
@@ -1533,6 +1554,8 @@ var __slice = [].slice,
           return typeof (_base1 = this.oktell).resume === "function" ? _base1.resume() : void 0;
         case 'answer':
           return typeof (_base2 = this.oktell).answer === "function" ? _base2.answer() : void 0;
+        default:
+          return typeof (_base3 = this.additionalActions)[action] === "function" ? _base3[action]() : void 0;
       }
     };
 
@@ -1725,6 +1748,10 @@ var __slice = [].slice,
         resume: {
           icon: '/img/icons/action/ghost_help.png',
           text: this.langs.actions.resume
+        },
+        dtmf: {
+          icon: '',
+          text: this.langs.actions.dtmf
         }
       };
       this.actionCssPrefix = 'i_';
@@ -2320,6 +2347,14 @@ var __slice = [].slice,
       return this.oktell.dtmf(code.toString().replace('∗', '*'));
     };
 
+    List.prototype.toggleDtmf = function() {
+      if (this.panelEl.hasClass('dtmf')) {
+        return this.hideDtmf();
+      } else {
+        return this.showDtmf();
+      }
+    };
+
     List.prototype.showDtmf = function(dontAnimate) {
       var _this = this;
 
@@ -2646,10 +2681,27 @@ var __slice = [].slice,
     };
 
     List.prototype.setAbonents = function(abonents) {
-      var _this = this;
+      var abonent, number, _ref, _ref1,
+        _this = this;
 
       this.log('setAbonents', abonents, this.abonents);
+      _ref = this.abonents;
+      for (number in _ref) {
+        if (!__hasProp.call(_ref, number)) continue;
+        abonent = _ref[number];
+        abonent.removeAction('dtmf');
+      }
       this.syncAbonentsAndUserlist(abonents, this.abonents);
+      if (!this.oktell.conferenceId) {
+        _ref1 = this.abonents;
+        for (number in _ref1) {
+          if (!__hasProp.call(_ref1, number)) continue;
+          abonent = _ref1[number];
+          abonent.addAction('dtmf', function() {
+            return _this.toggleDtmf();
+          });
+        }
+      }
       this.setAbonentsHtml();
       return setTimeout(function() {
         return _this.setUserListHeight();
@@ -3224,7 +3276,8 @@ var __slice = [].slice,
         ghostListen: 'Прослушка',
         ghostHelp: 'Помощь',
         hold: 'Удержание',
-        resume: 'Продолжить'
+        resume: 'Продолжить',
+        dtmf: 'Донабор'
       },
       callPopup: {
         title: 'Входящий вызов',
@@ -3278,7 +3331,8 @@ var __slice = [].slice,
         ghostListen: 'Audition',
         ghostHelp: 'Help',
         hold: 'Hold',
-        resume: 'Resume'
+        resume: 'Resume',
+        dtmf: 'Extension'
       },
       callPopup: {
         title: 'Incoming call',
@@ -3332,7 +3386,8 @@ var __slice = [].slice,
         ghostListen: 'Odposlech',
         ghostHelp: 'Nápověda',
         hold: 'Udržet',
-        resume: 'Pokračovat'
+        resume: 'Pokračovat',
+        dtmf: 'Prodloužení vytáčení'
       },
       callPopup: {
         title: 'Příchozí hovor',

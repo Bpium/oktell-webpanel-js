@@ -2,6 +2,7 @@ class CUser
 	logGroup: 'User'
 	constructor: (data) ->
 		@state = false
+		@additionalActions = {}
 		@hasHover = false
 		@buttonLastAction = ''
 		@firstLiCssPrefix = 'm_button_action_'
@@ -186,10 +187,22 @@ class CUser
 		else
 			actions = @oktell.getPhoneActions @id or @number
 		#@log 'actions for ' + @getInfo(), actions
+		for own action of @additionalActions
+			actions.push action
 		actions
 
-	loadActions: ()->
+	addAction: (action, callback)->
+		if action and typeof action is 'string' and typeof callback is 'function'
+			@additionalActions[action] = callback
+
+	removeAction: (action)->
+		action and delete @additionalActions[action]
+
+	loadActions: ->
 		actions = @loadOktellActions()
+		for own action of @additionalActions
+			actions.push action
+
 		#@log 'load action for user id='+@id+' number='+@number+' actions='+actions
 		#window.cuser = @
 		action = actions?[0] or ''
@@ -248,6 +261,8 @@ class CUser
 				@oktell.resume?()
 			when 'answer'
 				@oktell.answer?()
+			else
+				@additionalActions[action]?()
 
 
 	doLastFirstAction: ->
