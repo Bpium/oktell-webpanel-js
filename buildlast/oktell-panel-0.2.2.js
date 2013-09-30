@@ -1,4 +1,4 @@
-/* Oktell-panel.js 0.2.2.1007 http://js.oktell.ru/webpanel */
+/* Oktell-panel.js 0.2.2.1008 http://js.oktell.ru/webpanel */
 
 /*! Copyright (c) 2013 Brandon Aaron (http://brandonaaron.net)
  * Licensed under the MIT License (LICENSE.txt).
@@ -3034,10 +3034,12 @@ var __slice = [].slice,
       this.puckupEl = this.el.find('.j_pickup');
       this.el.find('.j_abort_action').bind('click', function() {
         _this.hide();
+        _this.playRingtone(false);
         return oktell.endCall();
       });
       this.el.find('.j_answer').bind('click', function() {
         _this.hide();
+        _this.playRingtone(false);
         return oktell.answer();
       });
       this.el.find('.j_close_action').bind('click', function() {

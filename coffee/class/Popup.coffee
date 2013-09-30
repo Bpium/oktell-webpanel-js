@@ -13,9 +13,11 @@ class Popup
 
 		@el.find('.j_abort_action').bind 'click', =>
 			@hide()
+			@playRingtone false
 			oktell.endCall();
 		@el.find('.j_answer').bind 'click', =>
 			@hide()
+			@playRingtone false
 			oktell.answer();
 
 		@el.find('.j_close_action').bind 'click', =>
