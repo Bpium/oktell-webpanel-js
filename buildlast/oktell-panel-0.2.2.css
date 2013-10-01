@@ -1,4 +1,4 @@
-/* Oktell-panel.js 0.2.2.1008 http://js.oktell.ru/webpanel */
+/* Oktell-panel.js 0.2.2.1009 http://js.oktell.ru/webpanel */
 
 /* Normalize panel
 ---------------------------------------------------------------*/
@@ -277,7 +277,6 @@
   background-color: #eeebd0;
   cursor: pointer;
   overflow: hidden;
-  white-space: nowrap;
 }
 .oktell_panel .b_department_header .h_shadow_top {
   padding: 3px 10px;

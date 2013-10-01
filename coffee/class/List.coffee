@@ -483,6 +483,7 @@ class List
 		@processStickyHeaders()
 
 	headerHeight: 24
+	cloneHeaderHeight: null
 
 	processStickyHeaders: (elIndex)->
 		if @headerEls?.length > 0
@@ -493,6 +494,7 @@ class List
 				@currentTopIndex = elIndex
 				@currentTopHeaderClone?.remove()
 				@currentTopHeaderClone = @headerEls[@currentTopIndex].clone()
+				@cloneHeaderHeight = @headerEls[@currentTopIndex].height()
 				@headerEls[@currentTopIndex].after @currentTopHeaderClone
 				#@currentTopHeaderClone.find('.h_shadow_top span').text('Клон')
 				@currentTopHeaderClone.css
@@ -519,16 +521,17 @@ class List
 						@currentTopHeaderClone.show()
 					if @headerEls[@currentTopIndex+1]
 						nexTop = @headerEls[@currentTopIndex+1].offset().top
-						if nexTop > conTop + @headerHeight
+						if nexTop > conTop + ( @cloneHeaderHeight or @headerHeight )
 							@currentTopHeaderClone.offset({top:conTop})
 						else if nexTop > conTop
-							@currentTopHeaderClone.offset({top:nexTop - @headerHeight })
+							@currentTopHeaderClone.offset({top:nexTop - ( @cloneHeaderHeight or @headerHeight ) })
 						else if nexTop < conTop
 							@processStickyHeaders @currentTopIndex + 1
 
 	resetStickyHeaders: ->
 		@currentTopHeaderClone?.remove?()
 		@currentTopHeaderClone = null
+		@cloneHeaderHeight = null
 		@currentTopIndex = null
 		@headerEls = null
 

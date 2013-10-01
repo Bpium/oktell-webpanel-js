@@ -1,4 +1,4 @@
-/* Oktell-panel.js 0.2.2.1008 http://js.oktell.ru/webpanel */
+/* Oktell-panel.js 0.2.2.1009 http://js.oktell.ru/webpanel */
 
 /*! Copyright (c) 2013 Brandon Aaron (http://brandonaaron.net)
  * Licensed under the MIT License (LICENSE.txt).
@@ -2250,6 +2250,8 @@ var __slice = [].slice,
 
     List.prototype.headerHeight = 24;
 
+    List.prototype.cloneHeaderHeight = null;
+
     List.prototype.processStickyHeaders = function(elIndex) {
       var conTop, curTop, nexTop, _ref, _ref1;
 
@@ -2263,6 +2265,7 @@ var __slice = [].slice,
             _ref1.remove();
           }
           this.currentTopHeaderClone = this.headerEls[this.currentTopIndex].clone();
+          this.cloneHeaderHeight = this.headerEls[this.currentTopIndex].height();
           this.headerEls[this.currentTopIndex].after(this.currentTopHeaderClone);
           this.currentTopHeaderClone.css({
             position: 'fixed',
@@ -2292,13 +2295,13 @@ var __slice = [].slice,
             }
             if (this.headerEls[this.currentTopIndex + 1]) {
               nexTop = this.headerEls[this.currentTopIndex + 1].offset().top;
-              if (nexTop > conTop + this.headerHeight) {
+              if (nexTop > conTop + (this.cloneHeaderHeight || this.headerHeight)) {
                 return this.currentTopHeaderClone.offset({
                   top: conTop
                 });
               } else if (nexTop > conTop) {
                 return this.currentTopHeaderClone.offset({
-                  top: nexTop - this.headerHeight
+                  top: nexTop - (this.cloneHeaderHeight || this.headerHeight)
                 });
               } else if (nexTop < conTop) {
                 return this.processStickyHeaders(this.currentTopIndex + 1);
@@ -2318,6 +2321,7 @@ var __slice = [].slice,
         }
       }
       this.currentTopHeaderClone = null;
+      this.cloneHeaderHeight = null;
       this.currentTopIndex = null;
       return this.headerEls = null;
     };

@@ -565,6 +565,8 @@ List = (function() {
 
   List.prototype.headerHeight = 24;
 
+  List.prototype.cloneHeaderHeight = null;
+
   List.prototype.processStickyHeaders = function(elIndex) {
     var conTop, curTop, nexTop, _ref, _ref1;
     if (((_ref = this.headerEls) != null ? _ref.length : void 0) > 0) {
@@ -577,6 +579,7 @@ List = (function() {
           _ref1.remove();
         }
         this.currentTopHeaderClone = this.headerEls[this.currentTopIndex].clone();
+        this.cloneHeaderHeight = this.headerEls[this.currentTopIndex].height();
         this.headerEls[this.currentTopIndex].after(this.currentTopHeaderClone);
         this.currentTopHeaderClone.css({
           position: 'fixed',
@@ -606,13 +609,13 @@ List = (function() {
           }
           if (this.headerEls[this.currentTopIndex + 1]) {
             nexTop = this.headerEls[this.currentTopIndex + 1].offset().top;
-            if (nexTop > conTop + this.headerHeight) {
+            if (nexTop > conTop + (this.cloneHeaderHeight || this.headerHeight)) {
               return this.currentTopHeaderClone.offset({
                 top: conTop
               });
             } else if (nexTop > conTop) {
               return this.currentTopHeaderClone.offset({
-                top: nexTop - this.headerHeight
+                top: nexTop - (this.cloneHeaderHeight || this.headerHeight)
               });
             } else if (nexTop < conTop) {
               return this.processStickyHeaders(this.currentTopIndex + 1);
@@ -631,6 +634,7 @@ List = (function() {
       }
     }
     this.currentTopHeaderClone = null;
+    this.cloneHeaderHeight = null;
     this.currentTopIndex = null;
     return this.headerEls = null;
   };
