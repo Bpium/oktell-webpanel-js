@@ -185,7 +185,7 @@ class CUser
 		if @isIvr
 			actions = ['endCall']
 		else
-			actions = @oktell.getPhoneActions @id or @number
+			actions = @oktell.getPhoneActions @number or @id
 		#@log 'actions for ' + @getInfo(), actions
 		for own action of @additionalActions
 			actions.push action

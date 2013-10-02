@@ -216,7 +216,7 @@ CUser = (function() {
     if (this.isIvr) {
       actions = ['endCall'];
     } else {
-      actions = this.oktell.getPhoneActions(this.id || this.number);
+      actions = this.oktell.getPhoneActions(this.number || this.id);
     }
     _ref = this.additionalActions;
     for (action in _ref) {
