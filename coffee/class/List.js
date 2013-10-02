@@ -1096,13 +1096,16 @@ List = (function() {
   };
 
   List.prototype._setUsersHtml = function(usersArray, $el, useIndependentCopies) {
-    var html, lastDepId, prevLetter, u, _i, _len;
+    var html, lastDepId, prevLetter, u, userEl, _i, _len;
     html = [];
     lastDepId = null;
     prevLetter = '';
     for (_i = 0, _len = usersArray.length; _i < _len; _i++) {
       u = usersArray[_i];
-      html.push(u.getEl(useIndependentCopies));
+      userEl = u.getEl(useIndependentCopies);
+      if ((userEl != null ? userEl[0] : void 0) != null) {
+        html.push(userEl[0]);
+      }
       u.showLetter(prevLetter !== u.letter ? true : false);
       prevLetter = u.letter;
     }
@@ -1127,6 +1130,11 @@ List = (function() {
     renderDep = function(dep) {
       var depExactMatch, el, users, _ref;
       el = dep.getEl(filter !== '');
+      if ((el != null ? el[0] : void 0) != null) {
+        el = el[0];
+      } else {
+        return;
+      }
       depExactMatch = false;
       _ref = dep.getUsers(filter, _this.showOffline, _this.filterLang), users = _ref[0], depExactMatch = _ref[1];
       _this.panelUsersFiltered = _this.panelUsersFiltered.concat(users);
@@ -1161,14 +1169,16 @@ List = (function() {
       el = this.exactMatchUserDep.getEl();
       this._setUsersHtml([this.filterFantomUser], this.exactMatchUserDep.getContainer());
       this.filterFantomUser.showLetter(false);
-      allDeps.unshift(el);
+      if ((el != null ? el[0] : void 0) != null) {
+        allDeps.unshift(el[0]);
+      }
     } else {
       this.filterFantomUser = false;
     }
     this.scrollContent.children().detach();
     this.scrollContent.html(allDeps);
     if (allDeps.length > 0) {
-      allDeps[allDeps.length - 1].find('tr:last').addClass('g_last');
+      $(allDeps[allDeps.length - 1]).find('tr:last').addClass('g_last');
     }
     this.initStickyHeaders();
     if (!notScrollTop) {

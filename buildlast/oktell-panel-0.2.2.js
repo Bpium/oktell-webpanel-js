@@ -1,4 +1,4 @@
-/* Oktell-panel.js 0.2.2.1009 http://js.oktell.ru/webpanel */
+/* Oktell-panel.js 0.2.2.1011 http://js.oktell.ru/webpanel */
 
 /*! Copyright (c) 2013 Brandon Aaron (http://brandonaaron.net)
  * Licensed under the MIT License (LICENSE.txt).
@@ -1290,7 +1290,7 @@ var __slice = [].slice,
       ns = this.nameHtml.split(/\s+/);
       if (ns.length > 1 && data.name.toString() !== this.number) {
         this.nameHtml1 = ns[0];
-        this.nameHtml2 = ' ' + ns.splice(1).join('');
+        this.nameHtml2 = ' ' + ns.splice(1).join(' ');
       } else {
         this.nameHtml1 = this.nameHtml;
         this.nameHtml2 = '';
@@ -1473,7 +1473,7 @@ var __slice = [].slice,
       if (this.isIvr) {
         actions = ['endCall'];
       } else {
-        actions = this.oktell.getPhoneActions(this.id || this.number);
+        actions = this.oktell.getPhoneActions(this.number || this.id);
       }
       _ref = this.additionalActions;
       for (action in _ref) {
@@ -2800,14 +2800,17 @@ var __slice = [].slice,
     };
 
     List.prototype._setUsersHtml = function(usersArray, $el, useIndependentCopies) {
-      var html, lastDepId, prevLetter, u, _i, _len;
+      var html, lastDepId, prevLetter, u, userEl, _i, _len;
 
       html = [];
       lastDepId = null;
       prevLetter = '';
       for (_i = 0, _len = usersArray.length; _i < _len; _i++) {
         u = usersArray[_i];
-        html.push(u.getEl(useIndependentCopies));
+        userEl = u.getEl(useIndependentCopies);
+        if ((userEl != null ? userEl[0] : void 0) != null) {
+          html.push(userEl[0]);
+        }
         u.showLetter(prevLetter !== u.letter ? true : false);
         prevLetter = u.letter;
       }
@@ -2834,6 +2837,11 @@ var __slice = [].slice,
         var depExactMatch, el, users, _ref;
 
         el = dep.getEl(filter !== '');
+        if ((el != null ? el[0] : void 0) != null) {
+          el = el[0];
+        } else {
+          return;
+        }
         depExactMatch = false;
         _ref = dep.getUsers(filter, _this.showOffline, _this.filterLang), users = _ref[0], depExactMatch = _ref[1];
         _this.panelUsersFiltered = _this.panelUsersFiltered.concat(users);
@@ -2868,14 +2876,16 @@ var __slice = [].slice,
         el = this.exactMatchUserDep.getEl();
         this._setUsersHtml([this.filterFantomUser], this.exactMatchUserDep.getContainer());
         this.filterFantomUser.showLetter(false);
-        allDeps.unshift(el);
+        if ((el != null ? el[0] : void 0) != null) {
+          allDeps.unshift(el[0]);
+        }
       } else {
         this.filterFantomUser = false;
       }
       this.scrollContent.children().detach();
       this.scrollContent.html(allDeps);
       if (allDeps.length > 0) {
-        allDeps[allDeps.length - 1].find('tr:last').addClass('g_last');
+        $(allDeps[allDeps.length - 1]).find('tr:last').addClass('g_last');
       }
       this.initStickyHeaders();
       if (!notScrollTop) {
@@ -3111,10 +3121,12 @@ var __slice = [].slice,
       return $.each(abonents, function(i, abonent) {
         var el, name, phone;
 
-        phone = abonent.phone.toString();
-        name = abonent.name.toString() || phone;
-        if (name === phone) {
+        phone = abonent.phoneFormatted.toString();
+        if (abonent.name.toString() === abonent.phone.toString()) {
+          name = abonent.phoneFormatted.toString();
           phone = '';
+        } else {
+          name = abonent.name.toString();
         }
         el = _this.abonentEl.clone();
         el.find('span:first').text(name);

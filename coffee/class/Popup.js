@@ -86,10 +86,12 @@ Popup = (function() {
     this.absContainer.empty();
     return $.each(abonents, function(i, abonent) {
       var el, name, phone;
-      phone = abonent.phone.toString();
-      name = abonent.name.toString() || phone;
-      if (name === phone) {
+      phone = abonent.phoneFormatted.toString();
+      if (abonent.name.toString() === abonent.phone.toString()) {
+        name = abonent.phoneFormatted.toString();
         phone = '';
+      } else {
+        name = abonent.name.toString();
       }
       el = _this.abonentEl.clone();
       el.find('span:first').text(name);

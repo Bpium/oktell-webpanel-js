@@ -69,9 +69,13 @@ class Popup
 	setAbonents: (abonents) ->
 		@absContainer.empty()
 		$.each abonents, (i,abonent) =>
-			phone = abonent.phone.toString()
-			name = abonent.name.toString() or phone
-			phone = '' unless name isnt phone
+			phone = abonent.phoneFormatted.toString()
+			if abonent.name.toString() is abonent.phone.toString()
+				name = abonent.phoneFormatted.toString()
+				phone = ''
+			else
+				name = abonent.name.toString()
+
 			el = @abonentEl.clone()
 			el.find('span:first').text(name)
 			el.find('span:last').text(phone)

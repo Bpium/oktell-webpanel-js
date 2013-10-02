@@ -832,7 +832,9 @@ class List
 		prevLetter = ''
 		for u in usersArray
 			#log 'render ' + u.getInfo()
-			html.push u.getEl useIndependentCopies
+			userEl = u.getEl useIndependentCopies
+			if userEl?[0]?
+				html.push userEl[0]
 			#html = html.add u.getEl useIndependentCopies
 			u.showLetter if prevLetter isnt u.letter then true else false
 			prevLetter = u.letter
@@ -855,6 +857,10 @@ class List
 		allDeps = []
 		renderDep = (dep) =>
 			el = dep.getEl filter isnt ''
+			if el?[0]?
+				el = el[0]
+			else
+				return
 			depExactMatch = false
 			[ users, depExactMatch ] = dep.getUsers filter, @showOffline, @filterLang
 			@panelUsersFiltered = @panelUsersFiltered.concat users
@@ -887,7 +893,8 @@ class List
 			el = @exactMatchUserDep.getEl()
 			@_setUsersHtml [@filterFantomUser], @exactMatchUserDep.getContainer()
 			@filterFantomUser.showLetter false
-			allDeps.unshift el
+			if el?[0]?
+				allDeps.unshift el[0]
 		else
 			@filterFantomUser = false
 
@@ -895,7 +902,7 @@ class List
 		@scrollContent.html allDeps
 
 		if allDeps.length > 0
-			allDeps[allDeps.length-1].find('tr:last').addClass 'g_last'
+			$(allDeps[allDeps.length-1]).find('tr:last').addClass 'g_last'
 
 		@initStickyHeaders()
 
