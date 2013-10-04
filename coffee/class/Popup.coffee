@@ -69,9 +69,15 @@ class Popup
 	setAbonents: (abonents) ->
 		@absContainer.empty()
 		$.each abonents, (i,abonent) =>
-			phone = abonent.phoneFormatted.toString()
-			if abonent.name.toString() is abonent.phone.toString()
-				name = abonent.phoneFormatted.toString()
+			if not abonent
+				@log 'setAbonent: bad abonent'
+				return
+			phoneFormatted = abonent.phoneFormatted?.toString?()
+			phone = abonent.phone?.toString?()
+			name = abonent.name?.toString?()
+
+			if name is phone
+				name = phoneFormatted or phone
 				phone = ''
 			else
 				name = abonent.name.toString()

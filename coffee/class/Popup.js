@@ -85,10 +85,16 @@ Popup = (function() {
     var _this = this;
     this.absContainer.empty();
     return $.each(abonents, function(i, abonent) {
-      var el, name, phone;
-      phone = abonent.phoneFormatted.toString();
-      if (abonent.name.toString() === abonent.phone.toString()) {
-        name = abonent.phoneFormatted.toString();
+      var el, name, phone, phoneFormatted, _ref, _ref1, _ref2;
+      if (!abonent) {
+        _this.log('setAbonent: bad abonent');
+        return;
+      }
+      phoneFormatted = (_ref = abonent.phoneFormatted) != null ? typeof _ref.toString === "function" ? _ref.toString() : void 0 : void 0;
+      phone = (_ref1 = abonent.phone) != null ? typeof _ref1.toString === "function" ? _ref1.toString() : void 0 : void 0;
+      name = (_ref2 = abonent.name) != null ? typeof _ref2.toString === "function" ? _ref2.toString() : void 0 : void 0;
+      if (name === phone) {
+        name = phoneFormatted || phone;
         phone = '';
       } else {
         name = abonent.name.toString();
