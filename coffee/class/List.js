@@ -402,7 +402,8 @@ List = (function() {
         }
         if (user.id !== oInfo.userid) {
           _this.panelUsers.push(user);
-          if (user.departmentId && user.departmentId !== '00000000-0000-0000-0000-000000000000') {
+          if (user.departmentId && user.departmentId !== '00000000-0000-0000-0000-000000000000' && user.departmentId !== _this.withoutDepName) {
+            _this.log('# 346', user.departmentId, user.department);
             if (createdDeps[user.departmentId]) {
               dep = createdDeps[user.departmentId];
             } else {
@@ -412,6 +413,7 @@ List = (function() {
             }
             dep.addUser(user);
           } else {
+            _this.log('# 355', user.departmentId, user.department);
             otherDep.addUser(user);
           }
           _this.allUserDep.addUser(user);
@@ -728,7 +730,7 @@ List = (function() {
           if (dep.getContainer().children().length === 1) {
             _results.push(this.setFilter(this.filter, true, true));
           } else {
-            _results.push((_ref1 = user.el) != null ? typeof _ref1.remove === "function" ? _ref1.remove() : void 0 : void 0);
+            _results.push((_ref1 = user.el) != null ? typeof _ref1.detach === "function" ? _ref1.detach() : void 0 : void 0);
           }
         } else if (!wasFiltered) {
           dep.getUsers(this.filter, this.showOffline, this.filterLang);
@@ -905,7 +907,7 @@ List = (function() {
         }
       }
       if (aEls.length) {
-        this.dropdownEl.append(aEls);
+        this.dropdownEl.append(aEls.join(''));
         this.dropdownEl.children('li:first').addClass('g_first');
         this.dropdownEl.children('li:last').addClass('g_last');
         this.dropdownEl.data('user', user);

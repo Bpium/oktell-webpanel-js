@@ -64,6 +64,7 @@ class Popup
 		@el.fadeIn 200
 
 	hide: ->
+		@playRingtone false
 		@el.fadeOut 200
 
 	setAbonents: (abonents) ->

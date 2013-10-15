@@ -342,7 +342,8 @@ class List
 
 				if user.id isnt oInfo.userid
 					@panelUsers.push user
-					if user.departmentId and user.departmentId isnt '00000000-0000-0000-0000-000000000000'
+					if user.departmentId and user.departmentId isnt '00000000-0000-0000-0000-000000000000' and user.departmentId isnt @withoutDepName
+						@log '# 346', user.departmentId, user.department
 						if createdDeps[user.departmentId]
 							dep = createdDeps[user.departmentId]
 						else
@@ -351,6 +352,7 @@ class List
 							@departmentsById[user.departmentId] = dep
 						dep.addUser user
 					else
+						@log '# 355', user.departmentId, user.department
 						otherDep.addUser user
 					@allUserDep.addUser user
 				else
@@ -603,7 +605,7 @@ class List
 					if dep.getContainer().children().length is 1
 						@setFilter @filter, true, true
 					else
-						user.el?.remove?()
+						user.el?.detach?()
 				else if not wasFiltered
 					dep.getUsers @filter, @showOffline, @filterLang
 					index = dep.lastFilteredUsers.indexOf user
@@ -711,7 +713,7 @@ class List
 
 			if aEls.length
 
-				@dropdownEl.append aEls
+				@dropdownEl.append aEls.join('')
 
 				@dropdownEl.children('li:first').addClass 'g_first'
 				@dropdownEl.children('li:last').addClass 'g_last'

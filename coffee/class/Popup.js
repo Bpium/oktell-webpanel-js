@@ -78,6 +78,7 @@ Popup = (function() {
   };
 
   Popup.prototype.hide = function() {
+    this.playRingtone(false);
     return this.el.fadeOut(200);
   };
 

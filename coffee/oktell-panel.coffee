@@ -30,31 +30,34 @@ do ($)->
 
 	langs = {
 		ru:
-			panel: { dtmf: 'донабор', inTalk: 'В разговоре', onHold: 'На удержании', queue: 'Очередь ожидания', inputPlaceholder: 'введите имя или номер', withoutDepartment: 'без отдела', showDepartments: 'Группировать по отделам', showDepartmentsClicked: 'Показать общим списком', showOnlineOnly: 'Показать только online', showOnlineOnlyCLicked: 'Показать всех' },
+			panel: { dtmf: 'донабор', dtmfPanelName: 'Донабор', inTalk: 'В разговоре', onHold: 'На удержании', queue: 'Очередь ожидания', inputPlaceholder: 'введите имя или номер', withoutDepartment: 'без отдела', showDepartments: 'Группировать по отделам', showDepartmentsClicked: 'Показать общим списком', showOnlineOnly: 'Показать только online', showOnlineOnlyCLicked: 'Показать всех' },
 			actions: { answer: 'Ответить', call: 'Позвонить', conference: 'Конференция', transfer: 'Перевести', toggle: 'Переключиться', intercom: 'Интерком', endCall: 'Завершить', ghostListen: 'Прослушка', ghostHelp: 'Помощь', hold: 'Удержание', resume: 'Продолжить', dtmf: 'Донабор' }
-			callPopup: { title: 'Входящий вызов', hide: 'Скрыть', answer: 'Ответить', reject: 'Отклонить', undefinedNumber: 'Номер не определен', goPickup: 'Поднимите трубку' }
+			callPopup: { title: 'Входящий вызов', hide: 'Скрыть', answer: 'Ответить', reject: 'Отклонить', undefinedNumber: 'Номер не определен', goPickup: 'Поднимите трубку', answer: 'Ответить' }
 			permissionsPopup: { header: 'Запрос на доступ к микрофону', text: 'Для использования веб-телефона необходимо разрешить браузеру доступ к микрофону.' }
 			error:
+				title: 'Ошибка'
 				usingOktellClient: { header: 'Пользователь «%username%» использует стандартный Oktell-клиент.', message: 'Одновременная работа двух типов клиентских приложений невозможна.', message2: 'Закройте стандартный Oktell-клиент и повторите попытку.' }
 				loginPass: { header: 'Пароль для пользователя «%username%» не подходит.', message: 'Проверьте правильность имени пользователя и пароля.' }
 				unavailable: { header: 'Сервер телефонии Oktell не доступен.', message: 'Убедитесь что сервер телефонии работает и проверьте настройки соединения.'}
 				#tryAgain: 'Повторить попытку'
 		en:
-			panel: { dtfm: 'ext', inTalk: 'In conversation', onHold: 'On hold', queue: 'Wait queue', inputPlaceholder: 'Enter name or number', withoutDepartment: 'Without department', showDepartments: 'Show departments', showDepartmentsClicked: 'Hide departments', showOnlineOnly: 'Show online only', showOnlineOnlyCLicked: 'Show all' },
-			actions: { answer: 'Answer', call: 'Dial', conference: 'Conference', transfer: 'Transfer', toggle: 'Switch', intercom: 'Intercom', endCall: 'End', ghostListen: 'Audition', ghostHelp: 'Help', hold: 'Hold', resume: 'Resume', dtmf: 'Extension' }
-			callPopup: { title: 'Incoming call', hide: 'Hide', answer: 'Answer', reject: 'Decline', undefinedNumber: 'Phone number is not defined', goPickup: 'Pick up the phone' }
+			panel: { dtmf: 'dtmf', dtmfPanelName: 'DTMF', inTalk: 'In conversation', onHold: 'On hold', queue: 'Wait queue', inputPlaceholder: 'Enter name or number', withoutDepartment: 'Without department', showDepartments: 'Show departments', showDepartmentsClicked: 'Hide departments', showOnlineOnly: 'Show online only', showOnlineOnlyCLicked: 'Show all' },
+			actions: { answer: 'Answer', call: 'Dial', conference: 'Conference', transfer: 'Transfer', toggle: 'Switch', intercom: 'Intercom', endCall: 'End', ghostListen: 'Audition', ghostHelp: 'Help', hold: 'Hold', resume: 'Resume', dtmf: 'DTMF' }
+			callPopup: { title: 'Incoming call', hide: 'Hide', answer: 'Answer', reject: 'Decline', undefinedNumber: 'Phone number is not defined', goPickup: 'Pick up the phone', answer: 'Answer' }
 			permissionsPopup: { header: 'Request for access to the microphone', text: 'To use the web-phone you need to allow browser access to the microphone.' }
 			error:
+				title: 'Error'
 				usingOktellClient: { header: 'User «%username%» uses standard Oktell client application.', message: 'Simultaneous work of two types of client applications is not possible.', message2: 'Close standard Oktell client application and try again.' }
 				loginPass: { header: 'Wrong password for user «%username%».', message: 'Make sure that the username and password are correct.' }
 				unavailable: { header: 'Oktell server is not available.', message: 'Make sure that Oktell server is running and check your connection.'}
 				#tryAgain: 'Try again'
 		cz:
-			panel: { dtmf: 'ext', inTalk: 'V rozhovoru', onHold: 'Na hold', queue: 'Fronta čekaní', inputPlaceholder: 'zadejte jméno nebo číslo', withoutDepartment: 'Bez oddělení', showDepartments: 'Zobrazit oddělení', showDepartmentsClicked: 'Skrýt oddělení', showOnlineOnly: 'Zobrazit pouze online', showOnlineOnlyCLicked: 'Zobrazit všechny' },
-			actions: { answer: 'Odpověď', call: 'Zavolat', conference: 'Konference', transfer: 'Převést', toggle: 'Přepnout', intercom: 'Intercom', endCall: 'Ukončit', ghostListen: 'Odposlech', ghostHelp: 'Nápověda', hold: 'Udržet', resume: 'Pokračovat', dtmf: 'Prodloužení vytáčení' }
-			callPopup: { title: 'Příchozí hovor', hide: 'Schovat', answer: 'Odpovědět', reject: 'Odmítnout', undefinedNumber: '', goPickup: 'Zvedněte sluchátko' }
+			panel: { dtmf: 'dtmf', dtmfPanelName: 'DTMF', inTalk: 'V rozhovoru', onHold: 'Na hold', queue: 'Fronta čekaní', inputPlaceholder: 'zadejte jméno nebo číslo', withoutDepartment: 'Bez oddělení', showDepartments: 'Zobrazit oddělení', showDepartmentsClicked: 'Skrýt oddělení', showOnlineOnly: 'Zobrazit pouze online', showOnlineOnlyCLicked: 'Zobrazit všechny' },
+			actions: { answer: 'Odpověď', call: 'Zavolat', conference: 'Konference', transfer: 'Převést', toggle: 'Přepnout', intercom: 'Intercom', endCall: 'Ukončit', ghostListen: 'Odposlech', ghostHelp: 'Nápověda', hold: 'Udržet', resume: 'Pokračovat', dtmf: 'DTMF' }
+			callPopup: { title: 'Příchozí hovor', hide: 'Schovat', answer: 'Odpovědět', reject: 'Odmítnout', undefinedNumber: '', goPickup: 'Zvedněte sluchátko', answer: 'Odpovědět' }
 			permissionsPopup: { header: 'Žádost o přístup k mikrofonu', text: 'Abyste mohli používat telefon, musíte povolit prohlížeče přístup k mikrofonu.' }
 			error:
+				title: 'Chyba'
 				usingOktellClient: { header: 'Uživatel «%username%» používá standardní Oktell klientské aplikace.', message: 'Současnou práci dvou typů klientských aplikací není možné.', message2: 'Zavřít Oktell standardní klientskou aplikaci a zkuste to znovu.' }
 				loginPass: { header: 'Chybné heslo uživatele «%username%».', message: 'Ujistěte se, že uživatelské jméno a heslo jsou správné.' }
 				unavailable: { header: 'Oktell server není k dispozici.', message: 'Ujistěte se, že Oktell server běží a zkontrolujte připojení.'}
@@ -176,6 +179,7 @@ do ($)->
 		langs = langs[options.lang] or langs.ru
 		CUser.prototype.template = userTemplateHtml.replace '{{button}}', actionButtonHtml
 		panelHtml = panelHtml.replace('{{inTalk}}',langs.panel.inTalk)
+			.replace('{{dtmfPanelName}}',langs.panel.dtmfPanelName)
 			.replace('{{onHold}}',langs.panel.onHold)
 			.replace('{{queue}}',langs.panel.queue)
 			.replace('{{inputPlaceholder}}',langs.panel.inputPlaceholder)
@@ -212,6 +216,7 @@ do ($)->
 		if not getOptions().withoutCallPopup
 			popupHtml = popupHtml.replace('{{title}}', langs.callPopup.title)
 				.replace('{{goPickup}}', langs.callPopup.goPickup)
+				.replace('{{answer}}', langs.callPopup.answer)
 				.replace('{{hide}}', langs.callPopup.hide)
 				.replace('{{reject}}', langs.callPopup.reject)
 
@@ -227,6 +232,7 @@ do ($)->
 			permissionsPopup = new PermissionsPopup permissionsPopupEl, getOptions().oktellVoice
 
 		if not getOptions().withoutError
+			errorHtml = errorHtml.replace('{{title}}', langs.error.title)
 			errorEl = $(errorHtml)
 			panelEl.find('.h_panel_bg:first').append errorEl
 			#errorEl.hide()

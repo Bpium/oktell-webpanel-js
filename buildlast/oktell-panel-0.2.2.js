@@ -1,4 +1,4 @@
-/* Oktell-panel.js 0.2.2.1012 http://js.oktell.ru/webpanel */
+/* Oktell-panel.js 0.2.2.1013 http://js.oktell.ru/webpanel */
 
 /*! Copyright (c) 2013 Brandon Aaron (http://brandonaaron.net)
  * Licensed under the MIT License (LICENSE.txt).
@@ -2085,7 +2085,8 @@ var __slice = [].slice,
           }
           if (user.id !== oInfo.userid) {
             _this.panelUsers.push(user);
-            if (user.departmentId && user.departmentId !== '00000000-0000-0000-0000-000000000000') {
+            if (user.departmentId && user.departmentId !== '00000000-0000-0000-0000-000000000000' && user.departmentId !== _this.withoutDepName) {
+              _this.log('# 346', user.departmentId, user.department);
               if (createdDeps[user.departmentId]) {
                 dep = createdDeps[user.departmentId];
               } else {
@@ -2095,6 +2096,7 @@ var __slice = [].slice,
               }
               dep.addUser(user);
             } else {
+              _this.log('# 355', user.departmentId, user.department);
               otherDep.addUser(user);
             }
             _this.allUserDep.addUser(user);
@@ -2418,7 +2420,7 @@ var __slice = [].slice,
             if (dep.getContainer().children().length === 1) {
               _results.push(this.setFilter(this.filter, true, true));
             } else {
-              _results.push((_ref1 = user.el) != null ? typeof _ref1.remove === "function" ? _ref1.remove() : void 0 : void 0);
+              _results.push((_ref1 = user.el) != null ? typeof _ref1.detach === "function" ? _ref1.detach() : void 0 : void 0);
             }
           } else if (!wasFiltered) {
             dep.getUsers(this.filter, this.showOffline, this.filterLang);
@@ -2602,7 +2604,7 @@ var __slice = [].slice,
           }
         }
         if (aEls.length) {
-          this.dropdownEl.append(aEls);
+          this.dropdownEl.append(aEls.join(''));
           this.dropdownEl.children('li:first').addClass('g_first');
           this.dropdownEl.children('li:last').addClass('g_last');
           this.dropdownEl.data('user', user);
@@ -3111,6 +3113,7 @@ var __slice = [].slice,
     };
 
     Popup.prototype.hide = function() {
+      this.playRingtone(false);
       return this.el.fadeOut(200);
     };
 
@@ -3279,6 +3282,7 @@ var __slice = [].slice,
     ru: {
       panel: {
         dtmf: 'донабор',
+        dtmfPanelName: 'Донабор',
         inTalk: 'В разговоре',
         onHold: 'На удержании',
         queue: 'Очередь ожидания',
@@ -3309,13 +3313,15 @@ var __slice = [].slice,
         answer: 'Ответить',
         reject: 'Отклонить',
         undefinedNumber: 'Номер не определен',
-        goPickup: 'Поднимите трубку'
+        goPickup: 'Поднимите трубку',
+        answer: 'Ответить'
       },
       permissionsPopup: {
         header: 'Запрос на доступ к микрофону',
         text: 'Для использования веб-телефона необходимо разрешить браузеру доступ к микрофону.'
       },
       error: {
+        title: 'Ошибка',
         usingOktellClient: {
           header: 'Пользователь «%username%» использует стандартный Oktell-клиент.',
           message: 'Одновременная работа двух типов клиентских приложений невозможна.',
@@ -3333,7 +3339,8 @@ var __slice = [].slice,
     },
     en: {
       panel: {
-        dtfm: 'ext',
+        dtmf: 'dtmf',
+        dtmfPanelName: 'DTMF',
         inTalk: 'In conversation',
         onHold: 'On hold',
         queue: 'Wait queue',
@@ -3356,7 +3363,7 @@ var __slice = [].slice,
         ghostHelp: 'Help',
         hold: 'Hold',
         resume: 'Resume',
-        dtmf: 'Extension'
+        dtmf: 'DTMF'
       },
       callPopup: {
         title: 'Incoming call',
@@ -3364,13 +3371,15 @@ var __slice = [].slice,
         answer: 'Answer',
         reject: 'Decline',
         undefinedNumber: 'Phone number is not defined',
-        goPickup: 'Pick up the phone'
+        goPickup: 'Pick up the phone',
+        answer: 'Answer'
       },
       permissionsPopup: {
         header: 'Request for access to the microphone',
         text: 'To use the web-phone you need to allow browser access to the microphone.'
       },
       error: {
+        title: 'Error',
         usingOktellClient: {
           header: 'User «%username%» uses standard Oktell client application.',
           message: 'Simultaneous work of two types of client applications is not possible.',
@@ -3388,7 +3397,8 @@ var __slice = [].slice,
     },
     cz: {
       panel: {
-        dtmf: 'ext',
+        dtmf: 'dtmf',
+        dtmfPanelName: 'DTMF',
         inTalk: 'V rozhovoru',
         onHold: 'Na hold',
         queue: 'Fronta čekaní',
@@ -3411,7 +3421,7 @@ var __slice = [].slice,
         ghostHelp: 'Nápověda',
         hold: 'Udržet',
         resume: 'Pokračovat',
-        dtmf: 'Prodloužení vytáčení'
+        dtmf: 'DTMF'
       },
       callPopup: {
         title: 'Příchozí hovor',
@@ -3419,13 +3429,15 @@ var __slice = [].slice,
         answer: 'Odpovědět',
         reject: 'Odmítnout',
         undefinedNumber: '',
-        goPickup: 'Zvedněte sluchátko'
+        goPickup: 'Zvedněte sluchátko',
+        answer: 'Odpovědět'
       },
       permissionsPopup: {
         header: 'Žádost o přístup k mikrofonu',
         text: 'Abyste mohli používat telefon, musíte povolit prohlížeče přístup k mikrofonu.'
       },
       error: {
+        title: 'Chyba',
         usingOktellClient: {
           header: 'Uživatel «%username%» používá standardní Oktell klientské aplikace.',
           message: 'Současnou práci dvou typů klientských aplikací není možné.',
@@ -3516,10 +3528,10 @@ var __slice = [].slice,
     'templates/department.html': '<tr class="b_contact"><td class="b_contact_department" colspan="3">{{department}}</td></tr>',
     'templates/dep.html': '<div class="b_department"><div class="b_department_header"><div class="h_shadow_top"><span>{{department}}</span></div></div><table class="b_main_list"><tbody></tbody></table></div>',
     'templates/usersTable.html': '<table class="b_main_list m_without_department"><tbody></tbody></table>',
-    'templates/panel.html': '<div class="oktell_panel"><div class="i_panel_bookmark"><div class="i_panel_bookmark_bg"></div></div><div class="h_panel_bg"><div class="b_header"><ul class="b_list_filter"><li class="i_group"></li><li class="i_online"></li></ul></div><div class="h_padding"><div class="b_marks i_conference j_abonents"><div class="h_shadow_top"><div class="b_marks_noise"><p class="b_marks_header"><span class="b_marks_label">{{inTalk}}</span><span class="b_marks_time"></span></p><table><tbody></tbody></table></div></div></div><div class="b_marks i_extension" style="display: none"><div class="h_shadow_top"><div class="b_marks_noise"><p class="b_marks_header"><span class="b_marks_label">Донабор</span></p><div class="h_btn-group"><div class="btn-group"><button class="btn btn-small">1</button><button class="btn btn-small">2</button><button class="btn btn-small">3</button><button class="btn btn-small">4</button><button class="btn btn-small">5</button><button class="btn btn-small">6</button><button class="btn btn-small">7</button><button class="btn btn-small">8</button><button class="btn btn-small">9</button><button class="btn btn-small">0</button></div><div class="btn-group"><button class="btn btn-small">&lowast;</button><button class="btn btn-small">#</button></div></div></div></div><i class="o_close"></i></div><div class="b_marks i_flash j_hold"><div class="h_shadow_top"><div class="b_marks_noise"><p class="b_marks_header"><span class="b_marks_label">{{onHold}}</span></p><table class="j_table_favorite"><tbody></tbody></table></div></div></div><div class="b_marks i_flash j_queue"><div class="h_shadow_top"><div class="b_marks_noise"><p class="b_marks_header"><span class="b_marks_label">{{queue}}</span></p><table class="j_table_queue"><tbody></tbody></table></div></div></div><div class="b_inconversation j_phone_block"><table class="j_table_phone"><tbody></tbody></table></div><div class="b_marks i_phone"><div class="h_shadow_top"><div class="h_phone_number_input"><div class="i_phone_state_bg"></div><div class="h_input_padding"><div class="jInputClear_hover"><input class="b_phone_number_input" type="text" placeholder="{{inputPlaceholder}}"><span class="jInputClear_close">&times;</span></div></div></div></div></div><div class="h_main_list j_main_list"></div></div></div></div>',
-    'templates/callPopup.html': '<div class="oktell_panel_popup" style="display: none"><div class="m_popup_staff"><div class="m_popup_data"><header><div class="h_header_bg"><i class="o_close"></i><h2>{{title}}</h2></div></header><div class="b_content"><div class="b_abonent"><span data-bind="text: name"></span>&nbsp;<span class="g_light" data-bind="textPhone: number"></span></div></div><div class="footer"><div class="b_take_phone j_pickup"><i></i>&nbsp;<span>{{goPickup}}</span></div><button class="oktell_panel_btn m_big m_button_green j_answer" style="margin-right: 20px; float: left"><i style="background: url(\'/img/icons/action/white/call.png\') no-repeat; vertical-align: -2px"></i>Ответить</button><button class="oktell_panel_btn m_big j_close_action">{{hide}}</button><button class="oktell_panel_btn m_big m_button_red j_abort_action"><i></i>{{reject}}</button></div></div></div></div>',
+    'templates/panel.html': '<div class="oktell_panel"><div class="i_panel_bookmark"><div class="i_panel_bookmark_bg"></div></div><div class="h_panel_bg"><div class="b_header"><ul class="b_list_filter"><li class="i_group"></li><li class="i_online"></li></ul></div><div class="h_padding"><div class="b_marks i_conference j_abonents"><div class="h_shadow_top"><div class="b_marks_noise"><p class="b_marks_header"><span class="b_marks_label">{{inTalk}}</span><span class="b_marks_time"></span></p><table><tbody></tbody></table></div></div></div><div class="b_marks i_extension" style="display: none"><div class="h_shadow_top"><div class="b_marks_noise"><p class="b_marks_header"><span class="b_marks_label">{{dtmfPanelName}}</span></p><div class="h_btn-group"><div class="btn-group"><button class="btn btn-small">1</button><button class="btn btn-small">2</button><button class="btn btn-small">3</button><button class="btn btn-small">4</button><button class="btn btn-small">5</button><button class="btn btn-small">6</button><button class="btn btn-small">7</button><button class="btn btn-small">8</button><button class="btn btn-small">9</button><button class="btn btn-small">0</button></div><div class="btn-group"><button class="btn btn-small">&lowast;</button><button class="btn btn-small">#</button></div></div></div></div><i class="o_close"></i></div><div class="b_marks i_flash j_hold"><div class="h_shadow_top"><div class="b_marks_noise"><p class="b_marks_header"><span class="b_marks_label">{{onHold}}</span></p><table class="j_table_favorite"><tbody></tbody></table></div></div></div><div class="b_marks i_flash j_queue"><div class="h_shadow_top"><div class="b_marks_noise"><p class="b_marks_header"><span class="b_marks_label">{{queue}}</span></p><table class="j_table_queue"><tbody></tbody></table></div></div></div><div class="b_inconversation j_phone_block"><table class="j_table_phone"><tbody></tbody></table></div><div class="b_marks i_phone"><div class="h_shadow_top"><div class="h_phone_number_input"><div class="i_phone_state_bg"></div><div class="h_input_padding"><div class="jInputClear_hover"><input class="b_phone_number_input" type="text" placeholder="{{inputPlaceholder}}"><span class="jInputClear_close">&times;</span></div></div></div></div></div><div class="h_main_list j_main_list"></div></div></div></div>',
+    'templates/callPopup.html': '<div class="oktell_panel_popup" style="display: none"><div class="m_popup_staff"><div class="m_popup_data"><header><div class="h_header_bg"><i class="o_close"></i><h2>{{title}}</h2></div></header><div class="b_content"><div class="b_abonent"><span data-bind="text: name"></span>&nbsp;<span class="g_light" data-bind="textPhone: number"></span></div></div><div class="footer"><div class="b_take_phone j_pickup"><i></i>&nbsp;<span>{{goPickup}}</span></div><button class="oktell_panel_btn m_big m_button_green j_answer" style="margin-right: 20px; float: left"><i></i>{{answer}}</button><button class="oktell_panel_btn m_big j_close_action">{{hide}}</button><button class="oktell_panel_btn m_big m_button_red j_abort_action"><i></i>{{reject}}</button></div></div></div></div>',
     'templates/permissionsPopup.html': '<div class="oktell_panel_popup" style="display: none"><div class="m_popup_staff"><div class="m_popup_data"><header><div class="h_header_bg"><h2>{{header}}</h2></div></header><div class="b_content"><p>{{text}}</p></div></div></div></div>',
-    'templates/error.html': '<div class="b_error m_form" style="display: none"><div class="h_padding"><h4>Ошибка</h4><p class="b_error_alert"></p><p class="g_light"></p><p class="g_light"></p></div></div>'
+    'templates/error.html': '<div class="b_error m_form" style="display: none"><div class="h_padding"><h4>{{title}}</h4><p class="b_error_alert"></p><p class="g_light"></p><p class="g_light"></p></div></div>'
   };
   loadTemplate = function(path) {
     var html;
@@ -3579,7 +3591,7 @@ var __slice = [].slice,
     Department.prototype.withoutDepName = List.prototype.withoutDepName = CUser.prototype.withoutDepName = 'zzzzz_without';
     langs = langs[options.lang] || langs.ru;
     CUser.prototype.template = userTemplateHtml.replace('{{button}}', actionButtonHtml);
-    panelHtml = panelHtml.replace('{{inTalk}}', langs.panel.inTalk).replace('{{onHold}}', langs.panel.onHold).replace('{{queue}}', langs.panel.queue).replace('{{inputPlaceholder}}', langs.panel.inputPlaceholder);
+    panelHtml = panelHtml.replace('{{inTalk}}', langs.panel.inTalk).replace('{{dtmfPanelName}}', langs.panel.dtmfPanelName).replace('{{onHold}}', langs.panel.onHold).replace('{{queue}}', langs.panel.queue).replace('{{inputPlaceholder}}', langs.panel.inputPlaceholder);
     List.prototype.langs = langs;
     List.prototype.departmentTemplate = departmentTemplateHtml;
     Error.prototype.langs = langs.error;
@@ -3605,7 +3617,7 @@ var __slice = [].slice,
       ringtone.loop = true;
     }
     if (!getOptions().withoutCallPopup) {
-      popupHtml = popupHtml.replace('{{title}}', langs.callPopup.title).replace('{{goPickup}}', langs.callPopup.goPickup).replace('{{hide}}', langs.callPopup.hide).replace('{{reject}}', langs.callPopup.reject);
+      popupHtml = popupHtml.replace('{{title}}', langs.callPopup.title).replace('{{goPickup}}', langs.callPopup.goPickup).replace('{{answer}}', langs.callPopup.answer).replace('{{hide}}', langs.callPopup.hide).replace('{{reject}}', langs.callPopup.reject);
       popupEl = $(popupHtml);
       $('body').append(popupEl);
       popup = new Popup(popupEl, oktell, ringtone);
@@ -3617,6 +3629,7 @@ var __slice = [].slice,
       permissionsPopup = new PermissionsPopup(permissionsPopupEl, getOptions().oktellVoice);
     }
     if (!getOptions().withoutError) {
+      errorHtml = errorHtml.replace('{{title}}', langs.error.title);
       errorEl = $(errorHtml);
       panelEl.find('.h_panel_bg:first').append(errorEl);
       error = new Error(errorEl, oktell);

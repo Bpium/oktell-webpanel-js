@@ -26,6 +26,7 @@ var __slice = [].slice;
     ru: {
       panel: {
         dtmf: 'донабор',
+        dtmfPanelName: 'Донабор',
         inTalk: 'В разговоре',
         onHold: 'На удержании',
         queue: 'Очередь ожидания',
@@ -56,13 +57,15 @@ var __slice = [].slice;
         answer: 'Ответить',
         reject: 'Отклонить',
         undefinedNumber: 'Номер не определен',
-        goPickup: 'Поднимите трубку'
+        goPickup: 'Поднимите трубку',
+        answer: 'Ответить'
       },
       permissionsPopup: {
         header: 'Запрос на доступ к микрофону',
         text: 'Для использования веб-телефона необходимо разрешить браузеру доступ к микрофону.'
       },
       error: {
+        title: 'Ошибка',
         usingOktellClient: {
           header: 'Пользователь «%username%» использует стандартный Oktell-клиент.',
           message: 'Одновременная работа двух типов клиентских приложений невозможна.',
@@ -80,7 +83,8 @@ var __slice = [].slice;
     },
     en: {
       panel: {
-        dtfm: 'ext',
+        dtmf: 'dtmf',
+        dtmfPanelName: 'DTMF',
         inTalk: 'In conversation',
         onHold: 'On hold',
         queue: 'Wait queue',
@@ -103,7 +107,7 @@ var __slice = [].slice;
         ghostHelp: 'Help',
         hold: 'Hold',
         resume: 'Resume',
-        dtmf: 'Extension'
+        dtmf: 'DTMF'
       },
       callPopup: {
         title: 'Incoming call',
@@ -111,13 +115,15 @@ var __slice = [].slice;
         answer: 'Answer',
         reject: 'Decline',
         undefinedNumber: 'Phone number is not defined',
-        goPickup: 'Pick up the phone'
+        goPickup: 'Pick up the phone',
+        answer: 'Answer'
       },
       permissionsPopup: {
         header: 'Request for access to the microphone',
         text: 'To use the web-phone you need to allow browser access to the microphone.'
       },
       error: {
+        title: 'Error',
         usingOktellClient: {
           header: 'User «%username%» uses standard Oktell client application.',
           message: 'Simultaneous work of two types of client applications is not possible.',
@@ -135,7 +141,8 @@ var __slice = [].slice;
     },
     cz: {
       panel: {
-        dtmf: 'ext',
+        dtmf: 'dtmf',
+        dtmfPanelName: 'DTMF',
         inTalk: 'V rozhovoru',
         onHold: 'Na hold',
         queue: 'Fronta čekaní',
@@ -158,7 +165,7 @@ var __slice = [].slice;
         ghostHelp: 'Nápověda',
         hold: 'Udržet',
         resume: 'Pokračovat',
-        dtmf: 'Prodloužení vytáčení'
+        dtmf: 'DTMF'
       },
       callPopup: {
         title: 'Příchozí hovor',
@@ -166,13 +173,15 @@ var __slice = [].slice;
         answer: 'Odpovědět',
         reject: 'Odmítnout',
         undefinedNumber: '',
-        goPickup: 'Zvedněte sluchátko'
+        goPickup: 'Zvedněte sluchátko',
+        answer: 'Odpovědět'
       },
       permissionsPopup: {
         header: 'Žádost o přístup k mikrofonu',
         text: 'Abyste mohli používat telefon, musíte povolit prohlížeče přístup k mikrofonu.'
       },
       error: {
+        title: 'Chyba',
         usingOktellClient: {
           header: 'Uživatel «%username%» používá standardní Oktell klientské aplikace.',
           message: 'Současnou práci dvou typů klientských aplikací není možné.',
@@ -311,7 +320,7 @@ var __slice = [].slice;
     Department.prototype.withoutDepName = List.prototype.withoutDepName = CUser.prototype.withoutDepName = 'zzzzz_without';
     langs = langs[options.lang] || langs.ru;
     CUser.prototype.template = userTemplateHtml.replace('{{button}}', actionButtonHtml);
-    panelHtml = panelHtml.replace('{{inTalk}}', langs.panel.inTalk).replace('{{onHold}}', langs.panel.onHold).replace('{{queue}}', langs.panel.queue).replace('{{inputPlaceholder}}', langs.panel.inputPlaceholder);
+    panelHtml = panelHtml.replace('{{inTalk}}', langs.panel.inTalk).replace('{{dtmfPanelName}}', langs.panel.dtmfPanelName).replace('{{onHold}}', langs.panel.onHold).replace('{{queue}}', langs.panel.queue).replace('{{inputPlaceholder}}', langs.panel.inputPlaceholder);
     List.prototype.langs = langs;
     List.prototype.departmentTemplate = departmentTemplateHtml;
     Error.prototype.langs = langs.error;
@@ -337,7 +346,7 @@ var __slice = [].slice;
       ringtone.loop = true;
     }
     if (!getOptions().withoutCallPopup) {
-      popupHtml = popupHtml.replace('{{title}}', langs.callPopup.title).replace('{{goPickup}}', langs.callPopup.goPickup).replace('{{hide}}', langs.callPopup.hide).replace('{{reject}}', langs.callPopup.reject);
+      popupHtml = popupHtml.replace('{{title}}', langs.callPopup.title).replace('{{goPickup}}', langs.callPopup.goPickup).replace('{{answer}}', langs.callPopup.answer).replace('{{hide}}', langs.callPopup.hide).replace('{{reject}}', langs.callPopup.reject);
       popupEl = $(popupHtml);
       $('body').append(popupEl);
       popup = new Popup(popupEl, oktell, ringtone);
@@ -349,6 +358,7 @@ var __slice = [].slice;
       permissionsPopup = new PermissionsPopup(permissionsPopupEl, getOptions().oktellVoice);
     }
     if (!getOptions().withoutError) {
+      errorHtml = errorHtml.replace('{{title}}', langs.error.title);
       errorEl = $(errorHtml);
       panelEl.find('.h_panel_bg:first').append(errorEl);
       error = new Error(errorEl, oktell);
