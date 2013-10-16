@@ -1,4 +1,4 @@
-/* Oktell-panel.js 0.2.2.1021 http://js.oktell.ru/webpanel */
+/* Oktell-panel.js 0.2.2.1023 http://js.oktell.ru/webpanel */
 
 /*! Copyright (c) 2013 Brandon Aaron (http://brandonaaron.net)
  * Licensed under the MIT License (LICENSE.txt).
@@ -2086,7 +2086,6 @@ var __slice = [].slice,
           if (user.id !== oInfo.userid) {
             _this.panelUsers.push(user);
             if (user.departmentId && user.departmentId !== '00000000-0000-0000-0000-000000000000' && user.departmentId !== _this.withoutDepName) {
-              _this.log('# 346', user.departmentId, user.department);
               if (createdDeps[user.departmentId]) {
                 dep = createdDeps[user.departmentId];
               } else {
@@ -2096,7 +2095,6 @@ var __slice = [].slice,
               }
               dep.addUser(user);
             } else {
-              _this.log('# 355', user.departmentId, user.department);
               otherDep.addUser(user);
             }
             _this.allUserDep.addUser(user);
