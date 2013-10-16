@@ -11,9 +11,8 @@
 
 	<!--<script type="text/javascript" src="jslib/vendor/jquery-1.9.1.js"></script>-->
 	<script src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
-	<script type="text/javascript" src='//cdn.airato.lan/oktelljs/oktell-1.5.3-dev.js'></script>
-	<script type="text/javascript" src="//cdn.airato.lan/oktelljs/jssip-0.3.7.js"></script>
-	<script type="text/javascript" src="//cdn.airato.lan/oktelljs/oktell-voice.js"></script>
+	<script type="text/javascript" src='bower_components/oktelljs/oktell-1.5.3-dev.js'></script>
+	<script type="text/javascript" src="bower_components/oktell-voice/build/oktell-voice.js"></script>
 	<script type="text/javascript" src="js/jquery.mousewheel.js"></script>
 	<script type="text/javascript" src="js/mwheelIntent.js"></script>
 	<script type="text/javascript" src="js/jquery.jscrollpane.js"></script>
@@ -93,7 +92,7 @@
 						debugMode: true,
 						openTimeout: 5000,
 						oktellVoice: useWebRTC,
-						webSocketSwfLocation: '/jslib/vendor/WebSocketMain.swf',
+						webSocketSwfLocation: '/bower_components/oktelljs/WebSocketMain.swf',
 						//expires: 84600,
 						queryTimeout: 5000,
 						queueInterval: 300000,

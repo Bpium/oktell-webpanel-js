@@ -36,6 +36,13 @@ module.exports = (grunt) ->
 				files:
 					'buildlast/oktell-panel.min.css': ['buildlast/oktell-panel.css']
 		copy:
+			build:
+				files: [{
+					src: ['buildlast/*.css', 'buildlast/*.js']
+					dest: 'build'
+					flatten: true
+					expand: true
+				}]
 			css:
 				files: [
 					{ src: 'css/oktell-panel.css', dest: 'buildlast/', flatten: true, expand: true }
@@ -47,6 +54,7 @@ module.exports = (grunt) ->
 				files: { 'buildlast/oktell-panel.min.js': ['buildlast/oktell-panel.js'] }
 		clean:
 			temp: ['temp/*']
+			build: ['build/*']
 			buildlast: ['buildlast/*']
 		compress:
 			main:
@@ -70,6 +78,10 @@ module.exports = (grunt) ->
 				replace:  '$1-version$2'
 				comment: 'Oktell-panel.js version http://js.oktell.ru/webpanel'
 				versionFile: 'version.json'
+			build:
+				fileNames: ['build/*']
+				comment: 'Oktell-panel.js version http://js.oktell.ru/webpanel'
+				versionFile: 'version.json'
 
 		concat:
 			js:
@@ -86,7 +98,7 @@ module.exports = (grunt) ->
 	grunt.loadNpmTasks 'grunt-contrib-concat'
 	grunt.loadNpmTasks 'grunt-contrib-compress'
 
-	grunt.registerTask 'build', ['clean:buildlast', 'insertfilesasvars', 'includecoffee', 'coffee', 'concat:js', 'uglify', 'concat:css', 'cssmin', 'addVersion', 'compress', 'clean:temp']
+	grunt.registerTask 'build', ['clean:buildlast', 'clean:build', 'insertfilesasvars', 'includecoffee', 'coffee', 'concat:js', 'uglify', 'concat:css', 'cssmin', 'copy:build', 'addVersion', 'compress', 'clean:temp']
 	#grunt.registerTask 'build', ['clean:buildlast', 'createbuildfolder', 'insertfilesasvars', 'includecoffee', 'coffee', 'uglify', 'cssmin', 'copy:css', 'addVersion', 'compress', 'copy:main', 'clean:temp']
 
 	grunt.registerTask 'default', ['build']
@@ -99,9 +111,11 @@ module.exports = (grunt) ->
 		build = versionArr[3] or '1000'
 		build = parseInt build
 		build++
-		config.replace = config.replace.replace('version', version)
+		if config.replace
+			config.replace = config.replace.replace('version', version)
 		config.comment = config.comment.replace('version', version + '.' + build)
 		for file in files
+			console.log file
 			pos = file.lastIndexOf '/'
 			fName = file.substr(pos+1)
 			path = file.substr(0, pos)
@@ -114,7 +128,8 @@ module.exports = (grunt) ->
 			else
 				content = '/* ' + config.comment + " */\n\n" + content
 			grunt.file.write file, content
-			fs.renameSync file, path + '/' + fName.replace( config.find, config.replace )
+			if config.find and config.replace
+				fs.renameSync file, path + '/' + fName.replace( config.find, config.replace )
 		grunt.file.write config.versionFile, version + '.' + build
 
 
