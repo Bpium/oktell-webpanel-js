@@ -403,7 +403,6 @@ List = (function() {
         if (user.id !== oInfo.userid) {
           _this.panelUsers.push(user);
           if (user.departmentId && user.departmentId !== '00000000-0000-0000-0000-000000000000' && user.departmentId !== _this.withoutDepName) {
-            _this.log('# 346', user.departmentId, user.department);
             if (createdDeps[user.departmentId]) {
               dep = createdDeps[user.departmentId];
             } else {
