@@ -343,7 +343,6 @@ class List
 				if user.id isnt oInfo.userid
 					@panelUsers.push user
 					if user.departmentId and user.departmentId isnt '00000000-0000-0000-0000-000000000000' and user.departmentId isnt @withoutDepName
-						@log '# 346', user.departmentId, user.department
 						if createdDeps[user.departmentId]
 							dep = createdDeps[user.departmentId]
 						else
@@ -352,7 +351,6 @@ class List
 							@departmentsById[user.departmentId] = dep
 						dep.addUser user
 					else
-						@log '# 355', user.departmentId, user.department
 						otherDep.addUser user
 					@allUserDep.addUser user
 				else
