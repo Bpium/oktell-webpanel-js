@@ -21,6 +21,6 @@
     "!bower.json"
   ],
   "dependencies": {
-    "oktelljs": "https://git.oktell.ru/web/oktelljs.git~1.6.0"
+    "oktelljs": "https://git.oktell.ru/web/oktelljs.git~1.6"
   }
 }
