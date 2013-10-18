@@ -412,7 +412,6 @@ List = (function() {
             }
             dep.addUser(user);
           } else {
-            _this.log('# 355', user.departmentId, user.department);
             otherDep.addUser(user);
           }
           _this.allUserDep.addUser(user);
