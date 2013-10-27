@@ -7,7 +7,7 @@ var List,
 List = (function() {
   List.prototype.logGroup = 'List';
 
-  function List(oktell, panelEl, dropdownEl, afterOktellConnect, options, debugMode) {
+  function List(oktell, panelEl, dropdownEl, afterOktellConnect, options, contained, useSticky, useNativeScroll, debugMode) {
     this.onPbxNumberStateChange = __bind(this.onPbxNumberStateChange, this);
     var debouncedSetFilter, debouncedSetHeight, dropdownHideTimer, oktellConnected, ringNotify, self,
       _this = this;
@@ -16,15 +16,12 @@ List = (function() {
       showDeps: true,
       showOffline: false
     };
+    this.useNativeScroll = useNativeScroll;
+    this.stickyHeaders = useSticky;
     this.jScrollPaneParams = {
       mouseWheelSpeed: 50,
       hideFocus: true,
-      verticalGutter: -13,
-      onScroll: function() {
-        if (_this.oktellConnected) {
-          return _this.processStickyHeaders.apply(_this);
-        }
-      }
+      verticalGutter: -13
     };
     this.allActions = {
       answer: {
@@ -102,6 +99,7 @@ List = (function() {
     };
     oktellConnected = false;
     this.options = options;
+    this.contained = contained;
     this.usersByNumber = {};
     this.me = false;
     this.oktell = oktell;
@@ -167,31 +165,33 @@ List = (function() {
     this.exactMatchUserDep = new Department('exact_match_user_dep', 'exactUser');
     this.exactMatchUserDep.template = this.usersTableTemplate;
     this.initJScrollPane = function() {
-      _this.usersListBlockEl.oktellPanelJScrollPane(_this.jScrollPaneParams);
-      _this.jScrollPaneAPI = _this.usersListBlockEl.data('jsp');
-      _this.scrollContainer = _this.usersListBlockEl.find('.jspContainer');
-      _this.scrollContent = _this.usersListBlockEl.find('.jspPane');
-      return _this.usersListBlockEl.bind('scroll', function() {
-        return _this.processStickyHeaders();
-      });
+      if (_this.useNativeScroll) {
+        _this.scrollContainer = _this.usersListBlockEl;
+        _this.scrollContent = _this.usersListBlockEl;
+        _this.usersListBlockEl.css('overflow-y', 'auto');
+      } else {
+        _this.usersListBlockEl.oktellPanelJScrollPane(_this.jScrollPaneParams);
+        _this.jScrollPaneAPI = _this.usersListBlockEl.data('jsp');
+        _this.scrollContainer = _this.usersListBlockEl.find('.jspContainer');
+        _this.scrollContent = _this.usersListBlockEl.find('.jspPane');
+      }
+      if (_this.stickyHeaders) {
+        return _this.usersListBlockEl.bind('scroll', function() {
+          return _this.processStickyHeaders();
+        });
+      }
     };
     this.initJScrollPane();
     this.reinitScroll = function() {
       var _ref;
-      return (_ref = _this.jScrollPaneAPI) != null ? _ref.reinitialise() : void 0;
-    };
-    this.resetDepsWidth = function() {
-      var w, _ref;
-      if (_this.scrollContent) {
-        w = parseInt(_this.scrollContent.css('width'));
-        _this.scrollContent.find('.b_department').css('width', w + 'px');
-        return (_ref = _this.currentTopHeaderClone) != null ? _ref.css({
-          width: w + 'px'
-        }) : void 0;
+      if (!_this.useNativeScroll) {
+        return (_ref = _this.jScrollPaneAPI) != null ? _ref.reinitialise() : void 0;
       }
     };
     this.userScrollerToTop = function() {
-      return _this.jScrollPaneAPI.scrollToY(0);
+      if (!_this.useNativeScroll) {
+        return _this.jScrollPaneAPI.scrollToY(0);
+      }
     };
     this.filterClearCross.bind('click', function() {
       return _this.clearFilter();
@@ -307,8 +307,7 @@ List = (function() {
       _this.usersListBlockEl.css({
         height: h
       });
-      _this.reinitScroll();
-      return _this.resetDepsWidth();
+      return _this.reinitScroll();
     };
     this.setUserListHeight();
     debouncedSetHeight = debounce(function() {
@@ -449,7 +448,7 @@ List = (function() {
         user = _ref2[_i];
         user.loadActions();
       }
-      if (_this.options.hideOnDisconnect) {
+      if (_this.contained || _this.options.hideOnDisconnect) {
         _this.showPanel();
       } else {
         _this.panelEl.show();
@@ -531,6 +530,9 @@ List = (function() {
   List.prototype.initStickyHeaders = function() {
     var conTop, h, i, _i, _j, _len, _len1, _ref, _ref1,
       _this = this;
+    if (!this.stickyHeaders) {
+      return;
+    }
     this.resetStickyHeaders();
     if (!this.oktellConnected) {
       return;
@@ -580,12 +582,8 @@ List = (function() {
         }
         this.currentTopHeaderClone = this.headerEls[this.currentTopIndex].clone();
         this.cloneHeaderHeight = this.headerEls[this.currentTopIndex].height();
-        this.headerEls[this.currentTopIndex].after(this.currentTopHeaderClone);
-        this.currentTopHeaderClone.css({
-          position: 'fixed',
-          zIndex: 1,
-          width: this.scrollContainer.width() + 'px'
-        });
+        this.currentTopHeaderClone.addClass('b_sticky_header');
+        $('.b_sticky_header_container').empty().append(this.currentTopHeaderClone);
         this.currentTopHeaderClone.offset({
           top: this.scrollContainer.offset().top
         });
@@ -777,26 +775,34 @@ List = (function() {
   List.prototype.showPanel = function(notAnimate) {
     var w,
       _this = this;
-    w = this.panelEl.data('width');
-    if (w > 0 && this.panelEl.data('hided')) {
-      this.panelEl.data('width', w);
-      this.panelEl.data('hided', false);
-      this.panelEl.css({
-        display: ''
-      });
+    if (this.contained) {
       if (notAnimate) {
-        return this.panelEl.css({
-          overflow: '',
-          width: w + 'px'
-        });
+        return this.panelEl.show();
       } else {
-        return this.panelEl.animate({
-          width: w + 'px'
-        }, 200, function() {
-          return _this.panelEl.css({
-            overflow: ''
-          });
+        return this.panelEl.fadeIn(200);
+      }
+    } else {
+      w = this.panelEl.data('width');
+      if (w > 0 && this.panelEl.data('hided')) {
+        this.panelEl.data('width', w);
+        this.panelEl.data('hided', false);
+        this.panelEl.css({
+          display: ''
         });
+        if (notAnimate) {
+          return this.panelEl.css({
+            overflow: '',
+            width: w + 'px'
+          });
+        } else {
+          return this.panelEl.animate({
+            width: w + 'px'
+          }, 200, function() {
+            return _this.panelEl.css({
+              overflow: ''
+            });
+          });
+        }
       }
     }
   };
@@ -804,25 +810,33 @@ List = (function() {
   List.prototype.hidePanel = function(notAnimate) {
     var w,
       _this = this;
-    w = this.panelEl.data('width') != null ? this.panelEl.data('width') : this.panelEl.width();
-    if (w > 0 && !this.panelEl.data('hided')) {
-      this.panelEl.data('width', w);
-      this.panelEl.data('hided', true);
+    if (this.contained) {
       if (notAnimate) {
-        return this.panelEl.css({
-          display: '',
-          overflow: 'hidden',
-          width: '0px'
-        });
+        return this.panelEl.hide();
       } else {
-        return this.panelEl.animate({
-          width: '0px'
-        }, 200, function() {
-          return _this.panelEl.css({
+        return this.panelEl.fadeOut(200);
+      }
+    } else {
+      w = this.panelEl.data('width') != null ? this.panelEl.data('width') : this.panelEl.width();
+      if (w > 0 && !this.panelEl.data('hided')) {
+        this.panelEl.data('width', w);
+        this.panelEl.data('hided', true);
+        if (notAnimate) {
+          return this.panelEl.css({
             display: '',
-            overflow: 'hidden'
+            overflow: 'hidden',
+            width: '0px'
           });
-        });
+        } else {
+          return this.panelEl.animate({
+            width: '0px'
+          }, 200, function() {
+            return _this.panelEl.css({
+              display: '',
+              overflow: 'hidden'
+            });
+          });
+        }
       }
     }
   };

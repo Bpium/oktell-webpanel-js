@@ -3,6 +3,7 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 	<title>Тестовая страничка для вебпанели</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 
 	<link rel="stylesheet" href="css/normalize.css"/>
 	<link rel="stylesheet" href="css/oktell-panel.css"/>
@@ -131,6 +132,7 @@
 				position: 'right',
 				debug: true,
 				lang: 'en',
+//				container: $('.panel_container'),
 				hideOnDisconnect: false
 			});
 			$('.userPhone').oktellButton()
@@ -138,8 +140,9 @@
 	</script>
 
 </head>
-<body>
-	<div style="width: 500px; height: 500px;">
+<body style="height: 100%">
+	<div class="panel_container" styl2e="width: 300px; float: left;"></div>
+	<div style="">
 		<style type="text/css">
 			.userPhone {
 				float: right;
@@ -179,150 +182,153 @@
 
 
 		</div>
-		<br>
-		<span>Статус:</span> <span id="connectionState">Соединение</span><br>
 		<div style="display: none;">
-			<button class="setStatus" data-status="ready">set Ready</button><br>
-			<button class="setStatus" data-status="dnd">set DND</button><br>
-			<button class="setStatus" data-status="redirect">set Redirect</button><br>
-			<button class="setStatus" data-status="break">set Break with text</button><br>
-			<div id="webstate"></div><br>
-		</div>
-
-		<p class="user">Дмитрий Е. 103<span class="userPhone" data-phone="103"></span></p>
-		<p class="user">Алексей В. 101<span class="userPhone" data-phone="101"></span></p>
-		<p class="user">Рамиль Г. 135<span class="userPhone" data-phone="135"></span></p>
-		<p class="user">Оператор 106<span class="userPhone" data-phone="106"></span></p>
-		<p class="user">Абонент 104<span class="userPhone" data-phone="104"></span></p>
-
-		<br>
-		<br>
-
-		<div style="display: none;">
-			Вид кнопок
-			Call
-			<ul class="b_button_action m_button_action_call">
-				<li class="g_first">
-					<i></i>
-				</li>
-				<li class="g_last drop_down">
-					<i></i>
-				</li>
-			</ul><br>
 			<br>
-			Conference
-			<ul class="b_button_action m_button_action_conference">
-				<li class="g_first">
-					<i></i>
-				</li>
-				<li class="g_last drop_down">
-					<i></i>
-				</li>
-			</ul><br>
+			<span>Статус:</span> <span id="connectionState">Соединение</span><br>
+			<div style="display: none;">
+				<button class="setStatus" data-status="ready">set Ready</button><br>
+				<button class="setStatus" data-status="dnd">set DND</button><br>
+				<button class="setStatus" data-status="redirect">set Redirect</button><br>
+				<button class="setStatus" data-status="break">set Break with text</button><br>
+				<div id="webstate"></div><br>
+			</div>
+
+			<p class="user">Дмитрий Е. 103<span class="userPhone" data-phone="103"></span></p>
+			<p class="user">Алексей В. 101<span class="userPhone" data-phone="101"></span></p>
+			<p class="user">Рамиль Г. 135<span class="userPhone" data-phone="135"></span></p>
+			<p class="user">Оператор 106<span class="userPhone" data-phone="106"></span></p>
+			<p class="user">Абонент 104<span class="userPhone" data-phone="104"></span></p>
+
 			<br>
-			transfer
-			<ul class="b_button_action m_button_action_transfer">
-				<li class="g_first">
-					<i></i>
-				</li>
-				<li class="g_last drop_down">
-					<i></i>
-				</li>
-			</ul><br>
 			<br>
-			toggle
-			<ul class="b_button_action m_button_action_toggle">
-				<li class="g_first">
-					<i></i>
-				</li>
-				<li class="g_last drop_down">
-					<i></i>
-				</li>
-			</ul><br>
-			<br>
-			intercom
-			<ul class="b_button_action m_button_action_intercom">
-				<li class="g_first">
-					<i></i>
-				</li>
-				<li class="g_last drop_down">
-					<i></i>
-				</li>
-			</ul><br>
-			<br>
-			endCall
-			<ul class="b_button_action m_button_action_endcall">
-				<li class="g_first">
-					<i></i>
-				</li>
-				<li class="g_last drop_down">
-					<i></i>
-				</li>
-			</ul><br>
-			<br>
-			ghostListen
-			<ul class="b_button_action m_button_action_ghostlisten">
-				<li class="g_first">
-					<i></i>
-				</li>
-				<li class="g_last drop_down">
-					<i></i>
-				</li>
-			</ul><br>
-			<br>
-			ghostHelp
-			<ul class="b_button_action m_button_action_ghosthelp">
-				<li class="g_first">
-					<i></i>
-				</li>
-				<li class="g_last drop_down">
-					<i></i>
-				</li>
-			</ul><br>
-			<br>
-            <ul style="z-index: 999; padding: 0px; font-size: 13px; font-family: Tahoma; top: 80px; left: 500px; visibility: visible; display: inline-block" class="b_actions_group_list">
-                <li class="i_call g_first" data-bind="click: $parent.doActionByClick, css: $data.css, hoverSelect: true" data-action="call">
-                    <i></i>
-                    <span data-bind="text: a.text">Позвонить</span>
-                </li>
 
-                <li class="i_conference" data-bind="click: $parent.doActionByClick, css: $data.css, hoverSelect: true" data-action="conference">
-                    <i></i>
-                    <span data-bind="text: a.text">Конференция</span>
-                </li>
+			<div style="display: none;">
+				Вид кнопок
+				Call
+				<ul class="b_button_action m_button_action_call">
+					<li class="g_first">
+						<i></i>
+					</li>
+					<li class="g_last drop_down">
+						<i></i>
+					</li>
+				</ul><br>
+				<br>
+				Conference
+				<ul class="b_button_action m_button_action_conference">
+					<li class="g_first">
+						<i></i>
+					</li>
+					<li class="g_last drop_down">
+						<i></i>
+					</li>
+				</ul><br>
+				<br>
+				transfer
+				<ul class="b_button_action m_button_action_transfer">
+					<li class="g_first">
+						<i></i>
+					</li>
+					<li class="g_last drop_down">
+						<i></i>
+					</li>
+				</ul><br>
+				<br>
+				toggle
+				<ul class="b_button_action m_button_action_toggle">
+					<li class="g_first">
+						<i></i>
+					</li>
+					<li class="g_last drop_down">
+						<i></i>
+					</li>
+				</ul><br>
+				<br>
+				intercom
+				<ul class="b_button_action m_button_action_intercom">
+					<li class="g_first">
+						<i></i>
+					</li>
+					<li class="g_last drop_down">
+						<i></i>
+					</li>
+				</ul><br>
+				<br>
+				endCall
+				<ul class="b_button_action m_button_action_endcall">
+					<li class="g_first">
+						<i></i>
+					</li>
+					<li class="g_last drop_down">
+						<i></i>
+					</li>
+				</ul><br>
+				<br>
+				ghostListen
+				<ul class="b_button_action m_button_action_ghostlisten">
+					<li class="g_first">
+						<i></i>
+					</li>
+					<li class="g_last drop_down">
+						<i></i>
+					</li>
+				</ul><br>
+				<br>
+				ghostHelp
+				<ul class="b_button_action m_button_action_ghosthelp">
+					<li class="g_first">
+						<i></i>
+					</li>
+					<li class="g_last drop_down">
+						<i></i>
+					</li>
+				</ul><br>
+				<br>
+				<ul style="z-index: 999; padding: 0px; font-size: 13px; font-family: Tahoma; top: 80px; left: 500px; visibility: visible; display: inline-block" class="b_actions_group_list">
+					<li class="i_call g_first" data-bind="click: $parent.doActionByClick, css: $data.css, hoverSelect: true" data-action="call">
+						<i></i>
+						<span data-bind="text: a.text">Позвонить</span>
+					</li>
 
-                <li class="i_intercom" data-bind="click: $parent.doActionByClick, css: $data.css, hoverSelect: true" data-action="intercom">
-                    <i></i>
-                    <span data-bind="text: a.text">Интерком</span>
-                </li>
+					<li class="i_conference" data-bind="click: $parent.doActionByClick, css: $data.css, hoverSelect: true" data-action="conference">
+						<i></i>
+						<span data-bind="text: a.text">Конференция</span>
+					</li>
 
-                <li class="i_toggle" data-bind="click: $parent.doActionByClick, css: $data.css, hoverSelect: true" data-action="intercom">
-                    <i></i>
-                    <span data-bind="text: a.text">toggle</span>
-                </li>
+					<li class="i_intercom" data-bind="click: $parent.doActionByClick, css: $data.css, hoverSelect: true" data-action="intercom">
+						<i></i>
+						<span data-bind="text: a.text">Интерком</span>
+					</li>
 
-                <li class="i_transfer" data-bind="click: $parent.doActionByClick, css: $data.css, hoverSelect: true" data-action="intercom">
-                    <i></i>
-                    <span data-bind="text: a.text">transfer</span>
-                </li>
+					<li class="i_toggle" data-bind="click: $parent.doActionByClick, css: $data.css, hoverSelect: true" data-action="intercom">
+						<i></i>
+						<span data-bind="text: a.text">toggle</span>
+					</li>
 
-                <li class="i_endcall" data-bind="click: $parent.doActionByClick, css: $data.css, hoverSelect: true" data-action="intercom">
-                    <i></i>
-                    <span data-bind="text: a.text">endcall</span>
-                </li>
+					<li class="i_transfer" data-bind="click: $parent.doActionByClick, css: $data.css, hoverSelect: true" data-action="intercom">
+						<i></i>
+						<span data-bind="text: a.text">transfer</span>
+					</li>
 
-                <li class="i_ghostlisten" data-bind="click: $parent.doActionByClick, css: $data.css, hoverSelect: true" data-action="intercom">
-                    <i></i>
-                    <span data-bind="text: a.text">ghostlisten</span>
-                </li>
+					<li class="i_endcall" data-bind="click: $parent.doActionByClick, css: $data.css, hoverSelect: true" data-action="intercom">
+						<i></i>
+						<span data-bind="text: a.text">endcall</span>
+					</li>
 
-                <li class="i_ghosthelp g_last" data-bind="click: $parent.doActionByClick, css: $data.css, hoverSelect: true" data-action="intercom">
-                    <i></i>
-                    <span data-bind="text: a.text">ghosthelp</span>
-                </li>
-            </ul>
+					<li class="i_ghostlisten" data-bind="click: $parent.doActionByClick, css: $data.css, hoverSelect: true" data-action="intercom">
+						<i></i>
+						<span data-bind="text: a.text">ghostlisten</span>
+					</li>
 
+					<li class="i_ghosthelp g_last" data-bind="click: $parent.doActionByClick, css: $data.css, hoverSelect: true" data-action="intercom">
+						<i></i>
+						<span data-bind="text: a.text">ghosthelp</span>
+					</li>
+				</ul>
+
+			</div>
 		</div>
 	</div>
+
 </body>
 </html>

@@ -2,7 +2,7 @@
 var __slice = [].slice;
 
 (function($) {
-  var actionButtonContainerClass, actionButtonHtml, actionListEl, actionListHtml, addActionButtonToEl, afterOktellConnect, checkCssAnimationSupport, defaultOptions, departmentTemplateHtml, error, errorHtml, getOptions, initActionButtons, initButtonOnElement, initPanel, langs, list, loadTemplate, log, logStr, oktell, oktellConnected, options, panelHtml, panelWasInitialized, permissionsPopup, permissionsPopupHtml, popup, popupHtml, templates, userTemplateHtml, usersTableHtml,
+  var actionButtonContainerClass, actionButtonHtml, actionListEl, actionListHtml, addActionButtonToEl, afterOktellConnect, checkCssAnimationSupport, contEl, defaultOptions, departmentTemplateHtml, error, errorHtml, getOptions, initActionButtons, initButtonOnElement, initPanel, isMobileDevice, langs, list, loadTemplate, log, logStr, oktell, oktellConnected, options, panelEl, panelHtml, panelWasInitialized, permissionsPopup, permissionsPopupHtml, popup, popupHtml, templates, useNativeScroll, useSticky, userTemplateHtml, usersTableHtml,
     _this = this;
   if (!$) {
     throw new Error('Error init oktell panel, jQuery ( $ ) is not defined');
@@ -207,11 +207,15 @@ var __slice = [].slice;
   popup = null;
   permissionsPopup = null;
   error = null;
+  panelEl = null;
+  contEl = null;
   actionButtonContainerClass = 'oktellPanelActionButton';
   getOptions = function() {
     return options || defaultOptions;
   };
-  logStr = '';
+  isMobileDevice = navigator.userAgent.match(/(Android|webOS|iPhone|iPad|iPod|BlackBerry|Windows Phone)/i) ? true : false;
+  useSticky = !isMobileDevice;
+  useNativeScroll = isMobileDevice;
   checkCssAnimationSupport = function() {
     var div, divStyle, suffix, testProperties, v, _i, _len;
     div = document.createElement("div");
@@ -227,6 +231,7 @@ var __slice = [].slice;
     return divStyle;
     return false;
   };
+  logStr = '';
   log = function() {
     var args, d, dd, e, fnName, i, t, val, _i, _len;
     args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
@@ -303,10 +308,19 @@ var __slice = [].slice;
   Department.prototype.template = departmentTemplateHtml;
   panelWasInitialized = false;
   initPanel = function(opts) {
-    var $user, $userActionButton, animOptHide, animOptShow, bookmarkAnimOptHide, bookmarkAnimOptShow, bookmarkPos, cssAnimNow, enableMoving, errorEl, hidePanel, hideTimer, killPanelHideTimer, maxPosClose, minPosOpen, mouseOnPanel, oldBinding, pageX, panelBookmarkEl, panelEl, panelHideTimer, panelMinPos, panelPos, panelStatus, permissionsPopupEl, popupEl, ringtone, showPanel, showTimer, touchClickedContact, touchClickedContactClear, touchClickedCss, touchMoving, useCssAnim, _panelStatus,
+    var $user, $userActionButton, animOptHide, animOptShow, bookmarkAnimOptHide, bookmarkAnimOptShow, bookmarkPos, contOpt, cssAnimNow, enableMoving, errorEl, hidePanel, hideTimer, killPanelHideTimer, maxPosClose, minPosOpen, mouseOnPanel, oldBinding, pageX, panelBookmarkEl, panelHideTimer, panelMinPos, panelPos, panelStatus, permissionsPopupEl, popupEl, ringtone, showPanel, showTimer, touchMoving, useContainer, useCssAnim, _panelStatus, _ref,
       _this = this;
     panelWasInitialized = true;
     options = $.extend({}, defaultOptions, opts || {});
+    useContainer = false;
+    contOpt = ((_ref = getOptions().container) != null ? _ref[0] : void 0) || getOptions().container;
+    contEl = null;
+    if (contOpt && (typeof HTMLElement === "object" && contOpt instanceof HTMLElement) || ((contOpt != null ? contOpt.nodeType : void 0) === 1 && typeof contOpt.nodeName === "string")) {
+      contEl = $(contOpt);
+      useContainer = true;
+    } else {
+      contEl = $('body');
+    }
     if (options.oktellVoice) {
       if (options.oktellVoice.isOktellVoice === true) {
         options.oktellVoice = options.oktellVoice;
@@ -370,8 +384,11 @@ var __slice = [].slice;
     animOptHide[panelPos] = '-281px';
     panelMinPos = -281;
     panelEl.hide();
-    $("body").append(panelEl);
-    list = new List(oktell, panelEl, actionListEl, afterOktellConnect, getOptions(), getOptions().debug);
+    if (useContainer) {
+      panelEl.addClass('contained');
+    }
+    contEl.append(panelEl);
+    list = new List(oktell, panelEl, actionListEl, afterOktellConnect, getOptions(), useContainer, useSticky, useNativeScroll, getOptions().debug);
     if (getOptions().debug) {
       window.wList = list;
       window.wPopup = popup;
@@ -385,229 +402,192 @@ var __slice = [].slice;
     if (getOptions().dynamic) {
       panelEl.addClass("dynamic");
     }
-    panelBookmarkEl = panelEl.find('.i_panel_bookmark');
-    bookmarkAnimOptShow = {};
-    bookmarkPos = panelPos === 'left' ? 'right' : 'left';
-    bookmarkAnimOptShow[bookmarkPos] = '0px';
-    bookmarkAnimOptHide = {};
-    bookmarkAnimOptHide[bookmarkPos] = '-40px';
-    mouseOnPanel = false;
-    panelHideTimer = false;
-    _panelStatus = 'closed';
-    panelStatus = function(st) {
-      if (st && st !== _panelStatus) {
-        _panelStatus = st;
-      }
-      return _panelStatus;
-    };
-    killPanelHideTimer = function() {
-      clearTimeout(panelHideTimer);
-      return panelHideTimer = false;
-    };
-    useCssAnim = checkCssAnimationSupport();
-    showTimer = null;
-    hideTimer = null;
-    cssAnimNow = false;
-    showPanel = function() {
-      list.beforeShow();
-      panelStatus('opening');
-      panelBookmarkEl.css(bookmarkAnimOptShow);
-      if (useCssAnim) {
-        if (!cssAnimNow) {
-          cssAnimNow = true;
-          panelEl.css('right', '');
-          clearTimeout(showTimer);
-          panelEl.removeClass('hide_t_' + panelPos).addClass('show_t_' + panelPos);
-          return showTimer = setTimeout(function() {
-            panelEl.css('right', '0px');
-            panelEl.removeClass('show_t_' + panelPos);
+    if (!useContainer) {
+      panelBookmarkEl = panelEl.find('.i_panel_bookmark');
+      bookmarkAnimOptShow = {};
+      bookmarkPos = panelPos === 'left' ? 'right' : 'left';
+      bookmarkAnimOptShow[bookmarkPos] = '0px';
+      bookmarkAnimOptHide = {};
+      bookmarkAnimOptHide[bookmarkPos] = '-40px';
+      mouseOnPanel = false;
+      panelHideTimer = false;
+      _panelStatus = 'closed';
+      panelStatus = function(st) {
+        if (st && st !== _panelStatus) {
+          _panelStatus = st;
+        }
+        return _panelStatus;
+      };
+      killPanelHideTimer = function() {
+        clearTimeout(panelHideTimer);
+        return panelHideTimer = false;
+      };
+      useCssAnim = checkCssAnimationSupport();
+      showTimer = null;
+      hideTimer = null;
+      cssAnimNow = false;
+      showPanel = function() {
+        list.beforeShow();
+        panelStatus('opening');
+        panelBookmarkEl.css(bookmarkAnimOptShow);
+        if (useCssAnim) {
+          if (!cssAnimNow) {
+            cssAnimNow = true;
+            panelEl.css('right', '');
+            clearTimeout(showTimer);
+            panelEl.removeClass('hide_t_' + panelPos).addClass('show_t_' + panelPos);
+            return showTimer = setTimeout(function() {
+              panelEl.css('right', '0px');
+              panelEl.removeClass('show_t_' + panelPos);
+              list.afterShow();
+              panelEl.addClass("g_hover");
+              panelStatus('open');
+              panelBookmarkEl.css(bookmarkAnimOptShow);
+              return cssAnimNow = false;
+            }, 200);
+          }
+        } else {
+          panelEl.stop(true, true);
+          return panelEl.animate(animOptShow, 100, "swing", function() {
             list.afterShow();
             panelEl.addClass("g_hover");
             panelStatus('open');
-            panelBookmarkEl.css(bookmarkAnimOptShow);
-            return cssAnimNow = false;
-          }, 200);
+            return panelBookmarkEl.css(bookmarkAnimOptShow);
+          });
         }
-      } else {
-        panelEl.stop(true, true);
-        return panelEl.animate(animOptShow, 100, "swing", function() {
-          list.afterShow();
-          panelEl.addClass("g_hover");
-          panelStatus('open');
-          return panelBookmarkEl.css(bookmarkAnimOptShow);
-        });
-      }
-    };
-    hidePanel = function() {
-      var _this = this;
-      if (useCssAnim) {
-        if (!cssAnimNow) {
+      };
+      hidePanel = function() {
+        var _this = this;
+        if (useCssAnim) {
+          if (!cssAnimNow) {
+            panelStatus('closing');
+            list.beforeHide();
+            cssAnimNow = true;
+            panelEl.css('right', '');
+            clearTimeout(hideTimer);
+            panelEl.removeClass('show_t_' + panelPos).addClass('hide_t_' + panelPos);
+            return hideTimer = setTimeout(function() {
+              panelEl.css('right', '-281px');
+              panelEl.removeClass('hide_t_' + panelPos);
+              list.afterHide();
+              panelEl.removeClass("g_hover");
+              panelBookmarkEl.css(bookmarkAnimOptHide);
+              panelStatus('closed');
+              return cssAnimNow = false;
+            }, 400);
+          }
+        } else {
           panelStatus('closing');
           list.beforeHide();
-          cssAnimNow = true;
-          panelEl.css('right', '');
-          clearTimeout(hideTimer);
-          panelEl.removeClass('show_t_' + panelPos).addClass('hide_t_' + panelPos);
-          return hideTimer = setTimeout(function() {
-            panelEl.css('right', '-281px');
-            panelEl.removeClass('hide_t_' + panelPos);
+          panelEl.stop(true, true);
+          return panelEl.animate(animOptHide, 300, "swing", function() {
+            panelEl.css({
+              panelPos: 0
+            });
             list.afterHide();
             panelEl.removeClass("g_hover");
             panelBookmarkEl.css(bookmarkAnimOptHide);
-            panelStatus('closed');
-            return cssAnimNow = false;
-          }, 400);
-        }
-      } else {
-        panelStatus('closing');
-        list.beforeHide();
-        panelEl.stop(true, true);
-        return panelEl.animate(animOptHide, 300, "swing", function() {
-          panelEl.css({
-            panelPos: 0
+            return panelStatus('closed');
           });
-          list.afterHide();
-          panelEl.removeClass("g_hover");
-          panelBookmarkEl.css(bookmarkAnimOptHide);
-          return panelStatus('closed');
-        });
-      }
-    };
-    panelEl.bind("mouseenter", function() {
-      mouseOnPanel = true;
-      killPanelHideTimer();
-      if (parseInt(panelEl.css(panelPos)) < 0 && (panelStatus() === 'closed' || panelStatus() === 'closing')) {
-        showPanel();
-      }
-      return true;
-    });
-    pageX = false;
-    minPosOpen = -250;
-    maxPosClose = 30;
-    touchMoving = false;
-    enableMoving = false;
-    panelBookmarkEl.bind('touchstart', function() {
-      if (panelStatus() === 'closed') {
-        panelStatus('touchopening');
-      } else if (panelStatus() === 'open') {
-        panelStatus('touchclosing');
-      }
-      return true;
-    });
-    panelBookmarkEl.bind('touchmove', function(e) {
-      var pos, t, _ref, _ref1;
-      if (panelStatus() === 'touchopening' || panelStatus() === 'touchclosing') {
-        touchMoving = true;
-      }
-      if (enableMoving && touchMoving) {
-        t = e != null ? (_ref = e.originalEvent) != null ? (_ref1 = _ref.touches) != null ? _ref1[0] : void 0 : void 0 : void 0;
-        if (t) {
-          if (pageX !== false) {
-            pos = parseInt(panelEl.css(panelPos));
-            panelEl.css(panelPos, Math.max(panelMinPos, Math.min(0, pos + pageX - t.pageX)) + 'px');
-          }
-          pageX = t.pageX;
         }
-      }
-      return true;
-    });
-    panelBookmarkEl.bind('touchend', function() {
-      var pos;
-      if (!touchMoving) {
-        if (panelStatus() === 'touchopening') {
+      };
+      panelEl.bind("mouseenter", function() {
+        mouseOnPanel = true;
+        killPanelHideTimer();
+        if (parseInt(panelEl.css(panelPos)) < 0 && (panelStatus() === 'closed' || panelStatus() === 'closing')) {
           showPanel();
         }
-      } else {
-        touchMoving = false;
-        pos = parseInt(panelEl.css(panelPos));
-        if (panelStatus() === 'touchopening') {
-          if (pos > minPosOpen) {
+        return true;
+      });
+      pageX = false;
+      minPosOpen = -250;
+      maxPosClose = 30;
+      touchMoving = false;
+      enableMoving = false;
+      panelBookmarkEl.bind('touchstart', function() {
+        if (panelStatus() === 'closed') {
+          panelStatus('touchopening');
+        } else if (panelStatus() === 'open') {
+          panelStatus('touchclosing');
+        }
+        return true;
+      });
+      panelBookmarkEl.bind('touchmove', function(e) {
+        var pos, t, _ref1, _ref2;
+        if (panelStatus() === 'touchopening' || panelStatus() === 'touchclosing') {
+          touchMoving = true;
+        }
+        if (enableMoving && touchMoving) {
+          t = e != null ? (_ref1 = e.originalEvent) != null ? (_ref2 = _ref1.touches) != null ? _ref2[0] : void 0 : void 0 : void 0;
+          if (t) {
+            if (pageX !== false) {
+              pos = parseInt(panelEl.css(panelPos));
+              panelEl.css(panelPos, Math.max(panelMinPos, Math.min(0, pos + pageX - t.pageX)) + 'px');
+            }
+            pageX = t.pageX;
+          }
+        }
+        return true;
+      });
+      panelBookmarkEl.bind('touchend', function() {
+        var pos;
+        if (!touchMoving) {
+          if (panelStatus() === 'touchopening') {
             showPanel();
-          } else {
-            hidePanel();
           }
-        } else if (panelStatus() === 'touchclosing') {
-          if (pos < maxPosClose) {
-            hidePanel();
-          } else {
-            openPanel();
-          }
-        }
-      }
-      return true;
-    });
-    panelBookmarkEl.bind('touchcancel', function() {
-      return true;
-    });
-    touchClickedContact = null;
-    touchClickedCss = 'm_touch_clicked';
-    touchClickedContactClear = function() {
-      if (touchClickedContact != null) {
-        touchClickedContact.removeClass(touchClickedCss);
-      }
-      return touchClickedContact = null;
-    };
-    $(window).bind('touchcancel', function(e) {
-      return true;
-    });
-    $(window).bind('touchend', function(e) {
-      var parents, parentsArr, target;
-      target = $(e.target);
-      parents = target.parents();
-      parentsArr = parents.toArray();
-      if (parentsArr.indexOf(panelEl[0]) === -1) {
-        hidePanel();
-      }
-      if (!target.is('.oktell_button_action .drop_down') && parents.filter('.oktell_button_action .drop_down').size() === 0) {
-        if (list != null) {
-          if (typeof list.hideActionListDropdown === "function") {
-            list.hideActionListDropdown();
+        } else {
+          touchMoving = false;
+          pos = parseInt(panelEl.css(panelPos));
+          if (panelStatus() === 'touchopening') {
+            if (pos > minPosOpen) {
+              showPanel();
+            } else {
+              hidePanel();
+            }
+          } else if (panelStatus() === 'touchclosing') {
+            if (pos < maxPosClose) {
+              hidePanel();
+            } else {
+              openPanel();
+            }
           }
         }
-      }
-      return true;
-    });
-    panelEl.bind('touchend', function(e) {
-      var contact, parents, target;
-      target = $(e.target);
-      parents = target.parents();
-      if (!target.is('.oktell_button_action .drop_down') && parents.filter('.oktell_button_action .drop_down').size() === 0) {
-        if (list != null) {
-          if (typeof list.hideActionListDropdown === "function") {
-            list.hideActionListDropdown();
-          }
+        return true;
+      });
+      panelBookmarkEl.bind('touchcancel', function() {
+        return true;
+      });
+      $(window).bind('touchcancel', function(e) {
+        return true;
+      });
+      $(window).bind('touchend', function(e) {
+        var parents, parentsArr, target;
+        target = $(e.target);
+        parents = target.parents();
+        parentsArr = parents.toArray();
+        if (parentsArr.indexOf(panelEl[0]) === -1) {
+          hidePanel();
         }
-      }
-      contact = target.is('.oktell_panel .b_contact') ? target : parents.filter('.oktell_panel .b_contact');
-      if (contact.size() > 0) {
-        if (!contact.hasClass(touchClickedCss)) {
-          touchClickedContactClear();
-          touchClickedContact = contact;
-          contact.addClass(touchClickedCss);
-          return false;
+        return true;
+      });
+      panelEl.bind("mouseleave", function() {
+        mouseOnPanel = false;
+        return true;
+      });
+      $('html').bind('mouseleave', function(e) {
+        killPanelHideTimer();
+        return true;
+      });
+      return $('html').bind('mousemove', function(e) {
+        if (panelStatus() === 'open' && !mouseOnPanel && panelHideTimer === false && !list.dropdownOpenedOnPanel) {
+          panelHideTimer = setTimeout(function() {
+            return hidePanel();
+          }, 100);
+          1;
         }
-      } else {
-        touchClickedContactClear();
-      }
-      return true;
-    });
-    panelEl.bind("mouseleave", function() {
-      mouseOnPanel = false;
-      return true;
-    });
-    $('html').bind('mouseleave', function(e) {
-      killPanelHideTimer();
-      return true;
-    });
-    return $('html').bind('mousemove', function(e) {
-      if (panelStatus() === 'open' && !mouseOnPanel && panelHideTimer === false && !list.dropdownOpenedOnPanel) {
-        panelHideTimer = setTimeout(function() {
-          return hidePanel();
-        }, 100);
-        1;
-      }
-      return true;
-    });
+        return true;
+      });
+    }
   };
   afterOktellConnect = function() {
     return oktellConnected = true;
@@ -643,6 +623,16 @@ var __slice = [].slice;
     return $(this).each(function() {
       return addActionButtonToEl($(this));
     });
+  };
+  $.fn.oktellPanel = function() {
+    var args;
+    args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+    if (!panelWasInitialized) {
+      args.container = $(this);
+      return $.oktellPanel.apply(window, args);
+    } else if ($(this)[0] === (panelEl != null ? panelEl[0] : void 0)) {
+      return $.oktellPanel.apply(window, args);
+    }
   };
   $.oktellPanel.show = function() {
     return list.showPanel();

@@ -1,18 +1,21 @@
 class List
 	logGroup: 'List'
-	constructor: (oktell, panelEl, dropdownEl, afterOktellConnect, options, debugMode) ->
+	constructor: (oktell, panelEl, dropdownEl, afterOktellConnect, options, contained, useSticky, useNativeScroll, debugMode) ->
 		@defaultConfig =
 			departmentVisibility: {}
 			showDeps: true
 			showOffline: false
 
+		@useNativeScroll = useNativeScroll
+		@stickyHeaders = useSticky
+
 		@jScrollPaneParams =
 			mouseWheelSpeed: 50,
 			hideFocus: true,
 			verticalGutter: -13,
-			onScroll: =>
-				if @oktellConnected
-					@processStickyHeaders.apply @
+#			onScroll: =>
+#				if @oktellConnected
+#					@processStickyHeaders.apply @
 
 		@allActions =
 			answer: { icon: '/img/icons/action/call.png', iconWhite: '/img/icons/action/white/call.png', text: @langs.actions.answer }
@@ -56,6 +59,7 @@ class List
 
 		oktellConnected = false
 		@options = options
+		@contained = contained
 		@usersByNumber = {}
 		@me = false
 		@oktell = oktell
@@ -124,32 +128,28 @@ class List
 		@exactMatchUserDep.template = @usersTableTemplate
 
 		@initJScrollPane = =>
-			@usersListBlockEl.oktellPanelJScrollPane @jScrollPaneParams
-			@jScrollPaneAPI = @usersListBlockEl.data 'jsp'
-			@scrollContainer = @usersListBlockEl.find '.jspContainer'
-			@scrollContent = @usersListBlockEl.find '.jspPane'
-			@usersListBlockEl.bind 'scroll', =>
-				#@log 'scroll'
-				@processStickyHeaders()
+			if @useNativeScroll
+				@scrollContainer = @usersListBlockEl #.find '.jspContainer'
+				@scrollContent = @usersListBlockEl # @usersListBlockEl.find '.jspPane'
+				@usersListBlockEl.css 'overflow-y', 'auto'
+			else
+				@usersListBlockEl.oktellPanelJScrollPane @jScrollPaneParams
+				@jScrollPaneAPI = @usersListBlockEl.data 'jsp'
+				@scrollContainer = @usersListBlockEl.find '.jspContainer'
+				@scrollContent = @usersListBlockEl.find '.jspPane'
+			if @stickyHeaders
+				@usersListBlockEl.bind 'scroll', =>
+					@processStickyHeaders()
 
 		@initJScrollPane()
 
 		@reinitScroll = =>
-			@jScrollPaneAPI?.reinitialise()
-			#@usersListBlockEl.find('.jspPane').css 'width', parseInt(@usersListBlockEl.css('width') ) - 5 + 'px'
-
-		@resetDepsWidth = =>
-			if @scrollContent
-				w = parseInt @scrollContent.css 'width'
-				@scrollContent.find('.b_department').css 'width', w + 'px'
-				@currentTopHeaderClone?.css
-					width: w  + 'px'
-
-
+			if not @useNativeScroll
+				@jScrollPaneAPI?.reinitialise()
 
 		@userScrollerToTop = =>
-			#@usersScroller.css({top:'0px'})
-			@jScrollPaneAPI.scrollToY 0
+			if not @useNativeScroll
+				@jScrollPaneAPI.scrollToY 0
 
 		@filterClearCross.bind 'click', =>
 			@clearFilter()
@@ -259,7 +259,6 @@ class List
 			@usersListBlockEl.css
 				height: h
 			@reinitScroll()
-			@resetDepsWidth()
 
 		@setUserListHeight()
 
@@ -393,7 +392,7 @@ class List
 			for user in @usersWithBeforeConnectButtons
 				user.loadActions()
 
-			if @options.hideOnDisconnect
+			if @contained or @options.hideOnDisconnect
 				@showPanel()
 			else
 				@panelEl.show()
@@ -455,6 +454,8 @@ class List
 			sel.removeAllRanges()
 
 	initStickyHeaders: ->
+		if not @stickyHeaders
+			return
 		@resetStickyHeaders()
 		if not @oktellConnected
 			return
@@ -495,12 +496,8 @@ class List
 				@currentTopHeaderClone?.remove()
 				@currentTopHeaderClone = @headerEls[@currentTopIndex].clone()
 				@cloneHeaderHeight = @headerEls[@currentTopIndex].height()
-				@headerEls[@currentTopIndex].after @currentTopHeaderClone
-				#@currentTopHeaderClone.find('.h_shadow_top span').text('Клон')
-				@currentTopHeaderClone.css
-					position: 'fixed'
-					zIndex: 1
-					width: @scrollContainer.width() + 'px'
+				@currentTopHeaderClone.addClass 'b_sticky_header'
+				$('.b_sticky_header_container').empty().append @currentTopHeaderClone
 				@currentTopHeaderClone.offset({top:@scrollContainer.offset().top})
 				@processStickyHeaders()
 
@@ -627,29 +624,41 @@ class List
 
 
 	showPanel: (notAnimate)->
-		w = @panelEl.data('width')
-		if w > 0 and @panelEl.data('hided')
-			#@log 'show panel'
-			@panelEl.data('width', w)
-			@panelEl.data('hided', false)
-			@panelEl.css {display: ''}
+		if @contained
 			if notAnimate
-				@panelEl.css { overflow: '', width: w+'px' }
+				@panelEl.show()
 			else
-				@panelEl.animate {width: w+'px'}, 200, =>
-					@panelEl.css { overflow: '' }
+				@panelEl.fadeIn 200
+		else
+			w = @panelEl.data('width')
+			if w > 0 and @panelEl.data('hided')
+				#@log 'show panel'
+				@panelEl.data('width', w)
+				@panelEl.data('hided', false)
+				@panelEl.css {display: ''}
+				if notAnimate
+					@panelEl.css { overflow: '', width: w+'px' }
+				else
+					@panelEl.animate {width: w+'px'}, 200, =>
+						@panelEl.css { overflow: '' }
 
 	hidePanel: (notAnimate)->
-		w = if @panelEl.data('width')? then @panelEl.data('width') else @panelEl.width()
-		if w > 0 and not @panelEl.data('hided')
-			#@log 'hide panel'
-			@panelEl.data('width', w)
-			@panelEl.data('hided', true)
+		if @contained
 			if notAnimate
-				@panelEl.css {display: '', overflow: 'hidden', width: '0px'}
+				@panelEl.hide()
 			else
-				@panelEl.animate {width: '0px'}, 200, =>
-					@panelEl.css {display: '', overflow: 'hidden'}
+				@panelEl.fadeOut 200
+		else
+			w = if @panelEl.data('width')? then @panelEl.data('width') else @panelEl.width()
+			if w > 0 and not @panelEl.data('hided')
+				#@log 'hide panel'
+				@panelEl.data('width', w)
+				@panelEl.data('hided', true)
+				if notAnimate
+					@panelEl.css {display: '', overflow: 'hidden', width: '0px'}
+				else
+					@panelEl.animate {width: '0px'}, 200, =>
+						@panelEl.css {display: '', overflow: 'hidden'}
 
 
 
