@@ -201,6 +201,8 @@ List = (function() {
     this.userScrollerToTop = function() {
       if (!_this.useNativeScroll) {
         return _this.jScrollPaneAPI.scrollToY(0);
+      } else {
+        return _this.usersListBlockEl.scrollTop(0);
       }
     };
     this.filterClearCross.bind('click', function() {

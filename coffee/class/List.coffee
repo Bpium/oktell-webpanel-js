@@ -159,6 +159,9 @@ class List
 		@userScrollerToTop = =>
 			if not @useNativeScroll
 				@jScrollPaneAPI.scrollToY 0
+			else
+				@usersListBlockEl.scrollTop(0)
+
 
 		@filterClearCross.bind 'click', =>
 			@clearFilter()

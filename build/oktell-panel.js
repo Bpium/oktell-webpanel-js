@@ -1,4 +1,4 @@
-/* Oktell-panel.js 0.3.1.1010 http://js.oktell.ru/webpanel */
+/* Oktell-panel.js 0.3.1.1012 http://js.oktell.ru/webpanel */
 
 /*! Copyright (c) 2013 Brandon Aaron (http://brandonaaron.net)
  * Licensed under the MIT License (LICENSE.txt).
@@ -1878,6 +1878,8 @@ var __slice = [].slice,
       this.userScrollerToTop = function() {
         if (!_this.useNativeScroll) {
           return _this.jScrollPaneAPI.scrollToY(0);
+        } else {
+          return _this.usersListBlockEl.scrollTop(0);
         }
       };
       this.filterClearCross.bind('click', function() {
