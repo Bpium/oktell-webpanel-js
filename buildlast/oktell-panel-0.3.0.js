@@ -1,4 +1,4 @@
-/* Oktell-panel.js 0.3.0.1001 http://js.oktell.ru/webpanel */
+/* Oktell-panel.js 0.3.0.1005 http://js.oktell.ru/webpanel */
 
 /*! Copyright (c) 2013 Brandon Aaron (http://brandonaaron.net)
  * Licensed under the MIT License (LICENSE.txt).
@@ -2701,7 +2701,6 @@ var __slice = [].slice,
       var abonent, number, _ref, _ref1,
         _this = this;
 
-      this.log('setAbonents', abonents, this.abonents);
       _ref = this.abonents;
       for (number in _ref) {
         if (!__hasProp.call(_ref, number)) continue;
@@ -2841,7 +2840,6 @@ var __slice = [].slice,
       oldFilter = this.filter;
       this.filter = filter;
       this.filterLang = filter.match(/^[^А-яёЁ]+$/) ? 'en' : filter.match(/^[^A-z]+$/) ? 'ru' : '';
-      this.log('set filter');
       exactMatch = false;
       this.timer();
       this.panelUsersFiltered = [];

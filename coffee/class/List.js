@@ -1001,7 +1001,6 @@ List = (function() {
   List.prototype.setAbonents = function(abonents) {
     var abonent, number, _ref, _ref1,
       _this = this;
-    this.log('setAbonents', abonents, this.abonents);
     _ref = this.abonents;
     for (number in _ref) {
       if (!__hasProp.call(_ref, number)) continue;
@@ -1136,7 +1135,6 @@ List = (function() {
     oldFilter = this.filter;
     this.filter = filter;
     this.filterLang = filter.match(/^[^А-яёЁ]+$/) ? 'en' : filter.match(/^[^A-z]+$/) ? 'ru' : '';
-    this.log('set filter');
     exactMatch = false;
     this.timer();
     this.panelUsersFiltered = [];

@@ -768,7 +768,7 @@ class List
 				delete userlist[user.number]
 
 	setAbonents: (abonents) ->
-		@log 'setAbonents', abonents, @abonents
+#		@log 'setAbonents', abonents, @abonents
 		for own number, abonent of @abonents
 			abonent.removeAction 'dtmf'
 		@syncAbonentsAndUserlist abonents, @abonents
@@ -857,7 +857,7 @@ class List
 
 		@filterLang = if filter.match(/^[^А-яёЁ]+$/) then 'en' else if filter.match(/^[^A-z]+$/) then 'ru' else ''
 
-		@log 'set filter'
+#		@log 'set filter'
 
 		exactMatch = false
 		@timer()
