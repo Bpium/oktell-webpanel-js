@@ -147,6 +147,15 @@ class List
 			if not @useNativeScroll
 				@jScrollPaneAPI?.reinitialise()
 
+		@resetDepsWidth = =>
+			if not @useNativeScroll and not @contained and @scrollContent
+				w = parseInt @scrollContent.css 'width'
+				@scrollContent.find('.b_department').css 'width', w + 'px'
+				@currentTopHeaderClone?.css
+					width: w  + 'px'
+
+
+
 		@userScrollerToTop = =>
 			if not @useNativeScroll
 				@jScrollPaneAPI.scrollToY 0
@@ -259,6 +268,7 @@ class List
 			@usersListBlockEl.css
 				height: h
 			@reinitScroll()
+			@resetDepsWidth()
 
 		@setUserListHeight()
 
@@ -497,6 +507,10 @@ class List
 				@currentTopHeaderClone = @headerEls[@currentTopIndex].clone()
 				@cloneHeaderHeight = @headerEls[@currentTopIndex].height()
 				@currentTopHeaderClone.addClass 'b_sticky_header'
+				@currentTopHeaderClone.bind 'click', =>
+					@headerEls[@currentTopIndex].click()
+					@initStickyHeaders()
+					@reinitScroll()
 				$('.b_sticky_header_container').empty().append @currentTopHeaderClone
 				@currentTopHeaderClone.offset({top:@scrollContainer.offset().top})
 				@processStickyHeaders()

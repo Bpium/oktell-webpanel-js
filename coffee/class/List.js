@@ -188,6 +188,16 @@ List = (function() {
         return (_ref = _this.jScrollPaneAPI) != null ? _ref.reinitialise() : void 0;
       }
     };
+    this.resetDepsWidth = function() {
+      var w, _ref;
+      if (!_this.useNativeScroll && !_this.contained && _this.scrollContent) {
+        w = parseInt(_this.scrollContent.css('width'));
+        _this.scrollContent.find('.b_department').css('width', w + 'px');
+        return (_ref = _this.currentTopHeaderClone) != null ? _ref.css({
+          width: w + 'px'
+        }) : void 0;
+      }
+    };
     this.userScrollerToTop = function() {
       if (!_this.useNativeScroll) {
         return _this.jScrollPaneAPI.scrollToY(0);
@@ -307,7 +317,8 @@ List = (function() {
       _this.usersListBlockEl.css({
         height: h
       });
-      return _this.reinitScroll();
+      _this.reinitScroll();
+      return _this.resetDepsWidth();
     };
     this.setUserListHeight();
     debouncedSetHeight = debounce(function() {
@@ -570,7 +581,8 @@ List = (function() {
   List.prototype.cloneHeaderHeight = null;
 
   List.prototype.processStickyHeaders = function(elIndex) {
-    var conTop, curTop, nexTop, _ref, _ref1;
+    var conTop, curTop, nexTop, _ref, _ref1,
+      _this = this;
     if (((_ref = this.headerEls) != null ? _ref.length : void 0) > 0) {
       if (elIndex != null) {
         if (elIndex < 0) {
@@ -583,6 +595,11 @@ List = (function() {
         this.currentTopHeaderClone = this.headerEls[this.currentTopIndex].clone();
         this.cloneHeaderHeight = this.headerEls[this.currentTopIndex].height();
         this.currentTopHeaderClone.addClass('b_sticky_header');
+        this.currentTopHeaderClone.bind('click', function() {
+          _this.headerEls[_this.currentTopIndex].click();
+          _this.initStickyHeaders();
+          return _this.reinitScroll();
+        });
         $('.b_sticky_header_container').empty().append(this.currentTopHeaderClone);
         this.currentTopHeaderClone.offset({
           top: this.scrollContainer.offset().top
