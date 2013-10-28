@@ -1,4 +1,4 @@
-/* Oktell-panel.js 0.3.0.1002 http://js.oktell.ru/webpanel */
+/* Oktell-panel.js 0.2.1.1001 http://js.oktell.ru/webpanel */
 
 /*! Copyright (c) 2013 Brandon Aaron (http://brandonaaron.net)
  * Licensed under the MIT License (LICENSE.txt).
@@ -958,7 +958,7 @@ var __slice = [].slice,
   __hasProp = {}.hasOwnProperty;
 
 (function($) {
-  var CUser, Department, Error, List, Notify, PermissionsPopup, Popup, actionButtonContainerClass, actionButtonHtml, actionListEl, actionListHtml, addActionButtonToEl, afterOktellConnect, checkCssAnimationSupport, contEl, cookie, debounce, defaultOptions, departmentTemplateHtml, error, errorHtml, escapeHtml, getOptions, initActionButtons, initButtonOnElement, initPanel, isMobileDevice, langs, list, loadTemplate, log, logStr, newGuid, oktell, oktellConnected, options, panelEl, panelHtml, panelWasInitialized, permissionsPopup, permissionsPopupHtml, popup, popupHtml, templates, useNativeScroll, useSticky, userTemplateHtml, usersTableHtml,
+  var CUser, Department, Error, List, Notify, PermissionsPopup, Popup, actionButtonContainerClass, actionButtonHtml, actionListEl, actionListHtml, addActionButtonToEl, afterOktellConnect, checkCssAnimationSupport, cookie, debounce, defaultOptions, departmentTemplateHtml, error, errorHtml, escapeHtml, getOptions, initActionButtons, initButtonOnElement, initPanel, langs, list, loadTemplate, log, logStr, newGuid, oktell, oktellConnected, options, panelHtml, panelWasInitialized, permissionsPopup, permissionsPopupHtml, popup, popupHtml, templates, userTemplateHtml, usersTableHtml,
     _this = this;
 
   if (!$) {
@@ -1257,7 +1257,6 @@ var __slice = [].slice,
 
     function CUser(data) {
       this.doAction = __bind(this.doAction, this);      this.state = false;
-      this.additionalActions = {};
       this.hasHover = false;
       this.buttonLastAction = '';
       this.firstLiCssPrefix = 'm_button_action_';
@@ -1285,12 +1284,10 @@ var __slice = [].slice,
       if (this.numberHtml === this.nameHtml) {
         this.numberHtml = '';
       }
-      this.isIvr = data.isIvr;
-      this.ivrName = data.ivrName;
       ns = this.nameHtml.split(/\s+/);
       if (ns.length > 1 && data.name.toString() !== this.number) {
         this.nameHtml1 = ns[0];
-        this.nameHtml2 = ' ' + ns.splice(1).join(' ');
+        this.nameHtml2 = ' ' + ns.splice(1).join('');
       } else {
         this.nameHtml1 = this.nameHtml;
         this.nameHtml2 = '';
@@ -1468,40 +1465,16 @@ var __slice = [].slice,
     };
 
     CUser.prototype.loadOktellActions = function() {
-      var action, actions, _ref;
+      var actions;
 
-      if (this.isIvr) {
-        actions = ['endCall'];
-      } else {
-        actions = this.oktell.getPhoneActions(this.number || this.id);
-      }
-      _ref = this.additionalActions;
-      for (action in _ref) {
-        if (!__hasProp.call(_ref, action)) continue;
-        actions.push(action);
-      }
+      actions = this.oktell.getPhoneActions(this.id || this.number);
       return actions;
     };
 
-    CUser.prototype.addAction = function(action, callback) {
-      if (action && typeof action === 'string' && typeof callback === 'function') {
-        return this.additionalActions[action] = callback;
-      }
-    };
-
-    CUser.prototype.removeAction = function(action) {
-      return action && delete this.additionalActions[action];
-    };
-
     CUser.prototype.loadActions = function() {
-      var action, actions, _ref;
+      var action, actions;
 
       actions = this.loadOktellActions();
-      _ref = this.additionalActions;
-      for (action in _ref) {
-        if (!__hasProp.call(_ref, action)) continue;
-        actions.push(action);
-      }
       action = (actions != null ? actions[0] : void 0) || '';
       if (this.buttonLastAction === action) {
         return actions;
@@ -1520,7 +1493,7 @@ var __slice = [].slice,
     };
 
     CUser.prototype.doAction = function(action) {
-      var target, _base, _base1, _base2, _base3;
+      var target, _base, _base1, _base2;
 
       if (!action) {
         return;
@@ -1554,8 +1527,6 @@ var __slice = [].slice,
           return typeof (_base1 = this.oktell).resume === "function" ? _base1.resume() : void 0;
         case 'answer':
           return typeof (_base2 = this.oktell).answer === "function" ? _base2.answer() : void 0;
-        default:
-          return typeof (_base3 = this.additionalActions)[action] === "function" ? _base3[action]() : void 0;
       }
     };
 
@@ -1680,7 +1651,7 @@ var __slice = [].slice,
   List = (function() {
     List.prototype.logGroup = 'List';
 
-    function List(oktell, panelEl, dropdownEl, afterOktellConnect, options, contained, useSticky, useNativeScroll, debugMode) {
+    function List(oktell, panelEl, dropdownEl, afterOktellConnect, options, debugMode) {
       this.onPbxNumberStateChange = __bind(this.onPbxNumberStateChange, this);
       var debouncedSetFilter, debouncedSetHeight, dropdownHideTimer, oktellConnected, ringNotify, self,
         _this = this;
@@ -1690,12 +1661,15 @@ var __slice = [].slice,
         showDeps: true,
         showOffline: false
       };
-      this.useNativeScroll = useNativeScroll;
-      this.stickyHeaders = useSticky;
       this.jScrollPaneParams = {
         mouseWheelSpeed: 50,
         hideFocus: true,
-        verticalGutter: -13
+        verticalGutter: -13,
+        onScroll: function() {
+          if (_this.oktellConnected) {
+            return _this.processStickyHeaders.apply(_this);
+          }
+        }
       };
       this.allActions = {
         answer: {
@@ -1745,10 +1719,6 @@ var __slice = [].slice,
         resume: {
           icon: '/img/icons/action/ghost_help.png',
           text: this.langs.actions.resume
-        },
-        dtmf: {
-          icon: '',
-          text: this.langs.actions.dtmf
         }
       };
       this.actionCssPrefix = 'i_';
@@ -1773,7 +1743,6 @@ var __slice = [].slice,
       };
       oktellConnected = false;
       this.options = options;
-      this.contained = contained;
       this.usersByNumber = {};
       this.me = false;
       this.oktell = oktell;
@@ -1840,34 +1809,33 @@ var __slice = [].slice,
       this.exactMatchUserDep = new Department('exact_match_user_dep', 'exactUser');
       this.exactMatchUserDep.template = this.usersTableTemplate;
       this.initJScrollPane = function() {
-        if (_this.useNativeScroll) {
-          _this.scrollContainer = _this.usersListBlockEl;
-          _this.scrollContent = _this.usersListBlockEl;
-          _this.usersListBlockEl.css('overflow-y', 'auto');
-        } else {
-          _this.usersListBlockEl.oktellPanelJScrollPane(_this.jScrollPaneParams);
-          _this.jScrollPaneAPI = _this.usersListBlockEl.data('jsp');
-          _this.scrollContainer = _this.usersListBlockEl.find('.jspContainer');
-          _this.scrollContent = _this.usersListBlockEl.find('.jspPane');
-        }
-        if (_this.stickyHeaders) {
-          return _this.usersListBlockEl.bind('scroll', function() {
-            return _this.processStickyHeaders();
-          });
-        }
+        _this.usersListBlockEl.oktellPanelJScrollPane(_this.jScrollPaneParams);
+        _this.jScrollPaneAPI = _this.usersListBlockEl.data('jsp');
+        _this.scrollContainer = _this.usersListBlockEl.find('.jspContainer');
+        _this.scrollContent = _this.usersListBlockEl.find('.jspPane');
+        return _this.usersListBlockEl.bind('scroll', function() {
+          return _this.processStickyHeaders();
+        });
       };
       this.initJScrollPane();
       this.reinitScroll = function() {
         var _ref;
 
-        if (!_this.useNativeScroll) {
-          return (_ref = _this.jScrollPaneAPI) != null ? _ref.reinitialise() : void 0;
+        return (_ref = _this.jScrollPaneAPI) != null ? _ref.reinitialise() : void 0;
+      };
+      this.resetDepsWidth = function() {
+        var w, _ref;
+
+        if (_this.scrollContent) {
+          w = parseInt(_this.scrollContent.css('width'));
+          _this.scrollContent.find('.b_department').css('width', w + 'px');
+          return (_ref = _this.currentTopHeaderClone) != null ? _ref.css({
+            width: w + 'px'
+          }) : void 0;
         }
       };
       this.userScrollerToTop = function() {
-        if (!_this.useNativeScroll) {
-          return _this.jScrollPaneAPI.scrollToY(0);
-        }
+        return _this.jScrollPaneAPI.scrollToY(0);
       };
       this.filterClearCross.bind('click', function() {
         return _this.clearFilter();
@@ -1987,7 +1955,8 @@ var __slice = [].slice,
         _this.usersListBlockEl.css({
           height: h
         });
-        return _this.reinitScroll();
+        _this.reinitScroll();
+        return _this.resetDepsWidth();
       };
       this.setUserListHeight();
       debouncedSetHeight = debounce(function() {
@@ -2083,7 +2052,7 @@ var __slice = [].slice,
           }
           if (user.id !== oInfo.userid) {
             _this.panelUsers.push(user);
-            if (user.departmentId && user.departmentId !== '00000000-0000-0000-0000-000000000000' && user.departmentId !== _this.withoutDepName) {
+            if (user.departmentId && user.departmentId !== '00000000-0000-0000-0000-000000000000') {
               if (createdDeps[user.departmentId]) {
                 dep = createdDeps[user.departmentId];
               } else {
@@ -2117,9 +2086,6 @@ var __slice = [].slice,
           return _this.setHold(oktell.getHoldInfo());
         }, 1000);
         _this.setFilter('', true);
-        setTimeout(function() {
-          return _this.setUserListHeight();
-        }, 500);
         oktell.getQueue(function(data) {
           if (data.result) {
             return _this.setQueue(data.queue);
@@ -2130,7 +2096,7 @@ var __slice = [].slice,
           user = _ref2[_i];
           user.loadActions();
         }
-        if (_this.contained || _this.options.hideOnDisconnect) {
+        if (_this.options.hideOnDisconnect) {
           _this.showPanel();
         } else {
           _this.panelEl.show();
@@ -2142,12 +2108,6 @@ var __slice = [].slice,
       });
       oktell.on('abonentsChange', function(abonents) {
         if (_this.oktellConnected) {
-          if (oktell.conferenceId()) {
-            _this.panelEl.addClass('conference');
-            _this.hideDtmf();
-          } else {
-            _this.panelEl.removeClass('conference');
-          }
           _this.setAbonents(abonents);
           return _this.reloadActions();
         }
@@ -2214,9 +2174,6 @@ var __slice = [].slice,
       var conTop, h, i, _i, _j, _len, _len1, _ref, _ref1,
         _this = this;
 
-      if (!this.stickyHeaders) {
-        return;
-      }
       this.resetStickyHeaders();
       if (!this.oktellConnected) {
         return;
@@ -2241,7 +2198,7 @@ var __slice = [].slice,
       _ref1 = this.headerEls;
       for (i = _j = 0, _len1 = _ref1.length; _j < _len1; i = ++_j) {
         h = _ref1[i];
-        if (h.offset().top > conTop || i === this.headerEls.length - 1) {
+        if (h.offset().top > conTop) {
           this.processStickyHeaders(i - 1);
           break;
         }
@@ -2250,8 +2207,6 @@ var __slice = [].slice,
     };
 
     List.prototype.headerHeight = 24;
-
-    List.prototype.cloneHeaderHeight = null;
 
     List.prototype.processStickyHeaders = function(elIndex) {
       var conTop, curTop, nexTop, _ref, _ref1;
@@ -2266,9 +2221,12 @@ var __slice = [].slice,
             _ref1.remove();
           }
           this.currentTopHeaderClone = this.headerEls[this.currentTopIndex].clone();
-          this.cloneHeaderHeight = this.headerEls[this.currentTopIndex].height();
-          this.currentTopHeaderClone.addClass('b_sticky_header');
-          $('.b_sticky_header_container').empty().append(this.currentTopHeaderClone);
+          this.headerEls[this.currentTopIndex].after(this.currentTopHeaderClone);
+          this.currentTopHeaderClone.css({
+            position: 'fixed',
+            zIndex: 1,
+            width: this.scrollContainer.width() + 'px'
+          });
           this.currentTopHeaderClone.offset({
             top: this.scrollContainer.offset().top
           });
@@ -2292,13 +2250,13 @@ var __slice = [].slice,
             }
             if (this.headerEls[this.currentTopIndex + 1]) {
               nexTop = this.headerEls[this.currentTopIndex + 1].offset().top;
-              if (nexTop > conTop + (this.cloneHeaderHeight || this.headerHeight)) {
+              if (nexTop > conTop + this.headerHeight) {
                 return this.currentTopHeaderClone.offset({
                   top: conTop
                 });
               } else if (nexTop > conTop) {
                 return this.currentTopHeaderClone.offset({
-                  top: nexTop - (this.cloneHeaderHeight || this.headerHeight)
+                  top: nexTop - this.headerHeight
                 });
               } else if (nexTop < conTop) {
                 return this.processStickyHeaders(this.currentTopIndex + 1);
@@ -2318,7 +2276,6 @@ var __slice = [].slice,
         }
       }
       this.currentTopHeaderClone = null;
-      this.cloneHeaderHeight = null;
       this.currentTopIndex = null;
       return this.headerEls = null;
     };
@@ -2346,14 +2303,6 @@ var __slice = [].slice,
 
     List.prototype.sendDtmf = function(code) {
       return this.oktell.dtmf(code.toString().replace('∗', '*'));
-    };
-
-    List.prototype.toggleDtmf = function() {
-      if (this.panelEl.hasClass('dtmf')) {
-        return this.hideDtmf();
-      } else {
-        return this.showDtmf();
-      }
     };
 
     List.prototype.showDtmf = function(dontAnimate) {
@@ -2413,16 +2362,16 @@ var __slice = [].slice,
           userNowIsFiltered = user.isFiltered(this.filter, this.showOffline, this.filterLang);
           if (!userNowIsFiltered) {
             if (dep.getContainer().children().length === 1) {
-              _results.push(this.setFilter(this.filter, true, true));
+              _results.push(this.setFilter(this.filter, true));
             } else {
-              _results.push((_ref1 = user.el) != null ? typeof _ref1.detach === "function" ? _ref1.detach() : void 0 : void 0);
+              _results.push((_ref1 = user.el) != null ? typeof _ref1.remove === "function" ? _ref1.remove() : void 0 : void 0);
             }
           } else if (!wasFiltered) {
             dep.getUsers(this.filter, this.showOffline, this.filterLang);
             index = dep.lastFilteredUsers.indexOf(user);
             if (index !== -1) {
               if (!dep.getContainer().is(':visible')) {
-                _results.push(this.setFilter(this.filter, true, true));
+                _results.push(this.setFilter(this.filter, true));
               } else {
                 if (index === 0) {
                   dep.getContainer().prepend(user.getEl());
@@ -2466,34 +2415,26 @@ var __slice = [].slice,
       var w,
         _this = this;
 
-      if (this.contained) {
+      w = this.panelEl.data('width');
+      if (w > 0 && this.panelEl.data('hided')) {
+        this.panelEl.data('width', w);
+        this.panelEl.data('hided', false);
+        this.panelEl.css({
+          display: ''
+        });
         if (notAnimate) {
-          return this.panelEl.show();
-        } else {
-          return this.panelEl.fadeIn(200);
-        }
-      } else {
-        w = this.panelEl.data('width');
-        if (w > 0 && this.panelEl.data('hided')) {
-          this.panelEl.data('width', w);
-          this.panelEl.data('hided', false);
-          this.panelEl.css({
-            display: ''
+          return this.panelEl.css({
+            overflow: '',
+            width: w + 'px'
           });
-          if (notAnimate) {
-            return this.panelEl.css({
-              overflow: '',
-              width: w + 'px'
+        } else {
+          return this.panelEl.animate({
+            width: w + 'px'
+          }, 200, function() {
+            return _this.panelEl.css({
+              overflow: ''
             });
-          } else {
-            return this.panelEl.animate({
-              width: w + 'px'
-            }, 200, function() {
-              return _this.panelEl.css({
-                overflow: ''
-              });
-            });
-          }
+          });
         }
       }
     };
@@ -2502,33 +2443,25 @@ var __slice = [].slice,
       var w,
         _this = this;
 
-      if (this.contained) {
+      w = this.panelEl.data('width') != null ? this.panelEl.data('width') : this.panelEl.width();
+      if (w > 0 && !this.panelEl.data('hided')) {
+        this.panelEl.data('width', w);
+        this.panelEl.data('hided', true);
         if (notAnimate) {
-          return this.panelEl.hide();
+          return this.panelEl.css({
+            display: '',
+            overflow: 'hidden',
+            width: '0px'
+          });
         } else {
-          return this.panelEl.fadeOut(200);
-        }
-      } else {
-        w = this.panelEl.data('width') != null ? this.panelEl.data('width') : this.panelEl.width();
-        if (w > 0 && !this.panelEl.data('hided')) {
-          this.panelEl.data('width', w);
-          this.panelEl.data('hided', true);
-          if (notAnimate) {
-            return this.panelEl.css({
+          return this.panelEl.animate({
+            width: '0px'
+          }, 200, function() {
+            return _this.panelEl.css({
               display: '',
-              overflow: 'hidden',
-              width: '0px'
+              overflow: 'hidden'
             });
-          } else {
-            return this.panelEl.animate({
-              width: '0px'
-            }, 200, function() {
-              return _this.panelEl.css({
-                display: '',
-                overflow: 'hidden'
-              });
-            });
-          }
+          });
         }
       }
     };
@@ -2615,7 +2548,7 @@ var __slice = [].slice,
           }
         }
         if (aEls.length) {
-          this.dropdownEl.append(aEls.join(''));
+          this.dropdownEl.append(aEls);
           this.dropdownEl.children('li:first').addClass('g_first');
           this.dropdownEl.children('li:last').addClass('g_last');
           this.dropdownEl.data('user', user);
@@ -2650,38 +2583,29 @@ var __slice = [].slice,
     };
 
     List.prototype.syncAbonentsAndUserlist = function(abonents, userlist) {
-      var absByNumber, uNumber, user, _ref, _results,
+      var absByNumber, uNumber, user, _results,
         _this = this;
 
       absByNumber = {};
-      if ((abonents != null ? abonents.length : void 0) === 0 || (abonents.length === 1 && (abonents != null ? (_ref = abonents[0]) != null ? _ref.isIvr : void 0 : void 0))) {
-        for (uNumber in userlist) {
-          if (!__hasProp.call(userlist, uNumber)) continue;
-          user = userlist[uNumber];
-          delete userlist[uNumber];
-        }
-      }
       $.each(abonents, function(i, ab) {
-        var number, u, _ref1;
+        var number, u;
 
         if (!ab) {
           return;
         }
-        number = ((_ref1 = ab.phone) != null ? typeof _ref1.toString === "function" ? _ref1.toString() : void 0 : void 0) || ab.ivrName || '';
+        number = ab.phone.toString() || '';
         if (!number) {
           return;
         }
         absByNumber[number] = ab;
-        if (!userlist[number.toString()]) {
+        if (!userlist[ab.phone.toString()]) {
           u = _this.getUser({
             name: ab.name,
-            number: ab.phone || '',
+            number: ab.phone,
             id: ab.userid,
-            state: ab.isIvr ? 5 : 1,
-            isIvr: ab.isIvr,
-            ivrName: ab.ivrName
-          }, ab.isIvr);
-          return userlist[number.toString()] = u;
+            state: 1
+          });
+          return userlist[u.number] = u;
         }
       });
       _results = [];
@@ -2698,31 +2622,9 @@ var __slice = [].slice,
     };
 
     List.prototype.setAbonents = function(abonents) {
-      var abonent, number, _ref, _ref1,
-        _this = this;
-
-      this.log('setAbonents', abonents, this.abonents);
-      _ref = this.abonents;
-      for (number in _ref) {
-        if (!__hasProp.call(_ref, number)) continue;
-        abonent = _ref[number];
-        abonent.removeAction('dtmf');
-      }
       this.syncAbonentsAndUserlist(abonents, this.abonents);
-      if (!this.oktell.conferenceId) {
-        _ref1 = this.abonents;
-        for (number in _ref1) {
-          if (!__hasProp.call(_ref1, number)) continue;
-          abonent = _ref1[number];
-          abonent.addAction('dtmf', function() {
-            return _this.toggleDtmf();
-          });
-        }
-      }
       this.setAbonentsHtml();
-      return setTimeout(function() {
-        return _this.setUserListHeight();
-      }, 200);
+      return this.setUserListHeight();
     };
 
     List.prototype.setQueue = function(queue) {
@@ -2813,17 +2715,14 @@ var __slice = [].slice,
     };
 
     List.prototype._setUsersHtml = function(usersArray, $el, useIndependentCopies) {
-      var html, lastDepId, prevLetter, u, userEl, _i, _len;
+      var html, lastDepId, prevLetter, u, _i, _len;
 
       html = [];
       lastDepId = null;
       prevLetter = '';
       for (_i = 0, _len = usersArray.length; _i < _len; _i++) {
         u = usersArray[_i];
-        userEl = u.getEl(useIndependentCopies);
-        if ((userEl != null ? userEl[0] : void 0) != null) {
-          html.push(userEl[0]);
-        }
+        html.push(u.getEl(useIndependentCopies));
         u.showLetter(prevLetter !== u.letter ? true : false);
         prevLetter = u.letter;
       }
@@ -2831,7 +2730,7 @@ var __slice = [].slice,
       return $el.html(html);
     };
 
-    List.prototype.setFilter = function(filter, reloadAnyway, notScrollTop) {
+    List.prototype.setFilter = function(filter, reloadAnyway) {
       var allDeps, dep, el, exactMatch, oldFilter, renderDep, _i, _len, _ref,
         _this = this;
 
@@ -2841,7 +2740,6 @@ var __slice = [].slice,
       oldFilter = this.filter;
       this.filter = filter;
       this.filterLang = filter.match(/^[^А-яёЁ]+$/) ? 'en' : filter.match(/^[^A-z]+$/) ? 'ru' : '';
-      this.log('set filter');
       exactMatch = false;
       this.timer();
       this.panelUsersFiltered = [];
@@ -2850,11 +2748,6 @@ var __slice = [].slice,
         var depExactMatch, el, users, _ref;
 
         el = dep.getEl(filter !== '');
-        if ((el != null ? el[0] : void 0) != null) {
-          el = el[0];
-        } else {
-          return;
-        }
         depExactMatch = false;
         _ref = dep.getUsers(filter, _this.showOffline, _this.filterLang), users = _ref[0], depExactMatch = _ref[1];
         _this.panelUsersFiltered = _this.panelUsersFiltered.concat(users);
@@ -2889,25 +2782,23 @@ var __slice = [].slice,
         el = this.exactMatchUserDep.getEl();
         this._setUsersHtml([this.filterFantomUser], this.exactMatchUserDep.getContainer());
         this.filterFantomUser.showLetter(false);
-        if ((el != null ? el[0] : void 0) != null) {
-          allDeps.unshift(el[0]);
-        }
+        allDeps.unshift(el);
       } else {
         this.filterFantomUser = false;
       }
       this.scrollContent.children().detach();
       this.scrollContent.html(allDeps);
       if (allDeps.length > 0) {
-        $(allDeps[allDeps.length - 1]).find('tr:last').addClass('g_last');
+        allDeps[allDeps.length - 1].find('tr:last').addClass('g_last');
       }
       this.initStickyHeaders();
-      if (!notScrollTop) {
-        this.userScrollerToTop();
-      }
-      setTimeout(function() {
-        return _this.setUserListHeight();
-      }, 1);
+      this.userScrollerToTop();
+      this.setUserListHeight();
       return this.timer(true);
+    };
+
+    List.prototype.afterSetFilter = function(filteredUsersArray) {
+      return this.setPanelUsersHtml(filteredUsersArray);
     };
 
     List.prototype.getUser = function(data, dontRemember) {
@@ -2925,12 +2816,12 @@ var __slice = [].slice,
       if (!data.numberFormatted) {
         data.numberFormatted = numberFormatted;
       }
-      if (!data.isIvr && !dontRemember && ((_ref = this.filterFantomUser) != null ? _ref.number : void 0) === strNumber) {
+      if (!dontRemember && ((_ref = this.filterFantomUser) != null ? _ref.number : void 0) === strNumber) {
         this.usersByNumber[strNumber] = this.filterFantomUser;
         data.isFantom = true;
         this.filterFantomUser = false;
       }
-      if (!data.isIvr && this.usersByNumber[strNumber]) {
+      if (this.usersByNumber[strNumber]) {
         if (this.usersByNumber[strNumber].isFantom) {
           this.usersByNumber[strNumber].init(data);
         }
@@ -2941,9 +2832,7 @@ var __slice = [].slice,
         numberFormatted: numberFormatted,
         name: data.name,
         isFantom: true,
-        state: ((data != null ? data.state : void 0) != null ? data.state : 1),
-        isIvr: data != null ? data.isIvr : void 0,
-        ivrName: data != null ? data.ivrName : void 0
+        state: ((data != null ? data.state : void 0) != null ? data.state : 1)
       });
       if (!dontRemember) {
         this.usersByNumber[strNumber] = fantom;
@@ -3049,8 +2938,7 @@ var __slice = [].slice,
     Popup.prototype.logGroup = 'Popup';
 
     function Popup(popupEl, oktell, ringtone) {
-      var abonentsSet,
-        _this = this;
+      var _this = this;
 
       this.el = popupEl;
       this.ringtone = ringtone;
@@ -3061,12 +2949,10 @@ var __slice = [].slice,
       this.puckupEl = this.el.find('.j_pickup');
       this.el.find('.j_abort_action').bind('click', function() {
         _this.hide();
-        _this.playRingtone(false);
         return oktell.endCall();
       });
       this.el.find('.j_answer').bind('click', function() {
         _this.hide();
-        _this.playRingtone(false);
         return oktell.answer();
       });
       this.el.find('.j_close_action').bind('click', function() {
@@ -3075,36 +2961,16 @@ var __slice = [].slice,
       this.el.find('i.o_close').bind('click', function() {
         return _this.hide();
       });
-      abonentsSet = false;
-      oktell.on('webrtcRingStart', function(name, identity) {
-        var _ref;
-
-        _this.log('webrtcRingStart, ' + identity);
-        _this.playRingtone(true);
-        _this.answerButtonVisible(true);
-        if (!abonentsSet) {
-          _this.setAbonents([
-            {
-              name: name,
-              phone: ((_ref = identity.match(/<sip:([\s\S]+?)@/)) != null ? _ref[1] : void 0) || ''
-            }
-          ]);
-        }
-        return _this.show();
-      });
       oktell.on('ringStart', function(abonents) {
-        _this.log('ringStart', abonents);
+        _this.playRingtone(true);
         _this.setAbonents(abonents);
-        abonentsSet = true;
+        _this.answerButtonVisible(oktell.webphoneIsActive());
         return _this.show();
       });
       oktell.on('ringStop', function() {
         _this.playRingtone(false);
-        _this.hide();
-        abonentsSet = false;
-        return _this.setAbonents([]);
+        return _this.hide();
       });
-      this.answerButtonVisible(false);
     }
 
     Popup.prototype.playRingtone = function(play) {
@@ -3124,7 +2990,6 @@ var __slice = [].slice,
     };
 
     Popup.prototype.hide = function() {
-      this.playRingtone(false);
       return this.el.fadeOut(200);
     };
 
@@ -3133,20 +2998,12 @@ var __slice = [].slice,
 
       this.absContainer.empty();
       return $.each(abonents, function(i, abonent) {
-        var el, name, phone, phoneFormatted, _ref, _ref1, _ref2;
+        var el, name, phone;
 
-        if (!abonent) {
-          _this.log('setAbonent: bad abonent');
-          return;
-        }
-        phoneFormatted = (_ref = abonent.phoneFormatted) != null ? typeof _ref.toString === "function" ? _ref.toString() : void 0 : void 0;
-        phone = (_ref1 = abonent.phone) != null ? typeof _ref1.toString === "function" ? _ref1.toString() : void 0 : void 0;
-        name = (_ref2 = abonent.name) != null ? typeof _ref2.toString === "function" ? _ref2.toString() : void 0 : void 0;
+        phone = abonent.phone.toString();
+        name = abonent.name.toString() || phone;
         if (name === phone) {
-          name = phoneFormatted || phone;
           phone = '';
-        } else {
-          name = abonent.name.toString();
         }
         el = _this.abonentEl.clone();
         el.find('span:first').text(name);
@@ -3293,7 +3150,6 @@ var __slice = [].slice,
     ru: {
       panel: {
         dtmf: 'донабор',
-        dtmfPanelName: 'Донабор',
         inTalk: 'В разговоре',
         onHold: 'На удержании',
         queue: 'Очередь ожидания',
@@ -3315,8 +3171,7 @@ var __slice = [].slice,
         ghostListen: 'Прослушка',
         ghostHelp: 'Помощь',
         hold: 'Удержание',
-        resume: 'Продолжить',
-        dtmf: 'Донабор'
+        resume: 'Продолжить'
       },
       callPopup: {
         title: 'Входящий вызов',
@@ -3324,15 +3179,13 @@ var __slice = [].slice,
         answer: 'Ответить',
         reject: 'Отклонить',
         undefinedNumber: 'Номер не определен',
-        goPickup: 'Поднимите трубку',
-        answer: 'Ответить'
+        goPickup: 'Поднимите трубку'
       },
       permissionsPopup: {
         header: 'Запрос на доступ к микрофону',
         text: 'Для использования веб-телефона необходимо разрешить браузеру доступ к микрофону.'
       },
       error: {
-        title: 'Ошибка',
         usingOktellClient: {
           header: 'Пользователь «%username%» использует стандартный Oktell-клиент.',
           message: 'Одновременная работа двух типов клиентских приложений невозможна.',
@@ -3350,8 +3203,7 @@ var __slice = [].slice,
     },
     en: {
       panel: {
-        dtmf: 'dtmf',
-        dtmfPanelName: 'DTMF',
+        dtfm: 'ext',
         inTalk: 'In conversation',
         onHold: 'On hold',
         queue: 'Wait queue',
@@ -3373,8 +3225,7 @@ var __slice = [].slice,
         ghostListen: 'Audition',
         ghostHelp: 'Help',
         hold: 'Hold',
-        resume: 'Resume',
-        dtmf: 'DTMF'
+        resume: 'Resume'
       },
       callPopup: {
         title: 'Incoming call',
@@ -3382,15 +3233,13 @@ var __slice = [].slice,
         answer: 'Answer',
         reject: 'Decline',
         undefinedNumber: 'Phone number is not defined',
-        goPickup: 'Pick up the phone',
-        answer: 'Answer'
+        goPickup: 'Pick up the phone'
       },
       permissionsPopup: {
         header: 'Request for access to the microphone',
         text: 'To use the web-phone you need to allow browser access to the microphone.'
       },
       error: {
-        title: 'Error',
         usingOktellClient: {
           header: 'User «%username%» uses standard Oktell client application.',
           message: 'Simultaneous work of two types of client applications is not possible.',
@@ -3408,8 +3257,7 @@ var __slice = [].slice,
     },
     cz: {
       panel: {
-        dtmf: 'dtmf',
-        dtmfPanelName: 'DTMF',
+        dtmf: 'ext',
         inTalk: 'V rozhovoru',
         onHold: 'Na hold',
         queue: 'Fronta čekaní',
@@ -3431,8 +3279,7 @@ var __slice = [].slice,
         ghostListen: 'Odposlech',
         ghostHelp: 'Nápověda',
         hold: 'Udržet',
-        resume: 'Pokračovat',
-        dtmf: 'DTMF'
+        resume: 'Pokračovat'
       },
       callPopup: {
         title: 'Příchozí hovor',
@@ -3440,15 +3287,13 @@ var __slice = [].slice,
         answer: 'Odpovědět',
         reject: 'Odmítnout',
         undefinedNumber: '',
-        goPickup: 'Zvedněte sluchátko',
-        answer: 'Odpovědět'
+        goPickup: 'Zvedněte sluchátko'
       },
       permissionsPopup: {
         header: 'Žádost o přístup k mikrofonu',
         text: 'Abyste mohli používat telefon, musíte povolit prohlížeče přístup k mikrofonu.'
       },
       error: {
-        title: 'Chyba',
         usingOktellClient: {
           header: 'Uživatel «%username%» používá standardní Oktell klientské aplikace.',
           message: 'Současnou práci dvou typů klientských aplikací není možné.',
@@ -3474,15 +3319,11 @@ var __slice = [].slice,
   popup = null;
   permissionsPopup = null;
   error = null;
-  panelEl = null;
-  contEl = null;
   actionButtonContainerClass = 'oktellPanelActionButton';
   getOptions = function() {
     return options || defaultOptions;
   };
-  isMobileDevice = navigator.userAgent.match(/(Android|webOS|iPhone|iPad|iPod|BlackBerry|Windows Phone)/i) ? true : false;
-  useSticky = !isMobileDevice;
-  useNativeScroll = isMobileDevice;
+  logStr = '';
   checkCssAnimationSupport = function() {
     var div, divStyle, suffix, testProperties, v, _i, _len;
 
@@ -3499,7 +3340,6 @@ var __slice = [].slice,
     return divStyle;
     return false;
   };
-  logStr = '';
   log = function() {
     var args, d, dd, e, fnName, i, t, val, _i, _len;
 
@@ -3544,10 +3384,10 @@ var __slice = [].slice,
     'templates/department.html': '<tr class="b_contact"><td class="b_contact_department" colspan="3">{{department}}</td></tr>',
     'templates/dep.html': '<div class="b_department"><div class="b_department_header"><div class="h_shadow_top"><span>{{department}}</span></div></div><table class="b_main_list"><tbody></tbody></table></div>',
     'templates/usersTable.html': '<table class="b_main_list m_without_department"><tbody></tbody></table>',
-    'templates/panel.html': '<div class="oktell_panel"><div class="i_panel_bookmark"><div class="i_panel_bookmark_bg"></div></div><div class="h_panel_bg"><div class="b_header"><ul class="b_list_filter"><li class="i_group"></li><li class="i_online"></li></ul></div><div class="h_padding"><div class="b_marks i_conference j_abonents"><div class="h_shadow_top"><div class="b_marks_noise"><p class="b_marks_header"><span class="b_marks_label">{{inTalk}}</span><span class="b_marks_time"></span></p><table><tbody></tbody></table></div></div></div><div class="b_marks i_extension" style="display: none"><div class="h_shadow_top"><div class="b_marks_noise"><p class="b_marks_header"><span class="b_marks_label">{{dtmfPanelName}}</span></p><div class="h_btn-group"><div class="btn-group"><button class="btn btn-small">1</button><button class="btn btn-small">2</button><button class="btn btn-small">3</button><button class="btn btn-small">4</button><button class="btn btn-small">5</button><button class="btn btn-small">6</button><button class="btn btn-small">7</button><button class="btn btn-small">8</button><button class="btn btn-small">9</button><button class="btn btn-small">0</button></div><div class="btn-group"><button class="btn btn-small">&lowast;</button><button class="btn btn-small">#</button></div></div></div></div><i class="o_close"></i></div><div class="b_marks i_flash j_hold"><div class="h_shadow_top"><div class="b_marks_noise"><p class="b_marks_header"><span class="b_marks_label">{{onHold}}</span></p><table class="j_table_favorite"><tbody></tbody></table></div></div></div><div class="b_marks i_flash j_queue"><div class="h_shadow_top"><div class="b_marks_noise"><p class="b_marks_header"><span class="b_marks_label">{{queue}}</span></p><table class="j_table_queue"><tbody></tbody></table></div></div></div><div class="b_inconversation j_phone_block"><table class="j_table_phone"><tbody></tbody></table></div><div class="b_marks i_phone"><div class="h_shadow_top"><div class="h_phone_number_input"><div class="i_phone_state_bg"></div><div class="h_input_padding"><div class="jInputClear_hover"><input class="b_phone_number_input" type="text" placeholder="{{inputPlaceholder}}"><span class="jInputClear_close">&times;</span></div></div></div></div></div><div class="b_sticky_header_container"></div><div class="h_main_list j_main_list"></div></div></div></div>',
-    'templates/callPopup.html': '<div class="oktell_panel_popup" style="display: none"><div class="m_popup_staff"><div class="m_popup_data"><header><div class="h_header_bg"><i class="o_close"></i><h2>{{title}}</h2></div></header><div class="b_content"><div class="b_abonent"><span data-bind="text: name"></span>&nbsp;<span class="g_light" data-bind="textPhone: number"></span></div></div><div class="footer"><div class="b_take_phone j_pickup"><i></i>&nbsp;<span>{{goPickup}}</span></div><button class="oktell_panel_btn m_big m_button_green j_answer" style="margin-right: 20px; float: left"><i></i>{{answer}}</button><button class="oktell_panel_btn m_big j_close_action">{{hide}}</button><button class="oktell_panel_btn m_big m_button_red j_abort_action"><i></i>{{reject}}</button></div></div></div></div>',
+    'templates/panel.html': '<div class="oktell_panel"><div class="i_panel_bookmark"><div class="i_panel_bookmark_bg"></div></div><div class="h_panel_bg"><div class="b_header"><ul class="b_list_filter"><li class="i_group"></li><li class="i_online"></li></ul></div><div class="h_padding"><div class="b_marks i_conference j_abonents"><div class="h_shadow_top"><div class="b_marks_noise"><p class="b_marks_header"><span class="b_marks_label">{{inTalk}}</span><span class="b_marks_time"></span></p><table><tbody></tbody></table></div></div></div><div class="b_marks i_extension" style="display: none"><div class="h_shadow_top"><div class="b_marks_noise"><p class="b_marks_header"><span class="b_marks_label">Донабор</span></p><div class="h_btn-group"><div class="btn-group"><button class="btn btn-small">1</button><button class="btn btn-small">2</button><button class="btn btn-small">3</button><button class="btn btn-small">4</button><button class="btn btn-small">5</button><button class="btn btn-small">6</button><button class="btn btn-small">7</button><button class="btn btn-small">8</button><button class="btn btn-small">9</button><button class="btn btn-small">0</button></div><div class="btn-group"><button class="btn btn-small">&lowast;</button><button class="btn btn-small">#</button></div></div></div></div><i class="o_close"></i></div><div class="b_marks i_flash j_hold"><div class="h_shadow_top"><div class="b_marks_noise"><p class="b_marks_header"><span class="b_marks_label">{{onHold}}</span></p><table class="j_table_favorite"><tbody></tbody></table></div></div></div><div class="b_marks i_flash j_queue"><div class="h_shadow_top"><div class="b_marks_noise"><p class="b_marks_header"><span class="b_marks_label">{{queue}}</span></p><table class="j_table_queue"><tbody></tbody></table></div></div></div><div class="b_inconversation j_phone_block"><table class="j_table_phone"><tbody></tbody></table></div><div class="b_marks i_phone"><div class="h_shadow_top"><div class="h_phone_number_input"><div class="i_phone_state_bg"></div><div class="h_input_padding"><div class="jInputClear_hover"><input class="b_phone_number_input" type="text" placeholder="{{inputPlaceholder}}"><span class="jInputClear_close">&times;</span></div></div></div></div></div><div class="h_main_list j_main_list"></div></div></div></div>',
+    'templates/callPopup.html': '<div class="oktell_panel_popup" style="display: none"><div class="m_popup_staff"><div class="m_popup_data"><header><div class="h_header_bg"><i class="o_close"></i><h2>{{title}}</h2></div></header><div class="b_content"><div class="b_abonent"><span data-bind="text: name"></span>&nbsp;<span class="g_light" data-bind="textPhone: number"></span></div></div><div class="footer"><div class="b_take_phone j_pickup"><i></i>&nbsp;<span>{{goPickup}}</span></div><button class="oktell_panel_btn m_big m_button_green j_answer" style="margin-right: 20px; float: left"><i style="background: url(\'/img/icons/action/white/call.png\') no-repeat; vertical-align: -2px"></i>Ответить</button><button class="oktell_panel_btn m_big j_close_action">{{hide}}</button><button class="oktell_panel_btn m_big m_button_red j_abort_action"><i></i>{{reject}}</button></div></div></div></div>',
     'templates/permissionsPopup.html': '<div class="oktell_panel_popup" style="display: none"><div class="m_popup_staff"><div class="m_popup_data"><header><div class="h_header_bg"><h2>{{header}}</h2></div></header><div class="b_content"><p>{{text}}</p></div></div></div></div>',
-    'templates/error.html': '<div class="b_error m_form" style="display: none"><div class="h_padding"><h4>{{title}}</h4><p class="b_error_alert"></p><p class="g_light"></p><p class="g_light"></p></div></div>'
+    'templates/error.html': '<div class="b_error m_form" style="display: none"><div class="h_padding"><h4>Ошибка</h4><p class="b_error_alert"></p><p class="g_light"></p><p class="g_light"></p></div></div>'
   };
   loadTemplate = function(path) {
     var html;
@@ -3589,20 +3429,11 @@ var __slice = [].slice,
   Department.prototype.template = departmentTemplateHtml;
   panelWasInitialized = false;
   initPanel = function(opts) {
-    var $user, $userActionButton, animOptHide, animOptShow, bookmarkAnimOptHide, bookmarkAnimOptShow, bookmarkPos, contOpt, cssAnimNow, enableMoving, errorEl, hidePanel, hideTimer, killPanelHideTimer, maxPosClose, minPosOpen, mouseOnPanel, oldBinding, pageX, panelBookmarkEl, panelHideTimer, panelMinPos, panelPos, panelStatus, permissionsPopupEl, popupEl, ringtone, showPanel, showTimer, touchMoving, useContainer, useCssAnim, _panelStatus, _ref,
+    var $user, $userActionButton, animOptHide, animOptShow, bookmarkAnimOptHide, bookmarkAnimOptShow, bookmarkPos, cssAnimNow, enableMoving, errorEl, hidePanel, hideTimer, killPanelHideTimer, maxPosClose, minPosOpen, mouseOnPanel, oldBinding, pageX, panelBookmarkEl, panelEl, panelHideTimer, panelMinPos, panelPos, panelStatus, permissionsPopupEl, popupEl, ringtone, showPanel, showTimer, touchClickedContact, touchClickedContactClear, touchClickedCss, touchMoving, useCssAnim, _panelStatus,
       _this = this;
 
     panelWasInitialized = true;
     options = $.extend({}, defaultOptions, opts || {});
-    useContainer = false;
-    contOpt = ((_ref = getOptions().container) != null ? _ref[0] : void 0) || getOptions().container;
-    contEl = null;
-    if (contOpt && (typeof HTMLElement === "object" && contOpt instanceof HTMLElement) || ((contOpt != null ? contOpt.nodeType : void 0) === 1 && typeof contOpt.nodeName === "string")) {
-      contEl = $(contOpt);
-      useContainer = true;
-    } else {
-      contEl = $('body');
-    }
     if (options.oktellVoice) {
       if (options.oktellVoice.isOktellVoice === true) {
         options.oktellVoice = options.oktellVoice;
@@ -3613,10 +3444,10 @@ var __slice = [].slice,
     if (getOptions().useNotifies && window.webkitNotifications && window.webkitNotifications.checkPermission() === 1) {
       webkitNotifications.requestPermission(function() {});
     }
-    Department.prototype.withoutDepName = List.prototype.withoutDepName = CUser.prototype.withoutDepName = 'zzzzz_without';
+    Department.prototype.withoutDepName = List.prototype.withoutDepName = 'zzzzz_without';
     langs = langs[options.lang] || langs.ru;
     CUser.prototype.template = userTemplateHtml.replace('{{button}}', actionButtonHtml);
-    panelHtml = panelHtml.replace('{{inTalk}}', langs.panel.inTalk).replace('{{dtmfPanelName}}', langs.panel.dtmfPanelName).replace('{{onHold}}', langs.panel.onHold).replace('{{queue}}', langs.panel.queue).replace('{{inputPlaceholder}}', langs.panel.inputPlaceholder);
+    panelHtml = panelHtml.replace('{{inTalk}}', langs.panel.inTalk).replace('{{onHold}}', langs.panel.onHold).replace('{{queue}}', langs.panel.queue).replace('{{inputPlaceholder}}', langs.panel.inputPlaceholder);
     List.prototype.langs = langs;
     List.prototype.departmentTemplate = departmentTemplateHtml;
     Error.prototype.langs = langs.error;
@@ -3642,7 +3473,7 @@ var __slice = [].slice,
       ringtone.loop = true;
     }
     if (!getOptions().withoutCallPopup) {
-      popupHtml = popupHtml.replace('{{title}}', langs.callPopup.title).replace('{{goPickup}}', langs.callPopup.goPickup).replace('{{answer}}', langs.callPopup.answer).replace('{{hide}}', langs.callPopup.hide).replace('{{reject}}', langs.callPopup.reject);
+      popupHtml = popupHtml.replace('{{title}}', langs.callPopup.title).replace('{{goPickup}}', langs.callPopup.goPickup).replace('{{hide}}', langs.callPopup.hide).replace('{{reject}}', langs.callPopup.reject);
       popupEl = $(popupHtml);
       $('body').append(popupEl);
       popup = new Popup(popupEl, oktell, ringtone);
@@ -3654,7 +3485,6 @@ var __slice = [].slice,
       permissionsPopup = new PermissionsPopup(permissionsPopupEl, getOptions().oktellVoice);
     }
     if (!getOptions().withoutError) {
-      errorHtml = errorHtml.replace('{{title}}', langs.error.title);
       errorEl = $(errorHtml);
       panelEl.find('.h_panel_bg:first').append(errorEl);
       error = new Error(errorEl, oktell);
@@ -3666,11 +3496,8 @@ var __slice = [].slice,
     animOptHide[panelPos] = '-281px';
     panelMinPos = -281;
     panelEl.hide();
-    if (useContainer) {
-      panelEl.addClass('contained');
-    }
-    contEl.append(panelEl);
-    list = new List(oktell, panelEl, actionListEl, afterOktellConnect, getOptions(), useContainer, useSticky, useNativeScroll, getOptions().debug);
+    $("body").append(panelEl);
+    list = new List(oktell, panelEl, actionListEl, afterOktellConnect, getOptions(), getOptions().debug);
     if (getOptions().debug) {
       window.wList = list;
       window.wPopup = popup;
@@ -3684,196 +3511,234 @@ var __slice = [].slice,
     if (getOptions().dynamic) {
       panelEl.addClass("dynamic");
     }
-    if (!useContainer) {
-      panelBookmarkEl = panelEl.find('.i_panel_bookmark');
-      bookmarkAnimOptShow = {};
-      bookmarkPos = panelPos === 'left' ? 'right' : 'left';
-      bookmarkAnimOptShow[bookmarkPos] = '0px';
-      bookmarkAnimOptHide = {};
-      bookmarkAnimOptHide[bookmarkPos] = '-40px';
-      mouseOnPanel = false;
-      panelHideTimer = false;
-      _panelStatus = 'closed';
-      panelStatus = function(st) {
-        if (st && st !== _panelStatus) {
-          _panelStatus = st;
-        }
-        return _panelStatus;
-      };
-      killPanelHideTimer = function() {
-        clearTimeout(panelHideTimer);
-        return panelHideTimer = false;
-      };
-      useCssAnim = checkCssAnimationSupport();
-      showTimer = null;
-      hideTimer = null;
-      cssAnimNow = false;
-      showPanel = function() {
-        list.beforeShow();
-        panelStatus('opening');
-        panelBookmarkEl.css(bookmarkAnimOptShow);
-        if (useCssAnim) {
-          if (!cssAnimNow) {
-            cssAnimNow = true;
-            panelEl.css('right', '');
-            clearTimeout(showTimer);
-            panelEl.removeClass('hide_t_' + panelPos).addClass('show_t_' + panelPos);
-            return showTimer = setTimeout(function() {
-              panelEl.css('right', '0px');
-              panelEl.removeClass('show_t_' + panelPos);
-              list.afterShow();
-              panelEl.addClass("g_hover");
-              panelStatus('open');
-              panelBookmarkEl.css(bookmarkAnimOptShow);
-              return cssAnimNow = false;
-            }, 200);
-          }
-        } else {
-          panelEl.stop(true, true);
-          return panelEl.animate(animOptShow, 100, "swing", function() {
+    panelBookmarkEl = panelEl.find('.i_panel_bookmark');
+    bookmarkAnimOptShow = {};
+    bookmarkPos = panelPos === 'left' ? 'right' : 'left';
+    bookmarkAnimOptShow[bookmarkPos] = '0px';
+    bookmarkAnimOptHide = {};
+    bookmarkAnimOptHide[bookmarkPos] = '-40px';
+    mouseOnPanel = false;
+    panelHideTimer = false;
+    _panelStatus = 'closed';
+    panelStatus = function(st) {
+      if (st && st !== _panelStatus) {
+        _panelStatus = st;
+      }
+      return _panelStatus;
+    };
+    killPanelHideTimer = function() {
+      clearTimeout(panelHideTimer);
+      return panelHideTimer = false;
+    };
+    useCssAnim = checkCssAnimationSupport();
+    showTimer = null;
+    hideTimer = null;
+    cssAnimNow = false;
+    showPanel = function() {
+      list.beforeShow();
+      panelStatus('opening');
+      panelBookmarkEl.css(bookmarkAnimOptShow);
+      if (useCssAnim) {
+        if (!cssAnimNow) {
+          cssAnimNow = true;
+          panelEl.css('right', '');
+          clearTimeout(showTimer);
+          panelEl.removeClass('hide_t_' + panelPos).addClass('show_t_' + panelPos);
+          return showTimer = setTimeout(function() {
+            panelEl.css('right', '0px');
+            panelEl.removeClass('show_t_' + panelPos);
             list.afterShow();
             panelEl.addClass("g_hover");
             panelStatus('open');
-            return panelBookmarkEl.css(bookmarkAnimOptShow);
-          });
+            panelBookmarkEl.css(bookmarkAnimOptShow);
+            return cssAnimNow = false;
+          }, 200);
         }
-      };
-      hidePanel = function() {
-        var _this = this;
+      } else {
+        panelEl.stop(true, true);
+        return panelEl.animate(animOptShow, 100, "swing", function() {
+          list.afterShow();
+          panelEl.addClass("g_hover");
+          panelStatus('open');
+          return panelBookmarkEl.css(bookmarkAnimOptShow);
+        });
+      }
+    };
+    hidePanel = function() {
+      var _this = this;
 
-        if (useCssAnim) {
-          if (!cssAnimNow) {
-            panelStatus('closing');
-            list.beforeHide();
-            cssAnimNow = true;
-            panelEl.css('right', '');
-            clearTimeout(hideTimer);
-            panelEl.removeClass('show_t_' + panelPos).addClass('hide_t_' + panelPos);
-            return hideTimer = setTimeout(function() {
-              panelEl.css('right', '-281px');
-              panelEl.removeClass('hide_t_' + panelPos);
-              list.afterHide();
-              panelEl.removeClass("g_hover");
-              panelBookmarkEl.css(bookmarkAnimOptHide);
-              panelStatus('closed');
-              return cssAnimNow = false;
-            }, 400);
-          }
-        } else {
+      if (useCssAnim) {
+        if (!cssAnimNow) {
           panelStatus('closing');
           list.beforeHide();
-          panelEl.stop(true, true);
-          return panelEl.animate(animOptHide, 300, "swing", function() {
-            panelEl.css({
-              panelPos: 0
-            });
+          cssAnimNow = true;
+          panelEl.css('right', '');
+          clearTimeout(hideTimer);
+          panelEl.removeClass('show_t_' + panelPos).addClass('hide_t_' + panelPos);
+          return hideTimer = setTimeout(function() {
+            panelEl.css('right', '-281px');
+            panelEl.removeClass('hide_t_' + panelPos);
             list.afterHide();
             panelEl.removeClass("g_hover");
             panelBookmarkEl.css(bookmarkAnimOptHide);
-            return panelStatus('closed');
-          });
+            panelStatus('closed');
+            return cssAnimNow = false;
+          }, 400);
         }
-      };
-      panelEl.bind("mouseenter", function() {
-        mouseOnPanel = true;
-        killPanelHideTimer();
-        if (parseInt(panelEl.css(panelPos)) < 0 && (panelStatus() === 'closed' || panelStatus() === 'closing')) {
+      } else {
+        panelStatus('closing');
+        list.beforeHide();
+        panelEl.stop(true, true);
+        return panelEl.animate(animOptHide, 300, "swing", function() {
+          panelEl.css({
+            panelPos: 0
+          });
+          list.afterHide();
+          panelEl.removeClass("g_hover");
+          panelBookmarkEl.css(bookmarkAnimOptHide);
+          return panelStatus('closed');
+        });
+      }
+    };
+    panelEl.bind("mouseenter", function() {
+      mouseOnPanel = true;
+      killPanelHideTimer();
+      if (parseInt(panelEl.css(panelPos)) < 0 && (panelStatus() === 'closed' || panelStatus() === 'closing')) {
+        showPanel();
+      }
+      return true;
+    });
+    pageX = false;
+    minPosOpen = -250;
+    maxPosClose = 30;
+    touchMoving = false;
+    enableMoving = false;
+    panelBookmarkEl.bind('touchstart', function() {
+      if (panelStatus() === 'closed') {
+        panelStatus('touchopening');
+      } else if (panelStatus() === 'open') {
+        panelStatus('touchclosing');
+      }
+      return true;
+    });
+    panelBookmarkEl.bind('touchmove', function(e) {
+      var pos, t, _ref, _ref1;
+
+      if (panelStatus() === 'touchopening' || panelStatus() === 'touchclosing') {
+        touchMoving = true;
+      }
+      if (enableMoving && touchMoving) {
+        t = e != null ? (_ref = e.originalEvent) != null ? (_ref1 = _ref.touches) != null ? _ref1[0] : void 0 : void 0 : void 0;
+        if (t) {
+          if (pageX !== false) {
+            pos = parseInt(panelEl.css(panelPos));
+            panelEl.css(panelPos, Math.max(panelMinPos, Math.min(0, pos + pageX - t.pageX)) + 'px');
+          }
+          pageX = t.pageX;
+        }
+      }
+      return true;
+    });
+    panelBookmarkEl.bind('touchend', function() {
+      var pos;
+
+      if (!touchMoving) {
+        if (panelStatus() === 'touchopening') {
           showPanel();
         }
-        return true;
-      });
-      pageX = false;
-      minPosOpen = -250;
-      maxPosClose = 30;
-      touchMoving = false;
-      enableMoving = false;
-      panelBookmarkEl.bind('touchstart', function() {
-        if (panelStatus() === 'closed') {
-          panelStatus('touchopening');
-        } else if (panelStatus() === 'open') {
-          panelStatus('touchclosing');
-        }
-        return true;
-      });
-      panelBookmarkEl.bind('touchmove', function(e) {
-        var pos, t, _ref1, _ref2;
-
-        if (panelStatus() === 'touchopening' || panelStatus() === 'touchclosing') {
-          touchMoving = true;
-        }
-        if (enableMoving && touchMoving) {
-          t = e != null ? (_ref1 = e.originalEvent) != null ? (_ref2 = _ref1.touches) != null ? _ref2[0] : void 0 : void 0 : void 0;
-          if (t) {
-            if (pageX !== false) {
-              pos = parseInt(panelEl.css(panelPos));
-              panelEl.css(panelPos, Math.max(panelMinPos, Math.min(0, pos + pageX - t.pageX)) + 'px');
-            }
-            pageX = t.pageX;
-          }
-        }
-        return true;
-      });
-      panelBookmarkEl.bind('touchend', function() {
-        var pos;
-
-        if (!touchMoving) {
-          if (panelStatus() === 'touchopening') {
+      } else {
+        touchMoving = false;
+        pos = parseInt(panelEl.css(panelPos));
+        if (panelStatus() === 'touchopening') {
+          if (pos > minPosOpen) {
             showPanel();
+          } else {
+            hidePanel();
           }
-        } else {
-          touchMoving = false;
-          pos = parseInt(panelEl.css(panelPos));
-          if (panelStatus() === 'touchopening') {
-            if (pos > minPosOpen) {
-              showPanel();
-            } else {
-              hidePanel();
-            }
-          } else if (panelStatus() === 'touchclosing') {
-            if (pos < maxPosClose) {
-              hidePanel();
-            } else {
-              openPanel();
-            }
+        } else if (panelStatus() === 'touchclosing') {
+          if (pos < maxPosClose) {
+            hidePanel();
+          } else {
+            openPanel();
           }
         }
-        return true;
-      });
-      panelBookmarkEl.bind('touchcancel', function() {
-        return true;
-      });
-      $(window).bind('touchcancel', function(e) {
-        return true;
-      });
-      $(window).bind('touchend', function(e) {
-        var parents, parentsArr, target;
+      }
+      return true;
+    });
+    panelBookmarkEl.bind('touchcancel', function() {
+      return true;
+    });
+    touchClickedContact = null;
+    touchClickedCss = 'm_touch_clicked';
+    touchClickedContactClear = function() {
+      if (touchClickedContact != null) {
+        touchClickedContact.removeClass(touchClickedCss);
+      }
+      return touchClickedContact = null;
+    };
+    $(window).bind('touchcancel', function(e) {
+      return true;
+    });
+    $(window).bind('touchend', function(e) {
+      var parents, parentsArr, target;
 
-        target = $(e.target);
-        parents = target.parents();
-        parentsArr = parents.toArray();
-        if (parentsArr.indexOf(panelEl[0]) === -1) {
-          hidePanel();
+      target = $(e.target);
+      parents = target.parents();
+      parentsArr = parents.toArray();
+      if (parentsArr.indexOf(panelEl[0]) === -1) {
+        hidePanel();
+      }
+      if (!target.is('.oktell_button_action .drop_down') && parents.filter('.oktell_button_action .drop_down').size() === 0) {
+        if (list != null) {
+          if (typeof list.hideActionListDropdown === "function") {
+            list.hideActionListDropdown();
+          }
         }
-        return true;
-      });
-      panelEl.bind("mouseleave", function() {
-        mouseOnPanel = false;
-        return true;
-      });
-      $('html').bind('mouseleave', function(e) {
-        killPanelHideTimer();
-        return true;
-      });
-      return $('html').bind('mousemove', function(e) {
-        if (panelStatus() === 'open' && !mouseOnPanel && panelHideTimer === false && !list.dropdownOpenedOnPanel) {
-          panelHideTimer = setTimeout(function() {
-            return hidePanel();
-          }, 100);
-          1;
+      }
+      return true;
+    });
+    panelEl.bind('touchend', function(e) {
+      var contact, parents, target;
+
+      target = $(e.target);
+      parents = target.parents();
+      if (!target.is('.oktell_button_action .drop_down') && parents.filter('.oktell_button_action .drop_down').size() === 0) {
+        if (list != null) {
+          if (typeof list.hideActionListDropdown === "function") {
+            list.hideActionListDropdown();
+          }
         }
-        return true;
-      });
-    }
+      }
+      contact = target.is('.oktell_panel .b_contact') ? target : parents.filter('.oktell_panel .b_contact');
+      if (contact.size() > 0) {
+        if (!contact.hasClass(touchClickedCss)) {
+          touchClickedContactClear();
+          touchClickedContact = contact;
+          contact.addClass(touchClickedCss);
+          return false;
+        }
+      } else {
+        touchClickedContactClear();
+      }
+      return true;
+    });
+    panelEl.bind("mouseleave", function() {
+      mouseOnPanel = false;
+      return true;
+    });
+    $('html').bind('mouseleave', function(e) {
+      killPanelHideTimer();
+      return true;
+    });
+    return $('html').bind('mousemove', function(e) {
+      if (panelStatus() === 'open' && !mouseOnPanel && panelHideTimer === false && !list.dropdownOpenedOnPanel) {
+        panelHideTimer = setTimeout(function() {
+          return hidePanel();
+        }, 100);
+        1;
+      }
+      return true;
+    });
   };
   afterOktellConnect = function() {
     return oktellConnected = true;
@@ -3910,17 +3775,6 @@ var __slice = [].slice,
     return $(this).each(function() {
       return addActionButtonToEl($(this));
     });
-  };
-  $.fn.oktellPanel = function() {
-    var args;
-
-    args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
-    if (!panelWasInitialized) {
-      args.container = $(this);
-      return $.oktellPanel.apply(window, args);
-    } else if ($(this)[0] === (panelEl != null ? panelEl[0] : void 0)) {
-      return $.oktellPanel.apply(window, args);
-    }
   };
   $.oktellPanel.show = function() {
     return list.showPanel();

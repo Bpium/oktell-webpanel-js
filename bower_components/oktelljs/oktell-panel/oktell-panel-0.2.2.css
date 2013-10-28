@@ -1,3 +1,7 @@
+/* Oktell-panel.js 0.2.2.1013 http://js.oktell.ru/webpanel */
+
+/* Normalize panel
+---------------------------------------------------------------*/
 .oktell_panel p,
 .oktell_panel ul,
 .oktell_panel li,
@@ -36,6 +40,8 @@
 .oktell_panel ul {
   list-style: none;
 }
+/* Main styles
+---------------------------------------------------------------*/
 .oktell_panel {
   width: 280px;
   top: 0;
@@ -48,14 +54,6 @@
   z-index: 202;
   line-height: normal;
   font-size: 13px;
-  -webkit-overflow-scrolling: touch;
-}
-.oktell_panel.contained {
-  box-sizing: border-box;
-  width: 100%;
-  top: none;
-  bottom: none;
-  position: static;
 }
 .oktell_panel * {
   font-family: Tahoma, Verdana, Arial, sans-serif;
@@ -71,11 +69,6 @@
 .oktell_panel.right.dynamic {
   right: -281px;
 }
-.oktell_panel.right.contained,
-.oktell_panel.left.contained {
-  right: auto;
-  left: auto;
-}
 .oktell_panel.left.dynamic {
   left: -281px;
 }
@@ -83,9 +76,6 @@
   background: transparent !important;
   width: 100%;
   height: 100%;
-}
-.oktell_panel.contained .h_panel_bg {
-  position: relative;
 }
 .oktell_panel .h_panel_bg .b_header {
   height: 18px;
@@ -155,9 +145,6 @@
   right: -40px;
   border-left: 0;
 }
-.oktell_panel.contained .i_panel_bookmark {
-  display: none;
-}
 .oktell_panel .i_panel_bookmark_bg {
   background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA0AAAASCAYAAAH3bGSkAAAACXBIWXMAAC4jAAAuIwF4pT92AAAACXRFWHRDb21tZW50AACJKo0GAAAA60lEQVR4nGP4//8/AwgzoDBWrVx5B0RIgkWAjP+oaoAijDBRZE2icKVAhjey8v/IHGt0ff+BeCXceCDnL4hwg8p8hklg03YCqySSggysklAFm6CKQFgaJliFYSRQ8B9UlTC6xH2oRAG6hBayt7E53QWbhA26LmTnvoLq/IvNLzB/vEOXkIBKzIMJ1CD5pxfdhdg8b4tkPAw34NUEtakV2V1AzEtQE1TjLqimT6CkRpQmqMbdsHSBTyOGAFDxcqjGr0AcC8QiQMyMVxNUYxSWwAHhGJyaoBr5gfgCFo0+eOMDqlkZiJOAWAkmBgA2ap5oLJI8FAAAAABJRU5ErkJggg==");
   background-position: 6px center;
@@ -194,16 +181,8 @@
 .oktell_panel.webphone.talking:not(.dtmf):not(.conference) .i_conference .b_contact td.b_contact_title span.o_dtmf {
   display: inline !important;
 }
-.oktell_panel .b_sticky_header_container {
-  position: relative;
-}
-.oktell_panel .b_sticky_header {
-  position: absolute;
-  top: 0;
-  right: 0;
-  left: 0;
-  z-index: 1;
-}
+/* Marks
+---------------------------------------------------------------*/
 .oktell_panel .b_marks {
   width: 100%;
 }
@@ -312,6 +291,8 @@
 .oktell_panel .b_department_header.g_first {
   border-top: none;
 }
+/* Phone number input fields
+---------------------------------------------------------------*/
 .oktell_panel .h_input_padding {
   background: #fff;
   -webkit-border-radius: 3px;
@@ -373,7 +354,7 @@
   line-height: 22px;
   height: 22px !important;
 }
-.oktell_panel .h_phone_number_input .h_input_padding {
+.oktell_panel .h_phone_number_input  .h_input_padding {
   padding-top: 0;
   padding-bottom: 0;
   height: 22px;
@@ -413,6 +394,8 @@
   height: 16px;
   display: inline-block;
 }
+/* Buttons
+---------------------------------------------------------------*/
 .oktell_panel .btn {
   display: inline-block;
   padding: 4px 10px 4px;
@@ -432,14 +415,17 @@
   -moz-box-shadow: inset 0 1px 0 rgba(255,255,255,0.2), 0 1px 2px rgba(0,0,0,0.05);
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.2), 0 1px 2px rgba(0,0,0,0.05);
   cursor: pointer;
-/**margin-left: .3em*/
+  *margin-left: 0.3em;
   text-decoration: none;
+}
+.oktell_panel .btn:first-child {
+  *margin-left: 0;
 }
 .oktell_panel .btn:hover {
   color: #333;
   text-decoration: none;
   background-color: #e6e6e6;
-  background-position: -15px;
+  background-position: 0 -15px;
   -webkit-transition: background-position 0.1s linear;
   -moz-transition: background-position 0.1s linear;
   -ms-transition: background-position 0.1s linear;
@@ -487,6 +473,8 @@
 .oktell_panel .btn.m_big .icon {
   margin-top: 1px;
 }
+/* Popup phone input panel
+---------------------------------------------------------------*/
 .oktell_panel .b_phone_keypad {
   margin: 24px 0 10px;
   box-sizing: border-box;
@@ -563,6 +551,8 @@
 .oktell_panel .b_phone_keypad .b_phone_panel li button.m_big:active {
   border: none;
 }
+/* Resolution styles
+---------------------------------------------------------------*/
 @media screen and (min-width: 1200px) {
   .oktell_panel.right.dynamic {
     right: 0 !important;
@@ -573,12 +563,9 @@
   .oktell_panel.dynamic .i_panel_bookmark {
     visibility: hidden;
   }
-  .oktell_panel.right.dynamic.contained,
-  .oktell_panel.left.dynamic.contained {
-    right: auto;
-    left: auto;
-  }
 }
+/* Clear input plugin. It blocks create in javascript.
+---------------------------------------------------------------*/
 .oktell_panel .jInputClear_hover {
   width: 100% !important;
   height: 22px;
@@ -593,6 +580,8 @@
   cursor: pointer;
   font-size: 1.1em;
 }
+/* Contact lists
+---------------------------------------------------------------*/
 .oktell_panel table {
   width: 100%;
 }
@@ -723,6 +712,8 @@
 .oktell_panel .b_main_list .b_contact.m_busy .b_contact_title * {
   color: #bd3b1b;
 }
+/* Action bar
+---------------------------------------------------------------*/
 .oktell_button_action {
   border: 1px solid #d8dce0;
   -webkit-border-radius: 3px;
@@ -893,6 +884,8 @@
   background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAAK/INwWK6QAAABl0RVh0U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAACbSURBVHjaYvz//z/Dyz3yDCQAfSA2AOIH4i4PD7IQqRiGHZDkGoAYqwH+QFyAphgnwGaAARbNB4D4AhSD5BLwGQADC4B4AhBfRBNXQOYw4THgARbNGICJgUIw8AawkKA2Hhr6CuQYEA+NFbwuwGoDtqjDZgBOG6DgAi4xFkI2QMFGaAoNQEpkD5ENuECErRexJSwWQjYQAgABBgCwZyD2wRq2swAAAABJRU5ErkJggg==");
   background-repeat: no-repeat;
 }
+/* Buttons gradient style
+---------------------------------------------------------------*/
 .oktell_button_action li {
   background-repeat: repeat-x;
 }
@@ -986,6 +979,8 @@
   box-shadow: inset 0 2px 4px rgba(0,0,0,0.15), 0 1px 2px rgba(0,0,0,0.05);
   background: #e6e6e6;
 }
+/* Buttons icons style
+---------------------------------------------------------------*/
 .oktell_button_action li.g_first i {
   background-position: 0 3px;
   background-repeat: no-repeat;
@@ -1036,7 +1031,7 @@
 .oktell_button_action.m_button_action_play .g_first:hover {
   text-decoration: none;
   background-color: #e6e6e6;
-  background-position: -15px;
+  background-position: 0 -15px;
   -webkit-transition: background-position 0.1s linear;
   -moz-transition: background-position 0.1s linear;
   -ms-transition: background-position 0.1s linear;
@@ -1075,6 +1070,8 @@
 .oktell_button_action.m_button_action_message img {
   margin-top: 1px;
 }
+/* Popup
+---------------------------------------------------------------*/
 .oktell_panel_popup {
   width: 100%;
   height: 100%;
@@ -1171,6 +1168,8 @@
   margin-top: 1px;
   margin-right: 4px;
 }
+/* Buttons
+---------------------------------------------------------------*/
 .oktell_panel_btn {
   display: inline-block;
   padding: 4px 10px 4px;
@@ -1195,16 +1194,17 @@
   -moz-box-shadow: inset 0 1px 0 rgba(255,255,255,0.2), 0 1px 2px rgba(0,0,0,0.05);
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.2), 0 1px 2px rgba(0,0,0,0.05);
   cursor: pointer;
-/**margin-left: .3em*/
+  *margin-left: 0.3em;
   text-decoration: none;
-/*&:first-child*/
-/**margin-left: 0*/
+}
+.oktell_panel_btn:first-child {
+  *margin-left: 0;
 }
 .oktell_panel_btn:hover {
-  color: #333332;
+  color: #333;
   text-decoration: none;
   background-color: #e6e6e6;
-  background-position: -15px;
+  background-position: 0 -15px;
   -webkit-transition: background-position 0.1s linear;
   -moz-transition: background-position 0.1s linear;
   -ms-transition: background-position 0.1s linear;
@@ -1247,7 +1247,7 @@
 .oktell_panel_btn.m_button_red:hover,
 .oktell_panel_btn.m_button_green,
 .oktell_panel_btn.m_button_green:hover {
-  text-shadow: -1px 0 rgba(0,0,0,0.25);
+  text-shadow: 0 -1px 0 rgba(0,0,0,0.25);
   color: #fff;
 }
 .oktell_panel_btn.m_button_green.active,
@@ -1260,7 +1260,7 @@
 .oktell_panel_btn.m_button_red.disabled,
 .oktell_panel_btn.m_button_red[disabled] {
   background-color: #9a2828;
-  background-position: -15px;
+  background-position: 0 -15px;
 }
 .oktell_panel_btn.m_button_red:active,
 .oktell_panel_btn.m_button_red.active {
@@ -1270,7 +1270,6 @@
 .oktell_panel_btn.m_button_green i {
   background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAAK/INwWK6QAAABl0RVh0U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAADBSURBVHjaYvzy6hUDCcASiX0cRLAQ0MAHxGFAHA7E2mhyV4E4mAWPxlQo5sOhBmRgMTYDtIB4PhDLEuElbSYsmtehaf4ExLOhNDo4zoJFM7KTVwJxPVQziN2EFIDHQDQjNBZAmnaj2VwAxKsI+QHmhVQ0zb3EaIYZAAtxGNgBNYCBWAM80Px9jJSUxYSWuhigASVDigHY4tuDFAOwgR2kGPAYTQwUBk9IMaAemjFgYDYpgciIlJ0toa55QooBAAEGANK7J9iGo9t7AAAAAElFTkSuQmCC");
   background-repeat: no-repeat;
-  vertical-align: -2px;
 }
 .oktell_panel_btn.disabled,
 .oktell_panel_btn[disabled] {
@@ -1292,8 +1291,6 @@
   background: -ms-linear-gradient(top, #94bf58 1%, #94bf58 23%, #68a33c 52%, #68a33c 78%);
   background: linear-gradient(to bottom, #94bf58 1%, #94bf58 23%, #68a33c 52%, #68a33c 78%);
   border-color: rgba(0,0,0,0.1) rgba(0,0,0,0.1) rgba(0,0,0,0.2);
-  margin-right: 20px;
-  float: left;
 }
 .oktell_panel_btn.m_button_green.disabled,
 .oktell_panel_btn.m_button_green[disabled] {
@@ -1316,6 +1313,8 @@
   -moz-border-radius: 5px;
   border-radius: 5px;
 }
+/* Forms error blocks
+---------------------------------------------------------------*/
 .oktell_panel .m_form {
   position: absolute;
   top: 0;
@@ -1348,14 +1347,15 @@
 .oktell_panel .btn-group {
   position: relative;
   display: inline-block;
-/**display: inline*/
-/**zoom: 1*/
+  *display: inline;
+  *zoom: 1;
   font-size: 0;
   vertical-align: middle;
   white-space: nowrap;
-/**margin-left: .3em*/
-/*&:first-child*/
-/**margin-left: 0*/
+  *margin-left: 0.3em;
+}
+.oktell_panel .btn-group:first-child {
+  *margin-left: 0;
 }
 .oktell_panel .btn-group + .btn-group {
   margin-left: 5px;
@@ -1420,4 +1420,172 @@
 .oktell_panel .btn-group > .btn:active,
 .oktell_panel .btn-group > .btn.active {
   z-index: 2;
+}
+
+.oktell_panel.show_right {
+    right: 0px !important;
+
+    -webkit-transition: all .1s ease-out;
+    -moz-transition: all .1s ease-out;
+    -o-transition: all .1s ease-out;
+    -ms-transition: all .1s ease-out;
+    transition: all .1s ease-out;
+}
+.oktell_panel.hide_right {
+    right: -281px !important;
+
+    -webkit-transition: all .3s ease-out;
+    -moz-transition: all .3s ease-out;
+    -o-transition: all .3s ease-out;
+    -ms-transition: all .3s ease-out;
+    transition: all .3s ease-out;
+}
+.oktell_panel.show_t_right {
+    -webkit-transform-origin: 0px 0px;
+    transform-origin: 0px 0px;
+    -webkit-transform: translate(-281px,0px);
+    -moz-transform: translate(-281px,0px);
+    -o-transform: translate(-281px,0px);
+    -ms-transform: translate(-281px,0px);
+    transform: translate(-281px,0px);
+
+    -webkit-transition: all .1s ease-out;
+    -moz-transition: all .1s ease-out;
+    -o-transition: all .1s ease-out;
+    -ms-transition: all .1s ease-out;
+    transition: all .1s ease-out;
+}
+.oktell_panel.hide_t_right {
+    -webkit-transform-origin: 0px 0px;
+    transform-origin: 0px 0px;
+    -webkit-transform: translate(0px,0px);
+    -moz-transform: translate(0px,0px);
+    -o-transform: translate(0px,0px);
+    -ms-transform: translate(0px,0px);
+    transform: translate(0px,0px);
+
+    -webkit-transition: all .3s ease-out;
+    -moz-transition: all .3s ease-out;
+    -o-transition: all .3s ease-out;
+    -ms-transition: all .3s ease-out;
+    transition: all .3s ease-out;
+}
+.oktell_panel.show_left {
+    /*-webkit-transform-origin: 0px 0px;*/
+    /*transform-origin: 0px 0px;*/
+    /*-webkit-transform: translate(-281px,0px);*/
+    /*-moz-transform: translate(-281px,0px);*/
+    /*-o-transform: translate(-281px,0px);*/
+    /*-ms-transform: translate(-281px,0px);*/
+    /*transform: translate(-281px,0px);*/
+    left: 0px !important;
+
+    -webkit-transition: all .1s ease-out;
+    -moz-transition: all .1s ease-out;
+    -o-transition: all .1s ease-out;
+    -ms-transition: all .1s ease-out;
+    transition: all .1s ease-out;
+}
+.oktell_panel.hide_left {
+    /*-webkit-transform-origin: 0px 0px;*/
+    /*transform-origin: 0px 0px;*/
+    /*-webkit-transform: translate(0px,0px);*/
+    /*-moz-transform: translate(0px,0px);*/
+    /*-o-transform: translate(0px,0px);*/
+    /*-ms-transform: translate(0px,0px);*/
+    /*transform: translate(0px,0px);*/
+    left: -281px !important;
+
+    -webkit-transition: all .3s ease-out;
+    -moz-transition: all .3s ease-out;
+    -o-transition: all .3s ease-out;
+    -ms-transition: all .3s ease-out;
+    transition: all .3s ease-out;
+}
+
+.oktell_panel .m_form.b_error {
+    z-index: 4;
+}
+
+.oktell_panel .selected_text {
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+/*
+ * CSS Styles that are needed by jScrollPane for it to operate correctly.
+ *
+ * Include this stylesheet in your site or copy and paste the styles below into your stylesheet - jScrollPane
+ * may not operate correctly without them.
+ */
+
+.oktell_panel .jspContainer
+{
+	overflow: hidden;
+	position: relative;
+}
+
+.oktell_panel .jspPane
+{
+	position: absolute;
+}
+
+.oktell_panel .jspVerticalBar
+{
+	position: absolute;
+	top: 0;
+	right: 0;
+	width: 13px;
+	height: 100%;
+	background: transparent;
+    z-index: 3;
+}
+
+.oktell_panel .jspVerticalBar *
+{
+	margin: 0;
+	padding: 0;
+}
+
+.oktell_panel .jspCap
+{
+	display: none;
+}
+
+.oktell_panel .jspTrack
+{
+	background: transparent;
+	position: relative;
+}
+
+.oktell_panel .jspDrag
+{
+	background: transparent;
+	position: relative;
+    top: 0;
+	left: 0;
+    cursor: pointer;
+}
+
+.oktell_panel .jspDragInner {
+    position: relative;
+    border-radius: 3px;
+    background: black;
+    opacity: 0.4;
+    width: 5px;
+    margin: 0 auto;
+    height: 100%;
+}
+
+.oktell_panel .jspCorner
+{
+	background: #eeeef4;
+	float: left;
+	height: 100%;
+}
+
+/* Yuk! CSS Hack for IE6 3 pixel bug :( */
+* html .oktell_panel .jspCorner
+{
+	margin: 0 -3px 0 0;
 }

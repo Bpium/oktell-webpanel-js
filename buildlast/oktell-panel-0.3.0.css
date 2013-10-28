@@ -1,3 +1,5 @@
+/* Oktell-panel.js 0.3.0.1001 http://js.oktell.ru/webpanel */
+
 .oktell_panel p,
 .oktell_panel ul,
 .oktell_panel li,
@@ -1420,4 +1422,172 @@
 .oktell_panel .btn-group > .btn:active,
 .oktell_panel .btn-group > .btn.active {
   z-index: 2;
+}
+
+.oktell_panel.show_right {
+    right: 0px !important;
+
+    -webkit-transition: all .1s ease-out;
+    -moz-transition: all .1s ease-out;
+    -o-transition: all .1s ease-out;
+    -ms-transition: all .1s ease-out;
+    transition: all .1s ease-out;
+}
+.oktell_panel.hide_right {
+    right: -281px !important;
+
+    -webkit-transition: all .3s ease-out;
+    -moz-transition: all .3s ease-out;
+    -o-transition: all .3s ease-out;
+    -ms-transition: all .3s ease-out;
+    transition: all .3s ease-out;
+}
+.oktell_panel.show_t_right {
+    -webkit-transform-origin: 0px 0px;
+    transform-origin: 0px 0px;
+    -webkit-transform: translate(-281px,0px);
+    -moz-transform: translate(-281px,0px);
+    -o-transform: translate(-281px,0px);
+    -ms-transform: translate(-281px,0px);
+    transform: translate(-281px,0px);
+
+    -webkit-transition: all .1s ease-out;
+    -moz-transition: all .1s ease-out;
+    -o-transition: all .1s ease-out;
+    -ms-transition: all .1s ease-out;
+    transition: all .1s ease-out;
+}
+.oktell_panel.hide_t_right {
+    -webkit-transform-origin: 0px 0px;
+    transform-origin: 0px 0px;
+    -webkit-transform: translate(0px,0px);
+    -moz-transform: translate(0px,0px);
+    -o-transform: translate(0px,0px);
+    -ms-transform: translate(0px,0px);
+    transform: translate(0px,0px);
+
+    -webkit-transition: all .3s ease-out;
+    -moz-transition: all .3s ease-out;
+    -o-transition: all .3s ease-out;
+    -ms-transition: all .3s ease-out;
+    transition: all .3s ease-out;
+}
+.oktell_panel.show_left {
+    /*-webkit-transform-origin: 0px 0px;*/
+    /*transform-origin: 0px 0px;*/
+    /*-webkit-transform: translate(-281px,0px);*/
+    /*-moz-transform: translate(-281px,0px);*/
+    /*-o-transform: translate(-281px,0px);*/
+    /*-ms-transform: translate(-281px,0px);*/
+    /*transform: translate(-281px,0px);*/
+    left: 0px !important;
+
+    -webkit-transition: all .1s ease-out;
+    -moz-transition: all .1s ease-out;
+    -o-transition: all .1s ease-out;
+    -ms-transition: all .1s ease-out;
+    transition: all .1s ease-out;
+}
+.oktell_panel.hide_left {
+    /*-webkit-transform-origin: 0px 0px;*/
+    /*transform-origin: 0px 0px;*/
+    /*-webkit-transform: translate(0px,0px);*/
+    /*-moz-transform: translate(0px,0px);*/
+    /*-o-transform: translate(0px,0px);*/
+    /*-ms-transform: translate(0px,0px);*/
+    /*transform: translate(0px,0px);*/
+    left: -281px !important;
+
+    -webkit-transition: all .3s ease-out;
+    -moz-transition: all .3s ease-out;
+    -o-transition: all .3s ease-out;
+    -ms-transition: all .3s ease-out;
+    transition: all .3s ease-out;
+}
+
+.oktell_panel .m_form.b_error {
+    z-index: 4;
+}
+
+.oktell_panel .selected_text {
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+/*
+ * CSS Styles that are needed by jScrollPane for it to operate correctly.
+ *
+ * Include this stylesheet in your site or copy and paste the styles below into your stylesheet - jScrollPane
+ * may not operate correctly without them.
+ */
+
+.oktell_panel .jspContainer
+{
+	overflow: hidden;
+	position: relative;
+}
+
+.oktell_panel .jspPane
+{
+	position: absolute;
+}
+
+.oktell_panel .jspVerticalBar
+{
+	position: absolute;
+	top: 0;
+	right: 0;
+	width: 13px;
+	height: 100%;
+	background: transparent;
+    z-index: 3;
+}
+
+.oktell_panel .jspVerticalBar *
+{
+	margin: 0;
+	padding: 0;
+}
+
+.oktell_panel .jspCap
+{
+	display: none;
+}
+
+.oktell_panel .jspTrack
+{
+	background: transparent;
+	position: relative;
+}
+
+.oktell_panel .jspDrag
+{
+	background: transparent;
+	position: relative;
+    top: 0;
+	left: 0;
+    cursor: pointer;
+}
+
+.oktell_panel .jspDragInner {
+    position: relative;
+    border-radius: 3px;
+    background: black;
+    opacity: 0.4;
+    width: 5px;
+    margin: 0 auto;
+    height: 100%;
+}
+
+.oktell_panel .jspCorner
+{
+	background: #eeeef4;
+	float: left;
+	height: 100%;
+}
+
+/* Yuk! CSS Hack for IE6 3 pixel bug :( */
+* html .oktell_panel .jspCorner
+{
+	margin: 0 -3px 0 0;
 }
