@@ -182,6 +182,10 @@ do ($)->
 		else
 			contEl = $('body')
 
+		if useContainer
+			useSticky = false
+			useNativeScroll = true
+
 		if options.oktellVoice
 			if options.oktellVoice.isOktellVoice is true
 				options.oktellVoice = options.oktellVoice
