@@ -1,6 +1,6 @@
 {
   "name": "oktell-panel",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "authors": [
     "airato <airato.a@gmail.com>"
   ],
@@ -22,6 +22,7 @@
   ],
   "dependencies": {
     "oktelljs": "https://git.oktell.ru/web/oktelljs.git#~1.6",
-    "oktell-voice": "https://git.oktell.ru/web/oktell-voice.git#~0.2"
+    "oktell-voice": "https://git.oktell.ru/web/oktell-voice.git#~0.2",
+    "jquery": "~1.7"
   }
 }
