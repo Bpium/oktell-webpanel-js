@@ -12,7 +12,8 @@
 
 	<!--<script type="text/javascript" src="jslib/vendor/jquery-1.9.1.js"></script>-->
 	<script type="text/javascript" src='bower_components/jquery/jquery.js'></script>
-	<script type="text/javascript" src='bower_components/oktelljs/build/oktell.js'></script>
+	<!--<script type="text/javascript" src='bower_components/oktelljs/build/oktell.js'></script>-->
+	<script type="text/javascript" src='//cdn.airato.lan/oktelljs/oktell.js'></script>
 	<script type="text/javascript" src="bower_components/oktell-voice/build/oktell-voice.js"></script>
 	<script type="text/javascript" src="js/jquery.mousewheel.js"></script>
 	<script type="text/javascript" src="js/mwheelIntent.js"></script>
@@ -61,6 +62,23 @@
 				stateEl.text('Ошибка')
 			});
 
+			var phoneEvents = ['callStart','callStop','ringStart','ringStop','backRingStart','backRingStop','talkStart','talkStop'];
+
+			oktell.on('holdAbonentEnter', function(i){ console.log('==== holdAbonentEnter ' + i.phone ); });
+			oktell.on('holdAbonentLeave', function(i){ console.log('==== holdAbonentLeave ' + i.phone ); });
+			oktell.on('holdStateChange', function(i){ console.log('**** holdStateChange hasHold ' + i.hasHold + ', abonent ' + (i.abonent && i.abonent.phone) ); });
+			oktell.on('stateChange', function(n,o){ console.log('++++ stateChange to ' + n + ' from ' + o); });
+			oktell.on('readyStart', function(d){ console.log('---- readyStart ' + (d && d[0] && d[0].phone)); });
+			oktell.on('readyStop', function(d){	console.log('---- readyStop ' + (d && d[0] && d[0].phone)); });
+			oktell.on('callStart', function(d){	console.log('---- callStart ' + (d && d[0] && d[0].phone)); });
+			oktell.on('callStop', function(d){	console.log('---- callStop ' + (d && d[0] && d[0].phone)); });
+			oktell.on('ringStart', function(d){	console.log('---- ringStart ' + (d && d[0] && d[0].phone)); });
+			oktell.on('ringStop', function(d){	console.log('---- ringStop ' + (d && d[0] && d[0].phone)); });
+			oktell.on('backRingStart', function(d){	console.log('---- backRingStart ' + (d && d[0] && d[0].phone)); });
+			oktell.on('backRingStop', function(d){	console.log('---- backRingStop ' + (d && d[0] && d[0].phone)); });
+			oktell.on('talkStart', function(d){	console.log('---- talkStart ' + (d && d[0] && d[0].phone)); });
+			oktell.on('talkStop', function(d){	console.log('---- talkStop ' + (d && d[0] && d[0].phone)); });
+
 			var statesLogel = $('#webstate')
 			oktell.on('statusChange', function(newS, oldS){
 				var d = new Date();
@@ -90,7 +108,7 @@
 						//url: ['192.168.0.61'], login: 'a4', password: 'a4',
 						//url: ['192.168.0.12'], login: 'leader', password: '123', // звонить на 183
 						url: server, login: login, password: pass,
-						debugMode: true,
+						debugMode: false,
 						openTimeout: 5000,
 						oktellVoice: useWebRTC,
 						webSocketSwfLocation: '/bower_components/oktelljs/WebSocketMain.swf',

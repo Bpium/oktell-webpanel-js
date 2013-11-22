@@ -441,6 +441,7 @@ List = (function() {
         }
       });
       _this.departments.push(otherDep);
+      _this.departmentsById[otherDep.id] = otherDep;
       oktell.offNativeEvent('pbxnumberstatechanged', _this.onPbxNumberStateChange);
       oktell.onNativeEvent('pbxnumberstatechanged', _this.onPbxNumberStateChange);
       setTimeout(function() {

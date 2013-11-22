@@ -376,6 +376,7 @@ class List
 				else 0
 
 			@departments.push otherDep
+			@departmentsById[otherDep.id] = otherDep
 
 			#@sortPanelUsers @panelUsers
 
