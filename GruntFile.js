@@ -175,7 +175,7 @@ module.exports = function(grunt) {
     if (config.replace) {
       config.replace = config.replace.replace('version', version);
     }
-    config.comment = config.comment.replace('version', version + '.' + build);
+    config.comment = config.comment.replace('version', version);
     for (_i = 0, _len = files.length; _i < _len; _i++) {
       file = files[_i];
       console.log(file);

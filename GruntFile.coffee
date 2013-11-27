@@ -113,7 +113,7 @@ module.exports = (grunt) ->
 		build++
 		if config.replace
 			config.replace = config.replace.replace('version', version)
-		config.comment = config.comment.replace('version', version + '.' + build)
+		config.comment = config.comment.replace('version', version ) # + '.' + build)
 		for file in files
 			console.log file
 			pos = file.lastIndexOf '/'
