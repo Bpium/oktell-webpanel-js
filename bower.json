@@ -23,6 +23,9 @@
   "dependencies": {
     "oktelljs": "https://git.oktell.ru/web/oktelljs.git#~1.6",
     "oktell-voice": "https://git.oktell.ru/web/oktell-voice.git#~0.2",
-    "jquery": "~1.7"
+    "jquery": "~1"
+  },
+  "devDependencies": {
+	  "jquery": "~1.7"
   }
 }
