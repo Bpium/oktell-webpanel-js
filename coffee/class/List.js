@@ -973,10 +973,10 @@ List = (function() {
   };
 
   List.prototype.syncAbonentsAndUserlist = function(abonents, userlist) {
-    var absByNumber, uNumber, user, _ref, _results,
+    var absByNumber, uNumber, user, _ref, _ref1, _results,
       _this = this;
     absByNumber = {};
-    if ((abonents != null ? abonents.length : void 0) === 0 || (abonents.length === 1 && (abonents != null ? (_ref = abonents[0]) != null ? _ref.isIvr : void 0 : void 0))) {
+    if ((abonents != null ? abonents.length : void 0) === 0 || (abonents.length === 1 && ((_ref = abonents[0]) != null ? _ref.isIvr : void 0) && !((_ref1 = abonents[0]) != null ? _ref1.phone : void 0))) {
       for (uNumber in userlist) {
         if (!__hasProp.call(userlist, uNumber)) continue;
         user = userlist[uNumber];
@@ -984,11 +984,11 @@ List = (function() {
       }
     }
     $.each(abonents, function(i, ab) {
-      var number, u, _ref1;
+      var number, u, _ref2;
       if (!ab) {
         return;
       }
-      number = ((_ref1 = ab.phone) != null ? typeof _ref1.toString === "function" ? _ref1.toString() : void 0 : void 0) || ab.ivrName || '';
+      number = ((_ref2 = ab.phone) != null ? typeof _ref2.toString === "function" ? _ref2.toString() : void 0 : void 0) || ab.ivrName || '';
       if (!number) {
         return;
       }
@@ -1001,7 +1001,7 @@ List = (function() {
           state: ab.isIvr ? 5 : 1,
           isIvr: ab.isIvr,
           ivrName: ab.ivrName
-        }, ab.isIvr);
+        }, ab.isIvr && !ab.phone);
         return userlist[number.toString()] = u;
       }
     });
@@ -1021,6 +1021,7 @@ List = (function() {
   List.prototype.setAbonents = function(abonents) {
     var abonent, number, _ref, _ref1,
       _this = this;
+    this.log('setAbonents', abonents, this.abonents);
     _ref = this.abonents;
     for (number in _ref) {
       if (!__hasProp.call(_ref, number)) continue;
@@ -1028,6 +1029,7 @@ List = (function() {
       abonent.removeAction('dtmf');
     }
     this.syncAbonentsAndUserlist(abonents, this.abonents);
+    this.log('setAbonents synced', this.abonents);
     if (!this.oktell.conferenceId) {
       _ref1 = this.abonents;
       for (number in _ref1) {
@@ -1224,6 +1226,7 @@ List = (function() {
 
   List.prototype.getUser = function(data, dontRemember) {
     var fantom, numberFormatted, strNumber, _ref;
+    this.log("getUser dontRemember=" + dontRemember, data);
     if (typeof data === 'string' || typeof data === 'number') {
       strNumber = data.toString();
       data = {
@@ -1232,6 +1235,7 @@ List = (function() {
     } else {
       strNumber = data.number.toString();
     }
+    this.log("getUser strNumber=" + strNumber);
     numberFormatted = data.phoneFormatted || (typeof oktell.formatPhone === "function" ? oktell.formatPhone(strNumber) : void 0) || strNumber;
     if (!data.numberFormatted) {
       data.numberFormatted = numberFormatted;
@@ -1241,7 +1245,7 @@ List = (function() {
       data.isFantom = true;
       this.filterFantomUser = false;
     }
-    if (!data.isIvr && this.usersByNumber[strNumber]) {
+    if (!(data.isIvr && !data.number) && this.usersByNumber[strNumber]) {
       if (this.usersByNumber[strNumber].isFantom) {
         this.usersByNumber[strNumber].init(data);
       }

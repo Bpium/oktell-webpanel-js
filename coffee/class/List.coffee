@@ -762,7 +762,7 @@ class List
 
 	syncAbonentsAndUserlist: (abonents, userlist) ->
 		absByNumber = {}
-		if abonents?.length is 0 or ( abonents.length is 1 and abonents?[0]?.isIvr )
+		if abonents?.length is 0 or ( abonents.length is 1 and abonents[0]?.isIvr and not abonents[0]?.phone )
 			for own uNumber, user of userlist
 				delete userlist[uNumber]
 		$.each abonents, (i, ab) =>
@@ -778,7 +778,7 @@ class List
 					state: if ab.isIvr then 5 else 1
 					isIvr: ab.isIvr
 					ivrName: ab.ivrName
-				, ab.isIvr
+				, ab.isIvr and not ab.phone
 				userlist[number.toString()] = u
 
 		for own uNumber, user of userlist
@@ -786,10 +786,11 @@ class List
 				delete userlist[user.number]
 
 	setAbonents: (abonents) ->
-#		@log 'setAbonents', abonents, @abonents
+		@log 'setAbonents', abonents, @abonents
 		for own number, abonent of @abonents
 			abonent.removeAction 'dtmf'
 		@syncAbonentsAndUserlist abonents, @abonents
+		@log 'setAbonents synced', @abonents
 		if not @oktell.conferenceId
 			for own number, abonent of @abonents
 				abonent.addAction 'dtmf', =>
@@ -944,11 +945,14 @@ class List
 
 
 	getUser: (data, dontRemember) ->
+		@log "getUser dontRemember=#{dontRemember}", data
 		if typeof data is 'string' or typeof data is 'number'
 			strNumber = data.toString()
 			data = {number:strNumber}
 		else
 			strNumber = data.number.toString()
+
+		@log "getUser strNumber=#{strNumber}"
 
 		numberFormatted = data.phoneFormatted or oktell.formatPhone?(strNumber) or strNumber
 		data.numberFormatted = numberFormatted unless data.numberFormatted
@@ -958,7 +962,7 @@ class List
 			data.isFantom = true
 			@filterFantomUser = false
 
-		if not data.isIvr and @usersByNumber[strNumber]
+		if not ( data.isIvr and not data.number ) and @usersByNumber[strNumber]
 			@usersByNumber[strNumber].init(data) if @usersByNumber[strNumber].isFantom
 			return @usersByNumber[strNumber]
 
