@@ -40,6 +40,8 @@ class Popup
 		oktell.on 'ringStart', (abonents) =>
 			@log 'ringStart', abonents
 			@setAbonents abonents
+			if abonents?[0]?.phone and oktell.getPhoneActions(abonents[0].phone)?.indexOf?('answer') != -1
+				@answerButtonVisible true
 			abonentsSet = true
 			@show()
 
