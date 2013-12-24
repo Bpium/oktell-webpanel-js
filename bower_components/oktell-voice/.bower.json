@@ -22,13 +22,13 @@
     "old"
   ],
   "dependencies": {
-    "oktelljs": "https://git.oktell.ru/web/oktelljs.git#~1.6"
+    "oktelljs": "https://git.oktell.ru/web/oktelljs.git#~1"
   },
   "_release": "0.2.0",
   "_resolution": {
     "type": "version",
     "tag": "v0.2.0",
-    "commit": "a44fdffb7904526922f71aa0134dbc490d5b87a3"
+    "commit": "0cbe21c0f53d287cce3ba465283cd7c5aafbbb47"
   },
   "_source": "https://git.oktell.ru/web/oktell-voice.git",
   "_target": "~0.2",
