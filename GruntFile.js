@@ -159,7 +159,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-compress');
-  grunt.registerTask('build', ['clean:buildlast', 'clean:build', 'insertfilesasvars', 'includecoffee', 'coffee', 'concat:js', 'uglify', 'concat:css', 'cssmin', 'copy:build', 'addVersion', 'compress', 'clean:temp']);
+  grunt.registerTask('build', ['clean:buildlast', 'clean:build', 'insertfilesasvars', 'includecoffee', 'coffee', 'concat:js', 'uglify', 'concat:css', 'cssmin', 'copy:build', 'addVersion', 'clean:temp', 'clean:buildlast']);
   grunt.registerTask('default', ['build']);
   grunt.registerMultiTask('addVersion', 'Add version to file names and to file content', function() {
     var build, config, content, fName, file, fileExt, files, path, pos, version, versionArr, _i, _len;

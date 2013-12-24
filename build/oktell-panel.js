@@ -1,4 +1,4 @@
-/* Oktell-panel.js 0.3.2 http://js.oktell.ru/webpanel */
+/* Oktell-panel.js 0.3.3 http://js.oktell.ru/webpanel */
 
 /*! Copyright (c) 2013 Brandon Aaron (http://brandonaaron.net)
  * Licensed under the MIT License (LICENSE.txt).
@@ -3116,8 +3116,13 @@ var __slice = [].slice,
         return _this.show();
       });
       oktell.on('ringStart', function(abonents) {
+        var _ref, _ref1;
+
         _this.log('ringStart', abonents);
         _this.setAbonents(abonents);
+        if ((abonents != null ? (_ref = abonents[0]) != null ? _ref.phone : void 0 : void 0) && ((_ref1 = oktell.getPhoneActions(abonents[0].phone)) != null ? typeof _ref1.indexOf === "function" ? _ref1.indexOf('answer') : void 0 : void 0) !== -1) {
+          _this.answerButtonVisible(true);
+        }
         abonentsSet = true;
         return _this.show();
       });
