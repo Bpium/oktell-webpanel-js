@@ -29,6 +29,9 @@ class Popup
 
 		abonentsSet = false
 
+		oktell.on 'connect', =>
+			@users = oktell.getUsers()
+
 		oktell.on 'webrtcRingStart', (name, identity) =>
 			@log 'webrtcRingStart, ' + identity
 			@playRingtone true
@@ -37,11 +40,13 @@ class Popup
 				@setAbonents [{name:name, phone: identity.match(/<sip:([\s\S]+?)@/)?[1] or ''}]
 			@show()
 
-		oktell.on 'ringStart', (abonents) =>
+		oktell.on 'ringStart backRingStart', (abonents) =>
 			@log 'ringStart', abonents
 			@setAbonents abonents
-			if abonents?[0]?.phone and oktell.getPhoneActions(abonents[0].phone)?.indexOf?('answer') != -1
-				@answerButtonVisible true
+			setTimeout =>
+				if abonents?[0]?.phone and oktell.getPhoneActions(abonents[0].phone)?.indexOf?('answer') != -1
+					@answerButtonVisible true
+			, 10
 			abonentsSet = true
 			@show()
 
@@ -80,8 +85,18 @@ class Popup
 			name = abonent.name?.toString?()
 
 			if name is phone
-				name = phoneFormatted or phone
-				phone = ''
+				foundInUsers = false
+				for u of @users
+					user = @users[u]
+					@log "Number = #{user.number}"
+					if user.number is phone
+						name = user.name
+						foundInUsers = true
+						break
+				@log "Found #{phone} in users = #{foundInUsers}"
+				if not foundInUsers
+					name = phoneFormatted or phone
+					phone = ''
 			else
 				name = abonent.name.toString()
 

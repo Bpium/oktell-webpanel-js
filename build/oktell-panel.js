@@ -1,4 +1,4 @@
-/* Oktell-panel.js 0.3.3 http://js.oktell.ru/webpanel */
+/* Oktell-panel.js 0.3.4 http://js.oktell.ru/webpanel */
 
 /*! Copyright (c) 2013 Brandon Aaron (http://brandonaaron.net)
  * Licensed under the MIT License (LICENSE.txt).
@@ -3099,6 +3099,9 @@ var __slice = [].slice,
         return _this.hide();
       });
       abonentsSet = false;
+      oktell.on('connect', function() {
+        return _this.users = oktell.getUsers();
+      });
       oktell.on('webrtcRingStart', function(name, identity) {
         var _ref;
 
@@ -3115,14 +3118,16 @@ var __slice = [].slice,
         }
         return _this.show();
       });
-      oktell.on('ringStart', function(abonents) {
-        var _ref, _ref1;
-
+      oktell.on('ringStart backRingStart', function(abonents) {
         _this.log('ringStart', abonents);
         _this.setAbonents(abonents);
-        if ((abonents != null ? (_ref = abonents[0]) != null ? _ref.phone : void 0 : void 0) && ((_ref1 = oktell.getPhoneActions(abonents[0].phone)) != null ? typeof _ref1.indexOf === "function" ? _ref1.indexOf('answer') : void 0 : void 0) !== -1) {
-          _this.answerButtonVisible(true);
-        }
+        setTimeout(function() {
+          var _ref, _ref1;
+
+          if ((abonents != null ? (_ref = abonents[0]) != null ? _ref.phone : void 0 : void 0) && ((_ref1 = oktell.getPhoneActions(abonents[0].phone)) != null ? typeof _ref1.indexOf === "function" ? _ref1.indexOf('answer') : void 0 : void 0) !== -1) {
+            return _this.answerButtonVisible(true);
+          }
+        }, 10);
         abonentsSet = true;
         return _this.show();
       });
@@ -3161,7 +3166,7 @@ var __slice = [].slice,
 
       this.absContainer.empty();
       return $.each(abonents, function(i, abonent) {
-        var el, name, phone, phoneFormatted, _ref, _ref1, _ref2;
+        var el, foundInUsers, name, phone, phoneFormatted, u, user, _ref, _ref1, _ref2;
 
         if (!abonent) {
           _this.log('setAbonent: bad abonent');
@@ -3171,8 +3176,21 @@ var __slice = [].slice,
         phone = (_ref1 = abonent.phone) != null ? typeof _ref1.toString === "function" ? _ref1.toString() : void 0 : void 0;
         name = (_ref2 = abonent.name) != null ? typeof _ref2.toString === "function" ? _ref2.toString() : void 0 : void 0;
         if (name === phone) {
-          name = phoneFormatted || phone;
-          phone = '';
+          foundInUsers = false;
+          for (u in _this.users) {
+            user = _this.users[u];
+            _this.log("Number = " + user.number);
+            if (user.number === phone) {
+              name = user.name;
+              foundInUsers = true;
+              break;
+            }
+          }
+          _this.log("Found " + phone + " in users = " + foundInUsers);
+          if (!foundInUsers) {
+            name = phoneFormatted || phone;
+            phone = '';
+          }
         } else {
           name = abonent.name.toString();
         }
