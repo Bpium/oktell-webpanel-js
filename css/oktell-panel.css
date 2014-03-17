@@ -3,7 +3,6 @@
 .oktell_panel li,
 .oktell_panel table,
 .oktell_panel tbody,
-.oktell_panel tbody,
 .oktell_panel tfoot,
 .oktell_panel thead,
 .oktell_panel tr,
@@ -35,6 +34,13 @@
 }
 .oktell_panel ul {
   list-style: none;
+}
+.oktell_panel *,
+.oktell_panel *:before,
+.oktell_panel *:after {
+  -webkit-box-sizing: content-box;
+  -moz-box-sizing: content-box;
+  box-sizing: content-box;
 }
 .oktell_panel {
   width: 280px;
