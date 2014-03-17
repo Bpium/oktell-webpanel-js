@@ -88,7 +88,6 @@ class Popup
 				foundInUsers = false
 				for u of @users
 					user = @users[u]
-					@log "Number = #{user.number}"
 					if user.number is phone
 						name = user.name
 						foundInUsers = true

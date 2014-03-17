@@ -107,7 +107,6 @@ Popup = (function() {
         foundInUsers = false;
         for (u in _this.users) {
           user = _this.users[u];
-          _this.log("Number = " + user.number);
           if (user.number === phone) {
             name = user.name;
             foundInUsers = true;
