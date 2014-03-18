@@ -1318,6 +1318,7 @@ var __slice = [].slice,
     };
 
     CUser.prototype.regexps = {
+      name: /\{\{name\}\}/,
       name1: /\{\{name1\}\}/,
       name2: /\{\{name2\}\}/,
       number: /\{\{number\}\}/,
@@ -1395,7 +1396,7 @@ var __slice = [].slice,
       var $el, str;
 
       if (!this.el || createIndependent) {
-        str = this.template.replace(this.regexps.name1, this.nameHtml1).replace(this.regexps.name2, this.nameHtml2).replace(this.regexps.number, this.numberHtml).replace(this.regexps.dtmf, this.langs.panel.dtmf).replace(this.regexps.avatarLink32x32, this.avatarLink32x32).replace(this.regexps.css, this.defaultAvatarCss);
+        str = this.template.replace(this.regexps.name1, this.nameHtml1).replace(this.regexps.name2, this.nameHtml2).replace(this.regexps.name, this.name).replace(this.regexps.number, this.numberHtml).replace(this.regexps.dtmf, this.langs.panel.dtmf).replace(this.regexps.avatarLink32x32, this.avatarLink32x32).replace(this.regexps.css, this.defaultAvatarCss);
         $el = $(str);
         $el.data('user', this);
         this.initButtonEl($el.find('.oktell_button_action'));
@@ -1915,7 +1916,7 @@ var __slice = [].slice,
         return true;
       });
       this.panelEl.bind('click', function(e) {
-        var actionButton, buttonEl, dep, target, user;
+        var actionButton, buttonEl, dep, target, useDtmfAsAction, user;
 
         target = $(e.target);
         if (target.is('.b_department_header') || target.parents('.b_department_header').size() > 0) {
@@ -1949,8 +1950,9 @@ var __slice = [].slice,
         }
         if ((buttonEl != null) && buttonEl.size()) {
           user = buttonEl.data('user');
+          useDtmfAsAction = buttonEl.parents('.j_abonents').size();
           if (user) {
-            _this.showDropdown(user, buttonEl, user.loadOktellActions(), true);
+            _this.showDropdown(user, buttonEl, user.loadOktellActions(), true, useDtmfAsAction);
           }
           return true;
         }
@@ -1972,7 +1974,11 @@ var __slice = [].slice,
         }
         user = _this.dropdownEl.data('user');
         if (action && user) {
-          user.doAction(action);
+          if (action === 'dtmf') {
+            _this.toggleDtmf();
+          } else {
+            user.doAction(action);
+          }
         }
         return _this.dropdownEl.hide();
       });
@@ -2622,11 +2628,14 @@ var __slice = [].slice,
       });
     };
 
-    List.prototype.showDropdown = function(user, buttonEl, actions, onPanel) {
+    List.prototype.showDropdown = function(user, buttonEl, actions, onPanel, useDtmfAsAction) {
       var a, aEls, t, _i, _len, _ref;
 
       t = this.dropdownElLiTemplate;
       this.dropdownEl.empty();
+      if (useDtmfAsAction && !this.oktell.conferenceId()) {
+        actions.push('dtmf');
+      }
       if (actions != null ? actions.length : void 0) {
         aEls = [];
         for (_i = 0, _len = actions.length; _i < _len; _i++) {
@@ -3585,7 +3594,7 @@ var __slice = [].slice,
   templates = {
     'templates/actionButton.html': '<ul class="oktell_button_action"><li class="g_first"><i></i></li><li class="g_last drop_down"><i></i></li></ul>',
     'templates/actionList.html': '<ul class="oktell_actions_group_list"><li class="{{css}}" data-action="{{action}}"><i></i><span>{{actionText}}</span></li></ul>',
-    'templates/user.html': '<tr class="b_contact"><td class="b_contact_avatar {{css}}"><img src="{{avatarLink32x32}}"><i></i><div class="o_busy"></div></td><td class="b_capital_letter"><span></span></td><td class="b_contact_title"><div class="wrapword"><span class="b_contact_name"><b>{{name1}}</b><span>{{name2}}</span></span><span class="o_number">{{number}}</span><span class="o_dtmf">{{dtmf}}</span></div>{{button}}</td></tr>',
+    'templates/user.html': '<tr class="b_contact"><td class="b_contact_avatar {{css}}"><img src="{{avatarLink32x32}}"><i></i><div class="o_busy"></div></td><td class="b_capital_letter"><span></span></td><td class="b_contact_title"><div class="wrapword" title="{{name}}"><span class="b_contact_name"><b>{{name1}}</b><span>{{name2}}</span></span><span class="o_number">{{number}}</span><span class="o_dtmf">{{dtmf}}</span></div>{{button}}</td></tr>',
     'templates/department.html': '<tr class="b_contact"><td class="b_contact_department" colspan="3">{{department}}</td></tr>',
     'templates/dep.html': '<div class="b_department"><div class="b_department_header"><div class="h_shadow_top"><span>{{department}}</span></div></div><table class="b_main_list"><tbody></tbody></table></div>',
     'templates/usersTable.html': '<table class="b_main_list m_without_department"><tbody></tbody></table>',
