@@ -1,10 +1,9 @@
-/* Oktell-panel.js 0.3.4 http://js.oktell.ru/webpanel */
+/* Oktell-panel.js 0.3.5 http://js.oktell.ru/webpanel */
 
 .oktell_panel p,
 .oktell_panel ul,
 .oktell_panel li,
 .oktell_panel table,
-.oktell_panel tbody,
 .oktell_panel tbody,
 .oktell_panel tfoot,
 .oktell_panel thead,
@@ -37,6 +36,13 @@
 }
 .oktell_panel ul {
   list-style: none;
+}
+.oktell_panel *,
+.oktell_panel *:before,
+.oktell_panel *:after {
+  -webkit-box-sizing: content-box;
+  -moz-box-sizing: content-box;
+  box-sizing: content-box;
 }
 .oktell_panel {
   width: 280px;
@@ -594,6 +600,7 @@
   display: none;
   cursor: pointer;
   font-size: 1.1em;
+  padding: 0;
 }
 .oktell_panel table {
   width: 100%;

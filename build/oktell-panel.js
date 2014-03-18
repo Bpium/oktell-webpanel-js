@@ -1,4 +1,4 @@
-/* Oktell-panel.js 0.3.4 http://js.oktell.ru/webpanel */
+/* Oktell-panel.js 0.3.5 http://js.oktell.ru/webpanel */
 
 /*! Copyright (c) 2013 Brandon Aaron (http://brandonaaron.net)
  * Licensed under the MIT License (LICENSE.txt).
@@ -3179,7 +3179,6 @@ var __slice = [].slice,
           foundInUsers = false;
           for (u in _this.users) {
             user = _this.users[u];
-            _this.log("Number = " + user.number);
             if (user.number === phone) {
               name = user.name;
               foundInUsers = true;

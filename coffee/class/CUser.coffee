@@ -64,6 +64,7 @@ class CUser
 		@loadActions()
 
 	regexps:
+		name: /\{\{name\}\}/
 		name1: /\{\{name1\}\}/
 		name2: /\{\{name2\}\}/
 		number: /\{\{number\}\}/
@@ -124,6 +125,7 @@ class CUser
 		if not @el or createIndependent
 			str = @template.replace( @regexps.name1, @nameHtml1)
 				.replace( @regexps.name2, @nameHtml2 )
+				.replace( @regexps.name, @name )
 				.replace( @regexps.number, @numberHtml )
 				.replace( @regexps.dtmf, @langs.panel.dtmf )
 				.replace( @regexps.avatarLink32x32, @avatarLink32x32)

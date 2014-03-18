@@ -230,8 +230,9 @@ class List
 
 			if buttonEl? and buttonEl.size()
 				user = buttonEl.data('user')
+				useDtmfAsAction = buttonEl.parents('.j_abonents').size()
 				if user
-					@showDropdown user, buttonEl, user.loadOktellActions(), true
+					@showDropdown user, buttonEl, user.loadOktellActions(), true, useDtmfAsAction
 				return true
 
 		@dropdownEl.bind 'click', (e) =>
@@ -246,7 +247,11 @@ class List
 			if not action then return
 			user = @dropdownEl.data('user')
 			if action and user
-				user.doAction action
+				if action is 'dtmf'
+					@toggleDtmf()
+				else
+					user.doAction action
+
 			@dropdownEl.hide()
 
 		dropdownHideTimer = ''
@@ -726,9 +731,12 @@ class List
 			if user
 				@showDropdown user, $(this)
 
-	showDropdown: ( user, buttonEl, actions, onPanel ) ->
+	showDropdown: ( user, buttonEl, actions, onPanel, useDtmfAsAction ) ->
 		t = @dropdownElLiTemplate
 		@dropdownEl.empty()
+
+		if useDtmfAsAction and not @oktell.conferenceId()
+			actions.push 'dtmf'
 
 		if actions?.length
 			aEls = []
