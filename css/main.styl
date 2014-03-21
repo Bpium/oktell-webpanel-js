@@ -1,3 +1,25 @@
+/* Set up box-sizing: content-box for all panel elements */
+.oktell_panel,
+.oktell_panel_btn,
+.oktell_panel_popup,
+.oktell_button_action,
+.oktell_actions_group_list
+	-webkit-box-sizing content-box
+	-moz-box-sizing content-box
+	box-sizing content-box
+
+.oktell_panel,
+.oktell_panel_btn,
+.oktell_panel_popup,
+.oktell_button_action,
+.oktell_actions_group_list
+	& *,
+	& *:before,
+	& *:after
+		-webkit-box-sizing content-box
+		-moz-box-sizing content-box
+		box-sizing content-box
+
 /* Normalize panel
 ---------------------------------------------------------------*/
 .oktell_panel
@@ -1322,16 +1344,3 @@
 		font-size: 1.125em
 
 
-/* Set up box-sizing:content for all panel elements */
-
-.oktell_panel,
-.oktell_panel_btn,
-.oktell_panel_popup,
-.oktell_button_action,
-.oktell_actions_group_list
-	& *,
-	& *:before,
-	& *:after
-		-webkit-box-sizing content-box
-		-moz-box-sizing content-box
-		box-sizing content-box
