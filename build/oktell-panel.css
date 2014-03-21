@@ -37,13 +37,6 @@
 .oktell_panel ul {
   list-style: none;
 }
-.oktell_panel *,
-.oktell_panel *:before,
-.oktell_panel *:after {
-  -webkit-box-sizing: content-box;
-  -moz-box-sizing: content-box;
-  box-sizing: content-box;
-}
 .oktell_panel {
   width: 280px;
   top: 0;
@@ -1353,6 +1346,25 @@
 .oktell_panel .m_form.b_error p.b_error_alert {
   font-weight: bold;
   font-size: 1.125em;
+}
+.oktell_panel *,
+.oktell_panel_btn *,
+.oktell_panel_popup *,
+.oktell_button_action *,
+.oktell_actions_group_list *,
+.oktell_panel *:before,
+.oktell_panel_btn *:before,
+.oktell_panel_popup *:before,
+.oktell_button_action *:before,
+.oktell_actions_group_list *:before,
+.oktell_panel *:after,
+.oktell_panel_btn *:after,
+.oktell_panel_popup *:after,
+.oktell_button_action *:after,
+.oktell_actions_group_list *:after {
+  -webkit-box-sizing: content-box;
+  -moz-box-sizing: content-box;
+  box-sizing: content-box;
 }
 .oktell_panel .btn-group {
   position: relative;
