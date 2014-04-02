@@ -3643,7 +3643,7 @@ var __slice = [].slice,
   Department.prototype.template = departmentTemplateHtml;
   panelWasInitialized = false;
   initPanel = function(opts) {
-    var $user, $userActionButton, animOptHide, animOptShow, bookmarkAnimOptHide, bookmarkAnimOptShow, bookmarkPos, contOpt, cssAnimNow, enableMoving, errorEl, hidePanel, hideTimer, killPanelHideTimer, maxPosClose, minPosOpen, mouseOnPanel, oldBinding, pageX, panelBookmarkEl, panelHideTimer, panelMinPos, panelPos, panelStatus, permissionsPopupEl, popupEl, ringtone, showPanel, showTimer, touchMoving, useContainer, useCssAnim, _panelStatus, _ref,
+    var animOptHide, animOptShow, bookmarkAnimOptHide, bookmarkAnimOptShow, bookmarkPos, contOpt, cssAnimNow, enableMoving, errorEl, hidePanel, hideTimer, killPanelHideTimer, maxPosClose, minPosOpen, mouseOnPanel, pageX, panelBookmarkEl, panelHideTimer, panelMinPos, panelPos, panelStatus, permissionsPopupEl, popupEl, ringtone, showPanel, showTimer, touchMoving, useContainer, useCssAnim, _panelStatus, _ref,
       _this = this;
 
     panelWasInitialized = true;
@@ -3684,11 +3684,6 @@ var __slice = [].slice,
     if (!getOptions().showAvatar) {
       panelEl.addClass('noavatar');
     }
-    $user = $(userTemplateHtml);
-    $userActionButton = $(actionButtonHtml);
-    oldBinding = $userActionButton.attr('data-bind');
-    $userActionButton.attr('data-bind', oldBinding + ', visible: $data.actionBarIsVisible');
-    $user.find('td.b_contact_title').append($userActionButton);
     actionListEl = $(actionListHtml);
     $('body').append(actionListEl);
     oktell = getOptions().oktell;

@@ -215,12 +215,6 @@ do ($)->
 #		if hasTouch
 #			panelEl.addClass('touch')
 
-		$user = $(userTemplateHtml)
-		$userActionButton = $(actionButtonHtml)
-		oldBinding = $userActionButton.attr 'data-bind'
-		$userActionButton.attr 'data-bind', oldBinding + ', visible: $data.actionBarIsVisible'
-		$user.find('td.b_contact_title').append $userActionButton
-
 		actionListEl = $(actionListHtml)
 		$('body').append actionListEl
 
