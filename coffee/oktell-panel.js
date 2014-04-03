@@ -598,7 +598,7 @@ var __slice = [].slice;
         killPanelHideTimer();
         return true;
       });
-      return $('html').bind('mousemove', function(e) {
+      $('html').bind('mousemove', function(e) {
         if (panelStatus() === 'open' && !mouseOnPanel && panelHideTimer === false && !list.dropdownOpenedOnPanel) {
           panelHideTimer = setTimeout(function() {
             return hidePanel();
@@ -608,6 +608,13 @@ var __slice = [].slice;
         return true;
       });
     }
+    $('.oktell_actions_group_list').on('touchstart', function(e) {
+      e.stopPropagation();
+      return true;
+    });
+    return $('body').on('touchstart', function(e) {
+      return list != null ? typeof list.hideActionListDropdown === "function" ? list.hideActionListDropdown() : void 0 : void 0;
+    });
   };
   afterOktellConnect = function() {
     return oktellConnected = true;

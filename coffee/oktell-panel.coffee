@@ -503,6 +503,14 @@ do ($)->
 #
 #			true
 
+		# close actions dropdown if touched anything else in body
+		$('.oktell_actions_group_list').on 'touchstart', (e)->
+			e.stopPropagation()
+			return true
+
+		$('body').on 'touchstart', (e)->
+			list?.hideActionListDropdown?()
+
 
 	afterOktellConnect = ->
 		oktellConnected = true
