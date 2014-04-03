@@ -88,12 +88,10 @@ class CUser
 
 	setStateCss: ->
 		if @els.length
-			if @state is 0
-				@els.removeClass('m_busy').addClass('m_offline')
-			else if @state is 5
-				@els.removeClass('m_offline').addClass('m_busy')
-			else
-				@els.removeClass('m_offline').removeClass('m_busy')
+			@els.toggleClass 'm_busy', @state is 5
+			@els.toggleClass 'm_offline', @state is 0
+			@els.toggleClass 'm_break', @state is 2
+			@els.toggleClass 'm_dnd', @state is 3
 
 	getInfo: ->
 		'"'+@number+'" ' + @state + ' ' + @name
@@ -125,7 +123,7 @@ class CUser
 		if not @el or createIndependent
 			str = @template.replace( @regexps.name1, @nameHtml1)
 				.replace( @regexps.name2, @nameHtml2 )
-				.replace( @regexps.name, @name )
+				.replace( @regexps.name, @name + ( if @numberHtml then ' (' + @numberHtml + ')' else '' ) )
 				.replace( @regexps.number, @numberHtml )
 				.replace( @regexps.dtmf, @langs.panel.dtmf )
 				.replace( @regexps.avatarLink32x32, @avatarLink32x32)
