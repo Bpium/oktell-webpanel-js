@@ -3147,13 +3147,20 @@ var __slice = [].slice,
     }
 
     Popup.prototype.playRingtone = function(play) {
-      if (this.ringtone) {
-        if (play) {
-          this.ringtone.currentTime = 0;
-          return this.ringtone.play();
-        } else {
-          return this.ringtone.pause();
+      var e;
+
+      try {
+        if (this.ringtone) {
+          if (play) {
+            this.ringtone.currentTime = 0;
+            return this.ringtone.play();
+          } else {
+            return this.ringtone.pause();
+          }
         }
+      } catch (_error) {
+        e = _error;
+        return this.log("playRingtone " + play + " throw error", e);
       }
     };
 

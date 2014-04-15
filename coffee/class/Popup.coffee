@@ -59,12 +59,15 @@ class Popup
 		@answerButtonVisible false
 
 	playRingtone: (play)->
-		if @ringtone
-			if play
-				@ringtone.currentTime = 0
-				@ringtone.play()
-			else
-				@ringtone.pause()
+		try
+			if @ringtone
+				if play
+					@ringtone.currentTime = 0
+					@ringtone.play()
+				else
+					@ringtone.pause()
+		catch e
+			@log "playRingtone #{play} throw error", e
 
 	show: (abonents) ->
 		@log 'Popup show! ', abonents
