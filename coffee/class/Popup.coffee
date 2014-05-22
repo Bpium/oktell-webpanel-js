@@ -50,11 +50,15 @@ class Popup
 			abonentsSet = true
 			@show()
 
-		oktell.on 'ringStop', =>
+		hidePopupAndResetAbonents =>
 			@playRingtone false
 			@hide()
 			abonentsSet = false
 			@setAbonents []
+		oktell.on 'ringStop', hidePopupAndResetAbonents
+		oktell.on "stateChange", (newState, oldState)=>
+			if newState is "call" and oldState is "backring"
+				hidePopupAndResetAbonents()
 
 		@answerButtonVisible false
 
