@@ -50,7 +50,7 @@ class Popup
 			abonentsSet = true
 			@show()
 
-		hidePopupAndResetAbonents =>
+		hidePopupAndResetAbonents = =>
 			@playRingtone false
 			@hide()
 			abonentsSet = false

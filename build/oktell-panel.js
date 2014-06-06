@@ -3017,7 +3017,7 @@ var __slice = [].slice,
     Popup.prototype.logGroup = 'Popup';
 
     function Popup(popupEl, oktell, ringtone) {
-      var abonentsSet,
+      var abonentsSet, hidePopupAndResetAbonents,
         _this = this;
       this.el = popupEl;
       this.ringtone = ringtone;
@@ -3073,12 +3073,12 @@ var __slice = [].slice,
         abonentsSet = true;
         return _this.show();
       });
-      hidePopupAndResetAbonents(function() {
+      hidePopupAndResetAbonents = function() {
         _this.playRingtone(false);
         _this.hide();
         abonentsSet = false;
         return _this.setAbonents([]);
-      });
+      };
       oktell.on('ringStop', hidePopupAndResetAbonents);
       oktell.on("stateChange", function(newState, oldState) {
         if (newState === "call" && oldState === "backring") {
