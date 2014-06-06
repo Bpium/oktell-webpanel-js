@@ -35,7 +35,7 @@ class CUser
 		@ivrName = data.ivrName
 
 		ns = @nameHtml.split(/\s+/)
-		if ns.length > 1 and data.name.toString() isnt @number
+		if ns.length > 1 and @name.toString() isnt @number
 			@nameHtml1 = ns[0]
 			@nameHtml2 = ' ' + ns.splice(1).join(' ')
 		else

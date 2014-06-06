@@ -1277,7 +1277,7 @@ var __slice = [].slice,
       this.isIvr = data.isIvr;
       this.ivrName = data.ivrName;
       ns = this.nameHtml.split(/\s+/);
-      if (ns.length > 1 && data.name.toString() !== this.number) {
+      if (ns.length > 1 && this.name.toString() !== this.number) {
         this.nameHtml1 = ns[0];
         this.nameHtml2 = ' ' + ns.splice(1).join(' ');
       } else {
@@ -3017,9 +3017,10 @@ var __slice = [].slice,
     Popup.prototype.logGroup = 'Popup';
 
     function Popup(popupEl, oktell, ringtone) {
-      var abonentsSet, hidePopupAndResetAbonents,
+      var abonentsSet,
         _this = this;
       this.el = popupEl;
+      this._lastPopupShowTime = 0;
       this.ringtone = ringtone;
       this.absContainer = this.el.find('.b_content');
       this.abonentEl = this.absContainer.find('.b_abonent').remove();
@@ -3073,16 +3074,12 @@ var __slice = [].slice,
         abonentsSet = true;
         return _this.show();
       });
-      hidePopupAndResetAbonents = function() {
-        _this.playRingtone(false);
-        _this.hide();
-        abonentsSet = false;
-        return _this.setAbonents([]);
-      };
-      oktell.on('ringStop', hidePopupAndResetAbonents);
+      oktell.on('ringStop', function() {
+        return _this.hide();
+      });
       oktell.on("stateChange", function(newState, oldState) {
-        if (newState === "call" && oldState === "backring") {
-          return hidePopupAndResetAbonents();
+        if ((newState === "call" && oldState === "backring") || newState === "ready" || newState === "talk") {
+          return _this.hide();
         }
       });
       this.answerButtonVisible(false);
@@ -3106,13 +3103,23 @@ var __slice = [].slice,
     };
 
     Popup.prototype.show = function(abonents) {
+      if (Date.now() - this._lastPopupShowTime < 1000) {
+        return;
+      }
+      this._lastPopupShowTime = Date.now();
       this.log('Popup show! ', abonents);
       return this.el.fadeIn(200);
     };
 
     Popup.prototype.hide = function() {
+      var _this = this;
+      this.log("Popup hide!");
       this.playRingtone(false);
-      return this.el.fadeOut(200);
+      return this.el.fadeOut(200, function() {
+        var abonentsSet;
+        _this.setAbonents([]);
+        return abonentsSet = false;
+      });
     };
 
     Popup.prototype.setAbonents = function(abonents) {
@@ -3876,7 +3883,7 @@ var __slice = [].slice,
     phone = el.attr('data-phone');
     el.empty();
     if (phone) {
-      button = list.getUserButtonForPlugin(phone);
+      button = list.getUserButtonForPlugin(phone.replace(/\+/g, ""));
       return el.html(button);
     }
   };

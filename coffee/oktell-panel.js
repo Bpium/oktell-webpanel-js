@@ -625,7 +625,7 @@ var __slice = [].slice;
     phone = el.attr('data-phone');
     el.empty();
     if (phone) {
-      button = list.getUserButtonForPlugin(phone);
+      button = list.getUserButtonForPlugin(phone.replace(/\+/g, ""));
       return el.html(button);
     }
   };

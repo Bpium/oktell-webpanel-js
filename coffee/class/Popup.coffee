@@ -2,6 +2,7 @@ class Popup
 	logGroup: 'Popup'
 	constructor: (popupEl, oktell, ringtone)->
 		@el = popupEl
+		@_lastPopupShowTime = 0
 		@ringtone = ringtone
 		@absContainer = @el.find('.b_content')
 		@abonentEl = @absContainer.find('.b_abonent').remove()
@@ -40,6 +41,7 @@ class Popup
 				@setAbonents [{name:name, phone: identity.match(/<sip:([\s\S]+?)@/)?[1] or ''}]
 			@show()
 
+
 		oktell.on 'ringStart backRingStart', (abonents) =>
 			@log 'ringStart', abonents
 			@setAbonents abonents
@@ -50,15 +52,11 @@ class Popup
 			abonentsSet = true
 			@show()
 
-		hidePopupAndResetAbonents = =>
-			@playRingtone false
+		oktell.on 'ringStop', =>
 			@hide()
-			abonentsSet = false
-			@setAbonents []
-		oktell.on 'ringStop', hidePopupAndResetAbonents
 		oktell.on "stateChange", (newState, oldState)=>
-			if newState is "call" and oldState is "backring"
-				hidePopupAndResetAbonents()
+			if ( newState is "call" and oldState is "backring" ) or newState is "ready" or newState is "talk"
+				@hide()
 
 		@answerButtonVisible false
 
@@ -74,12 +72,18 @@ class Popup
 			@log "playRingtone #{play} throw error", e
 
 	show: (abonents) ->
+		if Date.now() - @_lastPopupShowTime < 1000
+			return
+		@_lastPopupShowTime = Date.now()
 		@log 'Popup show! ', abonents
 		@el.fadeIn 200
 
 	hide: ->
+		@log "Popup hide!"
 		@playRingtone false
-		@el.fadeOut 200
+		@el.fadeOut 200, =>
+			@setAbonents []
+			abonentsSet = false	
 
 	setAbonents: (abonents) ->
 		@absContainer.empty()
