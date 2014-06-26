@@ -3056,7 +3056,7 @@ var __slice = [].slice,
           _this.setAbonents([
             {
               name: name,
-              phone: ((_ref = identity.match(/<sip:([\s\S]+?)@/)) != null ? _ref[1] : void 0) || ''
+              phone: (identity != null ? typeof identity.match === "function" ? (_ref = identity.match(/<sip:([\s\S]+?)@/)) != null ? _ref[1] : void 0 : void 0 : void 0) || ''
             }
           ]);
         }

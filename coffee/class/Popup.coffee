@@ -38,7 +38,7 @@ class Popup
 			@playRingtone true
 			@answerButtonVisible true
 			if not abonentsSet
-				@setAbonents [{name:name, phone: identity.match(/<sip:([\s\S]+?)@/)?[1] or ''}]
+				@setAbonents [{name:name, phone: identity?.match?(/<sip:([\s\S]+?)@/)?[1] or ''}]
 			@show()
 
 
