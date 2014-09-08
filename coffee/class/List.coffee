@@ -971,6 +971,8 @@ class List
 			@filterFantomUser = false
 
 		if not ( data.isIvr and not data.number ) and @usersByNumber[strNumber]
+			if dontRemember
+				@usersByNumber[strNumber].isFantom = true
 			@usersByNumber[strNumber].init(data) if @usersByNumber[strNumber].isFantom
 			return @usersByNumber[strNumber]
 
