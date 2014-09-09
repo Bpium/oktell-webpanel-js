@@ -1,4 +1,4 @@
-/* Oktell-panel.js 0.3.5 http://js.oktell.ru/webpanel */
+/* Oktell-panel.js 0.3.6 http://js.oktell.ru/webpanel */
 
 /*! Copyright (c) 2013 Brandon Aaron (http://brandonaaron.net)
  * Licensed under the MIT License (LICENSE.txt).
@@ -2902,6 +2902,9 @@ var __slice = [].slice,
         this.filterFantomUser = false;
       }
       if (!(data.isIvr && !data.number) && this.usersByNumber[strNumber]) {
+        if (dontRemember) {
+          this.usersByNumber[strNumber].isFantom = true;
+        }
         if (this.usersByNumber[strNumber].isFantom) {
           this.usersByNumber[strNumber].init(data);
         }
