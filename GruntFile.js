@@ -159,7 +159,8 @@
             hostname: 'localhost',
             port: 9002,
             base: '',
-            keepalive: true
+            keepalive: true,
+            open: true
           }
         }
       }

@@ -99,10 +99,11 @@ module.exports = (grunt) ->
     connect:
       site:
         options:
-          hostname: 'localhost',
-          port: 9002,
-          base: '',
+          hostname: 'localhost'
+          port: 9002
+          base: ''
           keepalive: true
+          open: true
 
   grunt.loadTasks './grunt_tasks'
 
