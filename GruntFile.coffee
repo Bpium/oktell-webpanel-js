@@ -99,7 +99,7 @@ module.exports = (grunt) ->
     connect:
       site:
         options:
-          hostname: 'localhost'
+          hostname: '0.0.0.0'
           port: 9002
           base: ''
           keepalive: true

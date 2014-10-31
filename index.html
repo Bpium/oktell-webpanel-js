@@ -12,10 +12,18 @@
 
 	<!--<script type="text/javascript" src="jslib/vendor/jquery-1.9.1.js"></script>-->
 	<script type="text/javascript" src='bower_components/jquery/jquery.js'></script>
-	<script type="text/javascript" src='bower_components/oktelljs/build/oktell.js'></script>
-	<!--<script type="text/javascript" src='//cdn.airato.lan/oktelljs/oktell.js'></script>-->
-	<script type="text/javascript" src="bower_components/oktell-voice/build/oktell-voice.js"></script>
-	<script type="text/javascript" src="js/jquery.mousewheel.js"></script>
+
+  <!-- <script type="text/javascript" src='bower_components/oktelljs/build/oktell.js'></script> -->
+  <script type="text/javascript" src="symlinks/oktell.js"></script>
+
+  <!-- <script type="text/javascript" src="bower_components/oktell-voice/build/oktell-voice.js"></script> -->
+  <script type="text/javascript" src="symlinks/jssip-devel.js"></script>
+	<script type="text/javascript" src="symlinks/oktell-voice.js"></script>
+
+
+
+
+  <script type="text/javascript" src="js/jquery.mousewheel.js"></script>
 	<script type="text/javascript" src="js/mwheelIntent.js"></script>
 	<script type="text/javascript" src="js/jquery.jscrollpane.js"></script>
 
@@ -46,12 +54,27 @@
 	<script type="text/javascript">
 		$(function(){
 
-			$('#j_login').val( localStorage.demoLogin || '' )
-			$('#j_pass').val( localStorage.demoPass || '' )
-			$('#j_server').val( localStorage.demoServer || '192.168.0.61' )
-			$('#j_webrtc').attr( 'checked',  Boolean(parseInt(localStorage.useWebRTC)) || false )
+      var getParams = location.search && location.search.substr(1).split('&').reduce(function(result, a, index, arr){
+        var vals = arr[index].split('=');
+        vals[0] && (result[vals[0]] = decodeURIComponent(vals[1]));
+        return result;
+      }, {});
+
+
+
+			$('#j_login').val( getParams.login || localStorage.demoLogin || '' )
+			$('#j_pass').val( getParams.pass || localStorage.demoPass || '' )
+			$('#j_server').val( getParams.server || localStorage.demoServer || '192.168.0.61' )
+			$('#j_webrtc').attr( 'checked',  Boolean(parseInt(getParams.webrtc || localStorage.useWebRTC)) || false )
 
 			$('#j_login').focus();
+
+      setTimeout(function(){
+        if ( getParams.login && getParams.pass && getParams.server ) {
+          $('#j_form').submit();
+        }
+
+      });
 
 
 			var stateEl = $('#connectionState');

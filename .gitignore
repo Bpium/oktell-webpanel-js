@@ -3,3 +3,5 @@ jslib/
 node_modules/
 builds/
 bower_components
+/temp
+/symlinks

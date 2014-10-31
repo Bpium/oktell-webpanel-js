@@ -2629,10 +2629,10 @@ var __slice = [].slice,
     };
 
     List.prototype.syncAbonentsAndUserlist = function(abonents, userlist) {
-      var absByNumber, uNumber, user, _ref, _ref1, _results,
+      var absByNumber, uNumber, user, _ref, _results,
         _this = this;
       absByNumber = {};
-      if ((abonents != null ? abonents.length : void 0) === 0 || (abonents.length === 1 && ((_ref = abonents[0]) != null ? _ref.isIvr : void 0) && !((_ref1 = abonents[0]) != null ? _ref1.phone : void 0))) {
+      if ((abonents != null ? abonents.length : void 0) === 0 || (abonents.length === 1 && ((_ref = abonents[0]) != null ? _ref.isIvr : void 0))) {
         for (uNumber in userlist) {
           if (!__hasProp.call(userlist, uNumber)) continue;
           user = userlist[uNumber];
@@ -2640,11 +2640,11 @@ var __slice = [].slice,
         }
       }
       $.each(abonents, function(i, ab) {
-        var number, u, _ref2;
+        var number, u, _ref1;
         if (!ab) {
           return;
         }
-        number = ((_ref2 = ab.phone) != null ? typeof _ref2.toString === "function" ? _ref2.toString() : void 0 : void 0) || ab.ivrName || '';
+        number = ((_ref1 = ab.phone) != null ? typeof _ref1.toString === "function" ? _ref1.toString() : void 0 : void 0) || ab.ivrName || '';
         if (!number) {
           return;
         }
