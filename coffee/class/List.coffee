@@ -179,10 +179,14 @@ class List
       else
         @filterClearCross.hide()
 
+      # Do first action for user with entered phone number, and if that user isn't exist -
+      # for first found user
       if e.keyCode is 13
         @filterInput.blur()
         setTimeout =>
-          @scrollContent.find('tr:first').data('user')?.doLastFirstAction()
+          text = @filterInput.val().toString().toLowerCase()
+          user = self.usersByNumber[text] or @scrollContent.find('tr:first').data('user')
+          user?.doLastFirstAction()
           @clearFilter()
         , 50
       else

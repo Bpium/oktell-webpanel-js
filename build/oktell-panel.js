@@ -1873,9 +1873,11 @@ var __slice = [].slice,
         if (e.keyCode === 13) {
           _this.filterInput.blur();
           setTimeout(function() {
-            var _ref;
-            if ((_ref = _this.scrollContent.find('tr:first').data('user')) != null) {
-              _ref.doLastFirstAction();
+            var text, user;
+            text = _this.filterInput.val().toString().toLowerCase();
+            user = self.usersByNumber[text] || _this.scrollContent.find('tr:first').data('user');
+            if (user != null) {
+              user.doLastFirstAction();
             }
             return _this.clearFilter();
           }, 50);
