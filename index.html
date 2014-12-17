@@ -17,7 +17,8 @@
   <script type="text/javascript" src="symlinks/oktell.js"></script>
 
   <!-- <script type="text/javascript" src="bower_components/oktell-voice/build/oktell-voice.js"></script> -->
-  <script type="text/javascript" src="symlinks/jssip-devel.js"></script>
+  <!-- <script type="text/javascript" src="symlinks/jssip-devel.js"></script> -->
+  <script type="text/javascript" src="symlinks/jssip-0.6.0.js"></script>
 	<script type="text/javascript" src="symlinks/oktell-voice.js"></script>
 
 
@@ -127,6 +128,8 @@
 				var server = $('#j_server').val()
 				var useWebRTC = $('#j_webrtc').is(':checked')
 
+        document.title = login;
+
 				//startWebRtcClient(login,pass,server);
 
 				localStorage.demoLogin = login
@@ -187,11 +190,20 @@
 			});
 			$('.userPhone').oktellButton()
 		});
+
+    var muted = false;
+    window.mute = function(){
+      muted = !muted;
+      $('audio').each(function(){
+        this.muted = muted;
+      });
+      $('#mute').text(muted ? 'Unmute' : 'Mute');
+    };
 	</script>
 
 </head>
 <body style="height: 100%">
-	<div class="panel_container" style="width: 300px; float: left; margin-left: 50px;"></div>
+	<div class="panel_container" style="width: 300px; float: left; margin-left: 5px;"></div>
 	<div style="">
 		<style type="text/css">
 			.userPhone {
@@ -230,11 +242,17 @@
 				</table>
 			</form>
 
+      <p>
+        <a href="http://0.0.0.0:9002/?login=a16&pass=a16&server=192.168.0.218&webrtc=1" target="_blank">a16</a>
+        <a href="http://0.0.0.0:9002/?login=a17&pass=a17&server=192.168.0.218&webrtc=1" target="_blank">a17</a>
+        <a href="http://0.0.0.0:9002/?login=a18&pass=a18&server=192.168.0.218&webrtc=1" target="_blank">a18</a>
+      </p>
 
 		</div>
 		<div style="">
 			<br>
-			<span>Статус:</span> <span id="connectionState">Соединение</span><br>
+      <span>Статус:</span> <span id="connectionState">Соединение</span><br>
+			<button id="mute" onclick="mute()">Mute</button><br>
 			<div style="display: none;">
 				<button class="setStatus" data-status="ready">set Ready</button><br>
 				<button class="setStatus" data-status="dnd">set DND</button><br>

@@ -29,6 +29,7 @@ class List
       ghostHelp : { icon: '/img/icons/action/ghost_help.png', text: @langs.actions.ghostHelp }
       hold : { icon: '/img/icons/action/ghost_help.png', text: @langs.actions.hold }
       resume : { icon: '/img/icons/action/ghost_help.png', text: @langs.actions.resume }
+      commutate : { icon: '/img/icons/action/ghost_help.png', text: @langs.actions.commutate }
       dtmf : { icon: '', text: @langs.actions.dtmf }
 
     @actionCssPrefix = 'i_'
@@ -319,7 +320,7 @@ class List
         user.loadActions()
 
 
-    oktell.on 'connect', =>
+    onConnect =>
       @oktellConnected = true
       oInfo = oktell.getMyInfo()
       oInfo.userid = oInfo.userid.toString().toLowerCase()
@@ -423,6 +424,11 @@ class List
       @setTalking oktell.getState() is 'talk'
 
       if typeof afterOktellConnect is 'function' then afterOktellConnect()
+
+    oktell.on 'connect', onConnect
+
+    if oktell.getState() or oktell.getStatus()
+      onConnect()
 
     oktell.on 'abonentsChange', ( abonents ) =>
       if @oktellConnected

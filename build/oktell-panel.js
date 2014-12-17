@@ -958,7 +958,7 @@ var __slice = [].slice,
   __hasProp = {}.hasOwnProperty;
 
 (function($) {
-  var CUser, Department, Error, List, Notify, PermissionsPopup, Popup, actionButtonContainerClass, actionButtonHtml, actionListEl, actionListHtml, addActionButtonToEl, afterOktellConnect, checkCssAnimationSupport, contEl, cookie, debounce, defaultOptions, departmentTemplateHtml, error, errorHtml, escapeHtml, getOptions, initActionButtons, initButtonOnElement, initPanel, isMobileDevice, langs, list, loadTemplate, log, logStr, newGuid, oktell, oktellConnected, options, panelEl, panelHtml, panelWasInitialized, permissionsPopup, permissionsPopupHtml, popup, popupHtml, templates, useNativeScroll, useSticky, userTemplateHtml, usersTableHtml,
+  var CUser, Department, ErrorView, List, Notify, PermissionsPopup, Popup, actionButtonContainerClass, actionButtonHtml, actionListEl, actionListHtml, addActionButtonToEl, afterOktellConnect, checkCssAnimationSupport, contEl, cookie, debounce, defaultOptions, departmentTemplateHtml, error, errorHtml, escapeHtml, getOptions, initActionButtons, initButtonOnElement, initPanel, isMobileDevice, langs, list, loadTemplate, log, logStr, newGuid, oktell, oktellConnected, options, panelEl, panelHtml, panelWasInitialized, permissionsPopup, permissionsPopupHtml, popup, popupHtml, templates, useNativeScroll, useSticky, userTemplateHtml, usersTableHtml,
     _this = this;
   if (!$) {
     throw new Error('Error init oktell panel, jQuery ( $ ) is not defined');
@@ -1498,7 +1498,7 @@ var __slice = [].slice,
     };
 
     CUser.prototype.doAction = function(action) {
-      var target, _base, _base1, _base2, _base3;
+      var target, _base, _base1, _base2, _base3, _base4;
       if (!action) {
         return;
       }
@@ -1531,8 +1531,10 @@ var __slice = [].slice,
           return typeof (_base1 = this.oktell).resume === "function" ? _base1.resume() : void 0;
         case 'answer':
           return typeof (_base2 = this.oktell).answer === "function" ? _base2.answer() : void 0;
+        case 'commutate':
+          return typeof (_base3 = this.oktell).commutate === "function" ? _base3.commutate() : void 0;
         default:
-          return typeof (_base3 = this.additionalActions)[action] === "function" ? _base3[action]() : void 0;
+          return typeof (_base4 = this.additionalActions)[action] === "function" ? _base4[action]() : void 0;
       }
     };
 
@@ -1719,6 +1721,10 @@ var __slice = [].slice,
         resume: {
           icon: '/img/icons/action/ghost_help.png',
           text: this.langs.actions.resume
+        },
+        commutate: {
+          icon: '/img/icons/action/ghost_help.png',
+          text: this.langs.actions.commutate
         },
         dtmf: {
           icon: '',
@@ -2019,7 +2025,7 @@ var __slice = [].slice,
         }
         return _results;
       });
-      oktell.on('connect', function() {
+      onConnect(function() {
         var createdDeps, dep, id, numObj, number, oId, oInfo, oNumbers, oUser, oUsers, otherDep, strNumber, user, _i, _len, _ref, _ref1, _ref2;
         _this.oktellConnected = true;
         oInfo = oktell.getMyInfo();
@@ -2127,6 +2133,10 @@ var __slice = [].slice,
           return afterOktellConnect();
         }
       });
+      oktell.on('connect', onConnect);
+      if (oktell.getState() || oktell.getStatus()) {
+        onConnect();
+      }
       oktell.on('abonentsChange', function(abonents) {
         if (_this.oktellConnected) {
           if (oktell.conferenceId()) {
@@ -3217,16 +3227,16 @@ var __slice = [].slice,
     return PermissionsPopup;
 
   })();
-  Error = (function() {
-    Error.prototype.logGroup = 'Error';
+  ErrorView = (function() {
+    ErrorView.prototype.logGroup = 'Error';
 
-    Error.prototype.errorTypes = {
+    ErrorView.prototype.errorTypes = {
       1: 'usingOktellClient',
       2: 'loginPass',
       3: 'unavailable'
     };
 
-    function Error(errorEl, oktell) {
+    function ErrorView(errorEl, oktell) {
       var _this = this;
       this.el = errorEl;
       oktell.on('connecting', function() {
@@ -3255,9 +3265,9 @@ var __slice = [].slice,
       });
     }
 
-    Error.prototype.onShow = function() {};
+    ErrorView.prototype.onShow = function() {};
 
-    Error.prototype.show = function(errorType, username) {
+    ErrorView.prototype.show = function(errorType, username) {
       var type, _ref, _ref1;
       if (!this.errorTypes[errorType]) {
         return false;
@@ -3273,11 +3283,11 @@ var __slice = [].slice,
       return this.el.fadeIn(200);
     };
 
-    Error.prototype.hide = function() {
+    ErrorView.prototype.hide = function() {
       return this.el.fadeOut(200);
     };
 
-    return Error;
+    return ErrorView;
 
   })();
   defaultOptions = {
@@ -3311,6 +3321,7 @@ var __slice = [].slice,
         showOnlineOnlyCLicked: 'Показать всех'
       },
       actions: {
+        commutate: 'Соединить',
         answer: 'Ответить',
         call: 'Позвонить',
         conference: 'Конференция',
@@ -3369,6 +3380,7 @@ var __slice = [].slice,
         showOnlineOnlyCLicked: 'Show all'
       },
       actions: {
+        commutate: 'Commutate',
         answer: 'Answer',
         call: 'Dial',
         conference: 'Conference',
@@ -3427,6 +3439,7 @@ var __slice = [].slice,
         showOnlineOnlyCLicked: 'Zobrazit všechny'
       },
       actions: {
+        commutate: 'Commutate',
         answer: 'Odpověď',
         call: 'Zavolat',
         conference: 'Konference',
@@ -3588,7 +3601,7 @@ var __slice = [].slice,
   Popup.prototype.log = log;
   PermissionsPopup.prototype.log = log;
   Department.prototype.log = log;
-  Error.prototype.log = log;
+  ErrorView.prototype.log = log;
   Department.prototype.template = departmentTemplateHtml;
   panelWasInitialized = false;
   initPanel = function(opts) {
@@ -3625,7 +3638,7 @@ var __slice = [].slice,
     panelHtml = panelHtml.replace('{{inTalk}}', langs.panel.inTalk).replace('{{dtmfPanelName}}', langs.panel.dtmfPanelName).replace('{{onHold}}', langs.panel.onHold).replace('{{queue}}', langs.panel.queue).replace('{{inputPlaceholder}}', langs.panel.inputPlaceholder);
     List.prototype.langs = langs;
     List.prototype.departmentTemplate = departmentTemplateHtml;
-    Error.prototype.langs = langs.error;
+    ErrorView.prototype.langs = langs.error;
     CUser.prototype.langs = langs;
     Department.prototype.langs = langs;
     panelEl = $(panelHtml);
@@ -3658,7 +3671,7 @@ var __slice = [].slice,
       errorHtml = errorHtml.replace('{{title}}', langs.error.title);
       errorEl = $(errorHtml);
       panelEl.find('.h_panel_bg:first').append(errorEl);
-      error = new Error(errorEl, oktell);
+      error = new ErrorView(errorEl, oktell);
     }
     panelPos = getOptions().position;
     animOptShow = {};

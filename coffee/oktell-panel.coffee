@@ -31,7 +31,7 @@ do ($)->
 	langs = {
 		ru:
 			panel: { dtmf: 'донабор', dtmfPanelName: 'Донабор', inTalk: 'В разговоре', onHold: 'На удержании', queue: 'Очередь ожидания', inputPlaceholder: 'введите имя или номер', withoutDepartment: 'без отдела', showDepartments: 'Группировать по отделам', showDepartmentsClicked: 'Показать общим списком', showOnlineOnly: 'Показать только online', showOnlineOnlyCLicked: 'Показать всех' },
-			actions: { answer: 'Ответить', call: 'Позвонить', conference: 'Конференция', transfer: 'Перевести', toggle: 'Переключиться', intercom: 'Интерком', endCall: 'Завершить', ghostListen: 'Прослушка', ghostHelp: 'Помощь', hold: 'Удержание', resume: 'Продолжить', dtmf: 'Донабор' }
+			actions: { commutate: 'Соединить', answer: 'Ответить', call: 'Позвонить', conference: 'Конференция', transfer: 'Перевести', toggle: 'Переключиться', intercom: 'Интерком', endCall: 'Завершить', ghostListen: 'Прослушка', ghostHelp: 'Помощь', hold: 'Удержание', resume: 'Продолжить', dtmf: 'Донабор' }
 			callPopup: { title: 'Входящий вызов', hide: 'Скрыть', answer: 'Ответить', reject: 'Отклонить', undefinedNumber: 'Номер не определен', goPickup: 'Поднимите трубку', answer: 'Ответить' }
 			permissionsPopup: { header: 'Запрос на доступ к микрофону', text: 'Для использования веб-телефона необходимо разрешить браузеру доступ к микрофону.' }
 			error:
@@ -42,7 +42,7 @@ do ($)->
 				#tryAgain: 'Повторить попытку'
 		en:
 			panel: { dtmf: 'dtmf', dtmfPanelName: 'DTMF', inTalk: 'In conversation', onHold: 'On hold', queue: 'Wait queue', inputPlaceholder: 'Enter name or number', withoutDepartment: 'Without department', showDepartments: 'Show departments', showDepartmentsClicked: 'Hide departments', showOnlineOnly: 'Show online only', showOnlineOnlyCLicked: 'Show all' },
-			actions: { answer: 'Answer', call: 'Dial', conference: 'Conference', transfer: 'Transfer', toggle: 'Switch', intercom: 'Intercom', endCall: 'End', ghostListen: 'Audition', ghostHelp: 'Help', hold: 'Hold', resume: 'Resume', dtmf: 'DTMF' }
+			actions: { commutate: 'Commutate', answer: 'Answer', call: 'Dial', conference: 'Conference', transfer: 'Transfer', toggle: 'Switch', intercom: 'Intercom', endCall: 'End', ghostListen: 'Audition', ghostHelp: 'Help', hold: 'Hold', resume: 'Resume', dtmf: 'DTMF' }
 			callPopup: { title: 'Incoming call', hide: 'Hide', answer: 'Answer', reject: 'Decline', undefinedNumber: 'Phone number is not defined', goPickup: 'Pick up the phone', answer: 'Answer' }
 			permissionsPopup: { header: 'Request for access to the microphone', text: 'To use the web-phone you need to allow browser access to the microphone.' }
 			error:
@@ -53,7 +53,7 @@ do ($)->
 				#tryAgain: 'Try again'
 		cz:
 			panel: { dtmf: 'dtmf', dtmfPanelName: 'DTMF', inTalk: 'V rozhovoru', onHold: 'Na hold', queue: 'Fronta čekaní', inputPlaceholder: 'zadejte jméno nebo číslo', withoutDepartment: 'Bez oddělení', showDepartments: 'Zobrazit oddělení', showDepartmentsClicked: 'Skrýt oddělení', showOnlineOnly: 'Zobrazit pouze online', showOnlineOnlyCLicked: 'Zobrazit všechny' },
-			actions: { answer: 'Odpověď', call: 'Zavolat', conference: 'Konference', transfer: 'Převést', toggle: 'Přepnout', intercom: 'Intercom', endCall: 'Ukončit', ghostListen: 'Odposlech', ghostHelp: 'Nápověda', hold: 'Udržet', resume: 'Pokračovat', dtmf: 'DTMF' }
+			actions: { commutate: 'Commutate', answer: 'Odpověď', call: 'Zavolat', conference: 'Konference', transfer: 'Převést', toggle: 'Přepnout', intercom: 'Intercom', endCall: 'Ukončit', ghostListen: 'Odposlech', ghostHelp: 'Nápověda', hold: 'Udržet', resume: 'Pokračovat', dtmf: 'DTMF' }
 			callPopup: { title: 'Příchozí hovor', hide: 'Schovat', answer: 'Odpovědět', reject: 'Odmítnout', undefinedNumber: '', goPickup: 'Zvedněte sluchátko', answer: 'Odpovědět' }
 			permissionsPopup: { header: 'Žádost o přístup k mikrofonu', text: 'Abyste mohli používat telefon, musíte povolit prohlížeče přístup k mikrofonu.' }
 			error:
@@ -155,7 +155,7 @@ do ($)->
 	Popup.prototype.log = log
 	PermissionsPopup.prototype.log = log
 	Department.prototype.log = log
-	Error.prototype.log = log
+	ErrorView.prototype.log = log
 
 	Department.prototype.template = departmentTemplateHtml
 
@@ -205,7 +205,7 @@ do ($)->
 			.replace('{{inputPlaceholder}}',langs.panel.inputPlaceholder)
 		List.prototype.langs = langs
 		List.prototype.departmentTemplate = departmentTemplateHtml
-		Error.prototype.langs = langs.error
+		ErrorView.prototype.langs = langs.error
 		CUser.prototype.langs = langs
 		Department.prototype.langs = langs
 		panelEl = $(panelHtml)
@@ -250,7 +250,7 @@ do ($)->
 			errorEl = $(errorHtml)
 			panelEl.find('.h_panel_bg:first').append errorEl
 			#errorEl.hide()
-			error = new Error errorEl, oktell
+			error = new ErrorView errorEl, oktell
 
 		panelPos = getOptions().position
 		animOptShow = {}

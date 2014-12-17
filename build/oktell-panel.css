@@ -842,6 +842,7 @@
 }
 .oktell_actions_group_list li.i_call i,
 .oktell_actions_group_list li.i_resume i,
+.oktell_actions_group_list li.i_commutate i,
 .oktell_actions_group_list li.i_answer i {
   background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAAK/INwWK6QAAABl0RVh0U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAADKSURBVHjaYoxdJMkABPxA3ADEBkB8AIgbGYgELFD6AFQzCDhA+QeJMYAJiO2RNDMgGcJArAHYAMUGMJBiALpfPwBxAakuuIAktgCIL5JqwAIksQRotJJswAcoWwCIJ5BqwEc0TSBXxJMaCyADHqCFRT0SXx6I86E0VgNArghA8goDNHmvh2p8gGTJfiD2BylghOYFZKAPTcoCRPhAAVtCughNiQ/INQBmiAHUCx9wqAGlnYMseEz/CM3WE6BhA3KVAlTuASy1AgQYAMumJ3E5CTqrAAAAAElFTkSuQmCC");
   background-repeat: no-repeat;

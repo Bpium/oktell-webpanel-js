@@ -1,4 +1,4 @@
-class Error
+class ErrorView
 	logGroup: 'Error'
 	errorTypes:
 		1: 'usingOktellClient'
