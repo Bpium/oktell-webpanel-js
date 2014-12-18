@@ -320,7 +320,7 @@ class List
         user.loadActions()
 
 
-    onConnect =>
+    onConnect = =>
       @oktellConnected = true
       oInfo = oktell.getMyInfo()
       oInfo.userid = oInfo.userid.toString().toLowerCase()

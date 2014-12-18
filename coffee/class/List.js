@@ -10,7 +10,7 @@
 
     function List(oktell, panelEl, dropdownEl, afterOktellConnect, options, contained, useSticky, useNativeScroll, debugMode) {
       this.onPbxNumberStateChange = __bind(this.onPbxNumberStateChange, this);
-      var debouncedSetFilter, debouncedSetHeight, dropdownHideTimer, oktellConnected, ringNotify, self;
+      var debouncedSetFilter, debouncedSetHeight, dropdownHideTimer, oktellConnected, onConnect, ringNotify, self;
       this.defaultConfig = {
         departmentVisibility: {},
         showDeps: true,
@@ -419,7 +419,7 @@
           return _results;
         };
       })(this));
-      onConnect((function(_this) {
+      onConnect = (function(_this) {
         return function() {
           var createdDeps, dep, id, numObj, number, oId, oInfo, oNumbers, oUser, oUsers, otherDep, strNumber, user, _i, _len, _ref, _ref1, _ref2;
           _this.oktellConnected = true;
@@ -528,7 +528,7 @@
             return afterOktellConnect();
           }
         };
-      })(this));
+      })(this);
       oktell.on('connect', onConnect);
       if (oktell.getState() || oktell.getStatus()) {
         onConnect();
