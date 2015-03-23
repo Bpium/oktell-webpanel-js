@@ -856,14 +856,14 @@ class List
     usersArray = []
     usersArray.push(u) for own k,u of users
     @_setUsersHtml usersArray, listEl, true
-    if usersArray.length and blockEl.is(':not(:visible)')
+    if usersArray.length and blockEl.css('display') is 'none'
       #@log 'Show abonent el'
       blockEl.stop true, true
       @resetStickyHeaders()
       blockEl.slideDown 50, =>
         @setUserListHeight()
         @initStickyHeaders()
-    else if usersArray.length is 0 and blockEl.is(':visible')
+    else if usersArray.length is 0 and blockEl.css('display') isnt 'none'
       #@log 'Hide abonent el'
       blockEl.stop true, true
       @resetStickyHeaders()

@@ -2781,14 +2781,14 @@ var __slice = [].slice,
         usersArray.push(u);
       }
       this._setUsersHtml(usersArray, listEl, true);
-      if (usersArray.length && blockEl.is(':not(:visible)')) {
+      if (usersArray.length && blockEl.css('display') === 'none') {
         blockEl.stop(true, true);
         this.resetStickyHeaders();
         return blockEl.slideDown(50, function() {
           _this.setUserListHeight();
           return _this.initStickyHeaders();
         });
-      } else if (usersArray.length === 0 && blockEl.is(':visible')) {
+      } else if (usersArray.length === 0 && blockEl.css('display') !== 'none') {
         blockEl.stop(true, true);
         this.resetStickyHeaders();
         return blockEl.slideUp(50, function() {
