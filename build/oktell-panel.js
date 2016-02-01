@@ -1,4 +1,4 @@
-/* Oktell-panel.js 0.4.0 http://js.oktell.ru/webpanel */
+/* Oktell-panel.js 0.4.1 http://js.oktell.ru/webpanel */
 
 /*! Copyright (c) 2013 Brandon Aaron (http://brandonaaron.net)
  * Licensed under the MIT License (LICENSE.txt).
