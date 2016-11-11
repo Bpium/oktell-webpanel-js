@@ -5,3 +5,6 @@ builds/
 bower_components
 /temp
 /symlinks
+/coffee/**/*.js
+/grunt_tasks/**/*.js
+GruntFile.js

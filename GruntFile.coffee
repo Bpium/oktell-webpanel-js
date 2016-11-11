@@ -32,12 +32,22 @@ module.exports = (grunt) ->
           removeComments: true
           collapseWhitespace: true
         files: {} # set by insertfilesasvars:templates
+    watch:
+      coffee:
+        files: '**/*.coffee'
+        tasks: 'coffee:compile'
     coffee:
       main:
         options:
           bare: true
         files:
           'buildlast/oktell-panel.js': 'temp/oktell-panel-cf.coffee'
+      compile:
+        options:
+          bare: true
+        expand: true
+        src: ['coffee/**/*.coffee', 'grunt_tasks/**/*.coffee']
+        ext: '.js'
     cssmin:
       css:
         files:
@@ -108,7 +118,7 @@ module.exports = (grunt) ->
   grunt.loadTasks './grunt_tasks'
 
 
-  grunt.registerTask 'build', ['clean:buildlast', 'clean:build', 'insertfilesasvars', 'includecoffee', 'coffee', 'concat:js', 'uglify', 'concat:css', 'cssmin', 'copy:build', 'addVersion', 'clean:temp', 'clean:buildlast']
+  grunt.registerTask 'build', ['clean:buildlast', 'clean:build', 'insertfilesasvars', 'includecoffee', 'coffee:compile', 'coffee:main', 'concat:js', 'uglify', 'concat:css', 'cssmin', 'copy:build', 'addVersion', 'clean:temp', 'clean:buildlast']
   #grunt.registerTask 'build', ['clean:buildlast', 'createbuildfolder', 'insertfilesasvars', 'includecoffee', 'coffee', 'uglify', 'cssmin', 'copy:css', 'addVersion', 'compress', 'copy:main', 'clean:temp']
 
   grunt.registerTask 'default', ['build']
