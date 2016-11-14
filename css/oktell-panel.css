@@ -829,6 +829,11 @@
 }
 .oktell_actions_group_list li span {
   line-height: 16px;
+  max-width: 120px;
+  display: inline-block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .oktell_actions_group_list li i {
   float: left;
