@@ -267,6 +267,7 @@ do ($)->
 		contEl.append panelEl
 
 		list = new List oktell, panelEl, actionListEl, afterOktellConnect, getOptions(), useContainer, useSticky, useNativeScroll, getOptions().debug
+		window.__list = list;
 
 #		if error
 #			error.onShow = =>
@@ -556,6 +557,25 @@ do ($)->
 		list.showPanel()
 	$.oktellPanel.hide = =>
 		list.hidePanel()
+
+	customActions = {}
+	customActionAutoincrement = 1
+
+	$.oktellPanel.appendPhoneAction = (number, {title, callback})=>
+		user = list.usersByNumber[number] || list.getUser(number)
+		id = String(customActionAutoincrement++)
+		customActions[id] = user
+		list.allActions[id] = {icon: '', text: title}
+		user.addAction(id, callback)
+		id
+
+	$.oktellPanel.removePhoneAction = (id)=>
+		user = customActions[id]
+		return false if not user
+		delete list.allActions[id]
+		delete customActions[id]
+		user.removeAction(id)
+		true
 
 
 #	$.fn.oktellActions = ->

@@ -237,7 +237,7 @@ class List
         user = buttonEl.data('user')
         useDtmfAsAction = buttonEl.parents('.j_abonents').size()
         if user
-          @showDropdown user, buttonEl, user.loadOktellActions(), true, useDtmfAsAction
+          @showDropdown user, buttonEl, user.loadActions(), true, useDtmfAsAction
         return true
 
     @dropdownEl.bind 'click', (e) =>

@@ -187,8 +187,8 @@ class CUser
     else
       actions = @oktell.getPhoneActions @number or @id
     #@log 'actions for ' + @getInfo(), actions
-    for own action of @additionalActions
-      actions.push action
+    #for own action of @additionalActions
+    #  actions.push action
     actions
 
   addAction: (action, callback)->
