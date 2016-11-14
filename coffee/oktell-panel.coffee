@@ -561,11 +561,11 @@ do ($)->
 	customActions = {}
 	customActionAutoincrement = 1
 
-	$.oktellPanel.appendPhoneAction = (number, {title, callback})=>
+	$.oktellPanel.appendPhoneAction = (number, {title, iconSrc, callback})=>
 		user = list.usersByNumber[number] || list.getUser(number)
 		id = String(customActionAutoincrement++)
 		customActions[id] = user
-		list.allActions[id] = {icon: '', text: title}
+		list.allActions[id] = {icon: '', iconSrc: iconSrc, text: title}
 		user.addAction(id, callback)
 		id
 

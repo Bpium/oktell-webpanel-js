@@ -54,6 +54,7 @@ class List
 
     @regexps =
       actionText: /\{\{actionText\}\}/
+      actionStyle: /\{\{style\}\}/
       action: /\{\{action\}\}/
       css: /\{\{css\}\}/
       dep: /\{\{department}\}/g
@@ -751,8 +752,22 @@ class List
     if actions?.length
       aEls = []
       for a in actions
-        if typeof a is 'string' and @allActions[a]?.text
-          aEls.push t.replace( @regexps.actionText, @allActions[a].text).replace( @regexps.action, a).replace( @regexps.css, @actionCssPrefix + a.toLowerCase() )
+        action = @allActions[a]
+
+        if typeof a is 'string' and action?.text
+          tc = t;
+          tc = tc.replace(@regexps.actionText, action.text)
+          tc = tc.replace(@regexps.action, a)
+          tc = tc.replace(@regexps.css, @actionCssPrefix + a.toLowerCase())
+
+          styles = ''
+
+          if action.iconSrc
+            styles += 'background-image: ' + action.iconSrc + ';'
+
+          tc = tc.replace(@regexps.actionStyle, styles)
+
+          aEls.push tc
 
       if aEls.length
 
