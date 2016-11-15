@@ -649,6 +649,12 @@
 .oktell_panel .b_contact .b_contact_title b span {
   font-weight: 700;
 }
+.oktell_panel .b_contact .b_contact_title .b_contact_name--btn {
+  border-bottom: 1px solid;
+}
+.oktell_panel .b_contact .b_contact_title .b_contact_name--btn:hover {
+  cursor: pointer;
+}
 .oktell_panel .b_contact .b_contact_title span.o_number {
   color: #999;
   padding-left: 6px;
@@ -657,7 +663,7 @@
   display: none;
   color: #6b844a;
   margin-left: 5px;
-  text-decoration: underline;
+  border-bottom: 1px solid;
   cursor: pointer;
 }
 .oktell_panel .b_contact .b_contact_status {

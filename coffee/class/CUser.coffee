@@ -132,6 +132,7 @@ class CUser
       $el.data 'user', @
       @initButtonEl $el.find '.oktell_button_action'
       @els = @els.add $el
+      @updateContactAction()
       @setStateCss()
       if not @el
         @el = $el
@@ -191,12 +192,40 @@ class CUser
     #  actions.push action
     actions
 
-  addAction: (action, callback)->
+  addAction: (action, {callback, triggerOnAbonentClick, title})->
     if action and typeof action is 'string' and typeof callback is 'function'
-      @additionalActions[action] = callback
+      @additionalActions[action] = {callback, triggerOnAbonentClick, title}
+    @updateContactAction()
 
   removeAction: (action)->
     action and delete @additionalActions[action]
+    @updateContactAction()
+
+  updateContactAction: () ->
+    action = null
+    for own aId, _action of @additionalActions
+      if _action.triggerOnAbonentClick
+        action = _action
+        break
+
+    eName = 'click.trigger-action'
+    modificator = 'b_contact_name--btn'
+
+    @els?.each (i, el)->
+      btn = $(el).find('.b_contact_name')
+
+      if !btn
+        return
+
+      btn.off(eName)
+
+      if action
+        btn.addClass(modificator)
+        btn.attr('title', action.title)
+        btn.on(eName, action.callback)
+      else
+        btn.removeAttr('title')
+        btn.removeClass(modificator)
 
   loadActions: ->
     actions = @loadOktellActions()
@@ -264,7 +293,7 @@ class CUser
       when 'commutate'
         @oktell.commutate?()
       else
-        @additionalActions[action]?()
+        @additionalActions[action]?.callback?()
 
 
   doLastFirstAction: ->

@@ -826,7 +826,7 @@ class List
     @log 'setAbonents synced', @abonents
     if not @oktell.conferenceId
       for own number, abonent of @abonents
-        abonent.addAction 'dtmf', =>
+        abonent.addAction 'dtmf', callback: =>
           @toggleDtmf()
     @setAbonentsHtml()
     setTimeout =>
