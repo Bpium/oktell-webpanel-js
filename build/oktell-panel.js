@@ -1,4 +1,4 @@
-/* Oktell-panel.js 0.4.1 http://js.oktell.ru/webpanel */
+/* Oktell-panel.js 0.5.0 http://js.oktell.ru/webpanel */
 
 /*! Copyright (c) 2013 Brandon Aaron (http://brandonaaron.net)
  * Licensed under the MIT License (LICENSE.txt).
@@ -958,7 +958,7 @@ var __slice = [].slice,
   __hasProp = {}.hasOwnProperty;
 
 (function($) {
-  var CUser, Department, ErrorView, List, Notify, PermissionsPopup, Popup, actionButtonContainerClass, actionButtonHtml, actionListEl, actionListHtml, addActionButtonToEl, afterOktellConnect, checkCssAnimationSupport, contEl, cookie, debounce, defaultOptions, departmentTemplateHtml, error, errorHtml, escapeHtml, getOptions, initActionButtons, initButtonOnElement, initPanel, isMobileDevice, langs, list, loadTemplate, log, logStr, newGuid, oktell, oktellConnected, options, panelEl, panelHtml, panelWasInitialized, permissionsPopup, permissionsPopupHtml, popup, popupHtml, templates, useNativeScroll, useSticky, userTemplateHtml, usersTableHtml,
+  var CUser, Department, ErrorView, List, Notify, PermissionsPopup, Popup, actionButtonContainerClass, actionButtonHtml, actionListEl, actionListHtml, addActionButtonToEl, afterOktellConnect, checkCssAnimationSupport, contEl, cookie, customActionAutoincrement, customActions, debounce, defaultOptions, departmentTemplateHtml, error, errorHtml, escapeHtml, getOptions, initActionButtons, initButtonOnElement, initPanel, isMobileDevice, langs, list, loadTemplate, log, logStr, newGuid, oktell, oktellConnected, options, panelEl, panelHtml, panelWasInitialized, permissionsPopup, permissionsPopupHtml, popup, popupHtml, templates, useNativeScroll, useSticky, userTemplateHtml, usersTableHtml,
     _this = this;
   if (!$) {
     throw new Error('Error init oktell panel, jQuery ( $ ) is not defined');
@@ -1383,6 +1383,7 @@ var __slice = [].slice,
         $el.data('user', this);
         this.initButtonEl($el.find('.oktell_button_action'));
         this.els = this.els.add($el);
+        this.updateContactAction();
         this.setStateCss();
         if (!this.el) {
           this.el = $el;
@@ -1448,28 +1449,63 @@ var __slice = [].slice,
     };
 
     CUser.prototype.loadOktellActions = function() {
-      var action, actions, _ref;
+      var actions;
       if (this.isIvr) {
         actions = ['endCall'];
       } else {
         actions = this.oktell.getPhoneActions(this.number || this.id);
       }
-      _ref = this.additionalActions;
-      for (action in _ref) {
-        if (!__hasProp.call(_ref, action)) continue;
-        actions.push(action);
-      }
       return actions;
     };
 
-    CUser.prototype.addAction = function(action, callback) {
+    CUser.prototype.addAction = function(action, _arg) {
+      var callback, title, triggerOnAbonentClick;
+      callback = _arg.callback, triggerOnAbonentClick = _arg.triggerOnAbonentClick, title = _arg.title;
       if (action && typeof action === 'string' && typeof callback === 'function') {
-        return this.additionalActions[action] = callback;
+        this.additionalActions[action] = {
+          callback: callback,
+          triggerOnAbonentClick: triggerOnAbonentClick,
+          title: title
+        };
       }
+      return this.updateContactAction();
     };
 
     CUser.prototype.removeAction = function(action) {
-      return action && delete this.additionalActions[action];
+      action && delete this.additionalActions[action];
+      return this.updateContactAction();
+    };
+
+    CUser.prototype.updateContactAction = function() {
+      var aId, action, eName, modificator, _action, _ref, _ref1;
+      action = null;
+      _ref = this.additionalActions;
+      for (aId in _ref) {
+        if (!__hasProp.call(_ref, aId)) continue;
+        _action = _ref[aId];
+        if (_action.triggerOnAbonentClick) {
+          action = _action;
+          break;
+        }
+      }
+      eName = 'click.trigger-action';
+      modificator = 'b_contact_name--btn';
+      return (_ref1 = this.els) != null ? _ref1.each(function(i, el) {
+        var btn;
+        btn = $(el).find('.b_contact_name');
+        if (!btn) {
+          return;
+        }
+        btn.off(eName);
+        if (action) {
+          btn.addClass(modificator);
+          btn.attr('title', action.title);
+          return btn.on(eName, action.callback);
+        } else {
+          btn.removeAttr('title');
+          return btn.removeClass(modificator);
+        }
+      }) : void 0;
     };
 
     CUser.prototype.loadActions = function() {
@@ -1498,7 +1534,7 @@ var __slice = [].slice,
     };
 
     CUser.prototype.doAction = function(action) {
-      var target, _base, _base1, _base2, _base3, _base4;
+      var target, _base, _base1, _base2, _base3, _ref;
       if (!action) {
         return;
       }
@@ -1534,7 +1570,7 @@ var __slice = [].slice,
         case 'commutate':
           return typeof (_base3 = this.oktell).commutate === "function" ? _base3.commutate() : void 0;
         default:
-          return typeof (_base4 = this.additionalActions)[action] === "function" ? _base4[action]() : void 0;
+          return (_ref = this.additionalActions[action]) != null ? typeof _ref.callback === "function" ? _ref.callback() : void 0 : void 0;
       }
     };
 
@@ -1747,6 +1783,7 @@ var __slice = [].slice,
       this.dropdownOpenedOnPanel = false;
       this.regexps = {
         actionText: /\{\{actionText\}\}/,
+        actionStyle: /\{\{style\}\}/,
         action: /\{\{action\}\}/,
         css: /\{\{css\}\}/,
         dep: /\{\{department}\}/g
@@ -1928,7 +1965,7 @@ var __slice = [].slice,
           user = buttonEl.data('user');
           useDtmfAsAction = buttonEl.parents('.j_abonents').size();
           if (user) {
-            _this.showDropdown(user, buttonEl, user.loadOktellActions(), true, useDtmfAsAction);
+            _this.showDropdown(user, buttonEl, user.loadActions(), true, useDtmfAsAction);
           }
           return true;
         }
@@ -2592,7 +2629,7 @@ var __slice = [].slice,
     };
 
     List.prototype.showDropdown = function(user, buttonEl, actions, onPanel, useDtmfAsAction) {
-      var a, aEls, t, _i, _len, _ref;
+      var a, aEls, action, styles, t, tc, _i, _len;
       t = this.dropdownElLiTemplate;
       this.dropdownEl.empty();
       if (useDtmfAsAction && !this.oktell.conferenceId()) {
@@ -2602,8 +2639,18 @@ var __slice = [].slice,
         aEls = [];
         for (_i = 0, _len = actions.length; _i < _len; _i++) {
           a = actions[_i];
-          if (typeof a === 'string' && ((_ref = this.allActions[a]) != null ? _ref.text : void 0)) {
-            aEls.push(t.replace(this.regexps.actionText, this.allActions[a].text).replace(this.regexps.action, a).replace(this.regexps.css, this.actionCssPrefix + a.toLowerCase()));
+          action = this.allActions[a];
+          if (typeof a === 'string' && (action != null ? action.text : void 0)) {
+            tc = t;
+            tc = tc.replace(this.regexps.actionText, action.text);
+            tc = tc.replace(this.regexps.action, a);
+            tc = tc.replace(this.regexps.css, this.actionCssPrefix + a.toLowerCase());
+            styles = '';
+            if (action.iconSrc) {
+              styles += 'background-image: ' + action.iconSrc + ';';
+            }
+            tc = tc.replace(this.regexps.actionStyle, styles);
+            aEls.push(tc);
           }
         }
         if (aEls.length) {
@@ -2703,8 +2750,10 @@ var __slice = [].slice,
         for (number in _ref1) {
           if (!__hasProp.call(_ref1, number)) continue;
           abonent = _ref1[number];
-          abonent.addAction('dtmf', function() {
-            return _this.toggleDtmf();
+          abonent.addAction('dtmf', {
+            callback: function() {
+              return _this.toggleDtmf();
+            }
           });
         }
       }
@@ -3556,7 +3605,7 @@ var __slice = [].slice,
   };
   templates = {
     'templates/actionButton.html': '<ul class="oktell_button_action"><li class="g_first"><i></i></li><li class="g_last drop_down"><i></i></li></ul>',
-    'templates/actionList.html': '<ul class="oktell_actions_group_list"><li class="{{css}}" data-action="{{action}}"><i></i> <span>{{actionText}}</span></li></ul>',
+    'templates/actionList.html': '<ul class="oktell_actions_group_list"><li class="{{css}}" data-action="{{action}}"><i style="{{style}}"></i> <span>{{actionText}}</span></li></ul>',
     'templates/user.html': '<tr class="b_contact"><td class="b_capital_letter"><span></span></td><td class="b_contact_avatar {{css}}"><img src="{{avatarLink32x32}}"> <i></i><div class="o_busy"></div></td><td class="b_contact_title"><div class="wrapword" title="{{name}}"><span class="b_contact_name"><b>{{name1}}</b><span>{{name2}}</span></span><span class="o_number">{{number}}</span><span class="o_dtmf">{{dtmf}}</span></div></td><td class="b_contact_status"><div class="o_dot_status"></div>{{button}}</td></tr>',
     'templates/department.html': '<tr class="b_contact"><td class="b_contact_department" colspan="3">{{department}}</td></tr>',
     'templates/dep.html': '<div class="b_department"><div class="b_department_header"><div class="h_shadow_top"><span>{{department}}</span></div></div><table class="b_main_list"><tbody></tbody></table></div>',
@@ -3685,6 +3734,7 @@ var __slice = [].slice,
     }
     contEl.append(panelEl);
     list = new List(oktell, panelEl, actionListEl, afterOktellConnect, getOptions(), useContainer, useSticky, useNativeScroll, getOptions().debug);
+    window.__list = list;
     if (getOptions().debug) {
       window.wList = list;
       window.wPopup = popup;
@@ -3940,7 +3990,38 @@ var __slice = [].slice,
   $.oktellPanel.show = function() {
     return list.showPanel();
   };
-  return $.oktellPanel.hide = function() {
+  $.oktellPanel.hide = function() {
     return list.hidePanel();
+  };
+  customActions = {};
+  customActionAutoincrement = 1;
+  $.oktellPanel.appendPhoneAction = function(number, _arg) {
+    var callback, iconSrc, id, title, triggerOnAbonentClick, user;
+    title = _arg.title, iconSrc = _arg.iconSrc, callback = _arg.callback, triggerOnAbonentClick = _arg.triggerOnAbonentClick;
+    user = list.usersByNumber[number] || list.getUser(number);
+    id = 'ext-action-' + String(customActionAutoincrement++);
+    customActions[id] = user;
+    list.allActions[id] = {
+      icon: '',
+      iconSrc: iconSrc,
+      text: title
+    };
+    user.addAction(id, {
+      callback: callback,
+      triggerOnAbonentClick: triggerOnAbonentClick,
+      title: title
+    });
+    return id;
+  };
+  return $.oktellPanel.removePhoneAction = function(id) {
+    var user;
+    user = customActions[id];
+    if (!user) {
+      return false;
+    }
+    delete list.allActions[id];
+    delete customActions[id];
+    user.removeAction(id);
+    return true;
   };
 })($);
