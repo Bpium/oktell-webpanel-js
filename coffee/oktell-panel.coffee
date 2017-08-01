@@ -1,4 +1,4 @@
-do ($)->
+do ($ = jQuery)->
 	if not $
 		throw new Error('Error init oktell panel, jQuery ( $ ) is not defined')
 

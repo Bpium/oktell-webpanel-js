@@ -2,8 +2,14 @@
   "name": "webpanel",
   "version": "0.0.0",
   "description": "[Oktell-panel.js](http://js.oktell.ru/webpanel \"Oktell-panel.js\")",
+  "scripts": {
+    "postinstall": "bower install",
+    "build": "grunt"
+  },
   "devDependencies": {
-    "grunt": "~0.4.1",
+    "bower": "^1.8.0",
+    "grunt": "^0.4.5",
+    "grunt-cli": "^1.2.0",
     "grunt-connect": "^0.2.0",
     "grunt-contrib-clean": "~0.4.0",
     "grunt-contrib-coffee": "~0.6.4",
