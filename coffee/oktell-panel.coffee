@@ -521,9 +521,10 @@ do ($ = jQuery)->
 		phone = el.attr('data-phone')
 		el.empty()
 		if phone
-			button = list.getUserButtonForPlugin phone.replace(/\+/g, "")
-			#log 'generated button for ' + phone, button
-			el.html button
+			if list
+				button = list.getUserButtonForPlugin phone.replace(/\+/g, "")
+				#log 'generated button for ' + phone, button
+				el.html button
 
 	addActionButtonToEl = (el) ->
 		initButtonOnElement el
