@@ -1,6 +1,6 @@
 {
   "name": "webpanel",
-  "version": "0.0.0",
+  "version": "0.5.1",
   "description": "[Oktell-panel.js](http://js.oktell.ru/webpanel \"Oktell-panel.js\")",
   "scripts": {
     "postinstall": "bower install",
